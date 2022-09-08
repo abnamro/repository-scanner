@@ -1,0 +1,9 @@
+[report]
+fail_under=61
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+omit =
+    src/repository_scanner_backend/bin/*
+    src/repository_scanner_backend/constants.py
+show_missing=true

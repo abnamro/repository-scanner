@@ -1,0 +1,16 @@
+.idea
+.run
+.vscode
+src/repository_scanner_backend.egg-info
+**/__pycache__/
+.coverage
+.tox/
+venv
+*.log
+*.sqlite
+self_signed_cert_generation/client
+self_signed_cert_generation/server
+self_signed_cert_generation/testca
+
+# Mac
+.DS_Store

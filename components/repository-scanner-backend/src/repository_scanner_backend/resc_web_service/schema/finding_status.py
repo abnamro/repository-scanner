@@ -1,0 +1,10 @@
+# Standard Library
+from enum import Enum
+
+
+class FindingStatus(str, Enum):
+    NOT_ANALYZED = "NOT_ANALYZED"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    CLARIFICATION_REQUIRED = "CLARIFICATION_REQUIRED"
+    FALSE_POSITIVE = "FALSE_POSITIVE"
+    TRUE_POSITIVE = "TRUE_POSITIVE"
