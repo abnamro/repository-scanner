@@ -30,9 +30,14 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         The output will contain a list of DetailedFindingRead objects,
         or an empty list if no finding was found for the given findings_filter
     """
+    max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
+                                            func.max(model.DBscanFinding.scan_id).label("scan_id"))
+    if findings_filter.scan_ids:
+        max_scan_subquery = max_scan_subquery.filter(model.DBscanFinding.scan_id.in_(findings_filter.scan_ids))
+    max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
 
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-    scan_id = model.DBscanFinding.scan_id.label("scan_id")
+    scan_id = model.DBscan.id_.label("scan_id")
     query = db_connection.query(
         model.DBfinding.id_,
         model.DBfinding.file_path,
@@ -44,7 +49,7 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         model.DBfinding.email,
         model.DBfinding.status,
         model.DBfinding.comment,
-        model.DBrule.rule_name,
+        model.DBfinding.rule_name,
         model.DBscan.rule_pack,
         model.DBfinding.event_sent_on,
         model.DBscan.timestamp,
@@ -55,11 +60,9 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         model.DBrepositoryInfo.project_key,
         model.DBrepositoryInfo.repository_name,
         model.DBrepositoryInfo.repository_url,
-    ).join(model.DBrule, model.DBfinding.rule_name == model.DBrule.rule_name)\
-        .join(model.scan_finding.DBscanFinding,
-              model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
+    ).join(max_scan_subquery, model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id)\
         .join(model.DBscan,
-              model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
+              model.scan.DBscan.id_ == max_scan_subquery.c.scan_id) \
         .join(model.DBbranchInfo,
               model.branch_info.DBbranchInfo.id_ == model.finding.DBfinding.branch_info_id) \
         .join(model.DBrepositoryInfo,
@@ -83,17 +86,12 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         query = query.filter(model.DBbranchInfo.branch_name == findings_filter.branch_name)
     if findings_filter.repository_name:
         query = query.filter(model.DBrepositoryInfo.repository_name == findings_filter.repository_name)
-    if findings_filter.scan_ids:
-        if len(findings_filter.scan_ids) == 1:
-            query = query.filter(model.scan_finding.DBscanFinding.scan_id == findings_filter.scan_ids[0])
-        if len(findings_filter.scan_ids) >= 2:
-            query = query.filter(model.scan_finding.DBscanFinding.scan_id.in_(findings_filter.scan_ids))
     if findings_filter.vcs_providers and findings_filter.vcs_providers is not None:
         query = query.filter(model.vcs_instance.DBVcsInstance.provider_type.in_(findings_filter.vcs_providers))
     if findings_filter.project_name:
         query = query.filter(model.repository_info.DBrepositoryInfo.project_key == findings_filter.project_name)
     if findings_filter.rule_names:
-        query = query.filter(model.DBrule.rule_name.in_(findings_filter.rule_names))
+        query = query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
     if findings_filter.finding_statuses:
         query = query.filter(model.finding.DBfinding.status.in_(findings_filter.finding_statuses))
     findings: List[detailed_finding_schema.DetailedFindingRead] = query.offset(skip).limit(limit_val).all()
@@ -112,6 +110,10 @@ def get_detailed_finding(db_connection: Session, finding_id: int) -> detailed_fi
         The output will contain a an object of type DetailedFindingRead,
             or a null object finding was found for the given finding_id
     """
+    max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
+                                            func.max(model.DBscanFinding.scan_id).label("scan_id"))
+    max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
+
     scan_id = model.DBscan.id_.label("scan_id")
     finding = db_connection.query(
         model.DBfinding.id_,
@@ -124,7 +126,7 @@ def get_detailed_finding(db_connection: Session, finding_id: int) -> detailed_fi
         model.DBfinding.email,
         model.DBfinding.status,
         model.DBfinding.comment,
-        model.DBrule.rule_name,
+        model.DBfinding.rule_name,
         model.DBscan.rule_pack,
         model.DBscan.timestamp,
         scan_id,
@@ -134,11 +136,9 @@ def get_detailed_finding(db_connection: Session, finding_id: int) -> detailed_fi
         model.DBrepositoryInfo.project_key,
         model.DBrepositoryInfo.repository_name,
         model.DBrepositoryInfo.repository_url,
-    ).join(model.DBrule, model.DBfinding.rule_id == model.DBrule.id_) \
-        .join(model.DBscanFinding,
-              model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
+    ).join(max_scan_subquery, model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id)\
         .join(model.DBscan,
-              model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
+              model.scan.DBscan.id_ == max_scan_subquery.c.scan_id) \
         .join(model.DBbranchInfo,
               model.branch_info.DBbranchInfo.id_ == model.scan.DBscan.branch_info_id) \
         .join(model.DBrepositoryInfo,
