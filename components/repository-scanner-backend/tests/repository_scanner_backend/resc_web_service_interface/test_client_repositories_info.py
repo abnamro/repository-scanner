@@ -8,7 +8,7 @@ from repository_scanner_backend.resc_web_service_interface.repositories_info imp
 
 @patch("requests.post")
 def test_create_repository_info(post):
-    expected_url = 'https://fake-host.com/sts/v1/repositories-info'
+    expected_url = 'https://fake-host.com/rws/v1/repositories-info'
     url = 'https://fake-host.com'
 
     repository_info = RepositoryInfoCreate(project_key="project_key",

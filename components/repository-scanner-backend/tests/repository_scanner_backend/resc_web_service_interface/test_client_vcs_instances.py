@@ -8,7 +8,7 @@ from repository_scanner_backend.resc_web_service_interface.vcs_instances import 
 
 @patch("requests.post")
 def test_create_vcs_instance(post):
-    expected_url = 'https://fake-host.com/sts/v1/vcs-instances'
+    expected_url = 'https://fake-host.com/rws/v1/vcs-instances'
     url = 'https://fake-host.com'
 
     vcs_instance = VCSInstanceCreate(name="bitbucket-dev", provider_type="BITBUCKET", hostname="dummy-host",

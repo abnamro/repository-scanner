@@ -50,10 +50,6 @@ COPY ./ /repository_scanner_backend
 RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER"
 RUN chown -R $RUN_AS_USER:$RUN_AS_USER ./repository_scanner_backend
 
-COPY ./pip.conf /etc/pip.conf
-
-ENV PIP_CONFIG_FILE=/etc/pip.conf
-
 USER $RUN_AS_USER
 ENV PATH=$PATH:/home/apiuser/.local/bin
 # hadolint ignore=DL3013

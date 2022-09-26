@@ -9,7 +9,7 @@ from repository_scanner_backend.resc_web_service_interface.scans import create_s
 
 @patch("requests.post")
 def test_create_scan(post):
-    expected_url = 'https://fake-host.com/sts/v1/scans'
+    expected_url = 'https://fake-host.com/rws/v1/scans'
     url = 'https://fake-host.com'
 
     scan = ScanCreate(scan_type="BASE", last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(), branch_info_id=1,

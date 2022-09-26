@@ -8,7 +8,7 @@ from repository_scanner_backend.resc_web_service_interface.branches_info import 
 
 @patch("requests.post")
 def test_create_branch_info(post):
-    expected_url = 'https://fake-host.com/sts/v1/branches-info'
+    expected_url = 'https://fake-host.com/rws/v1/branches-info'
     url = 'https://fake-host.com'
 
     branch_info = BranchInfoCreate(branch_id=1,

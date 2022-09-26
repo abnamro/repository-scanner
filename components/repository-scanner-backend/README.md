@@ -1,7 +1,7 @@
-#RESC
+# RESC
 Repository Scanner framework
 
-#Local Setup
+# Local Setup
 Run the below command from project root folder if your IDE doesn't recognize repository_scanner_backend as a valid python package  
 ```
 export PIP_CONFIG_FILE=pip.conf
@@ -34,13 +34,13 @@ Note: this target will also try to remove the DB container if it already exists.
 
 If you want to remove this container you can run: `make cleandb` 
 
-### Running the STS REST API:
+### Running the Repository scanner Web service:
 First you need to make sure the python virtual environment is created under `venv` and `repository_scanner_backend` is installed there using:
 `make env`
 
-Then you can run the STS api by running: `make sts`
+Then you can run the RWS api by running: `make rws`
 
-#Deployment
+# Deployment
 Deployment is done via Kubernetes, for local testing the easiest solution for this is enabling the kubernetes feature in Docker desktop and installing kubectl.
 
 

@@ -1,6 +1,6 @@
 SHELL:=/bin/bash
 
-sts_port = 1234
+rws_port = 1234
 
 test:
 	@pip install tox
@@ -29,8 +29,8 @@ init_db:
 cleandb:
 	@docker rm resc-db --force
 
-sts:
-	@source venv/bin/activate && source db.env && uvicorn repository_scanner_backend.resc_web_service.api:app --workers 1 --host $$MSSQL_DB_HOST --port $(sts_port) --reload
+rws:
+	@source venv/bin/activate && source db.env && uvicorn repository_scanner_backend.resc_web_service.api:app --workers 1 --host $$MSSQL_DB_HOST --port $(rws_port) --reload
 
 clean:
 	@rm -rf venv
