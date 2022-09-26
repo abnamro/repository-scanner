@@ -101,8 +101,7 @@ app = FastAPI(title="Repository Scanner(RESC)",
                           "obtained from multiple source code repositories.",
               openapi_tags=tags_metadata, dependencies=AUTH)
 
-# Enable CORS for local deployment
-if os.getenv('DEPLOYMENT_ENVIRONMENT', '') == 'local':
+if os.getenv('ENABLE_CORS', '') == 'true':
     origins = os.getenv('CORS_ALLOWED_DOMAINS', '').split(', ')
     app.add_middleware(
         CORSMiddleware,
