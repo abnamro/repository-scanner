@@ -1,0 +1,36 @@
+name: Backend basic validation
+
+on:
+  push:
+    branches: [ creating-github-actions ]
+  pull_request:
+    branches: [ creating-github-actions ]
+
+  workflow_dispatch:
+
+env:
+  RESC_BACKEND_DIR: components/repository-scanner-backend
+
+jobs:
+  Basic-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install test dependencies
+        run: |
+          cd ${{ env.RESC_BACKEND_DIR }}
+          pip install -r test-requirements.txt
+          tox
+
+      - name: Run unittests
+        run: |
+          cd ${{ env.RESC_BACKEND_DIR }}
+          tox -e pytest
+
+      - name: Run linting and sorting checks
+        run: |
+          cd ${{ env.RESC_BACKEND_DIR }}
+          tox -e lint
+          tox -e sort
