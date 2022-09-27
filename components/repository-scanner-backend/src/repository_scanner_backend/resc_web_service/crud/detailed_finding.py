@@ -3,6 +3,7 @@
 from typing import List
 
 # Third Party
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 # First Party
