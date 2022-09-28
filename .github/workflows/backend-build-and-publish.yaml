@@ -2,7 +2,7 @@ name: Backend build and publish
 
 on:
   push:
-    branches: [ main ]
+    branches: [ never ]
     paths:
       - components/repository-scanner-backend/**
 
