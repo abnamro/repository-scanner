@@ -1,6 +1,8 @@
 # RESC
 Repository Scanner framework
 
+[![Backend basic validation](https://github.com/ABNAMRO/repository-scanner/actions/workflows/backend-basic-validation.yaml/badge.svg)](https://github.com/ABNAMRO/repository-scanner/actions/workflows/backend-basic-validation.yaml)
+
 # Local Setup
 Run the below command from project root folder if your IDE doesn't recognize repository_scanner_backend as a valid python package  
 ```
