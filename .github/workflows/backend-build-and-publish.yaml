@@ -2,9 +2,9 @@ name: Backend build and publish
 
 on:
   push:
-    branches: [ creating-github-actions ]
-  pull_request:
-    branches: [ creating-github-actions ]
+    branches: [ main ]
+    paths:
+      - components/repository-scanner-backend/**
 
   workflow_run:
     workflows: [ "Backend basic validation" ]

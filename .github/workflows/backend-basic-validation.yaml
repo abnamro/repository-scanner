@@ -2,11 +2,15 @@ name: Backend basic validation
 
 on:
   push:
-    branches: [ creating-github-actions ]
-  pull_request:
-    branches: [ creating-github-actions ]
+    branches:
+      - '**'
+    paths:
+      - components/repository-scanner-backend/**
+      - .github/workflows/**
 
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
 
 env:
   RESC_BACKEND_DIR: components/repository-scanner-backend
