@@ -5,15 +5,15 @@ on:
     branches:
       - '**'
     paths:
-      - components/repository-scanner-backend/**
-      - .github/workflows/**
+      - components/resc-backend/**
+      - .github/workflows/backend-**
 
   pull_request:
     branches:
       - '**'
 
 env:
-  RESC_BACKEND_DIR: components/repository-scanner-backend
+  RESC_BACKEND_DIR: components/resc-backend
 
 jobs:
   Basic-tests:
