@@ -1,16 +1,16 @@
-name: Backend build and publish
+name: Scanner build and publish
 
 on:
   push:
     branches: [ never ]
     paths:
-      - components/resc-backend/**
+      - components/repository-scanners/**
 
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: abnamro/resc-backend
-  RESC_BACKEND_DIR: components/resc-backend
+  IMAGE_NAME: abnamro/repository-scanners
+  REPOSITORY_SCANNERS_DIR: components/repository-scanners
 jobs:
 
   Build-and-publish:
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Building python package
         run: |
-          cd ${{ env.RESC_BACKEND_DIR }}
+          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
           pip install build
           python setup.py sdist bdist_wheel
 
@@ -27,7 +27,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.__TEST_PYPI_TOKEN__ }}
-          packages_dir: ${{ env.RESC_BACKEND_DIR }}/dist
+          packages_dir: ${{ env.REPOSITORY_SCANNERS_DIR }}/dist
           skip_existing: true
           repository_url: https://test.pypi.org/legacy/
 
@@ -47,7 +47,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: ${{ env.RESC_BACKEND_DIR }}/
+          context: ${{ env.REPOSITORY_SCANNERS_DIR }}/
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

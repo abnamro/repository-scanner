@@ -9,8 +9,8 @@ from argparse import ArgumentParser, Namespace
 from urllib.parse import urlparse
 
 # Third Party
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfo
-from repository_scanner_backend.resc_web_service.schema.vcs_provider import VCSProviders
+from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 # First Party
 from repository_scanners.common import get_rule_pack_version_from_file, initialise_logs

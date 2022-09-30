@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 # Third Party
 from _pytest.monkeypatch import MonkeyPatch
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfo
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfo
-from repository_scanner_backend.resc_web_service.schema.scan_type import ScanType
+from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
 from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter

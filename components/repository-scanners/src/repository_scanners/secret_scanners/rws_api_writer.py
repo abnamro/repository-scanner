@@ -8,22 +8,19 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # Third Party
-from repository_scanner_backend.constants import TEMP_RULE_FILE
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfoCreate, BranchInfoRead
-from repository_scanner_backend.resc_web_service.schema.finding import FindingBase, FindingCreate
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
-from repository_scanner_backend.resc_web_service.schema.scan import Scan, ScanCreate, ScanRead
-from repository_scanner_backend.resc_web_service.schema.scan_type import ScanType
-from repository_scanner_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate, VCSInstanceRead
-from repository_scanner_backend.resc_web_service_interface.branches_info import (
-    create_branch_info,
-    get_last_scan_for_branch
-)
-from repository_scanner_backend.resc_web_service_interface.findings import create_findings_with_scan_id
-from repository_scanner_backend.resc_web_service_interface.repositories_info import create_repository_info
-from repository_scanner_backend.resc_web_service_interface.rules import download_rule_pack_toml_file
-from repository_scanner_backend.resc_web_service_interface.scans import create_scan
-from repository_scanner_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
+from resc_backend.constants import TEMP_RULE_FILE
+from resc_backend.resc_web_service.schema.branch_info import BranchInfoCreate, BranchInfoRead
+from resc_backend.resc_web_service.schema.finding import FindingBase, FindingCreate
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
+from resc_backend.resc_web_service.schema.scan import Scan, ScanCreate, ScanRead
+from resc_backend.resc_web_service.schema.scan_type import ScanType
+from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate, VCSInstanceRead
+from resc_backend.resc_web_service_interface.branches_info import create_branch_info, get_last_scan_for_branch
+from resc_backend.resc_web_service_interface.findings import create_findings_with_scan_id
+from resc_backend.resc_web_service_interface.repositories_info import create_repository_info
+from resc_backend.resc_web_service_interface.rules import download_rule_pack_toml_file
+from resc_backend.resc_web_service_interface.scans import create_scan
+from resc_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # First Party

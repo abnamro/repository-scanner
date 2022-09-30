@@ -6,8 +6,8 @@ import os
 # Third Party
 from celery import Celery
 from celery.utils.log import get_task_logger
-from repository_scanner_backend.constants import TEMP_RULE_FILE
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.constants import TEMP_RULE_FILE
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
 
 # First Party
 from repository_scanners.common import initialise_logs, load_vcs_instances

@@ -3,11 +3,11 @@ import abc
 from typing import List
 
 # Third Party
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfo
-from repository_scanner_backend.resc_web_service.schema.finding import FindingCreate
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfo
-from repository_scanner_backend.resc_web_service.schema.scan import Scan
-from repository_scanner_backend.resc_web_service.schema.scan_type import ScanType
+from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.finding import FindingCreate
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.scan import Scan
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
 from repository_scanners.model import VCSInstanceRuntime

@@ -1,22 +1,22 @@
-name: Backend basic validation
+name: Scanner basic validation
 
 on:
   push:
     branches:
       - '**'
     paths:
-      - components/resc-backend/**
-      - .github/workflows/backend-**
+      - components/repository-scanners/**
+      - .github/workflows/repo-scanner**
 
   pull_request:
     branches:
       - '**'
     paths:
-      - components/resc-backend/**
-      - .github/workflows/backend-**
+      - components/repository-scanners/**
+      - .github/workflows/repo-scanner**
 
 env:
-  RESC_BACKEND_DIR: components/resc-backend
+  REPOSITORY_SCANNERS_DIR: components/repository-scanners
 
 jobs:
   Basic-tests:
@@ -27,17 +27,17 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          cd ${{ env.RESC_BACKEND_DIR }}
+          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
           pip install -r test-requirements.txt
           tox
 
       - name: Run unittests
         run: |
-          cd ${{ env.RESC_BACKEND_DIR }}
+          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
           tox -e pytest
 
       - name: Run linting and sorting checks
         run: |
-          cd ${{ env.RESC_BACKEND_DIR }}
+          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
           tox -e lint
           tox -e sort

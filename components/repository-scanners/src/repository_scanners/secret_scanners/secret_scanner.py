@@ -9,9 +9,9 @@ from datetime import datetime
 from typing import List, Optional
 
 # Third Party
-from repository_scanner_backend.resc_web_service.schema.finding import FindingBase
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfo
-from repository_scanner_backend.resc_web_service.schema.scan_type import ScanType
+from resc_backend.resc_web_service.schema.finding import FindingBase
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
 from repository_scanners.output_module import OutputModule
