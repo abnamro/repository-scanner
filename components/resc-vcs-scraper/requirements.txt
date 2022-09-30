@@ -1,0 +1,7 @@
+celery==5.2.3
+atlassian-python-api==3.10.0
+requests==2.25.1
+azure-devops==6.0.0b4
+tenacity==8.0.1
+pydantic==1.8.2
+pygithub==1.55
