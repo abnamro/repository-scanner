@@ -11,6 +11,9 @@ on:
   pull_request:
     branches:
       - '**'
+    paths:
+      - components/resc-backend/**
+      - .github/workflows/backend-**
 
 env:
   RESC_BACKEND_DIR: components/resc-backend

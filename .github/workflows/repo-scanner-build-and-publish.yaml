@@ -6,8 +6,6 @@ on:
     paths:
       - components/repository-scanners/**
 
-  workflow_run:
-    workflows: [ "Scanner basic validation" ]
 
 env:
   REGISTRY: ghcr.io

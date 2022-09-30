@@ -6,8 +6,6 @@ on:
     paths:
       - components/resc-backend/**
 
-  workflow_run:
-    workflows: [ "Backend basic validation" ]
 
 env:
   REGISTRY: ghcr.io
