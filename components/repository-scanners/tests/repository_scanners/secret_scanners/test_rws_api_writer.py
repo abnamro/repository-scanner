@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 # Third Party
 import pytest
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfoBase, BranchInfoRead
-from repository_scanner_backend.resc_web_service.schema.finding import Finding
-from repository_scanner_backend.resc_web_service.schema.finding_status import FindingStatus
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
-from repository_scanner_backend.resc_web_service.schema.scan import ScanRead
-from repository_scanner_backend.resc_web_service.schema.scan_type import ScanType
+from resc_backend.resc_web_service.schema.branch_info import BranchInfoBase, BranchInfoRead
+from resc_backend.resc_web_service.schema.finding import Finding
+from resc_backend.resc_web_service.schema.finding_status import FindingStatus
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
+from resc_backend.resc_web_service.schema.scan import ScanRead
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
 from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter

@@ -6,7 +6,7 @@ import subprocess
 from typing import List, Optional
 
 # Third Party
-from repository_scanner_backend.resc_web_service.schema.finding import FindingBase
+from resc_backend.resc_web_service.schema.finding import FindingBase
 
 # First Party
 from repository_scanners.constants import LEAKS_FOUND_EXIT_CODE, NO_LEAKS_FOUND_EXIT_CODE

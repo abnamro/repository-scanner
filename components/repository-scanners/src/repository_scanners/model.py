@@ -5,9 +5,9 @@ from typing import List, Optional
 
 # Third Party
 from pydantic import BaseModel, conint, constr, validator
-from repository_scanner_backend.resc_web_service.schema.branch_info import BranchInfo
-from repository_scanner_backend.resc_web_service.schema.repository_info import RepositoryInfo
-from repository_scanner_backend.resc_web_service.schema.vcs_provider import VCSProviders
+from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
 class RepositoryInfoRuntime(BaseModel):
