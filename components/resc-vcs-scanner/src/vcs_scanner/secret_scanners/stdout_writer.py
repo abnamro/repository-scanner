@@ -12,8 +12,8 @@ from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceRead
 
 # First Party
-from repository_scanners.model import VCSInstanceRuntime
-from repository_scanners.output_module import OutputModule
+from vcs_scanner.model import VCSInstanceRuntime
+from vcs_scanner.output_module import OutputModule
 
 logger = logging.getLogger(__name__)
 

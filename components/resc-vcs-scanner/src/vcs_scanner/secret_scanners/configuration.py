@@ -1,6 +1,6 @@
 # pylint: disable=R0903
 # First Party
-from repository_scanners.helpers.environment_wrapper import EnvironmentVariable
+from vcs_scanner.helpers.environment_wrapper import EnvironmentVariable
 
 DEBUG_MODE = "DEBUG_MODE"
 

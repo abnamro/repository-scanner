@@ -9,15 +9,15 @@ from typing import Dict, List, Optional
 import tomlkit
 
 # First Party
-from repository_scanners.input_parser import parse_vcs_instances_file
-from repository_scanners.model import VCSInstanceRuntime
+from vcs_scanner.input_parser import parse_vcs_instances_file
+from vcs_scanner.model import VCSInstanceRuntime
 
 logger = logging.getLogger(__name__)
 
 
 def get_logging_settings_path():
-    if path.isfile(get_python_lib() + "/repository_scanners"):
-        base_dir = get_python_lib() + "/repository_scanners"
+    if path.isfile(get_python_lib() + "/vcs_scanner"):
+        base_dir = get_python_lib() + "/vcs_scanner"
     else:
         base_dir = path.dirname(__file__)
 

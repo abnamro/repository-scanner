@@ -1,22 +1,22 @@
-name: Scanner basic validation
+name: VCS Scanner basic validation
 
 on:
   push:
     branches:
       - '**'
     paths:
-      - components/repository-scanners/**
-      - .github/workflows/repo-scanner**
+      - components/vcs-scanner/**
+      - .github/workflows/vcs-scanner**
 
   pull_request:
     branches:
       - '**'
     paths:
-      - components/repository-scanners/**
-      - .github/workflows/repo-scanner**
+      - components/vcs-scanner/**
+      - .github/workflows/vcs-scanner**
 
 env:
-  REPOSITORY_SCANNERS_DIR: components/repository-scanners
+  VCS_SCANNER_DIR: components/vcs-scanner
 
 jobs:
   Basic-tests:
@@ -27,17 +27,17 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
+          cd ${{ env.VCS_SCANNER_DIR }}
           pip install -r test-requirements.txt
           tox
 
       - name: Run unittests
         run: |
-          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
+          cd ${{ env.VCS_SCANNER_DIR }}
           tox -e pytest
 
       - name: Run linting and sorting checks
         run: |
-          cd ${{ env.REPOSITORY_SCANNERS_DIR }}
+          cd ${{ env.VCS_SCANNER_DIR }}
           tox -e lint
           tox -e sort

@@ -8,7 +8,7 @@ from typing import List
 from pydantic import ValidationError
 
 # First Party
-from repository_scanners.model import VCSInstanceRuntime
+from vcs_scanner.model import VCSInstanceRuntime
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ from typing import List, Optional
 from resc_backend.resc_web_service.schema.finding import FindingBase
 
 # First Party
-from repository_scanners.constants import LEAKS_FOUND_EXIT_CODE, NO_LEAKS_FOUND_EXIT_CODE
+from vcs_scanner.constants import LEAKS_FOUND_EXIT_CODE, NO_LEAKS_FOUND_EXIT_CODE
 
 logger: logging.Logger = logging.getLogger(__name__)
 

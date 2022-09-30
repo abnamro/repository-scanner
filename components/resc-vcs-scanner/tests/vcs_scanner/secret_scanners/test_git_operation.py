@@ -2,7 +2,7 @@
 from unittest.mock import patch
 
 # First Party
-from repository_scanners.secret_scanners.git_operation import clone_repository
+from vcs_scanner.secret_scanners.git_operation import clone_repository
 
 
 @patch("git.repo.base.Repo.clone_from")

@@ -4,7 +4,7 @@ import sys
 from unittest import TestCase, mock
 
 sys.path.insert(0, "src")
-from repository_scanners.helpers.environment_wrapper import (  # noqa: E402  # isort:skip
+from vcs_scanner.helpers.environment_wrapper import (  # noqa: E402  # isort:skip
     validate_environment,
     EnvironmentVariable
 )
