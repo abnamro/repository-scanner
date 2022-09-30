@@ -8,7 +8,7 @@ from resc_backend.resc_web_service_interface.branches_info import create_branch_
 
 @patch("requests.post")
 def test_create_branch_info(post):
-    expected_url = 'https://fake-host.com/rws/v1/branches-info'
+    expected_url = 'https://fake-host.com/resc/v1/branches-info'
     url = 'https://fake-host.com'
 
     branch_info = BranchInfoCreate(branch_id=1,

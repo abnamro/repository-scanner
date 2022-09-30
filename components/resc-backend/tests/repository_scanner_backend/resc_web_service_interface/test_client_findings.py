@@ -27,7 +27,7 @@ for i in range(1, 6):
 
 @patch("requests.post")
 def test_create_findings(post):
-    expected_url = 'https://fake-host.com/rws/v1/findings'
+    expected_url = 'https://fake-host.com/resc/v1/findings'
     url = 'https://fake-host.com'
 
     findings_json = []
