@@ -1,4 +1,4 @@
-name: Backend basic validation
+name: Scanner basic validation
 
 on:
   push:
