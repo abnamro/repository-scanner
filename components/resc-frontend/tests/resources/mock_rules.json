@@ -1,0 +1,11 @@
+[
+  "Azure-Token",
+  "Environment-configuration-file",
+  "File-extensions-with-keys-and-credentials",
+  "Hardcoded-Hostname",
+  "Hardcoded-IP-Address-IPv4",
+  "Hardcoded-Password",
+  "Hardcoded-Secret",
+  "Hardcoded-Username",
+  "High-Entropy"
+]
