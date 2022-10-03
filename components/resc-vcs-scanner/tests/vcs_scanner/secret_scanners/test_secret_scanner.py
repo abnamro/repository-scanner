@@ -9,7 +9,7 @@ from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
-from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter
+from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
 
 sys.path.insert(0, "src")
 
@@ -23,7 +23,7 @@ mp.setenv('RABBITMQ_PASSWORD', 'fake pass')
 mp.setenv('RABBITMQ_QUEUE', 'queuename')
 mp.setenv('VCS_INSTANCES_FILE_PATH', 'fake_vcs_instance_config_json_path')
 
-from repository_scanners.secret_scanners.secret_scanner import SecretScanner  # noqa: E402  # isort:skip
+from vcs_scanner.secret_scanners.secret_scanner import SecretScanner  # noqa: E402  # isort:skip
 
 BITBUCKET_USERNAME = "test"
 GITLEAKS_PATH = "gitleaks_exec"
@@ -69,7 +69,7 @@ def test_clone_repo(clone_from):
                                        branch=branches[0].branch_name)
 
 
-@patch("repository_scanners.secret_scanners.gitleaks_wrapper.GitLeaksWrapper.start_scan")
+@patch("vcs_scanner.secret_scanners.gitleaks_wrapper.GitLeaksWrapper.start_scan")
 def test_scan_repo(start_scan):
     start_scan.return_value = None
     rws_url = "https://fakeurl.com:8000"

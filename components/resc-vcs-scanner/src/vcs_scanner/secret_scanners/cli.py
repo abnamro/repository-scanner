@@ -13,13 +13,13 @@ from resc_backend.resc_web_service.schema.branch_info import BranchInfo
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 # First Party
-from repository_scanners.common import get_rule_pack_version_from_file, initialise_logs
-from repository_scanners.constants import CLI_VCS_AZURE, CLI_VCS_BITBUCKET, CLI_VCS_LOCAL_SCAN, LOG_FILE_PATH_CLI
-from repository_scanners.model import RepositoryInfoRuntime
-from repository_scanners.secret_scanners.configuration import GITLEAKS_PATH
-from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter
-from repository_scanners.secret_scanners.secret_scanner import SecretScanner
-from repository_scanners.secret_scanners.stdout_writer import STDOUTWriter
+from vcs_scanner.common import get_rule_pack_version_from_file, initialise_logs
+from vcs_scanner.constants import CLI_VCS_AZURE, CLI_VCS_BITBUCKET, CLI_VCS_LOCAL_SCAN, LOG_FILE_PATH_CLI
+from vcs_scanner.model import RepositoryInfoRuntime
+from vcs_scanner.secret_scanners.configuration import GITLEAKS_PATH
+from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
+from vcs_scanner.secret_scanners.secret_scanner import SecretScanner
+from vcs_scanner.secret_scanners.stdout_writer import STDOUTWriter
 
 logger_config = initialise_logs(LOG_FILE_PATH_CLI)
 logger = logging.getLogger(__name__)

@@ -14,10 +14,10 @@ from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
-from repository_scanners.output_module import OutputModule
-from repository_scanners.resc_worker import RESCWorker
-from repository_scanners.secret_scanners.git_operation import clone_repository
-from repository_scanners.secret_scanners.gitleaks_wrapper import GitLeaksWrapper
+from vcs_scanner.output_module import OutputModule
+from vcs_scanner.resc_worker import RESCWorker
+from vcs_scanner.secret_scanners.git_operation import clone_repository
+from vcs_scanner.secret_scanners.gitleaks_wrapper import GitLeaksWrapper
 
 # This is an arbitrary number to distinguish between no issues, an error and
 # the situation in which leaks are found. Note that this number cannot be bigger than 255 (OS limitation)

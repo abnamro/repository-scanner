@@ -13,7 +13,7 @@ from resc_backend.resc_web_service.schema.scan import ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
-from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter
+from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
 
 
 # A test method to check the happy flow of the write_repository_info method.

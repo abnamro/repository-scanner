@@ -1,5 +1,5 @@
 # RESC
-## Secret scanner
+## VCS Scanner
 
 # Local Setup
 Run the below command from project root folder if your IDE doesn't recognize resc as a valid python package  

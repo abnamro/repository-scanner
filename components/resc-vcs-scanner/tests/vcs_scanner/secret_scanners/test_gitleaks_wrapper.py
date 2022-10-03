@@ -5,8 +5,8 @@ import sys
 from _pytest.monkeypatch import MonkeyPatch
 
 # First Party
-from repository_scanners.constants import LEAKS_FOUND_EXIT_CODE
-from repository_scanners.secret_scanners.gitleaks_wrapper import GitLeaksWrapper
+from vcs_scanner.constants import LEAKS_FOUND_EXIT_CODE
+from vcs_scanner.secret_scanners.gitleaks_wrapper import GitLeaksWrapper
 
 sys.path.insert(0, "src")
 

@@ -10,11 +10,11 @@ from resc_backend.constants import TEMP_RULE_FILE
 from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
 
 # First Party
-from repository_scanners.common import initialise_logs, load_vcs_instances
-from repository_scanners.constants import LOG_FILE_PATH
-from repository_scanners.helpers.environment_wrapper import validate_environment
-from repository_scanners.model import RepositoryInfoRuntime
-from repository_scanners.secret_scanners.configuration import (
+from vcs_scanner.common import initialise_logs, load_vcs_instances
+from vcs_scanner.constants import LOG_FILE_PATH
+from vcs_scanner.helpers.environment_wrapper import validate_environment
+from vcs_scanner.model import RepositoryInfoRuntime
+from vcs_scanner.secret_scanners.configuration import (
     GITLEAKS_PATH,
     RABBITMQ_DEFAULT_VHOST,
     RABBITMQ_PASSWORD,
@@ -26,8 +26,8 @@ from repository_scanners.secret_scanners.configuration import (
     RESC_API_NO_AUTH_SERVICE_PORT,
     VCS_INSTANCES_FILE_PATH
 )
-from repository_scanners.secret_scanners.rws_api_writer import RESTAPIWriter
-from repository_scanners.secret_scanners.secret_scanner import SecretScanner
+from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
+from vcs_scanner.secret_scanners.secret_scanner import SecretScanner
 
 env_variables = validate_environment(REQUIRED_ENV_VARS)
 app = Celery('secret_scanner_worker',

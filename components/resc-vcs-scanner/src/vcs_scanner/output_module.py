@@ -10,7 +10,7 @@ from resc_backend.resc_web_service.schema.scan import Scan
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
-from repository_scanners.model import VCSInstanceRuntime
+from vcs_scanner.model import VCSInstanceRuntime
 
 
 class OutputModule(metaclass=abc.ABCMeta):
