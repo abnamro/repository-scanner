@@ -4,13 +4,13 @@ on:
   push:
     branches: [ never ]
     paths:
-      - components/vcs-scanner/**
+      - components/resc-vcs-scanner/**
 
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: abnamro/vcs-scanner
-  VCS_SCANNER_DIR: components/vcs-scanner
+  IMAGE_NAME: abnamro/resc-vcs-scanner
+  VCS_SCANNER_DIR: components/resc-vcs-scanner
 jobs:
 
   Build-and-publish:

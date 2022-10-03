@@ -5,18 +5,18 @@ on:
     branches:
       - '**'
     paths:
-      - components/vcs-scanner/**
+      - components/resc-vcs-scanner/**
       - .github/workflows/vcs-scanner**
 
   pull_request:
     branches:
       - '**'
     paths:
-      - components/vcs-scanner/**
+      - components/resc-vcs-scanner/**
       - .github/workflows/vcs-scanner**
 
 env:
-  VCS_SCANNER_DIR: components/vcs-scanner
+  VCS_SCANNER_DIR: components/resc-vcs-scanner
 
 jobs:
   Basic-tests:
