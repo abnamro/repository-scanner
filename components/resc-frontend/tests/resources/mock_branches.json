@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "branch_id": "refs/heads/master",
+      "branch_name": "master",
+      "last_scanned_commit": "09de845cafff5758177e9754f5f0ce1e0be8caf1",
+      "repository_info_id": 3,
+      "id_": 1
+    },
+    {
+      "branch_id": "refs/heads/master",
+      "branch_name": "master",
+      "last_scanned_commit": "4b56f1e08cdf39afd5b488b96d1939f9cde29894",
+      "repository_info_id": 4,
+      "id_": 2
+    }
+  ],
+  "total": 200,
+  "limit": 2,
+  "skip": 0
+}

@@ -1,0 +1,47 @@
+{
+  "data": [
+    {
+      "date_lable": "2022-W01",
+      "finding_count": 15200
+    },
+    {
+      "date_lable": "2022-W02",
+      "finding_count": 3500
+    },
+    {
+      "date_lable": "2022-W03",
+      "finding_count": 2000
+    },
+    {
+      "date_lable": "2022-W04",
+      "finding_count": 2600
+    },
+    {
+      "date_lable": "2022-W05",
+      "finding_count": 7000
+    },
+    {
+      "date_lable": "2022-W06",
+      "finding_count": 9500
+    },
+    {
+      "date_lable": "2022-W07",
+      "finding_count": 5200
+    },
+    {
+      "date_lable": "2022-W08",
+      "finding_count": 3500
+    },
+    {
+      "date_lable": "2022-W09",
+      "finding_count": 6800
+    },
+    {
+      "date_lable": "2022-W10",
+      "finding_count": 5600
+    }
+  ],
+  "total": 60900,
+  "limit": 100,
+  "skip": 0
+}
