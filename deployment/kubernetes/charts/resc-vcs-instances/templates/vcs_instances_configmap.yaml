@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-vcs-instances-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  vcs_instances_config.json: |
+    {
+    {{- range $key, $value := .Values.vcsInstances }}
+      {{ if ne $key 0 }},{{ end }}
+      "{{ $value.name }}": {
+        "name": "{{ $value.name }}",
+        "exceptions": {{ $value.exceptions | toJson }},
+        "provider_type": "{{ $value.providerType }}",
+        "hostname": "{{ $value.hostname }}",
+        "port": "{{ $value.port }}",
+        "scheme": "{{ $value.scheme }}",
+        "username": "{{ $value.username }}",
+        "token": "{{ $value.token }}",
+        "scope": {{ $value.scope | toJson }},
+        "organization": "{{ $value.organization }}"
+      }
+    {{- end }}
+    }

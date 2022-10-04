@@ -1,0 +1,33 @@
+apiVersion: v2
+name: resc
+description: A Helm chart for the Repository Scanner
+
+type: application
+
+version: 0.0.1
+
+appVersion: "1.0.0"
+
+dependencies:
+    - name: resc-vcs-instances
+      version: "0.0.1"
+    - name: resc-project-collector
+      version: "0.0.1"
+    - name: resc-repository-collector
+      version: "0.0.1"
+    - name: resc-secret-scanner
+      version: "0.0.1"
+    - name: resc-dashboard
+      version: "0.0.1"
+    - name: resc-rabbitmq
+      version: "0.0.1"
+    - name: resc-secret-tracking-service
+      version: "0.0.1"
+    - name: resc-secret-tracking-service-no-auth
+      version: "0.0.1"
+    - name: resc-database-init
+      version: "0.0.1"
+    - name: resc-database
+      version: "0.0.1"
+    - name: resc-rules-init
+      version: "0.0.1"

@@ -1,0 +1,39 @@
+{{ if .Values.enableIngress }}
+{{ if eq .Values.enableIngress "true"}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.global.appName }}-dashboard
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "server: hide";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+      more_set_headers "Referrer-Policy: same-origin";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "Cross-Origin-Resource-Policy: same-site";
+      more_set_headers "Cache-control: no-cache, no-store";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self' {{ .Values.ingress.cspConnectSrc }}; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; frame-ancestors 'self'; form-action 'self';";  
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.global.host }}
+    secretName: {{ .Values.global.ingress.secretName }}
+  rules:
+  - http:
+      paths:
+      - path: {{ .Values.ingress.path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.global.appName }}-dashboard
+            port:
+              number: {{ .Values.port }}
+    host: {{ .Values.global.host }}
+{{ end }}
+{{ end }}

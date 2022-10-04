@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-repository-collector-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  {{ if .Values.config.debug_value }}
+  DEBUG_MODE: "{{ .Values.config.debug_value }}"
+  {{ end }}
+  {{ if .Values.config.vcs_instance_file_path }}
+  VCS_INSTANCES_FILE_PATH: "{{ .Values.config.vcs_instance_file_path }}"
+  {{ end }}

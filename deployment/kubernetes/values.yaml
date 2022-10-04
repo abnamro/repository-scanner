@@ -1,0 +1,43 @@
+# Default values for resc.
+global:
+  deploymentEnvironment: "unknown"
+  authenticationEnabled: "true"
+  enableInClusterDatabase: "true"
+  namespace: resc
+  appName: resc
+  host:
+  ingress:
+    secretName: ingress-tls
+
+  resc:
+    image:
+      repository: 
+      name: resc/repository-scanner-backend
+      tag: 1.1.16
+      pullPolicy: IfNotPresent
+        
+  rescFrontend:
+    image:
+      repository: 
+      name: resc/resc-frontend
+      tag: 0.7.28
+      pullPolicy: IfNotPresent
+
+  VCSScraper:
+    image:
+      repository: 
+      name: resc/vcs-scraper
+      tag: 0.0.15
+      pullPolicy: IfNotPresent
+        
+  rescSecretScanner:
+    image:
+      repository: 
+      name: resc/secret-scanner
+      tag: 0.1.10
+      pullPolicy: IfNotPresent
+      gitleaks:
+        binaryPath: /repository_scanners/gitleaks_config/seco-gitleaks-linux-amd64
+
+  imagePullSecret: 
+  imagePullSecret_proxy: 

@@ -1,0 +1,44 @@
+{{ if eq .Values.global.enableInClusterDatabase "true"}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.appName }}-db
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.global.appName }}
+      tier: ms-database
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.appName }}
+        tier: ms-database
+    spec:
+      volumes:
+        - name: {{ .Values.global.appName }}-database-pv-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.appName }}-database-pv-volume-claim
+      containers:
+        - name: {{ .Values.global.appName }}-db
+          image: {{ .Values.database.image.repository }}{{ .Values.database.image.name }}:{{ .Values.database.image.tag }}
+          imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: {{ .Values.database.resources.requests.cpu }}
+              memory: {{ .Values.database.resources.requests.memory }}
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.global.appName }}-database-config
+            - secretRef:
+                name: {{ .Values.global.appName }}-database-secret
+          volumeMounts:
+            - mountPath: "/var/opt/mssql"
+              name: {{ .Values.global.appName }}-database-pv-storage
+          ports:
+            - containerPort: {{ .Values.database.port }}
+{{ end }}

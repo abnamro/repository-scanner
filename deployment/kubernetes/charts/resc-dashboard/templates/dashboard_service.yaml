@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.appName }}-dashboard
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+    tier: dashboard
+spec:
+  {{ if .Values.exposeToHostPort }}
+  type: NodePort
+  {{ end }}
+  ports:
+    - port: {{ .Values.port }}
+      targetPort: {{ .Values.port }}
+      {{ if .Values.exposeToHostPort }}
+      nodePort: {{ .Values.exposeToHostPort }}
+      {{ end }}
+  selector:
+    app: {{ .Values.global.appName }}
+    tier: dashboard

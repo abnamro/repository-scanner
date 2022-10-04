@@ -1,0 +1,25 @@
+VCSScraper:
+  image:
+    repository:
+    name:
+    tag:
+    pullPolicy:
+restartPolicy: "Always"
+config:
+  vcs_instance_file_path: "/tmp/vcs_instances_config.json"
+  debug_value: "0"
+  loglevel: INFO
+  schedule: "0 6 * * 6"
+  scan_only_master_branch: 
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+resources:
+  requests:
+    cpu: 300m
+    memory: 300M
+  limits:
+    cpu: 750m
+    memory: 750M
+suspend: false
+useKubernetesSecret: "true"
+preStartUpCommand: ""

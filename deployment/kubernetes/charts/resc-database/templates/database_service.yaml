@@ -1,0 +1,23 @@
+{{ if eq .Values.global.enableInClusterDatabase "true"}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.appName }}-ms-database
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+    tier: ms-database
+spec:
+  {{ if .Values.database.exposeToHostPort }}
+  type: NodePort
+  {{ end }}
+  ports:
+    - port: {{ .Values.database.port }}
+      targetPort: {{ .Values.database.port }}
+      {{ if .Values.database.exposeToHostPort }}
+      nodePort: {{ .Values.database.exposeToHostPort }}
+      {{ end }}
+  selector:
+    app: {{ .Values.global.appName }}
+    tier: ms-database
+{{ end }}

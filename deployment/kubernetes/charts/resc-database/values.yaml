@@ -1,0 +1,15 @@
+hostOS: ""
+database:
+  exposeToHostPort:
+  port: 1433
+  image:
+    repository: mcr.microsoft.com/
+    name: azure-sql-edge
+    tag: 1.0.5
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 200m
+      memory: 500M
+  pvc_path: "/var/resc/mssql/data"
+  pvc_size: 10Gi

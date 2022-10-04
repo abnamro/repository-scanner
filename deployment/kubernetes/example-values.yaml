@@ -1,0 +1,146 @@
+global:
+  # Authentication is disabled by default, to enable it set authenticationEnabled to true and provide correct values for ssoConfig attributes
+  authenticationEnabled: "false"
+  resc:
+    image:
+      repository: "ghcr.io"
+      name: abnamro/resc-backend
+      tag: 1.1.15
+  rescFrontend:
+    image:
+      repository: "ghcr.io"
+      name: abnamro/resc-frontend
+      tag: 0.7.24
+  VCSScraper:
+    image:
+      repository: "ghcr.io"
+      name: abnamro/resc-vcs-scraper
+      tag: 0.0.12
+  rescSecretScanner:
+    image:
+      repository: "ghcr.io"
+      name: abnamro/resc-vcs-scanner
+      tag: 0.1.9
+
+resc-project-collector:
+  config:
+    schedule: "0 6 * * 6"
+    successfulJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 1
+
+resc-repository-collector:
+  config:
+    schedule: "0 6 * * 6"
+    scan_only_master_branch: true # Set this to false if you want to scan all branches
+
+resc-secret-scanner:
+  resources:
+    requests:
+      cpu: 300m
+      memory: 300M
+    limits:
+      cpu: 750m
+      memory: 750M
+
+resc-dashboard:
+  enableIngress: "false"
+  exposeToHostPort: 30000
+  rescWebServiceUrl: "http://localhost:30800/sts"
+  # To configure single sign on provide below values for ssoConfig attributes
+  # These attributes will be used in the RESC frontend
+  ssoConfig:
+    redirectUri: "<enter redirect uri here>"
+    idTokenIssuerUrl: "<enter ID token issuer url here>"
+    authorizationUrl: "<enter authorization url here>"
+    tokenEndPointUrl: "<enter token end point here>"
+    idTokenJwksUrl: "<enter ID token JWKS url here>"
+    accessTokenJwksUrl: "<enter Access token url here>"
+
+resc-secret-tracking-service:
+  exposeToHostPort: 30800
+  resc:
+    config:
+      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
+      dbSchema: "<enter database schema name here>"
+      dbUser: "<enter database username here>"
+      dbPass: "<enter database password here>"
+    # To configure single sign on provide below values for ssoConfig attributes
+    # These attributes will be used in the RESC API to validate access token
+    ssoConfig:
+      ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>"
+      ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>"
+    corsAllowedDomains: "http://localhost:8080, http://localhost:30000"
+    authRequired: "false"
+
+resc-secret-tracking-service-no-auth:
+  exposeToHostPort: 30900
+  resc:
+    config:
+      dbSchema: "<enter database schema name here>"
+      dbUser: "<enter database username here>"
+      dbPass: "<enter database password here>"
+
+resc-database:
+  hostOS: "NOTwindows" # For Windows OS, set value of hostOS: "windows"
+  database:
+    exposeToHostPort: 30880
+    pvc_path: "<enter path to store database data>" # Example: /Users/<username>/var/resc/database
+    config:
+      password: "<enter database system admin password here>"
+
+resc-database-init:
+  resc:
+    config:
+      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
+      dbSchema: "<enter database schema name here>"
+      dbUser: "<enter database username here>"
+      dbPass: "<enter database password here>"
+
+resc-rabbitmq:
+  rabbitMQ:
+    config:
+      admin_username: "<enter rabbitmq admin username>"
+      admin_password: "<enter rabbitmq admin password>"
+      queues_username: "<enter queue username>"
+      queues_password: "<enter queue password>"
+    pvc_path: "<enter path to store rabbitmq data>" # Example: /Users/<username>/var/resc/rabbitmq
+  filemountType: "windows" # possible values windows/linux/azure
+
+resc-vcs-instances:
+  vcsInstances:
+    - name: "GITHUB_PUBLIC"
+      scope: []
+      exceptions: []
+      providerType: "GITHUB_PUBLIC"
+      hostname: "github.com"
+      port: "443"
+      scheme: "https"
+      username: "GITHUB_PUBLIC_USERNAME"
+      usernameValue: "<enter github username here>"
+      organization: ""
+      token: "GITHUB_PUBLIC_TOKEN"
+      tokenValue: "<enter github personal access token here>"
+    - name: "AzureDevOps"
+      scope: []
+      exceptions: []
+      providerType: "AZURE_DEVOPS"
+      hostname: "<enter azuredevops host name here>" # Example - dev.azure.com
+      port: "443"
+      scheme: "https"
+      username: "AZURE_DEVOPS_USERNAME"
+      usernameValue: "NA"
+      organization: "<enter azuredevopsorganization name here>"
+      token: "AZURE_DEVOPS_TOKEN"
+      tokenValue: "<enter azuredevops personal access token here>"
+    - name: "BITBUCKET"
+      scope: []
+      exceptions: []
+      providerType: "BITBUCKET"
+      hostname: "<enter bitbucket host name here>"
+      port: "<enter bitbucket port number here>"
+      scheme: "https"
+      organization: ""
+      username: "BITBUCKET_USERNAME"
+      usernameValue: "<enter bitbucket username here>"
+      token: "BITBUCKET_TOKEN"
+      tokenValue: "<enter bitbucket personal access token here>"

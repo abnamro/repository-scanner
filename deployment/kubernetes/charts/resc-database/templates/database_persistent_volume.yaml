@@ -1,0 +1,33 @@
+{{ if eq .Values.global.enableInClusterDatabase "true"}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.appName }}-database-pv-volume
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    pv.beta.kubernetes.io/gid: "999"
+  labels:
+    type: local
+spec:
+  storageClassName: {{ .Values.global.appName }}-sql-storage
+  capacity:
+    storage: {{ .Values.database.pvc_size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  {{ if eq .Values.hostOS "windows" }}
+  local:
+    path: {{ .Values.database.pvc_path }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop
+  {{ else }}
+  hostPath:
+    path: {{ .Values.database.pvc_path }}
+  {{ end }}
+{{ end }}

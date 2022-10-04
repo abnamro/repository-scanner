@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.global.appName }}-mq-pv-volume
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    pv.beta.kubernetes.io/gid: "999"
+  labels:
+    type: local
+spec:
+  storageClassName: {{ .Values.global.appName }}-mq-storage
+  capacity:
+    storage: {{ .Values.rabbitMQ.pvc_size }}
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  {{ if eq .Values.filemountType "azure"}}
+  azureFile:
+    secretName: {{ .Values.storageClass.storageAccount }}-access-key
+    secretNamespace: resc
+    shareName: resc-data
+    readOnly: false
+  {{ else }}
+  {{ if eq .Values.filemountType "windows" }}
+  local:
+    path: {{ .Values.rabbitMQ.pvc_path }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - docker-desktop
+  {{ else }}
+  hostPath:
+    path: {{ .Values.rabbitMQ.pvc_path }}
+  {{ end }}
+  {{ end }}
