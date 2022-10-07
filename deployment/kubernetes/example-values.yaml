@@ -3,37 +3,39 @@ global:
   authenticationEnabled: "false"
   resc:
     image:
-      repository: "ghcr.io"
+      repository: ghcr.io/
       name: abnamro/resc-backend
-      tag: 1.1.15
+      tag: 0.0.0
   rescFrontend:
     image:
-      repository: "ghcr.io"
+      repository: ghcr.io/
       name: abnamro/resc-frontend
-      tag: 0.7.24
+      tag: 0.0.0
   VCSScraper:
     image:
-      repository: "ghcr.io"
+      repository: ghcr.io/
       name: abnamro/resc-vcs-scraper
-      tag: 0.0.12
+      tag: 0.0.0
   rescSecretScanner:
     image:
-      repository: "ghcr.io"
+      repository: ghcr.io/
       name: abnamro/resc-vcs-scanner
-      tag: 0.1.9
+      tag: 0.0.0
 
-resc-project-collector:
+resc-vcs-scraper-projects:
   config:
     schedule: "0 6 * * 6"
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
 
-resc-repository-collector:
+resc-vcs-scraper-repositories:
   config:
     schedule: "0 6 * * 6"
     scan_only_master_branch: true # Set this to false if you want to scan all branches
 
-resc-secret-scanner:
+resc-vcs-scanner-secrets:
+  config:
+    force_base_scan: "false" # force_base_scan is set to false in order to enable incremental scanning of commits. If set to true, all commits will be scanned each time.
   resources:
     requests:
       cpu: 300m
@@ -42,21 +44,21 @@ resc-secret-scanner:
       cpu: 750m
       memory: 750M
 
-resc-dashboard:
+resc-frontend:
   enableIngress: "false"
   exposeToHostPort: 30000
-  rescWebServiceUrl: "http://localhost:30800/sts"
+  rescWebServiceUrl: "http://localhost:30800/resc"
   # To configure single sign on provide below values for ssoConfig attributes
   # These attributes will be used in the RESC frontend
   ssoConfig:
-    redirectUri: "<enter redirect uri here>"
-    idTokenIssuerUrl: "<enter ID token issuer url here>"
-    authorizationUrl: "<enter authorization url here>"
-    tokenEndPointUrl: "<enter token end point here>"
-    idTokenJwksUrl: "<enter ID token JWKS url here>"
-    accessTokenJwksUrl: "<enter Access token url here>"
+    redirectUri: "<enter redirect uri here>" # optional
+    idTokenIssuerUrl: "<enter ID token issuer url here>" # optional
+    authorizationUrl: "<enter authorization url here>" # optional
+    tokenEndPointUrl: "<enter token end point here>" # optional
+    idTokenJwksUrl: "<enter ID token JWKS url here>" # optional
+    accessTokenJwksUrl: "<enter Access token url here>" # optional
 
-resc-secret-tracking-service:
+resc-web-service:
   exposeToHostPort: 30800
   resc:
     config:
@@ -67,12 +69,12 @@ resc-secret-tracking-service:
     # To configure single sign on provide below values for ssoConfig attributes
     # These attributes will be used in the RESC API to validate access token
     ssoConfig:
-      ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>"
-      ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>"
+      ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>" # optional
+      ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>" # optional
     corsAllowedDomains: "http://localhost:8080, http://localhost:30000"
     authRequired: "false"
 
-resc-secret-tracking-service-no-auth:
+resc-web-service-no-auth:
   exposeToHostPort: 30900
   resc:
     config:
@@ -81,7 +83,7 @@ resc-secret-tracking-service-no-auth:
       dbPass: "<enter database password here>"
 
 resc-database:
-  hostOS: "NOTwindows" # For Windows OS, set value of hostOS: "windows"
+  hostOS: "linux" # possible values windows/linux
   database:
     exposeToHostPort: 30880
     pvc_path: "<enter path to store database data>" # Example: /Users/<username>/var/resc/database

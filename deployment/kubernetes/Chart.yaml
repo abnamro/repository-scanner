@@ -11,19 +11,19 @@ appVersion: "1.0.0"
 dependencies:
     - name: resc-vcs-instances
       version: "0.0.1"
-    - name: resc-project-collector
+    - name: resc-vcs-scraper-projects
       version: "0.0.1"
-    - name: resc-repository-collector
+    - name: resc-vcs-scraper-repositories
       version: "0.0.1"
-    - name: resc-secret-scanner
+    - name: resc-vcs-scanner-secrets
       version: "0.0.1"
-    - name: resc-dashboard
+    - name: resc-frontend
       version: "0.0.1"
     - name: resc-rabbitmq
       version: "0.0.1"
-    - name: resc-secret-tracking-service
+    - name: resc-web-service
       version: "0.0.1"
-    - name: resc-secret-tracking-service-no-auth
+    - name: resc-web-service-no-auth
       version: "0.0.1"
     - name: resc-database-init
       version: "0.0.1"

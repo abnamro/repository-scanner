@@ -1,6 +1,6 @@
-{{- define "resc.projectCollectorAnnotations" -}}
+{{- define "resc.vcsScraperProjectsAnnotations" -}}
 {{ end -}}
-{{- define "resc.repositoryCollectorAnnotations" -}}
+{{- define "resc.vcsScraperRepositoriesAnnotations" -}}
 {{ end -}}
 {{- define "resc.secretScannerAnnotations" -}}
 {{ end -}}

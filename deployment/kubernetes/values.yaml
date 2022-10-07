@@ -12,29 +12,29 @@ global:
   resc:
     image:
       repository: 
-      name: resc/repository-scanner-backend
-      tag: 1.1.16
+      name: 
+      tag: 
       pullPolicy: IfNotPresent
         
   rescFrontend:
     image:
       repository: 
-      name: resc/resc-frontend
-      tag: 0.7.28
+      name: 
+      tag: 
       pullPolicy: IfNotPresent
 
   VCSScraper:
     image:
       repository: 
-      name: resc/vcs-scraper
-      tag: 0.0.15
+      name: 
+      tag: 
       pullPolicy: IfNotPresent
         
   rescSecretScanner:
     image:
       repository: 
-      name: resc/secret-scanner
-      tag: 0.1.10
+      name: 
+      tag: 
       pullPolicy: IfNotPresent
       gitleaks:
         binaryPath: /repository_scanners/gitleaks_config/seco-gitleaks-linux-amd64

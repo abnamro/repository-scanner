@@ -1,0 +1,9 @@
+apiVersion: v2
+name: resc-vcs-scraper-repositories
+description: A Helm chart for collecting repositories from VCS instances
+
+type: application
+
+version: 0.0.1
+
+appVersion: "1.0.0"

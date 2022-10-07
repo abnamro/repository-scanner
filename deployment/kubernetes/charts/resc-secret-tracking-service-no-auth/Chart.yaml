@@ -1,9 +1,0 @@
-apiVersion: v2
-name: resc-secret-tracking-service-no-auth
-description: A Helm chart for the Repository Scanner Secret Tracking Service with Authentication disabled
-
-type: application
-
-version: 0.0.1
-
-appVersion: "1.0.0"
