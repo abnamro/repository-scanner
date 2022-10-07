@@ -2,7 +2,7 @@
 {{ end -}}
 {{- define "resc.vcsScraperRepositoriesAnnotations" -}}
 {{ end -}}
-{{- define "resc.secretScannerAnnotations" -}}
+{{- define "resc.vcsScannerSecretsAnnotations" -}}
 {{ end -}}
 {{- define "resc.mqInitAnnotations" -}}
 {{ end -}}
