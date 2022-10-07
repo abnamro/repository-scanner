@@ -63,7 +63,7 @@ describe('function requestLoginPage', () => {
     window.location.replace = jest.fn();
     AuthService.generateCodeChallenge = jest.fn().mockReturnValue('mockcodechalange');
     const expected_url =
-      'https://fake-sso-url/as/authorization.oauth2?response_type=code&scope=openid%20profile%20email&client_id=RESC&code_challenge_method=S256&code_challenge=mockcodechalange&redirect_uri=http://localhost:8080/callback';
+      'https://fake-sso-url/as/authorization.oauth2?response_type=code&scope=openid%20profile%20email&client_id=RESC&code_challenge_method=fake-code-challenge-method&code_challenge=mockcodechalange&redirect_uri=http://localhost:8080/callback';
     AuthService.requestLoginPage();
     expect(window.location.replace).toHaveBeenCalledWith(expected_url);
   });

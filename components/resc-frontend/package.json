@@ -1,7 +1,7 @@
 {
   "name": "resc-frontend",
-  "version": "0.7.29",
-  "author": "Secure Coding(SECO) Team",
+  "version": "0.7.30",
+  "author": "ABN AMRO Bank",
   "description": "Repository Scanner Frontend",
   "repository": {
     "type": "git",
