@@ -11,6 +11,5 @@ def get_required_packages():
 
 
 setup(
-    install_requires=get_required_packages(),
-    version="0.0.0"
+    install_requires=get_required_packages()
 )
