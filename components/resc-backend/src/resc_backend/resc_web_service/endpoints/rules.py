@@ -206,20 +206,25 @@ def upload_rule_pack_toml_file(rule_file: UploadFile = File(...),
         created_global_rule_allow_list and created_global_rule_allow_list.id_ else None
 
     current_newest_rule_pack = get_newest_rule_pack(db_connection)
-    if Version(current_newest_rule_pack.version) < Version(rule_pack_version):
-        logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', using it to replace "
-                    f"'{current_newest_rule_pack.version}' as the active one.")
-        activate_uploaded_rule_pack = True
-    else:
-        if not current_newest_rule_pack.active:
-            logger.info(f"There is already a more recent rule pack present in the database "
-                        f"'{current_newest_rule_pack.version}', but it is set to inactive. "
-                        f"Activating the uploaded rule pack '{rule_pack_version}'")
+    if current_newest_rule_pack:
+        if Version(current_newest_rule_pack.version) < Version(rule_pack_version):
+            logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', using it to replace "
+                        f"'{current_newest_rule_pack.version}' as the active one.")
             activate_uploaded_rule_pack = True
         else:
-            logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', the existing rule pack "
-                        f"'{current_newest_rule_pack.version}' is kept as the active one.")
-            activate_uploaded_rule_pack = False
+            if not current_newest_rule_pack.active:
+                logger.info(f"There is already a more recent rule pack present in the database "
+                            f"'{current_newest_rule_pack.version}', but it is set to inactive. "
+                            f"Activating the uploaded rule pack '{rule_pack_version}'")
+                activate_uploaded_rule_pack = True
+            else:
+                logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', the existing rule pack "
+                            f"'{current_newest_rule_pack.version}' is kept as the active one.")
+                activate_uploaded_rule_pack = False
+    else:
+        logger.info(f"No existing rule pack found, So activating the uploaded rule pack '{rule_pack_version}'")
+        activate_uploaded_rule_pack = True
+
     rule_pack = RulePackCreate(version=rule_pack_version, active=activate_uploaded_rule_pack,
                                global_allow_list=global_allow_list_id)
     created_rule_pack_version = create_rule_pack_version(rule_pack=rule_pack, db_connection=db_connection)
