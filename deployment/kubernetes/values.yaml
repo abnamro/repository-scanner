@@ -36,8 +36,6 @@ global:
       name: 
       tag: 
       pullPolicy: IfNotPresent
-      gitleaks:
-        binaryPath: /repository_scanners/gitleaks_config/seco-gitleaks-linux-amd64
 
   imagePullSecret: 
   imagePullSecret_proxy: 

@@ -37,7 +37,7 @@ spec:
             - secretRef:
                 name: {{ .Values.global.appName }}-database-secret
           volumeMounts:
-            - mountPath: "/var/opt/mssql"
+            - mountPath: "/var/opt/mssql/data"
               name: {{ .Values.global.appName }}-database-pv-storage
           ports:
             - containerPort: {{ .Values.database.port }}
