@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.global.appName }}-mq
+  namespace: {{ .Values.global.namespace }}
+spec:
+  serviceName: "rabbitmq"
+  selector:
+    matchLabels:
+      app: {{ .Values.global.appName }}
+      tier: rabbitmq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.appName }}
+        tier: rabbitmq
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- with include "resc.mqAnnotations" .}}
+          {{- nindent 8 .}}
+        {{- end }}
+    spec:
+      {{ if .Values.global.serviceAccountName }}
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+      {{ end }}
+      volumes:
+        - name: {{ .Values.global.appName }}-mq-pv-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.appName }}-mq-pv-volume-claim
+      containers:
+        - name: {{ .Values.global.appName }}-mq
+          image: {{ .Values.rabbitMQ.image.repository }}{{ .Values.rabbitMQ.image.name }}:{{ .Values.rabbitMQ.image.tag }}
+          imagePullPolicy: {{ .Values.rabbitMQ.image.pullPolicy }}
+          command: ["sh", "-c"]
+          args: ["{{ .Values.preStartUpCommand }} docker-entrypoint.sh rabbitmq-server"]
+          resources:
+            requests:
+              cpu: {{ .Values.rabbitMQ.resources.requests.cpu }}
+              memory: {{ .Values.rabbitMQ.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.rabbitMQ.resources.limits.cpu }}
+              memory: {{ .Values.rabbitMQ.resources.limits.memory }}
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.global.appName }}-rabbitmq-config
+            {{ if eq .Values.useKubernetesSecret "true"}}
+            - secretRef:
+                name: {{ .Values.global.appName }}-rabbitmq-admin-secret
+            {{ end }}
+          ports:
+            - containerPort: {{ .Values.rabbitMQ.config.port}}
+          volumeMounts:
+            - mountPath: "/var/lib/rabbitmq/mnesia"
+              subPath: "var/lib/rabbitmq/mnesia"
+              name: {{ .Values.global.appName }}-mq-pv-storage
+      {{ if .Values.global.imagePullSecret_proxy }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret_proxy }}
+      {{ end }}

@@ -29,10 +29,12 @@ def get_rules_by_scan_id(db_connection: Session, scan_id: int) -> List[RuleRead]
 def get_newest_rule_pack(db_connection: Session) -> rule_pack_schema.RulePackRead:
 
     rule_packs = db_connection.query(model.DBrulePack).all()
-    newest_rule_pack: rule_pack_schema.RulePackRead = rule_packs[0]
-    for rule_pack in rule_packs[1:]:
-        if Version(rule_pack.version) > Version(newest_rule_pack.version):
-            newest_rule_pack = rule_pack
+    newest_rule_pack = None
+    if rule_packs:
+        newest_rule_pack: rule_pack_schema.RulePackRead = rule_packs[0]
+        for rule_pack in rule_packs[1:]:
+            if Version(rule_pack.version) > Version(newest_rule_pack.version):
+                newest_rule_pack = rule_pack
     return newest_rule_pack
 
 

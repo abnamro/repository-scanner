@@ -1,0 +1,14 @@
+{{ if eq .Values.global.enableInClusterDatabase "true"}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.appName }}-database-pv-volume-claim
+  namespace: {{ .Values.global.namespace }}
+spec:
+  storageClassName: {{ .Values.global.appName }}-sql-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.database.pvc_size }}
+{{ end }}

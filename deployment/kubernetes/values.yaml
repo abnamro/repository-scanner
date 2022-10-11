@@ -1,0 +1,41 @@
+# Default values for resc.
+global:
+  deploymentEnvironment: "unknown"
+  authenticationEnabled: "true"
+  enableInClusterDatabase: "true"
+  namespace: resc
+  appName: resc
+  host:
+  ingress:
+    secretName: ingress-tls
+
+  resc:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+        
+  rescFrontend:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+
+  VCSScraper:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+        
+  rescSecretScanner:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+
+  imagePullSecret: 
+  imagePullSecret_proxy: 

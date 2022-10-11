@@ -12,6 +12,7 @@
           <!-- Auth warning -->
           <div class="warning-msg text-left font-weight-bold">
             Unauthorized access prohibited.<br />
+            {{ ssoLoginPageMessage }}
           </div>
         </b-col>
       </b-row>
@@ -27,11 +28,14 @@
 <script>
 import AuthService from '@/services/auth-service';
 import AxiosConfig from '@/configuration/axios-config.js';
+import Config from '@/configuration/config';
 
 export default {
   name: 'Login',
   data() {
-    return {};
+    return {
+      ssoLoginPageMessage: `${Config.value('ssoLoginPageMessage')}`,
+    };
   },
   methods: {
     login() {

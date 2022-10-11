@@ -25,7 +25,6 @@ from resc_backend.constants import (
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import rule as rule_crud
-from resc_backend.resc_web_service.crud.rule import get_newest_rule_pack
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.helpers.rule import (
     create_toml_dictionary,
@@ -205,21 +204,10 @@ def upload_rule_pack_toml_file(rule_file: UploadFile = File(...),
     global_allow_list_id = created_global_rule_allow_list.id_ if \
         created_global_rule_allow_list and created_global_rule_allow_list.id_ else None
 
-    current_newest_rule_pack = get_newest_rule_pack(db_connection)
-    if Version(current_newest_rule_pack.version) < Version(rule_pack_version):
-        logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', using it to replace "
-                    f"'{current_newest_rule_pack.version}' as the active one.")
-        activate_uploaded_rule_pack = True
-    else:
-        if not current_newest_rule_pack.active:
-            logger.info(f"There is already a more recent rule pack present in the database "
-                        f"'{current_newest_rule_pack.version}', but it is set to inactive. "
-                        f"Activating the uploaded rule pack '{rule_pack_version}'")
-            activate_uploaded_rule_pack = True
-        else:
-            logger.info(f"Uploaded rule pack is of version '{rule_pack_version}', the existing rule pack "
-                        f"'{current_newest_rule_pack.version}' is kept as the active one.")
-            activate_uploaded_rule_pack = False
+    # Determine if uploaded rule pack needs to be activated
+    current_newest_rule_pack = rule_crud.get_newest_rule_pack(db_connection)
+    activate_uploaded_rule_pack = determine_uploaded_rule_pack_activation(rule_pack_version, current_newest_rule_pack)
+
     rule_pack = RulePackCreate(version=rule_pack_version, active=activate_uploaded_rule_pack,
                                global_allow_list=global_allow_list_id)
     created_rule_pack_version = create_rule_pack_version(rule_pack=rule_pack, db_connection=db_connection)
@@ -299,3 +287,26 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
             created_rule = create_rule(rule=rule_obj, db_connection=db_connection)
             if not created_rule.id_:
                 logger.warning(f"Creating rule failed for Rule: {rule_name}")
+
+
+def determine_uploaded_rule_pack_activation(requested_rule_pack_version: str, latest_rule_pack_from_db: RulePackRead):
+    if latest_rule_pack_from_db:
+        if Version(latest_rule_pack_from_db.version) < Version(requested_rule_pack_version):
+            logger.info(f"Uploaded rule pack is of version '{requested_rule_pack_version}', using it to replace "
+                        f"'{latest_rule_pack_from_db.version}' as the active one.")
+            activate_uploaded_rule_pack = True
+        else:
+            if not latest_rule_pack_from_db.active:
+                logger.info(f"There is already a more recent rule pack present in the database "
+                            f"'{latest_rule_pack_from_db.version}', but it is set to inactive. "
+                            f"Activating the uploaded rule pack '{requested_rule_pack_version}'")
+                activate_uploaded_rule_pack = True
+            else:
+                logger.info(f"Uploaded rule pack is of version '{requested_rule_pack_version}', the existing rule pack "
+                            f"'{latest_rule_pack_from_db.version}' is kept as the active one.")
+                activate_uploaded_rule_pack = False
+    else:
+        logger.info(
+            f"No existing rule pack found, So activating the uploaded rule pack '{requested_rule_pack_version}'")
+        activate_uploaded_rule_pack = True
+    return activate_uploaded_rule_pack

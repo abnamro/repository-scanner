@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.global.appName }}-mq-pv-volume-claim
+  namespace: {{ .Values.global.namespace }}
+spec:
+  storageClassName: {{ .Values.global.appName }}-mq-storage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.rabbitMQ.pvc_size }}

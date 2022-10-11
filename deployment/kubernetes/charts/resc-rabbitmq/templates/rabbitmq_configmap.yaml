@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-rabbitmq-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  {{ if .Values.rabbitMQ.config.vhost }}
+  RABBITMQ_DEFAULT_VHOST: "{{ .Values.rabbitMQ.config.vhost }}"
+  {{ end }}
