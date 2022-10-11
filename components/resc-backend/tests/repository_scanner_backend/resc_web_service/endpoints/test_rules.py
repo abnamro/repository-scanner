@@ -21,6 +21,7 @@ from resc_backend.db.model.rule_allow_list import DBruleAllowList
 from resc_backend.db.model.rule_pack import DBrulePack
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
+from resc_backend.resc_web_service.endpoints.rules import determine_uploaded_rule_pack_activation
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.rule import RuleCreate
 from resc_backend.resc_web_service.schema.rule_allow_list import RuleAllowListCreate
@@ -445,3 +446,52 @@ class TestRules(unittest.TestCase):
         assert data["detail"][0]["loc"] == ["query", "limit"]
         assert data["detail"][0]["msg"] == "ensure this value is greater than or equal to 1"
         get_all_rule_pack_versions.assert_not_called()
+
+    @patch('logging.Logger.info')
+    def test_rule_pack_activation_when_requested_rule_pack_version_is_greater_than_latest_rule_pack_from_db(self, mock):
+        db_rule_pack = self.db_rule_packs[0]
+        latest_rule_pack_from_db = db_rule_pack
+        requested_rule_pack_version = "1.0.2"
+        activate_uploaded_rule_pack = determine_uploaded_rule_pack_activation(requested_rule_pack_version,
+                                                                              latest_rule_pack_from_db)
+        assert activate_uploaded_rule_pack is True
+        mock.assert_called_with(
+            f"Uploaded rule pack is of version '{requested_rule_pack_version}', using it to replace "
+            f"'{latest_rule_pack_from_db.version}' as the active one.")
+
+    @patch('logging.Logger.info')
+    def test_rule_pack_activation_when_no_rule_pack_present_in_db(self, mock):
+        latest_rule_pack_from_db = None
+        requested_rule_pack_version = "1.0.2"
+        activate_uploaded_rule_pack = determine_uploaded_rule_pack_activation(requested_rule_pack_version,
+                                                                              latest_rule_pack_from_db)
+        assert activate_uploaded_rule_pack is True
+        mock.assert_called_with(
+            f"No existing rule pack found, So activating the uploaded rule pack '{requested_rule_pack_version}'")
+
+    @patch('logging.Logger.info')
+    def test_rule_pack_activation_when_latest_rule_pack_from_db_is_greater_and_latest_rule_pack_from_db_is_inactive(
+            self, mock):
+        db_rule_pack = self.db_rule_packs[0]
+        latest_rule_pack_from_db = db_rule_pack
+        requested_rule_pack_version = "1.0.0"
+        activate_uploaded_rule_pack = determine_uploaded_rule_pack_activation(requested_rule_pack_version,
+                                                                              latest_rule_pack_from_db)
+        assert activate_uploaded_rule_pack is True
+        mock.assert_called_with(
+            f"There is already a more recent rule pack present in the database "
+            f"'{latest_rule_pack_from_db.version}', but it is set to inactive. "
+            f"Activating the uploaded rule pack '{requested_rule_pack_version}'")
+
+    @patch('logging.Logger.info')
+    def test_rule_pack_activation_when_latest_rule_pack_from_db_is_greater_and_latest_rule_pack_from_db_is_active(self,
+                                                                                                                  mock):
+        db_rule_pack = DBrulePack(version="1.0.1", active=True, global_allow_list=1)
+        latest_rule_pack_from_db = db_rule_pack
+        requested_rule_pack_version = "1.0.0"
+        activate_uploaded_rule_pack = determine_uploaded_rule_pack_activation(requested_rule_pack_version,
+                                                                              latest_rule_pack_from_db)
+        assert activate_uploaded_rule_pack is False
+        mock.assert_called_with(
+            f"Uploaded rule pack is of version '{requested_rule_pack_version}', the existing rule pack "
+            f"'{latest_rule_pack_from_db.version}' is kept as the active one.")
