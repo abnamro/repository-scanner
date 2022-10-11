@@ -22,7 +22,7 @@ ssoConfig:
   accessTokenJwksUrl:
   ssoCodeChallengeMethod:
   ssoJwtSigningAlgorithm:
-  ssoLoginPageMessage: 
+  ssoLoginPageMessage: "Please use the Login button"
 
 
 rescFrontend:
