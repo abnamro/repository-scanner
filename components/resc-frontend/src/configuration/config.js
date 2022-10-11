@@ -18,6 +18,7 @@ export default class Config {
       ssoClientId: 'RESC',
       ssoCodeChallengeMethod: '$VUE_APP_SSO_CODE_CHALLENGE_METHOD',
       ssoJwtSigningAlgorithm: '$VUE_APP_SSO_JWT_SIGNING_ALOGORITHM',
+      ssoLoginPageMessage: '$VUE_APP_SSO_LOGIN_PAGE_MESSAGE',
       defaultPageSize: '100',
     };
   }

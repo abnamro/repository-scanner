@@ -30,3 +30,12 @@ data:
   {{ if .Values.ssoConfig.accessTokenJwksUrl }}
   VUE_APP_SSO_ACCESS_TOKEN_JWKS_URL: {{ .Values.ssoConfig.accessTokenJwksUrl }}
   {{ end }}
+  {{ if .Values.ssoConfig.ssoCodeChallengeMethod }}
+  VUE_APP_SSO_CODE_CHALLENGE_METHOD: {{ .Values.ssoConfig.ssoCodeChallengeMethod }}
+  {{ end }}
+  {{ if .Values.ssoConfig.ssoJwtSigningAlgorithm }}
+  VUE_APP_SSO_JWT_SIGNING_ALOGORITHM: {{ .Values.ssoConfig.ssoJwtSigningAlgorithm }}
+  {{ end }}
+  {{ if .Values.ssoConfig.ssoLoginPageMessage }}
+  VUE_APP_SSO_LOGIN_PAGE_MESSAGE: {{ .Values.ssoConfig.ssoLoginPageMessage }}
+  {{ end }}

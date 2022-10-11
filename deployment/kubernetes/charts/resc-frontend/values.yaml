@@ -19,7 +19,10 @@ ssoConfig:
   authorizationUrl: 
   tokenEndPointUrl: 
   idTokenJwksUrl: 
-  accessTokenJwksUrl: 
+  accessTokenJwksUrl:
+  ssoCodeChallengeMethod:
+  ssoJwtSigningAlgorithm:
+  ssoLoginPageMessage: 
 
 
 rescFrontend:
