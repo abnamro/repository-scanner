@@ -306,6 +306,7 @@ def determine_uploaded_rule_pack_activation(requested_rule_pack_version: str, la
                             f"'{latest_rule_pack_from_db.version}' is kept as the active one.")
                 activate_uploaded_rule_pack = False
     else:
-        logger.info(f"No existing rule pack found, So activating the uploaded rule pack '{requested_rule_pack_version}'")
+        logger.info(
+            f"No existing rule pack found, So activating the uploaded rule pack '{requested_rule_pack_version}'")
         activate_uploaded_rule_pack = True
     return activate_uploaded_rule_pack
