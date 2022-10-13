@@ -2,7 +2,7 @@
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
-1. [About The Project](#about-the-project)
+1. [About The Component](#about-the-component)
 2. [Technology Stack](#technology-stack)
 3. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -11,9 +11,9 @@
     - [Testing](#testing)
 4. [Additional Information](#additional-information)
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
-Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and BootstrapVue framework. It includes screens such as  Analytics , Repositories , Scan Findings, Rule Analytics and Rule Pack.
+<!-- ABOUT THE COMPONENT -->
+## About The Component
+Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and BootstrapVue framework. It includes screens such as Analytics, Repositories, Scan Findings, Rule Analytics and Rule Pack.
 
 <!-- TECHNOLOGY STACK -->
 ## Technology Stack
@@ -33,7 +33,6 @@ These instructions will get you a copy of the project up and running on your loc
 - Ensure RESC webservice is up and running at http://localhost:30000/ in order to visualize data.
 
 ### Run locally
-[(Back to top)](#table-of-contents)
 
 Follow the below steps to run the project locally:-
 ```
@@ -50,12 +49,12 @@ Now access the application using this url: http://localhost:8080/
 ***Note:***  Replace the actual values in the placeholders <branch-name> and <repository-scanner repo url>
 
 ### Run using docker
-[(Back to top)](#table-of-contents)
 
-Build the RESC Frontend docker image locally by running the following command (image version parameter defaults to 1.0.0):
-```
-./rebuild.sh <image version>
-```
+Build the RESC Frontend docker image locally by running the following commands (Keep the image version parameter in mind):
+
+- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-frontend:0.0.1`
+- Build the docker image by running:`docker build -t abnamro/resc-frontend:0.0.1`
+- Run the RESC frontend by using the following command: `docker run --name resc-frontend abnamro/resc-frontend:0.0.1`
 
 Now access the application using this url: http://localhost:8080/
 
