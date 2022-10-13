@@ -60,6 +60,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Docker Lint
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ${{ env.RESC_FRONTEND_DIR }}/Dockerfile
+          failure-threshold: error
+
       - name: Get Branch Name
         run: |
           if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
