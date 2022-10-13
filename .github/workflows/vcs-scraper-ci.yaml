@@ -105,7 +105,7 @@ jobs:
         with:
           password: ${{ secrets.__TEST_PYPI_TOKEN__ }}
           packages_dir: ${{ env.RESC_VCS_SCRAPER_DIR }}/dist
-          skip_existing: false
+          skip_existing: true
           repository_url: https://test.pypi.org/legacy/
 
   dockerize:
