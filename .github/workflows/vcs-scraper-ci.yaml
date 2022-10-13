@@ -100,7 +100,7 @@ jobs:
           python setup.py sdist bdist_wheel
 
       - name: Publish python package to PyPI
-        if: ${{ needs.python-basic-validation.outputs.branch_name }}  == 'main'
+        if: ${{ needs.python-basic-validation.outputs.branch_name == 'main' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.__TEST_PYPI_TOKEN__ }}
