@@ -66,6 +66,21 @@ jobs:
           dockerfile: ${{ env.RESC_FRONTEND_DIR }}/Dockerfile
           failure-threshold: error
 
+      - name: Build an image from Dockerfile
+        run: |
+          cd ${{ env.RESC_FRONTEND_DIR }}
+          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
       - name: Get Branch Name
         run: |
           if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
