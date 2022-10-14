@@ -57,4 +57,12 @@ jobs:
         exclude_paths: '${{ env.KUBERNETES_INFRA_DIR }}/example-values.yaml'
         fail_on: high,medium
 
+    - name: Run IaC scan using Checkov
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: '${{ env.KUBERNETES_INFRA_DIR }}'
+        quiet: true
+        soft_fail: true
+        output_format: json
     
