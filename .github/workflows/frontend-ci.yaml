@@ -19,7 +19,7 @@ env:
   IMAGE_TAG: 0.0.1
 
 jobs:
-  build-nodejs:
+  nodejs-basic-validation:
     name: Build Nodejs
     runs-on: ubuntu-latest
 
@@ -51,9 +51,14 @@ jobs:
         cd ${{ env.RESC_FRONTEND_DIR }}
         npm run ut
 
+    - name: Run Software Composition Analysis using AuditJS
+      run: | 
+        cd ${{ env.RESC_FRONTEND_DIR }}
+        npx auditjs@latest ossi -q || true
+
   dockerize:
     name: Build and Push Docker image
-    needs: build-nodejs
+    needs: nodejs-basic-validation
     runs-on: ubuntu-latest
 
     steps:
