@@ -1,0 +1,68 @@
+name: Kubernetes Infra CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/k8-infra-ci.yaml
+      - deployment/kubernetes/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/k8-infra-ci.yaml
+      - components/kubernetes/**
+
+env:
+  KUBERNETES_INFRA_DIR: deployment/kubernetes
+
+jobs:
+  helm-chart-validation:
+    name: Helm Chart Validation and IaC scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.10.0
+
+    - name: Download Secret Scan Rule Config File
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
+        echo 'version = "0.0.1"' | cat - gitleaks.toml > temp && mv temp gitleaks.toml
+
+    - name: Helm Dependency Update
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        helm dependency update
+
+    - name: Helm Lint
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        helm lint . --set-file global.secretScanRulePackConfig=./gitleaks.toml
+
+    - name: Helm Template
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./gitleaks.toml
+
+    - name: Run IaC scan using kics
+      uses: checkmarx/kics-github-action@v1.6
+      with:
+        path: '${{ env.KUBERNETES_INFRA_DIR }}'
+        exclude_paths: '${{ env.KUBERNETES_INFRA_DIR }}/example-values.yaml'
+        fail_on: high,medium
+
+    - name: Run IaC scan using Checkov
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: '${{ env.KUBERNETES_INFRA_DIR }}'
+        quiet: true
+        soft_fail: true
+        output_format: json
+    
