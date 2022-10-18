@@ -1,0 +1,173 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/backend-ci.yaml
+      - components/resc-backend/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - .github/workflows/backend-ci.yaml
+      - components/resc-backend/**
+
+env:
+  RESC_BACKEND_DIR: components/resc-backend
+  CONTAINER_REGISTRY: ghcr.io
+  IMAGE_NAME: abnamro/resc-backend
+  IMAGE_TAG: 0.0.1
+
+jobs:
+  python-basic-validation:
+    name: Python Basic Validation
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install test dependencies
+      run: |
+        cd ${{ env.RESC_BACKEND_DIR }}
+        pip install -r test-requirements.txt
+        tox
+
+    - name: Test with pytest
+      run: |
+        cd ${{ env.RESC_BACKEND_DIR }}
+        tox -e pytest
+
+    - name: Import sorting with isort
+      run: |
+        cd ${{ env.RESC_BACKEND_DIR }}
+        tox -e lint
+        tox -e sort
+    
+    - name: Lint with flake8
+      run: |
+        cd ${{ env.RESC_BACKEND_DIR }}
+        tox -e lint
+
+    - name: Get Branch Name
+      id: extract_branch
+      run: |
+        if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
+            export BRANCH_NAME="${GITHUB_HEAD_REF}"
+            echo "::set-output name=branch_name::${BRANCH_NAME}"
+        elif [[ ${GITHUB_EVENT_NAME} == 'push' ]]; then
+            export BRANCH_NAME="${GITHUB_REF_NAME}"
+            echo "::set-output name=branch_name::${BRANCH_NAME}"
+        else
+            echo "Event is neither pull_request nor push"
+        fi
+    outputs:
+      branch_name: ${{ steps.extract_branch.outputs.branch_name }}
+        
+    
+  python-build-and-publish:
+    name: Python Build and Publish
+    needs: python-basic-validation
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Building python package
+        run: |
+          cd ${{ env.RESC_BACKEND_DIR }}
+          python -m pip install --upgrade pip
+          pip install build wheel
+          python setup.py sdist bdist_wheel
+
+      - name: Publish python package to PyPI
+        if: ${{ needs.python-basic-validation.outputs.branch_name == 'main' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.__TEST_PYPI_TOKEN__ }}
+          packages_dir: ${{ env.RESC_BACKEND_DIR }}/dist
+          skip_existing: true
+          repository_url: https://test.pypi.org/legacy/
+
+  dockerize:
+    name: Build and Push Docker image
+    needs: [python-basic-validation, python-build-and-publish]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Docker Lint
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ${{ env.RESC_BACKEND_DIR }}/Dockerfile
+          failure-threshold: error
+
+      - name: Build an image from Dockerfile
+        run: |
+          cd ${{ env.RESC_BACKEND_DIR }}
+          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Get Branch Name
+        run: |
+          if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
+              echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> "$GITHUB_ENV"
+          elif [[ ${GITHUB_EVENT_NAME} == 'push' ]]; then
+              echo "BRANCH_NAME=$(echo ${GITHUB_REF_NAME})" >> "$GITHUB_ENV"
+          else
+              echo "Event is neither pull_request nor push"
+          fi
+
+      - name: Determine if image needs to be published
+        run: |
+          if [[ ${{ needs.python-basic-validation.outputs.branch_name }} == 'main' ]]; then
+              echo "PUBLISH_IMAGE=true" >> "$GITHUB_ENV"
+              echo "Going to publish image to registry"
+          else
+              echo "PUBLISH_IMAGE=false" >> "$GITHUB_ENV"
+              echo "Skipping publishing of image to registry"
+          fi
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ${{ env.RESC_BACKEND_DIR }}/
+          push: ${{ env.PUBLISH_IMAGE }}
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
