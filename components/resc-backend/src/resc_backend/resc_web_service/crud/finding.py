@@ -481,3 +481,26 @@ def get_findings_count_by_time_total(db_connection: Session,
 
     result = query.count()
     return result
+
+
+def get_distinct_rules_from_scans(db_connection: Session, scan_ids: List[int] = None) -> \
+        List[model.DBrule]:
+    """
+        Retrieve distinct rules detected
+    :param db_connection:
+        Session of the database connection
+    :param scan_ids:
+        List of scan ids
+    :return: rules
+        List of unique rules
+    """
+    query = db_connection.query(model.DBrule.rule_name)
+    query = query.join(model.DBfinding, model.DBfinding.rule_name == model.DBrule.rule_name)
+
+    if scan_ids:
+        query = query.join(model.DBscanFinding,
+                           model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
+        query = query.filter(model.DBscanFinding.scan_id.in_(scan_ids))
+
+    rules = query.distinct().order_by(model.DBrule.rule_name).all()
+    return rules

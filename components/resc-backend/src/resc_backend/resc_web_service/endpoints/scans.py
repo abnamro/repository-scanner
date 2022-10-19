@@ -1,5 +1,7 @@
 # Standard Library
+import json
 import logging
+import urllib
 from typing import List
 
 # Third Party
@@ -59,7 +61,6 @@ def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default
              response_model=scan_schema.ScanRead,
              status_code=status.HTTP_201_CREATED)
 def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(get_db_connection)):
-
     # Determine the increment number if needed and not supplied
     if scan.scan_type == ScanType.INCREMENTAL and (not scan.increment_number or scan.increment_number <= 0):
         last_scan = scan_crud.get_latest_scan_for_branch(db_connection, branch_info_id=scan.branch_info_id)
@@ -213,21 +214,33 @@ def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="S
     return PaginationModel[finding_schema.FindingRead](data=findings, total=total_findings, limit=limit, skip=skip)
 
 
-@router.get("/{scan_id}"f"{RWS_ROUTE_DETECTED_RULES}",
+@router.get(f"{RWS_ROUTE_DETECTED_RULES}/",
             response_model=List[str],
             status_code=status.HTTP_200_OK)
-def get_distinct_rules_from_findings(scan_id: int, db_connection: Session = Depends(get_db_connection)) -> List[str]:
+def get_distinct_rules_from_scans(query_string: str = None,
+                                  db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
-        Retrieve all uniquely detected rules across a certain scans findings
-    :param scan_id:
-        Id of the scan for which to retrieve the detected rules
+        Retrieve all uniquely detected rules for given scans
+    :param query_string:
+
+        A query string with the following format:
+            param1=value1
+
+        Where the possible parameters are:
+            scan_ids of type list Integer, Example: scan_ids=[1,2,3,4]
     :param db_connection:
         Session of the database connection
     :return: List[str]
-        The output will contain a list of strings of unique rules in the findings of a scan
+        The output will contain a list of strings of unique rules for given scans
     """
     return_rules = []
-    rules = finding_crud.get_distinct_rules_from_findings(db_connection, scan_id=scan_id)
-    for rule in rules:
-        return_rules.append(rule.rule_name)
+    scan_ids = []
+    parsed_query_string_params = dict(urllib.parse.parse_qsl(query_string))
+    if parsed_query_string_params.get('scan_ids'):
+        scan_ids = parsed_query_string_params['scan_ids'] = json.loads(parsed_query_string_params['scan_ids'])
+
+    if scan_ids:
+        rules = finding_crud.get_distinct_rules_from_scans(db_connection, scan_ids=scan_ids)
+        for rule in rules:
+            return_rules.append(rule.rule_name)
     return return_rules
