@@ -128,6 +128,9 @@ export default {
         this.$emit('previous-scans-checked', false);
         this.handleFilterChange();
       }
+
+      // Refresh rules in filter based on scan ids
+      this.refreshRuleFilter();
     },
     formatScanDateFilterOptions(scan) {
       return `${scan.scanDate}: ${scan.scanType}`;
@@ -159,9 +162,31 @@ export default {
         this.togglePreviousScans();
       }
     },
+    getPreviousScanIds() {
+      const previousScanIds = [];
+      for (const scan of this.previousScans) {
+        previousScanIds.push(scan.id_);
+      }
+      const scanIds = this.includePreviousScans ? previousScanIds : [this.selectedScan.scanId];
+      return scanIds;
+    },
+    refreshRuleFilter() {
+      const scanIds = this.getPreviousScanIds();
+      if (scanIds.length > 0) {
+        ScanFindingsService.getRulesByScanIds(scanIds)
+          .then((response) => {
+            this.selectedRule = null;
+            this.ruleList = response.data;
+          })
+          .catch((error) => {
+            AxiosConfig.handleError(error);
+          });
+      }
+    },
     fetchRules() {
-      if (this.selectedScan.scanId) {
-        ScanFindingsService.getRulesByScanId(this.selectedScan.scanId)
+      const scanIds = this.getPreviousScanIds();
+      if (this.selectedScan.scanId && scanIds.length > 0) {
+        ScanFindingsService.getRulesByScanIds(scanIds)
           .then((response) => {
             this.selectedRule = null;
             this.ruleList = response.data;

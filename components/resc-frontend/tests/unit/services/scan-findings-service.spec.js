@@ -103,7 +103,7 @@ describe('getRepositoryInfoById', () => {
       it('should return rules', async () => {
         axios.get.mockResolvedValueOnce(mock_rules);
 
-        const response = await ScanFindingsService.getRulesByScanId(1);
+        const response = await ScanFindingsService.getRulesByScanIds([1, 2]);
 
         expect(response).toEqual(mock_rules);
         expect(response).toBeDefined();
@@ -116,7 +116,7 @@ describe('getRepositoryInfoById', () => {
       it('should return error', async () => {
         axios.get.mockResolvedValueOnce([]);
 
-        await ScanFindingsService.getRulesByScanId('not valid')
+        await ScanFindingsService.getRulesByScanIds('not valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
