@@ -1,9 +1,7 @@
 # Standard Library
 import unittest
 from datetime import datetime
-from typing import List
 from unittest.mock import ANY, patch
-from urllib.parse import quote, urlencode
 
 # Third Party
 from fastapi.testclient import TestClient
@@ -325,14 +323,9 @@ class TestScans(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_scans")
     def test_get_distinct_rules_from_scans(self, get_distinct_rules_from_scans):
-        scan_ids: List[int] = [1, 2]
         get_distinct_rules_from_scans.return_value = self.db_rules
-
-        all_params = {"scan_ids": scan_ids}
-        all_params_url_encoded = quote(urlencode(all_params))
-
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}"
-                                   f"{RWS_ROUTE_DETECTED_RULES}/?query_string={all_params_url_encoded}")
+                                   f"{RWS_ROUTE_DETECTED_RULES}/?scan_id=1&scan_id=2")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data) == len(self.db_rules)

@@ -1,7 +1,5 @@
 # Standard Library
-import json
 import logging
-import urllib
 from typing import List
 
 # Third Party
@@ -217,28 +215,18 @@ def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="S
 @router.get(f"{RWS_ROUTE_DETECTED_RULES}/",
             response_model=List[str],
             status_code=status.HTTP_200_OK)
-def get_distinct_rules_from_scans(query_string: str = None,
+def get_distinct_rules_from_scans(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                                   db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all uniquely detected rules for given scans
-    :param query_string:
-
-        A query string with the following format:
-            param1=value1
-
-        Where the possible parameters are:
-            scan_ids of type list Integer, Example: scan_ids=[1,2,3,4]
+    :param scan_ids:
+        scan ids for which to retrieve the unique rules
     :param db_connection:
         Session of the database connection
     :return: List[str]
         The output will contain a list of strings of unique rules for given scans
     """
     return_rules = []
-    scan_ids = []
-    parsed_query_string_params = dict(urllib.parse.parse_qsl(query_string))
-    if parsed_query_string_params.get('scan_ids'):
-        scan_ids = parsed_query_string_params['scan_ids'] = json.loads(parsed_query_string_params['scan_ids'])
-
     if scan_ids:
         rules = finding_crud.get_distinct_rules_from_scans(db_connection, scan_ids=scan_ids)
         for rule in rules:

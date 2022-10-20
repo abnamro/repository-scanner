@@ -15,22 +15,17 @@ const ScanFindingsService = {
   },
 
   async getRulesByScanIds(scanIds) {
-    let query_string = '';
-
+    let queryParams = '';
     if (scanIds) {
-      query_string += `&scan_ids=${encodeURIComponent(JSON.stringify(scanIds))}`;
+      scanIds.forEach((scanId) => {
+        queryParams += `&scan_id=${scanId}`;
+      });
     }
-    if (query_string) {
-      query_string = query_string.substring(1);
-    } else {
-      query_string = null;
+    if (queryParams) {
+      queryParams = queryParams.slice(1);
     }
 
-    return axios.get(`/scans/detected-rules/`, {
-      params: {
-        query_string: query_string,
-      },
-    });
+    return axios.get(`/scans/detected-rules/?${queryParams}`);
   },
 
   async getScansByBranchId(branchId, perPage, skipRowCount) {
