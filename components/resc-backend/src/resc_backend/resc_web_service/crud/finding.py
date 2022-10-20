@@ -128,43 +128,6 @@ def get_findings(db_connection: Session, skip: int = 0,
     return findings
 
 
-def get_scan_findings(db_connection, scan_id: int, skip: int = 0, limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT,
-                      rule_filter: str = "", status_filter: FindingStatus = None) -> [model.DBfinding]:
-    """
-        Retrieve all finding child objects of a scan object from the database
-    :param db_connection:
-        Session of the database connection
-    :param scan_id:
-        id of the parent scan object of which to retrieve finding objects
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param rule_filter:
-        optional, filter on rule name. Is used as a string contains filter
-    :param status_filter:
-        optional, filter on status of findings
-    :return: [DBfinding]
-        The output will contain a list of DBfinding type objects,
-        or an empty list if no finding was found for the given scan_id
-    """
-    limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-    query = db_connection.query(model.DBfinding)
-
-    if rule_filter:
-        query = query.join(model.DBrule, model.DBfinding.rule_id == model.DBrule.id_)
-        query = query.filter(model.DBrule.rule_name.ilike(f"%{rule_filter}%"))
-        query = query.join(model.DBscanFinding,
-                           model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
-        query = query.filter(model.DBscanFinding.scan_id == scan_id)
-
-    if status_filter:
-        query = query.filter(model.DBfinding.status == status_filter)
-
-    findings = query.order_by(model.finding.DBfinding.id_).offset(skip).limit(limit_val).all()
-    return findings
-
-
 def get_scans_findings(db_connection, scan_ids: [int], skip: int = 0, limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT,
                        rules_filter: [str] = None, statuses_filter: [FindingStatus] = None) -> [model.DBfinding]:
     """
@@ -217,10 +180,6 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
 
     total_count_query = db_connection.query(func.count(model.DBfinding.id_))
     if findings_filter:
-        if findings_filter.rule_names:
-            total_count_query = total_count_query.join(
-                model.DBrule, model.DBfinding.rule_name == model.DBrule.rule_name)
-
         if (findings_filter.vcs_providers and findings_filter.vcs_providers is not None) \
                 or findings_filter.project_name or findings_filter.branch_name \
                 or findings_filter.repository_name or findings_filter.start_date_range \
@@ -256,7 +215,7 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
             total_count_query = total_count_query.filter(
                 model.repository_info.DBrepositoryInfo.project_key == findings_filter.project_name)
         if findings_filter.rule_names:
-            total_count_query = total_count_query.filter(model.DBrule.rule_name.in_(findings_filter.rule_names))
+            total_count_query = total_count_query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
         if findings_filter.finding_statuses:
             total_count_query = total_count_query.filter(
                 model.finding.DBfinding.status.in_(findings_filter.finding_statuses))
@@ -279,9 +238,8 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
 def get_findings_by_rule(db_connection: Session, skip: int = 0, limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT,
                          rule_name: str = ""):
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-    findings = db_connection.query(model.DBfinding, model.DBrule.rule_name)
-    findings = findings.join(model.DBrule, model.DBfinding.rule_id == model.DBrule.id_)
-    findings = findings.filter(model.DBrule.rule_name == rule_name)
+    findings = db_connection.query(model.DBfinding)
+    findings = findings.filter(model.DBfinding.rule_name == rule_name)
     findings = findings.order_by(model.finding.DBfinding.id_).offset(skip).limit(limit_val).all()
     return findings
 
@@ -315,8 +273,7 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
     :return: rules
         List of unique rules
     """
-    query = db_connection.query(model.DBrule.rule_name)
-    query = query.join(model.DBfinding, model.DBfinding.rule_name == model.DBrule.rule_name)
+    query = db_connection.query(model.DBfinding.rule_name)
 
     if (vcs_providers or project_name or repository_name or start_date or end_date) and scan_id < 0:
         query = query \
@@ -354,7 +311,7 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
         if end_date:
             query = query.filter(model.scan.DBscan.timestamp <= end_date)
 
-    rules = query.distinct().order_by(model.DBrule.rule_name).all()
+    rules = query.distinct().order_by(model.DBfinding.rule_name).all()
     return rules
 
 
@@ -375,9 +332,6 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     """
     query = db_connection.query(model.DBfinding.status, func.count(model.DBfinding.status).label('status_count'))
 
-    if rule_name:
-        query = query.join(model.DBrule, model.DBfinding.rule_name == model.DBrule.rule_name)
-
     if scan_ids and len(scan_ids) > 0:
         query = query \
             .join(model.DBscanFinding,
@@ -388,7 +342,7 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     if finding_statuses:
         query = query.filter(model.DBfinding.status.in_(finding_statuses))
     if rule_name:
-        query = query.filter(model.DBrule.rule_name == rule_name)
+        query = query.filter(model.DBfinding.rule_name == rule_name)
 
     findings_count_by_status = query.group_by(model.DBfinding.status).all()
 
@@ -481,3 +435,25 @@ def get_findings_count_by_time_total(db_connection: Session,
 
     result = query.count()
     return result
+
+
+def get_distinct_rules_from_scans(db_connection: Session, scan_ids: List[int] = None) -> \
+        List[model.DBrule]:
+    """
+        Retrieve distinct rules detected
+    :param db_connection:
+        Session of the database connection
+    :param scan_ids:
+        List of scan ids
+    :return: rules
+        List of unique rules
+    """
+    query = db_connection.query(model.DBfinding.rule_name)
+
+    if scan_ids:
+        query = query.join(model.DBscanFinding,
+                           model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
+        query = query.filter(model.DBscanFinding.scan_id.in_(scan_ids))
+
+    rules = query.distinct().order_by(model.DBfinding.rule_name).all()
+    return rules

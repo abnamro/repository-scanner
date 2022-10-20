@@ -100,7 +100,7 @@ export default {
       currentItems: [],
       totalRows: 0,
       currentPage: 1,
-      perPage: `${Config.value('defaultPageSize')}`,
+      perPage: Number(`${Config.value('defaultPageSize')}`),
       pageSizes: [20, 50, 100],
       requestedPageNumber: 1,
       vcsFilter: null,

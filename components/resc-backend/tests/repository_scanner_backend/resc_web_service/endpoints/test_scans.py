@@ -26,12 +26,12 @@ class TestScans(unittest.TestCase):
             self.db_scans.append(DBscan(branch_info_id=i, scan_type="BASE",
                                         last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(),
                                         increment_number=0, rule_pack=f"rule_pack_{i}"))
-            self.db_scans[i-1].id_ = i
+            self.db_scans[i - 1].id_ = i
 
         self.db_rules = []
         for i in range(1, 6):
             self.db_rules.append(DBrule(rule_name=f"test{i}", rule_pack=f"rule_pack_{i}", description=f"descr{i}"))
-            self.db_rules[i-1].id_ = i
+            self.db_rules[i - 1].id_ = i
 
         self.db_findings = []
         for i in range(1, 6):
@@ -47,7 +47,7 @@ class TestScans(unittest.TestCase):
                                               rule_name=f"rule_{i}",
                                               event_sent_on=datetime.utcnow(),
                                               branch_info_id=1))
-            self.db_findings[i-1].id_ = i
+            self.db_findings[i - 1].id_ = i
 
         self.enriched_findings = []
         for i in range(1, 6):
@@ -321,11 +321,11 @@ class TestScans(unittest.TestCase):
         assert data["detail"][0]["msg"] == "value is not a valid integer"
         assert data["detail"][0]["type"] == "type_error.integer"
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
-    def test_get_scan_finding_rules(self, get_distinct_rules_from_findings):
-        get_distinct_rules_from_findings.return_value = self.db_rules
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_SCANS}/1{RWS_ROUTE_DETECTED_RULES}")
+    @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_scans")
+    def test_get_distinct_rules_from_scans(self, get_distinct_rules_from_scans):
+        get_distinct_rules_from_scans.return_value = self.db_rules
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}"
+                                   f"{RWS_ROUTE_DETECTED_RULES}/?scan_id=1&scan_id=2")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data) == len(self.db_rules)

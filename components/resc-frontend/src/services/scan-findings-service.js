@@ -14,8 +14,18 @@ const ScanFindingsService = {
     return axios.get(`/branches-info/${brancheInfoId}`);
   },
 
-  async getRulesByScanId(scanId) {
-    return axios.get(`/scans/${scanId}/detected-rules`);
+  async getRulesByScanIds(scanIds) {
+    let queryParams = '';
+    if (scanIds) {
+      scanIds.forEach((scanId) => {
+        queryParams += `&scan_id=${scanId}`;
+      });
+    }
+    if (queryParams) {
+      queryParams = queryParams.slice(1);
+    }
+
+    return axios.get(`/scans/detected-rules/?${queryParams}`);
   },
 
   async getScansByBranchId(branchId, perPage, skipRowCount) {
