@@ -8,13 +8,13 @@ from pydantic import BaseModel, conint, constr
 
 class RuleBase(BaseModel):
     rule_name: constr(min_length=1, max_length=400)
-    description: constr(min_length=1, max_length=400)
-    tags: Optional[constr(max_length=400)] = None
+    description: Optional[constr(max_length=2000)] = None
+    tags: Optional[constr(max_length=2000)] = None
     entropy: Optional[float] = None
     secret_group: Optional[int] = None
-    regex: Optional[constr(max_length=1000)] = None
-    path: Optional[constr(max_length=1000)] = None
-    keywords: Optional[constr(max_length=400)] = None
+    regex: Optional[str] = None
+    path: Optional[str] = None
+    keywords: Optional[str] = None
 
 
 class RuleCreate(RuleBase):

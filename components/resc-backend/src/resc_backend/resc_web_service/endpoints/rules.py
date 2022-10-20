@@ -132,8 +132,10 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
 def create_rule_allow_list(
         rule_allow_list: RuleAllowList,
         db_connection: Session = Depends(get_db_connection)):
-    return rule_crud.create_rule_allow_list(db_connection=db_connection,
-                                            rule_allow_list=rule_allow_list)
+    if rule_allow_list.paths or rule_allow_list.commits or rule_allow_list.stop_words \
+            or rule_allow_list.description or rule_allow_list.regexes:
+        return rule_crud.create_rule_allow_list(db_connection=db_connection, rule_allow_list=rule_allow_list)
+    raise HTTPException(status_code=400, detail="No properties defined for rule allow list")
 
 
 @router.post(f"{RWS_ROUTE_RULES}{RWS_ROUTE_RULE_PACK}",

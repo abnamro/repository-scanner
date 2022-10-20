@@ -1,6 +1,6 @@
 # pylint: disable=R0902
 # Third Party
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 
 # First Party
 from resc_backend.db.model import Base
@@ -14,13 +14,13 @@ class DBrule(Base):
     rule_pack = Column(String(100), ForeignKey(DBrulePack.version), nullable=False)
     allow_list = Column(Integer, ForeignKey(DBruleAllowList.id_), nullable=True)
     rule_name = Column(String(400), nullable=False)
-    description = Column(String(400), nullable=False)
-    tags = Column(String(400), nullable=True)
+    description = Column(String(2000), nullable=True)
+    tags = Column(String(2000), nullable=True)
     entropy = Column(Float, nullable=True)
     secret_group = Column(Integer, nullable=True)
-    regex = Column(String(1000), nullable=True)
-    path = Column(String(1000), nullable=True)
-    keywords = Column(String(400), nullable=True)
+    regex = Column(Text, nullable=True)
+    path = Column(Text, nullable=True)
+    keywords = Column(Text, nullable=True)
     __table_args__ = (UniqueConstraint("rule_name", "rule_pack", name="unique_rule_name_per_rule_pack_version"),)
 
     def __init__(self, rule_pack: str, rule_name: str, description: str, allow_list: int = None,

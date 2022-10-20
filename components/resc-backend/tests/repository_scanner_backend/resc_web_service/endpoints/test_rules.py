@@ -291,11 +291,9 @@ class TestRules(unittest.TestCase):
     def test_post_rule_allow_list_empty_body(self, create_rule_allow_list):
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULES}{RWS_ROUTE_RULE_ALLOW_LIST}",
                                     json={})
-        assert response.status_code == 422, response.text
+        assert response.status_code == 400, response.text
         data = response.json()
-        assert data["detail"][0]["loc"] == ['body', 'description']
-        assert data["detail"][0]["msg"] == "field required"
-        assert data["detail"][0]["type"] == "value_error.missing"
+        assert data["detail"] == 'No properties defined for rule allow list'
         create_rule_allow_list.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.rule.create_rule_pack_version")
@@ -359,12 +357,9 @@ class TestRules(unittest.TestCase):
         assert data["detail"][0]["loc"] == ['body', 'rule_name']
         assert data["detail"][0]["msg"] == "field required"
         assert data["detail"][0]["type"] == "value_error.missing"
-        assert data["detail"][1]["loc"] == ['body', 'description']
+        assert data["detail"][1]["loc"] == ['body', 'rule_pack']
         assert data["detail"][1]["msg"] == "field required"
         assert data["detail"][1]["type"] == "value_error.missing"
-        assert data["detail"][2]["loc"] == ['body', 'rule_pack']
-        assert data["detail"][2]["msg"] == "field required"
-        assert data["detail"][2]["type"] == "value_error.missing"
         create_rule.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.rule.get_rule_pack")
