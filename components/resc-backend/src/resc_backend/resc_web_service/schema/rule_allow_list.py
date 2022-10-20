@@ -7,11 +7,11 @@ from pydantic import BaseModel, conint, constr
 
 
 class RuleAllowListBase(BaseModel):
-    description: constr(max_length=400)
-    regexes: Optional[constr(max_length=400)]
-    paths: Optional[constr(max_length=400)]
-    commits: Optional[constr(max_length=400)]
-    stop_words: Optional[constr(max_length=400)]
+    description: Optional[constr(max_length=2000)]
+    regexes: Optional[str]
+    paths: Optional[str]
+    commits: Optional[str]
+    stop_words: Optional[str]
 
 
 class RuleAllowListCreate(RuleAllowListBase):

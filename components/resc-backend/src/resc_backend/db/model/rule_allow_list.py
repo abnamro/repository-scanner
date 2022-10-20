@@ -1,5 +1,5 @@
 # Third Party
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
 
 # First Party
 from resc_backend.db.model import Base
@@ -8,11 +8,11 @@ from resc_backend.db.model import Base
 class DBruleAllowList(Base):
     __tablename__ = "rule_allow_list"
     id_ = Column("id", Integer, primary_key=True)
-    description = Column(String(400), nullable=False)
-    regexes = Column(String(400), nullable=True)
-    paths = Column(String(400), nullable=True)
-    commits = Column(String(400), nullable=True)
-    stop_words = Column(String(400), nullable=True)
+    description = Column(String(2000), nullable=True)
+    regexes = Column(Text, nullable=True)
+    paths = Column(Text, nullable=True)
+    commits = Column(Text, nullable=True)
+    stop_words = Column(Text, nullable=True)
 
     def __init__(self, description: str, regexes: str = None, paths: str = None, commits: str = None,
                  stop_words: str = None):
