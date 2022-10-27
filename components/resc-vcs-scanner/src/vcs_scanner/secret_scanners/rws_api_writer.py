@@ -9,15 +9,15 @@ from typing import Dict, List, Optional
 
 # Third Party
 from resc_backend.constants import TEMP_RULE_FILE
-from resc_backend.resc_web_service.schema.branch_info import BranchInfoCreate, BranchInfoRead
+from resc_backend.resc_web_service.schema.branch import BranchCreate, BranchRead
 from resc_backend.resc_web_service.schema.finding import FindingBase, FindingCreate
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
+from resc_backend.resc_web_service.schema.repository import RepositoryCreate, RepositoryRead
 from resc_backend.resc_web_service.schema.scan import Scan, ScanCreate, ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate, VCSInstanceRead
-from resc_backend.resc_web_service_interface.branches_info import create_branch_info, get_last_scan_for_branch
+from resc_backend.resc_web_service_interface.branches import create_branch, get_last_scan_for_branch
 from resc_backend.resc_web_service_interface.findings import create_findings_with_scan_id
-from resc_backend.resc_web_service_interface.repositories_info import create_repository_info
+from resc_backend.resc_web_service_interface.repositories import create_repository
 from resc_backend.resc_web_service_interface.rules import download_rule_pack_toml_file
 from resc_backend.resc_web_service_interface.scans import create_scan
 from resc_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
@@ -53,37 +53,37 @@ class RESTAPIWriter(OutputModule):
             logger.warning(f"Creating vcs_instance failed with error: {response.status_code}->{response.text}")
         return created_vcs_instance
 
-    def write_repository_info(self, repository_info: RepositoryInfoCreate) -> Optional[RepositoryInfoRead]:
-        created_repository_info = None
-        response = create_repository_info(self.rws_url,
-                                          repository_info)
+    def write_repository(self, repository: RepositoryCreate) -> Optional[RepositoryRead]:
+        created_repository = None
+        response = create_repository(self.rws_url,
+                                     repository)
         if response.status_code == 201:
-            created_repository_info = RepositoryInfoRead(**json.loads(response.text))
+            created_repository = RepositoryRead(**json.loads(response.text))
         else:
-            logger.warning(f"Creating repository info failed with error: {response.status_code}->{response.text}")
-        return created_repository_info
+            logger.warning(f"Creating repository failed with error: {response.status_code}->{response.text}")
+        return created_repository
 
-    def write_branch_info(self, repository_info: RepositoryInfoRead, branch: BranchInfoCreate) \
-            -> Optional[BranchInfoRead]:
-        created_branch_info = None
-        branch_info = BranchInfoCreate.create_from_base_class(
-            base_object=branch, repository_info_id=repository_info.id_)
+    def write_branch(self, repository: RepositoryRead, branch: BranchCreate) \
+            -> Optional[BranchRead]:
+        created_branch = None
+        branch = BranchCreate.create_from_base_class(
+            base_object=branch, repository_id=repository.id_)
 
-        response = create_branch_info(self.rws_url, branch_info)
+        response = create_branch(self.rws_url, branch)
         if response.status_code == 201:
-            created_branch_info = BranchInfoRead(**json.loads(response.text))
+            created_branch = BranchRead(**json.loads(response.text))
         else:
-            logger.warning(f"Creating branch info failed with error: {response.status_code}->{response.text}")
-        return created_branch_info
+            logger.warning(f"Creating branch failed with error: {response.status_code}->{response.text}")
+        return created_branch
 
     def write_findings(
             self,
             scan_id: int,
-            branch_info_id: int,
+            branch_id: int,
             scan_findings: List[FindingBase], ):
         findings_create = []
         for finding in scan_findings:
-            new_finding = FindingCreate.create_from_base_class(base_object=finding, branch_info_id=branch_info_id)
+            new_finding = FindingCreate.create_from_base_class(base_object=finding, branch_id=branch_id)
             findings_create.append(new_finding)
 
         response = create_findings_with_scan_id(self.rws_url,
@@ -100,27 +100,27 @@ class RESTAPIWriter(OutputModule):
             scan_type_to_run: ScanType,
             last_scanned_commit: str,
             scan_timestamp: datetime,
-            branch_info: BranchInfoRead,
+            branch: BranchRead,
             rule_pack: str) -> ScanRead:
         created_scan = None
         scan_object = ScanCreate.create_from_base_class(
             base_object=Scan(scan_type=scan_type_to_run, last_scanned_commit=last_scanned_commit,
-                             timestamp=scan_timestamp, rule_pack=rule_pack), branch_info_id=branch_info.id_)
+                             timestamp=scan_timestamp, rule_pack=rule_pack), branch_id=branch.id_)
 
         response = create_scan(self.rws_url, scan_object)
         if response.status_code == 201:
             created_scan = ScanRead(**json.loads(response.text))
-            logger.info(f"Successfully created scan for branch {branch_info.branch_name} ")
+            logger.info(f"Successfully created scan for branch {branch.branch_name} ")
         else:
             logger.warning(
                 f"Creating {scan_type_to_run} scan failed with error: {response.status_code}->{response.text}")
 
         return created_scan
 
-    def get_last_scanned_commit(self, branch_info: BranchInfoRead):
+    def get_last_scanned_commit(self, branch: BranchRead):
         last_scanned_commit = None
         response = get_last_scan_for_branch(self.rws_url,
-                                            branch_info.id_)
+                                            branch.id_)
         if response.status_code == 200:
             json_body = json.loads(response.text)
             last_scanned_commit = json_body['last_scanned_commit'] if json_body else None

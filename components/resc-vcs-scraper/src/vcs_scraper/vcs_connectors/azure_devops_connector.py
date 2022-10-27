@@ -10,11 +10,8 @@ from azure.devops.released.core.core_client import CoreClient
 from msrest.authentication import BasicAuthentication
 
 # First Party
-from vcs_scraper.model import BranchInfo, RepositoryInfo
-from vcs_scraper.vcs_connectors.azure_devops_data_mapper import (
-    map_azure_devops_branch_info,
-    map_azure_devops_repository_info
-)
+from vcs_scraper.model import Branch, Repository
+from vcs_scraper.vcs_connectors.azure_devops_data_mapper import map_azure_devops_branch, map_azure_devops_repository
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -98,33 +95,33 @@ class AzureDevopsConnector(VCSConnector):
         return ""
 
     @staticmethod
-    def export_repository_info(repository_information: Dict, branches_information: List[Dict],
-                               vcs_instance_name: str) \
-            -> RepositoryInfo:
+    def export_repository(repository_information: Dict, branches_information: List[Dict],
+                          vcs_instance_name: str) \
+            -> Repository:
         """
         A method which generate a repositoryInfo object about a single bitbucket repository.
 
         :param vcs_instance_name: Name of the VCS instance to which the repository belongs
         :param repository_information: Azure Devops repository information as returned by the Azure API.
         :param branches_information: Azure Devops branches information for a single repo as returned by the Azure API.
-        :return RepositoryInfo object
+        :return Repository object
         """
 
-        branches: List[BranchInfo] = []
+        branches: List[Branch] = []
         for branch_information in branches_information:
             if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
                 if branch_information["name"].lower() in ["main", "master"]:
-                    branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                             **map_azure_devops_branch_info(branch_information))
-                    branches.append(branch_info)
+                    branch = Branch(repository_id=repository_information["id"],
+                                    **map_azure_devops_branch(branch_information))
+                    branches.append(branch)
                     break
             else:
-                branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                         **map_azure_devops_branch_info(branch_information))
-                branches.append(branch_info)
+                branch = Branch(repository_id=repository_information["id"],
+                                **map_azure_devops_branch(branch_information))
+                branches.append(branch)
 
-        repository_info = RepositoryInfo(branches_info=branches,
-                                         vcs_instance_name=vcs_instance_name,
-                                         **map_azure_devops_repository_info(repository_information))
+        repository = Repository(branches=branches,
+                                vcs_instance_name=vcs_instance_name,
+                                **map_azure_devops_repository(repository_information))
 
-        return repository_info
+        return repository

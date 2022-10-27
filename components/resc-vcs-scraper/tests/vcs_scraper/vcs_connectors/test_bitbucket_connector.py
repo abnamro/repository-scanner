@@ -7,7 +7,7 @@ import requests
 
 # First Party
 from vcs_scraper.constants import BITBUCKET
-from vcs_scraper.model import RepositoryInfo
+from vcs_scraper.model import Repository
 from vcs_scraper.vcs_connectors.vcs_connector_factory import VCSConnectorFactory
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -25,7 +25,7 @@ with mock.patch.dict(os.environ, {"VCS_INSTANCE_TOKEN": "token123", "VCS_INSTANC
                                     scope=[])
 
 
-def test_export_repository_info_all_branches():
+def test_export_repository_all_branches():
     repository_information = {
         "project": {"key": "9999"},
         "name": "repo1",
@@ -40,18 +40,18 @@ def test_export_repository_info_all_branches():
     vcs_instance_name = "test server"
 
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        result = BitbucketConnector.export_repository_info(repository_information, branches_information,
-                                                           vcs_instance_name)
+        result = BitbucketConnector.export_repository(repository_information, branches_information,
+                                                      vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 2
-    assert result.branches_info[0].branch_id == "features/1"
-    assert result.branches_info[0].last_scanned_commit == "ABCDEFG"
-    assert result.branches_info[1].branch_id == "/refs/heads/main"
-    assert result.branches_info[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert len(result.branches) == 2
+    assert result.branches[0].branch_id == "features/1"
+    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[1].branch_id == "/refs/heads/main"
+    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
 
 
 def test_export_repository_info_main_branch_only():
@@ -70,16 +70,16 @@ def test_export_repository_info_main_branch_only():
     vcs_instance_name = "test server"
 
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository_info(repository_information, branches_information,
-                                                           vcs_instance_name)
+        result = BitbucketConnector.export_repository(repository_information, branches_information,
+                                                      vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 1
-    assert result.branches_info[0].branch_id == "/refs/heads/main"
-    assert result.branches_info[0].last_scanned_commit == "IJKLMNOP"
+    assert len(result.branches) == 1
+    assert result.branches[0].branch_id == "/refs/heads/main"
+    assert result.branches[0].last_scanned_commit == "IJKLMNOP"
 
 
 def test_export_repository_info_main_branch_only_upper_casing():
@@ -98,16 +98,16 @@ def test_export_repository_info_main_branch_only_upper_casing():
     vcs_instance_name = "test server"
 
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository_info(repository_information, branches_information,
-                                                           vcs_instance_name)
+        result = BitbucketConnector.export_repository(repository_information, branches_information,
+                                                      vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 1
-    assert result.branches_info[0].branch_id == "/refs/heads/MAIN"
-    assert result.branches_info[0].last_scanned_commit == "IJKLMNOP"
+    assert len(result.branches) == 1
+    assert result.branches[0].branch_id == "/refs/heads/MAIN"
+    assert result.branches[0].last_scanned_commit == "IJKLMNOP"
 
 
 def test_export_repository_info_main_branch_only_no_master():
@@ -125,14 +125,14 @@ def test_export_repository_info_main_branch_only_no_master():
     vcs_instance_name = "test server"
 
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository_info(repository_information, branches_information,
-                                                           vcs_instance_name)
+        result = BitbucketConnector.export_repository(repository_information, branches_information,
+                                                      vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 0
+    assert len(result.branches) == 0
 
 
 def test_export_repository_info_empty_branches():
@@ -149,14 +149,14 @@ def test_export_repository_info_empty_branches():
     vcs_instance_name = "test server"
 
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository_info(repository_information, branches_information,
-                                                           vcs_instance_name)
+        result = BitbucketConnector.export_repository(repository_information, branches_information,
+                                                      vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 0
+    assert len(result.branches) == 0
 
 
 def test_get_clone_url():

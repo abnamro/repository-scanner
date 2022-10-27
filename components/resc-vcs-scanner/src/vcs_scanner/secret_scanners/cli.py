@@ -9,13 +9,13 @@ from argparse import ArgumentParser, Namespace
 from urllib.parse import urlparse
 
 # Third Party
-from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 # First Party
 from vcs_scanner.common import get_rule_pack_version_from_file, initialise_logs
 from vcs_scanner.constants import CLI_VCS_AZURE, CLI_VCS_BITBUCKET, CLI_VCS_LOCAL_SCAN, LOG_FILE_PATH_CLI
-from vcs_scanner.model import RepositoryInfoRuntime
+from vcs_scanner.model import RepositoryRuntime
 from vcs_scanner.secret_scanners.configuration import GITLEAKS_PATH
 from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
 from vcs_scanner.secret_scanners.secret_scanner import SecretScanner
@@ -28,11 +28,11 @@ FAKE_COMMIT = "hash"
 FAKE_URL = "http://fake-host.none"
 
 
-def deserialize_repository_info_from_file(filepath: str) -> RepositoryInfoRuntime:
-    with open(filepath, encoding="utf-8") as repo_info_file:
-        repository_info_str: str = repo_info_file.read()
-    repository_info: RepositoryInfoRuntime = RepositoryInfoRuntime(**json.loads(repository_info_str))
-    return repository_info
+def deserialize_repository_from_file(filepath: str) -> RepositoryRuntime:
+    with open(filepath, encoding="utf-8") as repo_file:
+        repository_str: str = repo_file.read()
+    repository: RepositoryRuntime = RepositoryRuntime(**json.loads(repository_str))
+    return repository
 
 
 def create_cli_argparser() -> ArgumentParser:
@@ -118,23 +118,23 @@ def scan_repository_from_cli():
         logger.error("CLI arguments validation failed")
         sys.exit(-1)
     logger.debug("CLI arguments validation succeeded")
-    branches_info = []
+    branches = []
     for i, branch in enumerate(args.branches):
         logger.info(f"Adding branch {branch} to the list of branches to be scanned")
-        branches_info.append(
-            BranchInfo(**{"branch_name": branch, "branch_id": i, "last_scanned_commit": FAKE_COMMIT})
+        branches.append(
+            Branch(**{"branch_name": branch, "branch_id": i, "last_scanned_commit": FAKE_COMMIT})
         )
 
     vcs_type = guess_vcs_provider(args.repo_url)
     vcs_name = determine_vcs_name(args.repo_url, vcs_type)
 
-    repository_info = RepositoryInfoRuntime(
+    repository = RepositoryRuntime(
         repository_url=args.repo_url,
         repository_name=args.repo_name,
         repository_id=args.repo_name,
         project_key=args.repo_name,
         vcs_instance_name=vcs_name,
-        branches_info=branches_info
+        branches=branches
 
     )
 
@@ -152,7 +152,7 @@ def scan_repository_from_cli():
         gitleaks_rules_path=args.gitleaks_rules_path,
         rule_pack_version=rule_pack_version,
         output_plugin=output_plugin,
-        repository_info=repository_info.convert_to_repository_info(vcs_instance_id=1),
+        repository=repository.convert_to_repository(vcs_instance_id=1),
         username=args.username,
         personal_access_token=args.password,
         local_path=args.repo_dir,

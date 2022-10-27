@@ -94,11 +94,11 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
 
             if "uc_finding_per_branch" not in str(integrity_error):
                 raise integrity_error
-            logger.warning(f"Already existing finding in branch: '{db_finding.branch_info_id}' "
+            logger.warning(f"Already existing finding in branch: '{db_finding.branch_id}' "
                            f"filepath: '{db_finding.file_path}' for rule: '{db_finding.rule_name}' was ignored")
             db_finding = db_connection.query(model.DBfinding).filter_by(
                 file_path=db_finding.file_path,
-                branch_info_id=db_finding.branch_info_id,
+                branch_id=db_finding.branch_id,
                 line_number=db_finding.line_number,
                 rule_name=db_finding.rule_name,
                 commit_id=db_finding.commit_id
@@ -189,12 +189,12 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                       model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
                 .join(model.DBscan,
                       model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
-                .join(model.DBbranchInfo,
-                      model.branch_info.DBbranchInfo.id_ == model.scan.DBscan.branch_info_id) \
-                .join(model.DBrepositoryInfo,
-                      model.repository_info.DBrepositoryInfo.id_ == model.branch_info.DBbranchInfo.repository_info_id) \
+                .join(model.DBbranch,
+                      model.branch.DBbranch.id_ == model.scan.DBscan.branch_id) \
+                .join(model.DBrepository,
+                      model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
                 .join(model.DBVcsInstance,
-                      model.vcs_instance.DBVcsInstance.id_ == model.repository_info.DBrepositoryInfo.vcs_instance)
+                      model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
         if findings_filter.start_date_range:
             total_count_query = total_count_query.filter(
@@ -203,17 +203,17 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
             total_count_query = total_count_query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_range)
 
         if findings_filter.branch_name:
-            total_count_query = total_count_query.filter(model.DBbranchInfo.branch_name == findings_filter.branch_name)
+            total_count_query = total_count_query.filter(model.DBbranch.branch_name == findings_filter.branch_name)
         if findings_filter.repository_name:
             total_count_query = total_count_query.filter(
-                model.DBrepositoryInfo.repository_name == findings_filter.repository_name)
+                model.DBrepository.repository_name == findings_filter.repository_name)
 
         if findings_filter.vcs_providers and findings_filter.vcs_providers is not None:
             total_count_query = total_count_query.filter(
                 model.vcs_instance.DBVcsInstance.provider_type.in_(findings_filter.vcs_providers))
         if findings_filter.project_name:
             total_count_query = total_count_query.filter(
-                model.repository_info.DBrepositoryInfo.project_key == findings_filter.project_name)
+                model.repository.DBrepository.project_key == findings_filter.project_name)
         if findings_filter.rule_names:
             total_count_query = total_count_query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
         if findings_filter.finding_statuses:
@@ -281,12 +281,12 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
                   model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
             .join(model.DBscan,
                   model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
-            .join(model.DBbranchInfo,
-                  model.branch_info.DBbranchInfo.id_ == model.scan.DBscan.branch_info_id) \
-            .join(model.DBrepositoryInfo,
-                  model.repository_info.DBrepositoryInfo.id_ == model.branch_info.DBbranchInfo.repository_info_id) \
+            .join(model.DBbranch,
+                  model.branch.DBbranch.id_ == model.scan.DBscan.branch_id) \
+            .join(model.DBrepository,
+                  model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
             .join(model.DBVcsInstance,
-                  model.vcs_instance.DBVcsInstance.id_ == model.repository_info.DBrepositoryInfo.vcs_instance)
+                  model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
     if scan_id > 0:
         query = query.join(model.DBscanFinding,
@@ -300,10 +300,10 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
             query = query.filter(model.DBVcsInstance.provider_type.in_(vcs_providers))
 
         if project_name:
-            query = query.filter(model.DBrepositoryInfo.project_key == project_name)
+            query = query.filter(model.DBrepository.project_key == project_name)
 
         if repository_name:
-            query = query.filter(model.DBrepositoryInfo.repository_name == repository_name)
+            query = query.filter(model.DBrepository.repository_name == repository_name)
 
         if start_date:
             query = query.filter(model.scan.DBscan.timestamp >= start_date)

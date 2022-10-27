@@ -43,7 +43,7 @@ def test_check_db_initialized_false(has_table, error_logger):
         check_db_initialized()
 
     error_logger.assert_called_once_with("Database is NOT connected or initialized | Unable to determine existence of "
-                                         "required table(s) branch_info, finding, repository_info, rules, scan, "
+                                         "required table(s) branch, finding, repository, rules, scan, "
                                          "scan_finding | Retrying...")
 
 

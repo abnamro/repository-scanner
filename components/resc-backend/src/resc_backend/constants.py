@@ -7,8 +7,8 @@ GITHUB_PUBLIC = "GITHUB_PUBLIC"
 
 # RWS: RESC Web Service
 RWS_VERSION_PREFIX = "/resc/v1"
-RWS_ROUTE_REPOSITORIES_INFO = "/repositories-info"
-RWS_ROUTE_BRANCHES_INFO = "/branches-info"
+RWS_ROUTE_REPOSITORIES = "/repositories"
+RWS_ROUTE_BRANCHES = "/branches"
 RWS_ROUTE_SCANS = "/scans"
 RWS_ROUTE_LAST_SCAN = "/last-scan"
 RWS_ROUTE_FINDINGS = "/findings"

@@ -7,12 +7,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 # First Party
-from resc_backend.db.model import Base, DBbranchInfo, DBrepositoryInfo, DBVcsInstance
+from resc_backend.db.model import Base, DBbranch, DBrepository, DBVcsInstance
 
 sys.path.insert(0, "src")
 
 
-class TestBranchInfo(unittest.TestCase):
+class TestBranch(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(self.engine)
@@ -27,24 +27,24 @@ class TestBranchInfo(unittest.TestCase):
                                           exceptions="exceptions")
         self.session.add(self.vcs_instance)
 
-        self.repository_info = DBrepositoryInfo(project_key='TEST',
-                                                repository_id=1,
-                                                repository_name="test_temp",
-                                                repository_url="fake.url.com",
-                                                vcs_instance=1)
-        self.session.add(self.repository_info)
+        self.repository = DBrepository(project_key='TEST',
+                                       repository_id=1,
+                                       repository_name="test_temp",
+                                       repository_url="fake.url.com",
+                                       vcs_instance=1)
+        self.session.add(self.repository)
 
-        self.branch_info = DBbranchInfo(repository_info_id=1,
-                                        branch_name="test_temp",
-                                        branch_id='master',
-                                        last_scanned_commit="FAKE_HASH")
-        self.session.add(self.branch_info)
+        self.branch = DBbranch(repository_id=1,
+                               branch_name="test_temp",
+                               branch_id='master',
+                               last_scanned_commit="FAKE_HASH")
+        self.session.add(self.branch)
         self.session.commit()
 
     def tearDown(self):
         Base.metadata.drop_all(self.engine)
 
-    def test_query_all_branch_info(self):
-        expected = [self.branch_info]
-        result = self.session.query(DBbranchInfo).all()
+    def test_query_all_branch(self):
+        expected = [self.branch]
+        result = self.session.query(DBbranch).all()
         self.assertEqual(result, expected)

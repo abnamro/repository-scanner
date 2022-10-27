@@ -90,7 +90,7 @@ import PushNotification from '@/utils/push-notification';
 import ScanFindingsService from '@/services/scan-findings-service';
 
 export default {
-  name: 'FindingInfoTab',
+  name: 'FindingTab',
   data() {
     return {
       statusList: [],
@@ -107,7 +107,7 @@ export default {
       type: Object,
       required: true,
     },
-    repositoryInfo: {
+    repository: {
       type: Object,
       required: true,
     },

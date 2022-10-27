@@ -81,7 +81,7 @@ import ScanFindingsService from '@/services/scan-findings-service';
 export default {
   name: 'ScanFindingsFilter',
   props: {
-    repositoryInfo: {
+    repository: {
       type: Object,
       required: true,
     },
@@ -249,11 +249,11 @@ export default {
       }
     },
     fetchBranches() {
-      if (this.repositoryInfo.id_) {
-        RepositoryService.getRepositoryBranches(this.repositoryInfo.id_, 10000000, 0)
+      if (this.repository.id_) {
+        RepositoryService.getRepositoryBranches(this.repository.id_, 10000000, 0)
           .then((response) => {
             for (const branch of response.data.data) {
-              if (branch.branch_name === this.repositoryInfo.branch_name) {
+              if (branch.branch_name === this.repository.branch_name) {
                 this.selectedBranch = branch;
               }
               this.branchList.push(branch);
@@ -269,7 +269,7 @@ export default {
     },
   },
   watch: {
-    repositoryInfo: function (newVal, oldVal) {
+    repository: function (newVal, oldVal) {
       if (newVal !== oldVal) {
         this.fetchBranches();
       }

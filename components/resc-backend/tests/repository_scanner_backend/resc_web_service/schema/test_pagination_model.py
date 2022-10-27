@@ -68,7 +68,7 @@ def test_pagination_model_findings():
                             comment="",
                             rule_name=f"rule_{i}",
                             event_sent_on=datetime.utcnow(),
-                            branch_info_id=1)
+                            branch_id=1)
         finding.id_ = i
         findings.append(FindingRead.create_from_db_entities(finding, scan_ids=[]))
 

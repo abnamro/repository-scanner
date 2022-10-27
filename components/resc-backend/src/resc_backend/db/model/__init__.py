@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 # First Party
-from resc_backend.db.model.branch_info import DBbranchInfo
+from resc_backend.db.model.branch import DBbranch
 from resc_backend.db.model.finding import DBfinding
-from resc_backend.db.model.repository_info import DBrepositoryInfo
+from resc_backend.db.model.repository import DBrepository
 from resc_backend.db.model.rule import DBrule
 from resc_backend.db.model.rule_allow_list import DBruleAllowList
 from resc_backend.db.model.rule_pack import DBrulePack

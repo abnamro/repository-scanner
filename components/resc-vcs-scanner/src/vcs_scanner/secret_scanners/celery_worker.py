@@ -7,13 +7,13 @@ import os
 from celery import Celery
 from celery.utils.log import get_task_logger
 from resc_backend.constants import TEMP_RULE_FILE
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.repository import Repository
 
 # First Party
 from vcs_scanner.common import initialise_logs, load_vcs_instances
 from vcs_scanner.constants import LOG_FILE_PATH
 from vcs_scanner.helpers.environment_wrapper import validate_environment
-from vcs_scanner.model import RepositoryInfoRuntime
+from vcs_scanner.model import RepositoryRuntime
 from vcs_scanner.secret_scanners.configuration import (
     GITLEAKS_PATH,
     RABBITMQ_DEFAULT_VHOST,
@@ -53,28 +53,28 @@ rule_pack_version = rws_writer.download_rule_pack()
 
 
 @app.task(name="scan_repository", Queue=rabbitmq_queue)
-def scan_repository(repository_info):
-    repository_info_runtime = RepositoryInfoRuntime(**json.loads(repository_info))
+def scan_repository(repository):
+    repository_runtime = RepositoryRuntime(**json.loads(repository))
 
     logger.info(f"Received repository to scan via the queue '{rabbitmq_queue}' => "
-                f"{repository_info_runtime.project_key}/{repository_info_runtime.repository_name}")
+                f"{repository_runtime.project_key}/{repository_runtime.repository_name}")
     try:
-        vcs_instance = vcs_instances[repository_info_runtime.vcs_instance_name]
+        vcs_instance = vcs_instances[repository_runtime.vcs_instance_name]
 
-        repository_info = RepositoryInfo(project_key=repository_info_runtime.project_key,
-                                         repository_id=repository_info_runtime.repository_id,
-                                         repository_name=repository_info_runtime.repository_name,
-                                         repository_url=repository_info_runtime.repository_url,
-                                         vcs_instance=vcs_instance.id_,
-                                         branches_info=repository_info_runtime.branches_info,
-                                         )
+        repository = Repository(project_key=repository_runtime.project_key,
+                                repository_id=repository_runtime.repository_id,
+                                repository_name=repository_runtime.repository_name,
+                                repository_url=repository_runtime.repository_url,
+                                vcs_instance=vcs_instance.id_,
+                                branches=repository_runtime.branches,
+                                )
 
         secret_scanner = SecretScanner(
             gitleaks_binary_path=env_variables[GITLEAKS_PATH],
             gitleaks_rules_path=TEMP_RULE_FILE,
             rule_pack_version=rule_pack_version,
             output_plugin=RESTAPIWriter(rws_url=rws_url),
-            repository_info=repository_info,
+            repository=repository,
             username=vcs_instance.username,
             personal_access_token=vcs_instance.token,
             force_base_scan=os.getenv('FORCE_BASE_SCAN', "false").lower() in "true"
@@ -82,5 +82,5 @@ def scan_repository(repository_info):
 
         secret_scanner.run_repository_scan()
     except KeyError:
-        logger.error(f"No configuration found for vcs instance {repository_info_runtime.vcs_instance_name}, "
-                     f"unable to scan {repository_info_runtime.project_key}/{repository_info_runtime.repository_name}")
+        logger.error(f"No configuration found for vcs instance {repository_runtime.vcs_instance_name}, "
+                     f"unable to scan {repository_runtime.project_key}/{repository_runtime.repository_name}")

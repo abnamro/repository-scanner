@@ -8,7 +8,7 @@ from github import Github
 
 # First Party
 from vcs_scraper.constants import GITHUB_PUBLIC
-from vcs_scraper.model import RepositoryInfo
+from vcs_scraper.model import Repository
 from vcs_scraper.vcs_connectors.vcs_connector_factory import VCSConnectorFactory
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -43,7 +43,7 @@ with mock.patch.dict(os.environ, {"VCS_INSTANCE_TOKEN": "token123", "VCS_INSTANC
                                    scope=[])
 
 
-def test_export_repository_info_all_branches():
+def test_export_repository_all_branches():
     repository_information = {
         'id': 1,
         'project_key': 'project1',
@@ -60,24 +60,24 @@ def test_export_repository_info_all_branches():
 
     vcs_instance_name = "test server"
     with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        result = GithubPublicConnector.export_repository_info(repository_information, branches_information,
-                                                              vcs_instance_name)
+        result = GithubPublicConnector.export_repository(repository_information, branches_information,
+                                                         vcs_instance_name)
 
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.project_key == "project1"
     assert result.repository_id == "1"
     assert result.repository_name == "repo1"
     assert result.repository_url == "http://test.com/repo"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches_info) == 2
-    assert result.branches_info[0].branch_id == "feature"
-    assert result.branches_info[0].branch_name == "feature"
-    assert result.branches_info[0].repository_info_id == 1
-    assert result.branches_info[0].last_scanned_commit == "ABCDEFG"
-    assert result.branches_info[1].branch_id == "master"
-    assert result.branches_info[1].branch_name == "master"
-    assert result.branches_info[1].repository_info_id == 1
-    assert result.branches_info[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert len(result.branches) == 2
+    assert result.branches[0].branch_id == "feature"
+    assert result.branches[0].branch_name == "feature"
+    assert result.branches[0].repository_id == 1
+    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[1].branch_id == "master"
+    assert result.branches[1].branch_name == "master"
+    assert result.branches[1].repository_id == 1
+    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
 
 
 def test_create_github_client_from_vcs_instance():

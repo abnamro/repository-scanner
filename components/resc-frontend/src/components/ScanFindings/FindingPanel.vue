@@ -2,14 +2,14 @@
   <div>
     <b-card no-body class="text-left card-color">
       <b-tabs pills card>
-        <FindingInfoTab :finding="finding" :repositoryInfo="repositoryInfo"></FindingInfoTab>
+        <FindingTab :finding="finding" :repository="repository"></FindingTab>
       </b-tabs>
     </b-card>
   </div>
 </template>
 
 <script>
-import FindingInfoTab from '@/components/ScanFindings/FindingInfoTab.vue';
+import FindingTab from '@/components/ScanFindings/FindingTab.vue';
 
 export default {
   name: 'FindingPanel',
@@ -18,11 +18,11 @@ export default {
       type: Object,
       required: true,
     },
-    repositoryInfo: {
+    repository: {
       type: Object,
       required: true,
     },
   },
-  components: { FindingInfoTab },
+  components: { FindingTab },
 };
 </script>

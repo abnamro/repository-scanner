@@ -61,7 +61,7 @@ def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default
 def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(get_db_connection)):
     # Determine the increment number if needed and not supplied
     if scan.scan_type == ScanType.INCREMENTAL and (not scan.increment_number or scan.increment_number <= 0):
-        last_scan = scan_crud.get_latest_scan_for_branch(db_connection, branch_info_id=scan.branch_info_id)
+        last_scan = scan_crud.get_latest_scan_for_branch(db_connection, branch_id=scan.branch_id)
         new_increment = last_scan.increment_number + 1
         scan.increment_number = new_increment
 
