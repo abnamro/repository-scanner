@@ -30,10 +30,10 @@ const RuleService = {
       queryParams += `&repositoryname=${repositoryFilter}`;
     }
     if (startDate) {
-      queryParams += `&startdate=${startDate}T00:00:00`;
+      queryParams += `&start_date_time=${startDate}T00:00:00`;
     }
     if (endDate) {
-      queryParams += `&enddate=${endDate}T23:59:59`;
+      queryParams += `&end_date_time=${endDate}T23:59:59`;
     }
     if (queryParams) {
       queryParams = queryParams.slice(1);

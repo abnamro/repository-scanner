@@ -182,8 +182,8 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
     if findings_filter:
         if (findings_filter.vcs_providers and findings_filter.vcs_providers is not None) \
                 or findings_filter.project_name or findings_filter.branch_name \
-                or findings_filter.repository_name or findings_filter.start_date_range \
-                or findings_filter.end_date_range:
+                or findings_filter.repository_name or findings_filter.start_date_time \
+                or findings_filter.end_date_time:
             total_count_query = total_count_query \
                 .join(model.DBscanFinding,
                       model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
@@ -196,11 +196,11 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                 .join(model.DBVcsInstance,
                       model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
-        if findings_filter.start_date_range:
+        if findings_filter.start_date_time:
             total_count_query = total_count_query.filter(
-                model.scan.DBscan.timestamp >= findings_filter.start_date_range)
-        if findings_filter.end_date_range:
-            total_count_query = total_count_query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_range)
+                model.scan.DBscan.timestamp >= findings_filter.start_date_time)
+        if findings_filter.end_date_time:
+            total_count_query = total_count_query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_time)
 
         if findings_filter.branch_name:
             total_count_query = total_count_query.filter(model.DBbranch.branch_name == findings_filter.branch_name)
@@ -249,8 +249,8 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
                                      vcs_providers: [VCSProviders] = None,
                                      project_name: str = "",
                                      repository_name: str = "",
-                                     start_date: datetime = None,
-                                     end_date: datetime = None) -> \
+                                     start_date_time: datetime = None,
+                                     end_date_time: datetime = None) -> \
         List[model.DBrule]:
     """
         Retrieve distinct rules detected
@@ -266,16 +266,16 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
         Optional, filter on project name. Is used as a full string match filter
     :param repository_name:
         optional, filter on repository name. Is used as a string contains filter
-    :param start_date:
+    :param start_date_time:
         optional, filter on start date
-    :param end_date:
+    :param end_date_time:
         optional, filter on end date
     :return: rules
         List of unique rules
     """
     query = db_connection.query(model.DBfinding.rule_name)
 
-    if (vcs_providers or project_name or repository_name or start_date or end_date) and scan_id < 0:
+    if (vcs_providers or project_name or repository_name or start_date_time or end_date_time) and scan_id < 0:
         query = query \
             .join(model.DBscanFinding,
                   model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
@@ -305,11 +305,11 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
         if repository_name:
             query = query.filter(model.DBrepository.repository_name == repository_name)
 
-        if start_date:
-            query = query.filter(model.scan.DBscan.timestamp >= start_date)
+        if start_date_time:
+            query = query.filter(model.scan.DBscan.timestamp >= start_date_time)
 
-        if end_date:
-            query = query.filter(model.scan.DBscan.timestamp <= end_date)
+        if end_date_time:
+            query = query.filter(model.scan.DBscan.timestamp <= end_date_time)
 
     rules = query.distinct().order_by(model.DBfinding.rule_name).all()
     return rules
@@ -351,8 +351,8 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
 
 def get_findings_count_by_time(db_connection: Session,
                                date_type: DateFilter,
-                               start_date: datetime = None,
-                               end_date: datetime = None,
+                               start_date_time: datetime = None,
+                               end_date_time: datetime = None,
                                skip: int = 0,
                                limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT):
     """
@@ -361,9 +361,9 @@ def get_findings_count_by_time(db_connection: Session,
         Session of the database connection
     :param date_type:
         required, filter on time_type
-    :param start_date:
+    :param start_date_time:
         optional, filter on start date
-    :param end_date:
+    :param end_date_time:
         optional, filter on end date
     :param skip:
         integer amount of records to skip to support pagination
@@ -382,10 +382,10 @@ def get_findings_count_by_time(db_connection: Session,
 
     query = query.join(model.DBscanFinding, model.DBscanFinding.scan_id == model.DBscan.id_)
 
-    if start_date:
-        query = query.filter(model.DBscan.timestamp >= start_date)
-    if end_date:
-        query = query.filter(model.DBscan.timestamp <= end_date)
+    if start_date_time:
+        query = query.filter(model.DBscan.timestamp >= start_date_time)
+    if end_date_time:
+        query = query.filter(model.DBscan.timestamp <= end_date_time)
 
     if date_type == DateFilter.MONTH:
         query = query.group_by(extract('year', model.DBscan.timestamp), extract('month', model.DBscan.timestamp))
@@ -405,17 +405,17 @@ def get_findings_count_by_time(db_connection: Session,
 
 def get_findings_count_by_time_total(db_connection: Session,
                                      date_type: DateFilter,
-                                     start_date: datetime = None,
-                                     end_date: datetime = None):
+                                     start_date_time: datetime = None,
+                                     end_date_time: datetime = None):
     """
         Retrieve total count on date_type
     :param db_connection:
         Session of the database connection
     :param date_type:
         required, filter on time_type
-    :param start_date:
+    :param start_date_time:
         optional, filter on start date
-    :param end_date:
+    :param end_date_time:
         optional, filter on end date
     """
     if date_type == DateFilter.MONTH:
@@ -426,10 +426,10 @@ def get_findings_count_by_time_total(db_connection: Session,
         query = db_connection.query(extract('year', model.DBscan.timestamp), extract('month', model.DBscan.timestamp),
                                     extract('day', model.DBscan.timestamp))
 
-    if start_date:
-        query = query.filter(model.DBscan.timestamp >= start_date)
-    if end_date:
-        query = query.filter(model.DBscan.timestamp <= end_date)
+    if start_date_time:
+        query = query.filter(model.DBscan.timestamp >= start_date_time)
+    if end_date_time:
+        query = query.filter(model.DBscan.timestamp <= end_date_time)
 
     query = query.distinct()
 

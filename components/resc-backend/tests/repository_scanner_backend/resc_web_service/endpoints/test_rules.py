@@ -195,10 +195,10 @@ class TestRules(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
     def test_get_distinct_rules_from_findings_by_start_date(self, get_distinct_rules_from_findings):
-        start_date = "1991-07-01T00:00:00"
+        start_date_time = "1991-07-01T00:00:00"
         get_distinct_rules_from_findings.return_value = self.db_rules
         response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_DETECTED_RULES}?startdate={start_date}")
+                                   f"{RWS_ROUTE_DETECTED_RULES}?start_date_time={start_date_time}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data) == len(self.db_rules)
@@ -207,10 +207,10 @@ class TestRules(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
     def test_get_distinct_rules_from_findings_by_end_date(self, get_distinct_rules_from_findings):
-        end_date = "1991-07-01T00:00:00"
+        end_date_time = "1991-07-01T00:00:00"
         get_distinct_rules_from_findings.return_value = self.db_rules
         response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_DETECTED_RULES}?enddate={end_date}")
+                                   f"{RWS_ROUTE_DETECTED_RULES}?end_date_time={end_date_time}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data) == len(self.db_rules)
@@ -221,16 +221,16 @@ class TestRules(unittest.TestCase):
     def test_get_distinct_rules_from_findings_when_all_filters_selected(self, get_distinct_rules_from_findings):
         project_name = "Test_Project"
         repository_name = "Test_Repository"
-        start_date = "1991-07-01T00:00:00"
-        end_date = "1991-07-01T00:00:00"
+        start_date_time = "1991-07-01T00:00:00"
+        end_date_time = "1991-07-01T00:00:00"
         get_distinct_rules_from_findings.return_value = self.db_rules
         response = self.client.get(f"{RWS_VERSION_PREFIX}"
                                    f"{RWS_ROUTE_DETECTED_RULES}?findingstatus={FindingStatus.NOT_ANALYZED}"
                                    f"&vcsprovider={VCSProviders.BITBUCKET}"
                                    f"&projectname={project_name}"
                                    f"&repositoryname={repository_name}"
-                                   f"&startdate={start_date}"
-                                   f"&enddate={end_date}")
+                                   f"&start_date_time={start_date_time}"
+                                   f"&end_date_time={end_date_time}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data) == len(self.db_rules)

@@ -72,10 +72,10 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
         .order_by(model.finding.DBfinding.id_)
 
-    if findings_filter.start_date_range:
-        query = query.filter(model.scan.DBscan.timestamp >= findings_filter.start_date_range)
-    if findings_filter.end_date_range:
-        query = query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_range)
+    if findings_filter.start_date_time:
+        query = query.filter(model.scan.DBscan.timestamp >= findings_filter.start_date_time)
+    if findings_filter.end_date_time:
+        query = query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_time)
 
     if findings_filter.event_sent is not None:
         if findings_filter.event_sent:

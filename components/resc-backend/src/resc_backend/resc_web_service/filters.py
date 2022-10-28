@@ -21,15 +21,15 @@ class FindingsFilter:
     repository_name: str = None
     branch_name: str = None
     scan_ids: List[int] = None
-    start_date_range: datetime = None
-    end_date_range: datetime = None
+    start_date_time: datetime = None
+    end_date_time: datetime = None
     event_sent: bool = None
 
-    @validator("end_date_range")
+    @validator("end_date_time")
     @classmethod
-    def date_range_check(cls, end_date_range: datetime, values: dict):
-        if end_date_range and values["start_date_range"]:
-            if values["start_date_range"] >= end_date_range:
+    def date_range_check(cls, end_date_time: datetime, values: dict):
+        if end_date_time and values["start_date_time"]:
+            if values["start_date_time"] >= end_date_time:
                 raise ValueError("the start of the date range needs to be prior to the end of it.")
 
-        return end_date_range
+        return end_date_time

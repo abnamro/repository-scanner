@@ -260,8 +260,8 @@ def get_supported_statuses(response: Response) -> List[str]:
 def get_count_by_time(time_type: DateFilter,
                       skip: int = Query(default=0, ge=0),
                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                      startdate: Optional[datetime] = Query(None),
-                      enddate: Optional[datetime] = Query(None),
+                      start_date_time: Optional[datetime] = Query(None),
+                      end_date_time: Optional[datetime] = Query(None),
                       db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[DateCountModel]:
     """
@@ -274,9 +274,9 @@ def get_count_by_time(time_type: DateFilter,
         integer amount of records to skip to support pagination
     :param limit:
         integer amount of records to return, to support pagination
-    :param startdate
+    :param start_date_time
         Optional, filter on start date
-    :param enddate
+    :param end_date_time
         Optional, filter on end date
     :return: PaginationModel[DateCountModel]
         The output will contain a PaginationModel containing the list of DateCountModel type objects,
@@ -284,9 +284,11 @@ def get_count_by_time(time_type: DateFilter,
     """
     date_counts = []
     findings = finding_crud.get_findings_count_by_time(db_connection=db_connection, date_type=time_type,
-                                                       start_date=startdate, end_date=enddate, skip=skip, limit=limit)
+                                                       start_date_time=start_date_time, end_date_time=end_date_time,
+                                                       skip=skip, limit=limit)
     total_findings = finding_crud.get_findings_count_by_time_total(db_connection=db_connection, date_type=time_type,
-                                                                   start_date=startdate, end_date=enddate)
+                                                                   start_date_time=start_date_time,
+                                                                   end_date_time=end_date_time)
     for finding in findings:
         if time_type == DateFilter.MONTH:
             date_count = DateCountModel(finding_count=finding[2], date_lable=f"{finding[0]}-{finding[1]}")
