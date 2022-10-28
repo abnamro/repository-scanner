@@ -15,30 +15,30 @@ from vcs_scraper.constants import AZURE_DEVOPS, BITBUCKET, GITHUB_PUBLIC
 
 
 @dataclasses.dataclass
-class BranchInfo:
-    repository_info_id: int
+class Branch:
+    repository_id: int
     branch_name: str
     branch_id: str
     last_scanned_commit: str
 
     def json(self):
-        json_branch_info = json.dumps(dataclasses.asdict(self))
-        return json_branch_info
+        json_branch = json.dumps(dataclasses.asdict(self))
+        return json_branch
 
 
 @dataclasses.dataclass
-class RepositoryInfo:
+class Repository:
 
     repository_name: str
     repository_id: str
     repository_url: str
     project_key: str
     vcs_instance_name: str
-    branches_info: List[BranchInfo]
+    branches: List[Branch]
 
     def json(self):
-        json_repo_info = json.dumps(dataclasses.asdict(self))
-        return json_repo_info
+        json_repo = json.dumps(dataclasses.asdict(self))
+        return json_repo
 
 
 class VCSProviders(str, Enum):

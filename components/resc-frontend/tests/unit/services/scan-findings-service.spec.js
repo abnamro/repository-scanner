@@ -6,12 +6,12 @@ import repositories from '@/../tests/resources/mock_repositories.json';
 
 jest.mock('axios');
 
-describe('getRepositoryInfoById', () => {
+describe('getRepositoryById', () => {
   describe('when API call is successful', () => {
     it('should return repositories', async () => {
       axios.get.mockResolvedValueOnce(repositories);
 
-      const response = await ScanFindingsService.getRepositoryInfoById(1);
+      const response = await ScanFindingsService.getRepositoryById(1);
 
       expect(response).toEqual(repositories);
       expect(response).toBeDefined();
@@ -23,12 +23,12 @@ describe('getRepositoryInfoById', () => {
     });
   });
 
-  describe('getScanInfoById', () => {
+  describe('getScanById', () => {
     describe('when API call is successful', () => {
       it('should return scans', async () => {
         axios.get.mockResolvedValueOnce(scans);
 
-        const response = await ScanFindingsService.getScanInfoById(1);
+        const response = await ScanFindingsService.getScanById(1);
 
         expect(response).toEqual(scans);
         expect(response).toBeDefined();
@@ -44,7 +44,7 @@ describe('getRepositoryInfoById', () => {
       it('should return error', async () => {
         axios.get.mockResolvedValueOnce([]);
 
-        await ScanFindingsService.getScanInfoById('not_valid')
+        await ScanFindingsService.getScanById('not_valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
@@ -58,12 +58,12 @@ describe('getRepositoryInfoById', () => {
     });
   });
 
-  describe('getBranchInfoById', () => {
+  describe('getBranchById', () => {
     describe('when API call is successful', () => {
       it('should return branches', async () => {
         axios.get.mockResolvedValueOnce(branches);
 
-        const response = await ScanFindingsService.getBranchInfoById(1);
+        const response = await ScanFindingsService.getBranchById(1);
 
         expect(response).toEqual(branches);
         expect(response).toBeDefined();
@@ -79,7 +79,7 @@ describe('getRepositoryInfoById', () => {
       it('should return error', async () => {
         axios.get.mockResolvedValueOnce([]);
 
-        await ScanFindingsService.getBranchInfoById('not_valid')
+        await ScanFindingsService.getBranchById('not_valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();

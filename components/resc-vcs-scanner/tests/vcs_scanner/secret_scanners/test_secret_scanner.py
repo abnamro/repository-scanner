@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 # Third Party
 from _pytest.monkeypatch import MonkeyPatch
-from resc_backend.resc_web_service.schema.branch_info import BranchInfo
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.branch import Branch
+from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
@@ -37,31 +37,31 @@ def test_clone_repo(clone_from):
 
     branches = []
     for i in range(1, 6):
-        branches.append(BranchInfo(branch_id=i,
-                                   branch_name=f"branch_name{i}",
-                                   last_scanned_commit=f"last_scanned_commit{i}"))
+        branches.append(Branch(branch_id=i,
+                               branch_name=f"branch_name{i}",
+                               last_scanned_commit=f"last_scanned_commit{i}"))
 
-    repository_info = RepositoryInfo(project_key="project_key",
-                                     repository_id=1,
-                                     repository_name="repository_name",
-                                     repository_url="https://repository.url",
-                                     vcs_instance=1,
-                                     branches_info=branches)
+    repository = Repository(project_key="project_key",
+                            repository_id=1,
+                            repository_name="repository_name",
+                            repository_url="https://repository.url",
+                            vcs_instance=1,
+                            branches=branches)
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
         gitleaks_rules_path="/rules.toml",
         rule_pack_version="0.0.1",
         output_plugin=RESTAPIWriter(rws_url=rws_url),
-        repository_info=repository_info,
+        repository=repository,
         username=username,
         personal_access_token=personal_access_token,
     )
 
     result = secret_scanner.clone_repo(branches[0].branch_name)
-    assert result == f"./{repository_info.repository_name}@{branches[0].branch_name}"
+    assert result == f"./{repository.repository_name}@{branches[0].branch_name}"
 
-    url = repository_info.repository_url.replace("https://", "")
-    expected_repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository_info.repository_name}@" \
+    url = repository.repository_url.replace("https://", "")
+    expected_repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository.repository_name}@" \
                                f"{branches[0].branch_name}"
     expected_repo_clone_url = f"https://{username}:{personal_access_token}@{url}"
     clone_from.assert_called_once()
@@ -77,26 +77,26 @@ def test_scan_repo(start_scan):
     personal_access_token = "personal_access_token"
     branches = []
     for i in range(1, 6):
-        branches.append(BranchInfo(branch_id=i,
-                                   branch_name=f"branch_name{i}",
-                                   last_scanned_commit=f"last_scanned_commit{i}"))
+        branches.append(Branch(branch_id=i,
+                               branch_name=f"branch_name{i}",
+                               last_scanned_commit=f"last_scanned_commit{i}"))
 
-    repository_info = RepositoryInfo(project_key="project_key",
-                                     repository_id=1,
-                                     repository_name="repository_name",
-                                     repository_url="https://repository.url",
-                                     vcs_instance=1,
-                                     branches_info=branches)
+    repository = Repository(project_key="project_key",
+                            repository_id=1,
+                            repository_name="repository_name",
+                            repository_url="https://repository.url",
+                            vcs_instance=1,
+                            branches=branches)
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
         gitleaks_rules_path="/rules.toml",
         rule_pack_version="0.0.1",
         output_plugin=RESTAPIWriter(rws_url=rws_url),
-        repository_info=repository_info,
+        repository=repository,
         username=username,
         personal_access_token=personal_access_token,
     )
-    repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository_info.repository_name}@" \
+    repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository.repository_name}@" \
                       f"{branches[0].branch_name}"
     result = secret_scanner.scan_repo(ScanType.BASE, branches[0].branch_name, branches[0].last_scanned_commit,
                                       repo_clone_path)

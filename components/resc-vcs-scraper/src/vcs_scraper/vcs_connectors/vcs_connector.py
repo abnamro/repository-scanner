@@ -3,7 +3,7 @@ import abc
 from typing import Dict, List
 
 # First Party
-from vcs_scraper.model import RepositoryInfo, VCSInstance
+from vcs_scraper.model import Repository, VCSInstance
 
 
 class VCSConnector(metaclass=abc.ABCMeta):
@@ -27,9 +27,9 @@ class VCSConnector(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def export_repository_info(repository_information: Dict, branches_information: List[Dict],
-                               vcs_instance_name: str) \
-            -> RepositoryInfo:
+    def export_repository(repository_information: Dict, branches_information: List[Dict],
+                          vcs_instance_name: str) \
+            -> Repository:
         pass
 
     @staticmethod

@@ -6,7 +6,7 @@ from pydantic import BaseModel, HttpUrl, conint, constr
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
-class RepositoryInfoEnrichedBase(BaseModel):
+class RepositoryEnrichedBase(BaseModel):
     project_key: constr(min_length=1, max_length=100)
     repository_id: constr(min_length=1, max_length=100)
     repository_name: constr(min_length=1, max_length=100)
@@ -20,11 +20,11 @@ class RepositoryInfoEnrichedBase(BaseModel):
     total_findings_count: conint(gt=-1)
 
 
-class RepositoryInfoEnriched(RepositoryInfoEnrichedBase):
+class RepositoryEnriched(RepositoryEnrichedBase):
     pass
 
 
-class RepositoryInfoEnrichedRead(RepositoryInfoEnriched):
+class RepositoryEnrichedRead(RepositoryEnriched):
     id_: conint(gt=0)
 
     class Config:

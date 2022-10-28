@@ -55,8 +55,8 @@ def get_distinct_rules_from_findings(
         vcs_providers: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
         project_name: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
         repository_name: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
-        start_date: Optional[datetime] = Query(None),
-        end_date: Optional[datetime] = Query(None),
+        start_date_time: Optional[datetime] = Query(None),
+        end_date_time: Optional[datetime] = Query(None),
         db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all uniquely detected rules across all findings in the database
@@ -70,9 +70,9 @@ def get_distinct_rules_from_findings(
         optional, filter on project name. Is used as a full string match filter
     :param repository_name:
         Optional, filter on repository name. Is used as a string contains filter
-    :param start_date
+    :param start_date_time
         Optional, filter on start date
-    :param end_date
+    :param end_date_time
         Optional, filter on end date
     :return: List[str]
         The output will contain a list of strings of unique rules in the findings table
@@ -82,8 +82,8 @@ def get_distinct_rules_from_findings(
                                                                    vcs_providers=vcs_providers,
                                                                    project_name=project_name,
                                                                    repository_name=repository_name,
-                                                                   start_date=start_date,
-                                                                   end_date=end_date)
+                                                                   start_date_time=start_date_time,
+                                                                   end_date_time=end_date_time)
     rules = [rule.rule_name for rule in distinct_rules]
     return rules
 

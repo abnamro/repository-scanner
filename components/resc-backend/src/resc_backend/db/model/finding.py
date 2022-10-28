@@ -13,7 +13,7 @@ from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 class DBfinding(Base):
     __tablename__ = "finding"
     id_ = Column("id", Integer, primary_key=True)
-    branch_info_id = Column(Integer, ForeignKey("branch_info.id"), nullable=False)
+    branch_id = Column(Integer, ForeignKey("branch.id"), nullable=False)
     rule_name = Column(String(400), nullable=False)
     file_path = Column(String(500), nullable=False)
     line_number = Column(Integer, nullable=False)
@@ -27,11 +27,11 @@ class DBfinding(Base):
     comment = Column(String(255), nullable=True)
     event_sent_on = Column(DateTime, nullable=True)
 
-    __table_args__ = (UniqueConstraint("commit_id", "branch_info_id", "rule_name", "file_path", "line_number",
+    __table_args__ = (UniqueConstraint("commit_id", "branch_id", "rule_name", "file_path", "line_number",
                                        name="uc_finding_per_branch"),)
 
     def __init__(self, rule_name, file_path, line_number, commit_id, commit_message, commit_timestamp, author,
-                 email, status, comment, event_sent_on, branch_info_id):
+                 email, status, comment, event_sent_on, branch_id):
         self.email = email
         self.author = author
         self.commit_timestamp = commit_timestamp
@@ -43,7 +43,7 @@ class DBfinding(Base):
         self.status = status
         self.comment = comment
         self.event_sent_on = event_sent_on
-        self.branch_info_id = branch_info_id
+        self.branch_id = branch_id
 
     @staticmethod
     def create_from_finding(finding):
@@ -59,6 +59,6 @@ class DBfinding(Base):
             status=finding.status,
             comment=finding.comment,
             event_sent_on=finding.event_sent_on,
-            branch_info_id=finding.branch_info_id
+            branch_id=finding.branch_id
         )
         return db_finding

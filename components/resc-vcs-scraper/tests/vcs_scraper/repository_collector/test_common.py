@@ -8,7 +8,7 @@ from celery import Celery
 
 # First Party
 from vcs_scraper.constants import AZURE_DEVOPS, BITBUCKET, REPOSITORY_QUEUE
-from vcs_scraper.model import BranchInfo, RepositoryInfo
+from vcs_scraper.model import Branch, Repository
 from vcs_scraper.vcs_connectors.vcs_connector_factory import VCSConnectorFactory
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -54,20 +54,20 @@ def test_send_tasks_to_celery_queue(celery_send_task):
     repository_queue = REPOSITORY_QUEUE
     project_tasks = []
 
-    branches = [BranchInfo(branch_id="/ref/head/main",
-                           last_scanned_commit="abc",
-                           repository_info_id=1,
-                           branch_name="main"),
-                BranchInfo(branch_id="/ref/head/master",
-                           last_scanned_commit="xyz",
-                           repository_info_id=2,
-                           branch_name="master")]
+    branches = [Branch(branch_id="/ref/head/main",
+                       last_scanned_commit="abc",
+                       repository_id=1,
+                       branch_name="main"),
+                Branch(branch_id="/ref/head/master",
+                       last_scanned_commit="xyz",
+                       repository_id=2,
+                       branch_name="master")]
 
-    repository_info = RepositoryInfo(project_key="PROJ", repository_name="name", branches_info=branches,
-                                     repository_url="www.fake-vcs.com/proj/name", repository_id="xyz",
-                                     vcs_instance_name="test server")
+    repository = Repository(project_key="PROJ", repository_name="name", branches=branches,
+                            repository_url="www.fake-vcs.com/proj/name", repository_id="xyz",
+                            vcs_instance_name="test server")
 
-    project_tasks.append(repository_info)
+    project_tasks.append(repository)
 
     common.send_tasks_to_celery_queue(task_name, repository_queue, project_tasks)
     assert celery_send_task.call_count == len(project_tasks)
@@ -75,7 +75,7 @@ def test_send_tasks_to_celery_queue(celery_send_task):
     for index, send_task_call in enumerate(celery_send_task.call_args_list):
         args, kwargs = send_task_call
         assert args[0] == "celery_task1"
-        assert kwargs["kwargs"]['repository_info'] == project_tasks[index].json()
+        assert kwargs["kwargs"]['repository'] == project_tasks[index].json()
         assert kwargs["queue"] == repository_queue
 
 
@@ -127,13 +127,13 @@ def test_extract_ado_project_information(mock_get_branches, mock_get_repos):
 
     assert len(project_tasks) == 1
     result = project_tasks[0]
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
-    assert result.branches_info[0].branch_id == "feature"
-    assert result.branches_info[0].last_scanned_commit == "ABCDEFG"
-    assert result.branches_info[1].branch_id == "master"
-    assert result.branches_info[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[0].branch_id == "feature"
+    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[1].branch_id == "master"
+    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
 
 
 @patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_repos")
@@ -175,10 +175,10 @@ def test_extract_btbk_project_information(mock_get_branches, mock_get_repos):
 
     assert len(project_tasks) == 1
     result = project_tasks[0]
-    assert type(result) is RepositoryInfo
+    assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
-    assert result.branches_info[0].branch_id == "features/1"
-    assert result.branches_info[0].last_scanned_commit == "ABCDEFG"
-    assert result.branches_info[1].branch_id == "/refs/heads/main"
-    assert result.branches_info[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[0].branch_id == "features/1"
+    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[1].branch_id == "/refs/heads/main"
+    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"

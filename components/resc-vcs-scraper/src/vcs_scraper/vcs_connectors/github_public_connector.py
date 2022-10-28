@@ -4,11 +4,11 @@ from typing import List
 
 # Third Party
 from github import Github
-from github.Branch import Branch
-from github.Repository import Repository
+from github.Branch import Branch as GithubBranch
+from github.Repository import Repository as GithubRepository
 
 # First Party
-from vcs_scraper.model import BranchInfo, RepositoryInfo, VCSInstance
+from vcs_scraper.model import Branch, Repository, VCSInstance
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 
 
@@ -46,11 +46,11 @@ class GithubPublicConnector(VCSConnector):
             repository_list.append(repo_dict)
         return repository_list
 
-    def get_repository_details(self, project_key: str, repository_name: str) -> Repository:
+    def get_repository_details(self, project_key: str, repository_name: str) -> GithubRepository:
         repo_details = self.api_client.get_repo(f"{project_key}/{repository_name}")
         return repo_details
 
-    def get_branches(self, project_key: str, repository_id: str) -> List[Branch]:
+    def get_branches(self, project_key: str, repository_id: str) -> List[GithubBranch]:
         branches = self.api_client.get_repo(f"{project_key}/{repository_id}").get_branches()
         for branch in branches:
             branch_details = self.get_branch_details(project_key=project_key, repository_name=repository_id,
@@ -58,46 +58,46 @@ class GithubPublicConnector(VCSConnector):
             branch.latest_commit = branch_details.commit.sha
         return branches
 
-    def get_branch_details(self, project_key: str, repository_name: str, branch: str) -> Branch:
+    def get_branch_details(self, project_key: str, repository_name: str, branch: str) -> GithubBranch:
         branch = self.api_client.get_repo(f"{project_key}/{repository_name}").get_branch(branch)
         return branch
 
     @staticmethod
-    def export_repository_info(repository_information: Repository, branches_information: List[Branch],
-                               vcs_instance_name: str) \
-            -> RepositoryInfo:
+    def export_repository(repository_information: GithubRepository, branches_information: List[GithubBranch],
+                          vcs_instance_name: str) \
+            -> Repository:
         """
-        A method which generate a repositoryInfo object about a single bitbucket repository.
+        A method which generate a repository object about a single bitbucket repository.
 
         :param vcs_instance_name: Name of the VCS instance to which the repository belongs
         :param repository_information: Github repository information as returned by the Bitbucket API.
         :param branches_information: Github branches information for a single repo as returned by the Bitbucket API.
-        :return RepositoryInfo object
+        :return Repository object
         """
 
-        branches: List[BranchInfo] = []
+        branches: List[Branch] = []
         for branch_information in branches_information:
             if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
                 if branch_information.name.lower() in ["main", "master"]:
-                    branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                             branch_name=branch_information.name,
-                                             last_scanned_commit=branch_information.latest_commit,
-                                             branch_id=branch_information.name)
-                    branches.append(branch_info)
+                    branch = Branch(repository_id=repository_information["id"],
+                                    branch_name=branch_information.name,
+                                    last_scanned_commit=branch_information.latest_commit,
+                                    branch_id=branch_information.name)
+                    branches.append(branch)
                     break
             else:
-                branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                         branch_name=branch_information.name,
-                                         last_scanned_commit=branch_information.latest_commit,
-                                         branch_id=branch_information.name)
-                branches.append(branch_info)
-        repository_info = RepositoryInfo(branches_info=branches,
-                                         repository_url=repository_information["html_url"],
-                                         vcs_instance_name=vcs_instance_name,
-                                         repository_name=repository_information["name"],
-                                         repository_id=str(repository_information["id"]),
-                                         project_key=repository_information["project_key"])
-        return repository_info
+                branch = Branch(repository_id=repository_information["id"],
+                                branch_name=branch_information.name,
+                                last_scanned_commit=branch_information.latest_commit,
+                                branch_id=branch_information.name)
+                branches.append(branch)
+        repository = Repository(branches=branches,
+                                repository_url=repository_information["html_url"],
+                                vcs_instance_name=vcs_instance_name,
+                                repository_name=repository_information["name"],
+                                repository_id=str(repository_information["id"]),
+                                project_key=repository_information["project_key"])
+        return repository
 
     @staticmethod
     def create_client_from_vcs_instance(vcs_instance: VCSInstance) -> VCSConnector:

@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import List, Optional
 
 # Third Party
-from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.finding import FindingCreate
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan import ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceRead
@@ -32,12 +32,12 @@ class STDOUTWriter(OutputModule):
         logger.info(f"Scanning vcs instance {vcs_instance.name}")
         return vcs_instance
 
-    def write_repository_info(self, repository_info: RepositoryInfo) -> RepositoryInfo:
-        logger.info(f"Scanning repository {repository_info.project_key}/{repository_info.repository_name}")
-        return repository_info
+    def write_repository(self, repository: Repository) -> Repository:
+        logger.info(f"Scanning repository {repository.project_key}/{repository.repository_name}")
+        return repository
 
-    def write_branch_info(self, repository_info: RepositoryInfo, branch: BranchInfo) -> Optional[BranchInfo]:
-        logger.info(f"Scanning branch {branch.branch_name} of repository {repository_info.repository_name}")
+    def write_branch(self, repository: Repository, branch: Branch) -> Optional[Branch]:
+        logger.info(f"Scanning branch {branch.branch_name} of repository {repository.repository_name}")
         return branch
 
     @staticmethod
@@ -59,7 +59,7 @@ class STDOUTWriter(OutputModule):
     def write_findings(
             self,
             scan_id: int,
-            branch_info_id: int,
+            branch_id: int,
             scan_findings: List[FindingCreate],):
         for finding in scan_findings:
             logger.debug(self.format_commit_message(finding))
@@ -71,14 +71,14 @@ class STDOUTWriter(OutputModule):
             scan_type_to_run: ScanType,
             last_scanned_commit: str,
             scan_timestamp: datetime,
-            branch_info: BranchInfo,
+            branch: Branch,
             rule_pack: str) -> Optional[ScanRead]:
-        logger.info(f"Running {scan_type_to_run} scan on branch {branch_info.branch_name}")
+        logger.info(f"Running {scan_type_to_run} scan on branch {branch.branch_name}")
         return ScanRead(last_scanned_commit="NONE",
                         timestamp=datetime.now(),
-                        branch_info_id=1,
+                        branch_id=1,
                         id_=1,
                         rule_pack=rule_pack)
 
-    def get_last_scanned_commit(self, branch_info: BranchInfo):
+    def get_last_scanned_commit(self, branch: Branch):
         return None

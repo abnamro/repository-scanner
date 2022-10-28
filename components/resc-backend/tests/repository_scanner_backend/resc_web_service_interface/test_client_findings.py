@@ -21,7 +21,7 @@ for i in range(1, 6):
                                   status=FindingStatus.NOT_ANALYZED,
                                   comment=f"comment_{i}",
                                   rule_name=f"rule_{i}",
-                                  branch_info_id=1)
+                                  branch_id=1)
                     )
 
 

@@ -17,38 +17,38 @@ from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 
 def get_scan(db_connection: Session, scan_id: int) -> model.DBscan:
-    scan_info = db_connection.query(model.DBscan).filter(model.scan.DBscan.id_ == scan_id).first()
-    return scan_info
+    scan = db_connection.query(model.DBscan).filter(model.scan.DBscan.id_ == scan_id).first()
+    return scan
 
 
-def get_latest_scan_for_branch(db_connection: Session, branch_info_id: int) -> model.DBscan:
+def get_latest_scan_for_branch(db_connection: Session, branch_id: int) -> model.DBscan:
     """
-        Retrieve the most recent scan_info of a given branch_info object
+        Retrieve the most recent scan of a given branch object
     :param db_connection:
         Session of the database connection
-    :param branch_info_id:
-        id of the branch_info object for which to retrieve the most recent scan_info
-    :return: scan_info
-        scan_info object having the most recent timestamp for a given branch_info object
+    :param branch_id:
+        id of the branch object for which to retrieve the most recent scan
+    :return: scan
+        scan object having the most recent timestamp for a given branch object
     """
     subquery = (db_connection.query(func.max(model.DBscan.timestamp).label("max_time"))
-                .filter(model.scan.DBscan.branch_info_id == branch_info_id)).subquery()
+                .filter(model.scan.DBscan.branch_id == branch_id)).subquery()
 
-    scan_info = db_connection.query(model.DBscan) \
+    scan = db_connection.query(model.DBscan) \
         .join(subquery,
               and_(model.DBscan.timestamp == subquery.c.max_time)) \
-        .filter(model.scan.DBscan.branch_info_id == branch_info_id).first()
+        .filter(model.scan.DBscan.branch_id == branch_id).first()
 
-    return scan_info
+    return scan
 
 
 def get_scans(db_connection: Session, skip: int = 0,
-              limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT, branch_info_id: int = -1) -> List[model.DBscan]:
+              limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT, branch_id: int = -1) -> List[model.DBscan]:
     """
         Retrieve the scan records, ordered by scan_id and optionally filtered by branch
     :param db_connection:
         Session of the database connection
-    :param branch_info_id:
+    :param branch_id:
         optional int filtering the branch for which to retrieve scans
     :param skip:
         integer amount of records to skip to support pagination
@@ -60,27 +60,27 @@ def get_scans(db_connection: Session, skip: int = 0,
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
     query = db_connection.query(model.DBscan)
 
-    if branch_info_id > 0:
-        query = query.filter(model.DBscan.branch_info_id == branch_info_id)
+    if branch_id > 0:
+        query = query.filter(model.DBscan.branch_id == branch_id)
 
     scans = query.order_by(model.scan.DBscan.id_).offset(skip).limit(limit_val).all()
     return scans
 
 
-def get_scans_count(db_connection: Session, branch_info_id: int = -1) -> int:
+def get_scans_count(db_connection: Session, branch_id: int = -1) -> int:
     """
         Retrieve count of scan records optionally filtered by VCS provider
     :param db_connection:
         Session of the database connection
-    :param branch_info_id:
+    :param branch_id:
         optional int filtering the branch for which to retrieve scans
     :return: total_count
         count of scans
     """
     query = db_connection.query(func.count(model.DBscan.id_))
 
-    if branch_info_id > 0:
-        query = query.filter(model.DBscan.branch_info_id == branch_info_id)
+    if branch_id > 0:
+        query = query.filter(model.DBscan.branch_id == branch_id)
 
     total_count = query.scalar()
     return total_count
@@ -102,7 +102,7 @@ def create_scan(db_connection: Session, scan: scan_schema.ScanCreate) -> model.D
     db_scan = model.scan.DBscan(
         scan_type=scan.scan_type,
         last_scanned_commit=scan.last_scanned_commit,
-        branch_info_id=scan.branch_info_id,
+        branch_id=scan.branch_id,
         timestamp=scan.timestamp,
         increment_number=scan.increment_number,
         rule_pack=scan.rule_pack
@@ -120,38 +120,38 @@ def delete_scan(db_connection: Session, scan_id: int):
     return db_scan
 
 
-def get_latest_scan_for_repository_for_master_branch(db_connection: Session, repository_info_id: int) -> model.DBscan:
+def get_latest_scan_for_repository_for_master_branch(db_connection: Session, repository_id: int) -> model.DBscan:
     """
-        Retrieve the most recent scan_info of a given repository_info object
+        Retrieve the most recent scan of a given repository object
     :param db_connection:
         Session of the database connection
-    :param repository_info_id:
-        id of the repository_info object for which to retrieve the most recent scan_info
-    :return: scan_info
-        scan_info object having the most recent timestamp for a given repository_info object
+    :param repository_id:
+        id of the repository object for which to retrieve the most recent scan
+    :return: scan
+        scan object having the most recent timestamp for a given repository object
     """
     master_branch = ['master', 'main']
     subquery = (db_connection.query(func.max(model.DBscan.timestamp).label("max_time"))
-                .filter(model.scan.DBscan.branch_info_id == model.branch_info.DBbranchInfo.id_)
-                .filter(model.branch_info.DBbranchInfo.repository_info_id == repository_info_id)
-                .filter(func.lower(model.branch_info.DBbranchInfo.branch_name).in_(master_branch))
+                .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_)
+                .filter(model.branch.DBbranch.repository_id == repository_id)
+                .filter(func.lower(model.branch.DBbranch.branch_name).in_(master_branch))
                 ).subquery()
 
-    scan_info = db_connection.query(model.DBscan) \
+    scan = db_connection.query(model.DBscan) \
         .join(subquery,
               and_(model.DBscan.timestamp == subquery.c.max_time)) \
         .first()
 
-    return scan_info
+    return scan
 
 
-def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_info_id: int,
+def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_id: int,
                                                  scan_timestamp: datetime):
     """
         Retrieves the finding metadata for latest scan of a branch from the database
     :param db_connection:
         Session of the database connection
-    :param branch_info_id:
+    :param branch_id:
         branch id of the latest scan
     :param scan_timestamp:
         timestamp of the latest scan
@@ -160,7 +160,7 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
     """
     scan_ids_latest_to_base = []
     scans = get_scans(db_connection=db_connection,
-                      branch_info_id=branch_info_id, limit=1000000)
+                      branch_id=branch_id, limit=1000000)
     scans.sort(key=lambda x: x.timestamp, reverse=True)
     for scan in scans:
         if scan.timestamp <= scan_timestamp:

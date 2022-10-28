@@ -23,7 +23,7 @@ class TestScans(unittest.TestCase):
         app.dependency_overrides[requires_auth] = requires_no_auth
         self.db_scans = []
         for i in range(1, 6):
-            self.db_scans.append(DBscan(branch_info_id=i, scan_type="BASE",
+            self.db_scans.append(DBscan(branch_id=i, scan_type="BASE",
                                         last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(),
                                         increment_number=0, rule_pack=f"rule_pack_{i}"))
             self.db_scans[i - 1].id_ = i
@@ -46,7 +46,7 @@ class TestScans(unittest.TestCase):
                                               comment="",
                                               rule_name=f"rule_{i}",
                                               event_sent_on=datetime.utcnow(),
-                                              branch_info_id=1))
+                                              branch_id=1))
             self.db_findings[i - 1].id_ = i
 
         self.enriched_findings = []
@@ -62,7 +62,7 @@ class TestScans(unittest.TestCase):
                                                       email=f"email_{i}",
                                                       status=FindingStatus.NOT_ANALYZED,
                                                       comment=f"comment_{i}",
-                                                      branch_info_id=i,
+                                                      branch_id=i,
                                                       rule_name=f"rule_{i}",
                                                       event_sent_on=datetime.utcnow()))
 
@@ -71,7 +71,7 @@ class TestScans(unittest.TestCase):
         return {"timestamp": datetime.strftime(scan.timestamp, "%Y-%m-%dT%H:%M:%S.%f"),
                 "scan_type": scan.scan_type,
                 "last_scanned_commit": scan.last_scanned_commit,
-                "branch_info_id": scan.branch_info_id,
+                "branch_id": scan.branch_id,
                 "increment_number": scan.increment_number,
                 "rule_pack": scan.rule_pack
                 }
@@ -79,13 +79,13 @@ class TestScans(unittest.TestCase):
     @staticmethod
     def cast_db_scan_to_scan_create(scan):
         return ScanCreate(scan_type=scan.scan_type, last_scanned_commit=scan.last_scanned_commit,
-                          timestamp=scan.timestamp, branch_info_id=scan.branch_info_id,
+                          timestamp=scan.timestamp, branch_id=scan.branch_id,
                           increment_number=scan.increment_number, rule_pack=scan.rule_pack)
 
     @staticmethod
     def assert_scan(data, scan):
         assert data["id_"] == scan.id_
-        assert data["branch_info_id"] == scan.branch_info_id
+        assert data["branch_id"] == scan.branch_id
         assert datetime.strptime(data["timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == scan.timestamp
 
     @patch("resc_backend.resc_web_service.crud.scan.get_scan")
@@ -178,14 +178,14 @@ class TestScans(unittest.TestCase):
         assert data["detail"][1]["msg"] == "field required"
         assert data["detail"][2]["loc"] == ['body', 'rule_pack']
         assert data["detail"][2]["msg"] == "field required"
-        assert data["detail"][3]["loc"] == ['body', 'branch_info_id']
+        assert data["detail"][3]["loc"] == ['body', 'branch_id']
         assert data["detail"][3]["msg"] == "field required"
         create_scan.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.scan.create_scan")
     def test_post_scans_invalid_timestamp(self, create_scan):
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}",
-                                    json={"branch_info_id": 1, "scan_type": "BASE",
+                                    json={"branch_id": 1, "scan_type": "BASE",
                                           "last_scanned_commit": "dummy_commit", "timestamp": "invalid_time"})
         assert response.status_code == 422, response.text
         data = response.json()
@@ -218,7 +218,7 @@ class TestScans(unittest.TestCase):
                                          "last_scanned_commit": "dummy_commit",
                                          "timestamp": "2021-09-12T17:38:28.501000",
                                          "vcs_provider": "dummy_vcs_provider",
-                                         "branch_info_id": 999,
+                                         "branch_id": 999,
                                          "rule_pack": "1.5"
                                          },
                                    )
@@ -240,7 +240,7 @@ class TestScans(unittest.TestCase):
         assert data["detail"][1]["msg"] == "field required"
         assert data["detail"][2]["loc"] == ['body', 'rule_pack']
         assert data["detail"][2]["msg"] == "field required"
-        assert data["detail"][3]["loc"] == ['body', 'branch_info_id']
+        assert data["detail"][3]["loc"] == ['body', 'branch_id']
         assert data["detail"][3]["msg"] == "field required"
         update_scan.assert_not_called()
         get_scan.assert_not_called()

@@ -10,7 +10,7 @@ from typing import List, Optional
 
 # Third Party
 from resc_backend.resc_web_service.schema.finding import FindingBase
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
@@ -34,7 +34,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                  gitleaks_rules_path: str,
                  rule_pack_version: str,
                  output_plugin: OutputModule,
-                 repository_info: RepositoryInfo,
+                 repository: Repository,
                  username: str,
                  personal_access_token: str,
                  scan_tmp_directory: str = ".",
@@ -46,7 +46,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         self.rule_pack_version: str = rule_pack_version
         self._output_module: OutputModule = output_plugin
         self._scan_tmp_directory: str = scan_tmp_directory
-        self.repository_info: RepositoryInfo = repository_info
+        self.repository: Repository = repository
         self.username: str = username
         self.personal_access_token: str = personal_access_token
         self.local_path = local_path
@@ -54,39 +54,39 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         if self.local_path:
             self.repo_display_name = self.local_path.replace(".", "_").replace("/", "_")
         else:
-            self.repo_display_name = self.repository_info.repository_url
+            self.repo_display_name = self.repository.repository_url
 
     def clone_repo(self, branch_name: str) -> str:
-        repo_clone_path = f"{self._scan_tmp_directory}/{self.repository_info.repository_name}@{branch_name}"
-        clone_repository(self.repository_info.repository_url, branch_name, repo_clone_path,
+        repo_clone_path = f"{self._scan_tmp_directory}/{self.repository.repository_name}@{branch_name}"
+        clone_repository(self.repository.repository_url, branch_name, repo_clone_path,
                          username=self.username, personal_access_token=self.personal_access_token)
         return repo_clone_path
 
     def run_repository_scan(self) -> None:
-        logger.info(f"Started task for scanning {self.repository_info.repository_name}")
+        logger.info(f"Started task for scanning {self.repository.repository_name}")
 
-        # Insert in to repository_info table
-        created_repository_info = self._output_module.write_repository_info(self.repository_info)
-        if not created_repository_info:
+        # Insert in to repository table
+        created_repository = self._output_module.write_repository(self.repository)
+        if not created_repository:
             logger.error(f"Error processing "
-                         f"{self.repository_info.repository_name}."
-                         f" Error details: unable to create repository info: {created_repository_info}")
+                         f"{self.repository.repository_name}."
+                         f" Error details: unable to create repository: {created_repository}")
             return
 
-        for branch in self.repository_info.branches_info:
+        for branch in self.repository.branches:
             logger.info(f"Scanning branch {branch.branch_name} of repository "
-                        f"{self.repository_info.project_key}/{self.repository_info.repository_name}")
+                        f"{self.repository.project_key}/{self.repository.repository_name}")
 
-            # Insert in to branch_info table
-            created_branch_info = self._output_module.write_branch_info(created_repository_info, branch)
-            if not created_branch_info:
+            # Insert in to branch table
+            created_branch = self._output_module.write_branch(created_repository, branch)
+            if not created_branch:
                 logger.error(f"Error processing "
-                             f"{self.repository_info.project_key}/{self.repository_info.repository_name}:"
-                             f"{branch.branch_name}. Error details: unable to create branch info")
+                             f"{self.repository.project_key}/{self.repository.repository_name}:"
+                             f"{branch.branch_name}. Error details: unable to create branch")
                 return
 
             # Get last scanned commit for the branch
-            last_scanned_commit = self._output_module.get_last_scanned_commit(branch_info=created_branch_info)
+            last_scanned_commit = self._output_module.get_last_scanned_commit(branch=created_branch)
 
             # Decide which type of scan to run
             if self.force_base_scan:
@@ -100,11 +100,11 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                 scan_timestamp_start = datetime.utcnow()
                 created_scan = self._output_module.write_scan(
                     scan_type_to_run, branch.last_scanned_commit,
-                    scan_timestamp_start.isoformat(), created_branch_info,
+                    scan_timestamp_start.isoformat(), created_branch,
                     rule_pack=self.rule_pack_version)
                 if not created_scan:
                     logger.error(f"Error processing "
-                                 f"{self.repository_info.project_key}/{self.repository_info.repository_name}:"
+                                 f"{self.repository.project_key}/{self.repository.repository_name}:"
                                  f"{branch.branch_name}. Error details: unable to create scan object")
                     return
 
@@ -120,20 +120,20 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                                           repo_clone_path)
                 scan_timestamp_end = datetime.utcnow()
                 logger.info(f"Running {scan_type_to_run} scan on branch {branch.branch_name} of repository "
-                            f"{self.repository_info.project_key}/{self.repository_info.repository_name}"
+                            f"{self.repository.project_key}/{self.repository.repository_name}"
                             f" took {scan_timestamp_end - scan_timestamp_start} ms.")
 
                 if findings:
                     logger.info(f"Scan completed: {len(findings)} findings were found.")
-                    self._output_module.write_findings(branch_info_id=created_branch_info.id_, scan_id=created_scan.id_,
+                    self._output_module.write_findings(branch_id=created_branch.id_, scan_id=created_scan.id_,
                                                        scan_findings=findings)
                 else:
                     logger.info("No findings registered in "
-                                f"{self.repository_info.project_key}/{self.repository_info.repository_name}"
+                                f"{self.repository.project_key}/{self.repository.repository_name}"
                                 f":{branch.branch_name}.")
             else:
                 logger.info(f"Skipped {scan_type_to_run} scanning on branch: {branch.branch_name} of repository: "
-                            f"{self.repository_info.project_key}/{self.repository_info.repository_name}"
+                            f"{self.repository.project_key}/{self.repository.repository_name}"
                             f" no new commits found.")
 
     def scan_repo(self, scan_type_to_run: str, branch_name: str, last_scanned_commit: str, repo_clone_path: str) \
@@ -183,7 +183,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
             return findings
         except BaseException as error:
             logger.error(f"An exception occurred while scanning repository "
-                         f"{self.repository_info.repository_url}:{branch_name}"
+                         f"{self.repository.repository_url}:{branch_name}"
                          f" error: {error}")
         finally:
             # Make sure the tempfile and repo cloned path removed

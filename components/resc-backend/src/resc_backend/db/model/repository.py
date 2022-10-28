@@ -3,11 +3,11 @@ from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 
 # First Party
 from resc_backend.db.model import Base
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.repository import Repository
 
 
-class DBrepositoryInfo(Base):
-    __tablename__ = "repository_info"
+class DBrepository(Base):
+    __tablename__ = "repository"
     id_ = Column("id", Integer, primary_key=True)
     vcs_instance = Column(Integer, ForeignKey("vcs_instance.id"), nullable=False)
     project_key = Column(String(100), nullable=False)
@@ -25,12 +25,12 @@ class DBrepositoryInfo(Base):
         self.vcs_instance = vcs_instance
 
     @staticmethod
-    def create_from_repository_info(repository_info: RepositoryInfo):
-        db_repository_info = DBrepositoryInfo(
-            project_key=repository_info.project_key,
-            repository_id=repository_info.repository_id,
-            repository_name=repository_info.repository_name,
-            repository_url=repository_info.repository_url,
-            vcs_instance=repository_info.vcs_instance
+    def create_from_repository(repository: Repository):
+        db_repository = DBrepository(
+            project_key=repository.project_key,
+            repository_id=repository.repository_id,
+            repository_name=repository.repository_name,
+            repository_url=repository.repository_url,
+            vcs_instance=repository.vcs_instance
         )
-        return db_repository_info
+        return db_repository

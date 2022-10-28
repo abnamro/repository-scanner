@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 # Third Party
 import pytest
-from resc_backend.resc_web_service.schema.branch_info import BranchInfoBase, BranchInfoRead
+from resc_backend.resc_web_service.schema.branch import BranchBase, BranchRead
 from resc_backend.resc_web_service.schema.finding import Finding
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfoCreate, RepositoryInfoRead
+from resc_backend.resc_web_service.schema.repository import RepositoryCreate, RepositoryRead
 from resc_backend.resc_web_service.schema.scan import ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
@@ -16,66 +16,66 @@ from resc_backend.resc_web_service.schema.scan_type import ScanType
 from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
 
 
-# A test method to check the happy flow of the write_repository_info method.
+# A test method to check the happy flow of the write_repository method.
 @patch("requests.post")
-def test_write_correct_repository_info(post):
+def test_write_correct_repository(post):
     url = "https://nonexistingwebsite.com"
 
-    repository_info = RepositoryInfoCreate(project_key="project_key",
-                                           repository_id=1,
-                                           repository_name="repository_name",
-                                           repository_url="http://repository.url",
-                                           vcs_instance=1)
-    expected_result = RepositoryInfoRead(id_=1,
-                                         project_key=repository_info.project_key,
-                                         repository_id=repository_info.repository_id,
-                                         repository_name=repository_info.repository_name,
-                                         repository_url=repository_info.repository_url,
-                                         vcs_instance=repository_info.vcs_instance)
+    repository = RepositoryCreate(project_key="project_key",
+                                  repository_id=1,
+                                  repository_name="repository_name",
+                                  repository_url="http://repository.url",
+                                  vcs_instance=1)
+    expected_result = RepositoryRead(id_=1,
+                                     project_key=repository.project_key,
+                                     repository_id=repository.repository_id,
+                                     repository_name=repository.repository_name,
+                                     repository_url=repository.repository_url,
+                                     vcs_instance=repository.vcs_instance)
 
     expected_json = expected_result.json()
 
     post.return_value.status_code = 201
     post.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).write_repository_info(repository_info)
+    result = RESTAPIWriter(rws_url=url).write_repository(repository)
     assert result == expected_result
 
 
-# A test method to check the result with incorrect repository information from the write_repository_info method.
+# A test method to check the result with incorrect repository information from the write_repository method.
 @patch("requests.post")
 @patch("logging.Logger.warning")
-def test_write_incorrect_repository_info(warning, post):
+def test_write_incorrect_repository(warning, post):
     url = "https://nonexistingwebsite.com"
 
-    repository_info = RepositoryInfoCreate(project_key="project_key",
-                                           repository_id=1,
-                                           repository_name="repository_name",
-                                           repository_url="http://repository.url",
-                                           vcs_instance=1)
-    expected_result = RepositoryInfoRead(id_=1,
-                                         project_key=repository_info.project_key,
-                                         repository_id=repository_info.repository_id,
-                                         repository_name=repository_info.repository_name,
-                                         repository_url=repository_info.repository_url,
-                                         vcs_instance=repository_info.vcs_instance)
+    repository = RepositoryCreate(project_key="project_key",
+                                  repository_id=1,
+                                  repository_name="repository_name",
+                                  repository_url="http://repository.url",
+                                  vcs_instance=1)
+    expected_result = RepositoryRead(id_=1,
+                                     project_key=repository.project_key,
+                                     repository_id=repository.repository_id,
+                                     repository_name=repository.repository_name,
+                                     repository_url=repository.repository_url,
+                                     vcs_instance=repository.vcs_instance)
 
     expected_json = expected_result.json()
 
     post.return_value.status_code = 404
     post.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).write_repository_info(repository_info)
+    result = RESTAPIWriter(rws_url=url).write_repository(repository)
     assert result is None
     warning.assert_called_once()
     warning.assert_called_with(f"Creating repository info failed with error: {404}->{expected_json}")
 
 
-# A test method to check the happy flow of the write_branch_info method.
+# A test method to check the happy flow of the write_branch method.
 @patch("requests.post")
-def test_write_correct_branch_info(post):
+def test_write_correct_branch(post):
     url = "https://nonexistingwebsite.com"
-    repository_info = RepositoryInfoRead(
+    repository = RepositoryRead(
         id_=1,
         project_key="project_key",
         repository_id="repository_id",
@@ -84,30 +84,30 @@ def test_write_correct_branch_info(post):
         vcs_instance=1
     )
 
-    branch_info = BranchInfoBase(branch_id=1,
-                                 branch_name="branch_name",
-                                 last_scanned_commit="last_scanned_commit")
-    expected_result = BranchInfoRead(id_=1,
-                                     branch_id=branch_info.branch_id,
-                                     branch_name=branch_info.branch_name,
-                                     last_scanned_commit=branch_info.last_scanned_commit,
-                                     repository_info_id=1)
+    branch = BranchBase(branch_id=1,
+                        branch_name="branch_name",
+                        last_scanned_commit="last_scanned_commit")
+    expected_result = BranchRead(id_=1,
+                                 branch_id=branch.branch_id,
+                                 branch_name=branch.branch_name,
+                                 last_scanned_commit=branch.last_scanned_commit,
+                                 repository_id=1)
 
     expected_json = expected_result.json()
 
     post.return_value.status_code = 201
     post.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).write_branch_info(repository_info, branch_info)
+    result = RESTAPIWriter(rws_url=url).write_branch(repository, branch)
     assert result == expected_result
 
 
-# # A test method to check the result with incorrect branch information from the write_branch_info method.
+# # A test method to check the result with incorrect branch information from the write_branch method.
 @patch("requests.post")
 @patch("logging.Logger.warning")
-def test_write_incorrect_branch_info(warning, post):
+def test_write_incorrect_branch(warning, post):
     url = "https://nonexistingwebsite.com"
-    repository_info = RepositoryInfoRead(
+    repository = RepositoryRead(
         id_=1,
         project_key="project_key",
         repository_id="repository_id",
@@ -115,21 +115,21 @@ def test_write_incorrect_branch_info(warning, post):
         repository_url="https://repo.url",
         vcs_instance=1
     )
-    branch_info = BranchInfoBase(branch_id=1,
-                                 branch_name="branch_name",
-                                 last_scanned_commit="last_scanned_commit")
-    expected_result = BranchInfoRead(id_=1,
-                                     branch_id=branch_info.branch_id,
-                                     branch_name=branch_info.branch_name,
-                                     last_scanned_commit=branch_info.last_scanned_commit,
-                                     repository_info_id=1)
+    branch = BranchBase(branch_id=1,
+                        branch_name="branch_name",
+                        last_scanned_commit="last_scanned_commit")
+    expected_result = BranchRead(id_=1,
+                                 branch_id=branch.branch_id,
+                                 branch_name=branch.branch_name,
+                                 last_scanned_commit=branch.last_scanned_commit,
+                                 repository_id=1)
 
     expected_json = expected_result.json()
 
     post.return_value.status_code = 404
     post.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).write_branch_info(repository_info, branch_info)
+    result = RESTAPIWriter(rws_url=url).write_branch(repository, branch)
     assert result is None
     warning.assert_called_once()
     warning.assert_called_with(f"Creating branch info failed with error: {404}->{expected_json}")
@@ -179,17 +179,17 @@ def test_write_findings_unsuccessful(warning, post):
 @patch("requests.post")
 def test_write_scan(post):
     url = "https://nonexistingwebsite.com"
-    branch_info = BranchInfoRead(id_=2,
-                                 branch_id="branch_info.branch_id",
-                                 branch_name="branch_info.branch_name",
-                                 last_scanned_commit="last_scanned_commit",
-                                 repository_info_id=1)
+    branch = BranchRead(id_=2,
+                        branch_id="branch.branch_id",
+                        branch_name="branch.branch_name",
+                        last_scanned_commit="last_scanned_commit",
+                        repository_id=1)
     expected_result = ScanRead(id_=1,
                                scan_type=ScanType.BASE,
                                last_scanned_commit="123456789abcdef",
                                timestamp=datetime.now(),
                                increment_number=0,
-                               branch_info_id=branch_info.id_,
+                               branch_id=branch.id_,
                                rule_pack="0.0.0")
 
     expected_json = expected_result.json()
@@ -198,7 +198,7 @@ def test_write_scan(post):
     post.return_value.text = expected_json
 
     result = RESTAPIWriter(rws_url=url).write_scan(expected_result.scan_type, expected_result.last_scanned_commit,
-                                                   expected_result.timestamp, branch_info, rule_pack="0.0.0")
+                                                   expected_result.timestamp, branch, rule_pack="0.0.0")
     assert result == expected_result
 
 
@@ -206,17 +206,17 @@ def test_write_scan(post):
 @patch("logging.Logger.warning")
 def test_write_scan_unsuccessful(warning, post):
     url = "https://nonexistingwebsite.com"
-    branch_info = BranchInfoRead(id_=2,
-                                 branch_id="branch_info.branch_id",
-                                 branch_name="branch_info.branch_name",
-                                 last_scanned_commit="last_scanned_commit",
-                                 repository_info_id=1)
+    branch = BranchRead(id_=2,
+                        branch_id="branch.branch_id",
+                        branch_name="branch.branch_name",
+                        last_scanned_commit="last_scanned_commit",
+                        repository_id=1)
     expected_result = ScanRead(id_=1,
                                scan_type=ScanType.BASE,
                                last_scanned_commit="123456789abcdef",
                                timestamp=datetime.now(),
                                increment_number=0,
-                               branch_info_id=branch_info.id_,
+                               branch_id=branch.id_,
                                rule_pack="0.0.0")
 
     expected_json = expected_result.json()
@@ -225,7 +225,7 @@ def test_write_scan_unsuccessful(warning, post):
     post.return_value.text = expected_json
 
     result = RESTAPIWriter(rws_url=url).write_scan(expected_result.scan_type, expected_result.last_scanned_commit,
-                                                   expected_result.timestamp, branch_info, rule_pack="0.0.0")
+                                                   expected_result.timestamp, branch, rule_pack="0.0.0")
     assert result is None
     warning.assert_called_once()
     warning.assert_called_with(
@@ -235,16 +235,16 @@ def test_write_scan_unsuccessful(warning, post):
 @patch("requests.get")
 def test_get_last_scanned_commit(get):
     url = "https://nonexistingwebsite.com"
-    branch_info = BranchInfoRead(id_=1,
-                                 branch_id="branch_info.branch_id",
-                                 branch_name="branch_info.branch_name",
-                                 last_scanned_commit="last_scanned_commit",
-                                 repository_info_id=1)
+    branch = BranchRead(id_=1,
+                        branch_id="branch.branch_id",
+                        branch_name="branch.branch_name",
+                        last_scanned_commit="last_scanned_commit",
+                        repository_id=1)
     expected_result = ScanRead(id_=1,
                                last_scanned_commit="561dsf651t34544",
                                timestamp=datetime.now(),
                                increment_number=0,
-                               branch_info_id=1,
+                               branch_id=1,
                                rule_pack="0.0.0")
 
     expected_json = expected_result.json()
@@ -252,24 +252,24 @@ def test_get_last_scanned_commit(get):
     get.return_value.status_code = 200
     get.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch_info)
+    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch)
     assert result == expected_result.last_scanned_commit
 
 
 @patch("requests.get")
 @patch("logging.Logger.warning")
 def test_get_last_scanned_commit_invalid_id(warning, get):
-    branch_info = BranchInfoRead(id_=2,
-                                 branch_id="branch_info.branch_id",
-                                 branch_name="branch_info.branch_name",
-                                 last_scanned_commit="last_scanned_commit",
-                                 repository_info_id=1)
+    branch = BranchRead(id_=2,
+                        branch_id="branch.branch_id",
+                        branch_name="branch.branch_name",
+                        last_scanned_commit="last_scanned_commit",
+                        repository_id=1)
     url = "https://nonexistingwebsite.com"
     error_text = "Unable to retrieve scan for id"
     get.return_value.status_code = 404
     get.return_value.text = error_text
 
-    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch_info)
+    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch)
     assert result is None
     warning.assert_called_once()
     warning.assert_called_with(f"Retrieving last scan details failed with error: 404->{error_text}")

@@ -19,12 +19,12 @@ from resc_backend.resc_web_service.dependencies import (
     requires_no_auth
 )
 from resc_backend.resc_web_service.endpoints import (
-    branches_info,
+    branches,
     common,
     detailed_findings,
     findings,
     health,
-    repositories_info,
+    repositories,
     rules,
     scans,
     vcs_instances
@@ -113,11 +113,11 @@ if os.getenv('ENABLE_CORS', '') == 'true':
 
 app.include_router(health.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(common.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(branches_info.router, prefix=RWS_VERSION_PREFIX)
+app.include_router(branches.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(rules.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(repositories_info.router, prefix=RWS_VERSION_PREFIX)
+app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
 

@@ -4,8 +4,8 @@ const axios = require('axios');
 axiosRetry(axios, { retries: 3 });
 
 const BranchService = {
-  async getFindingsCountByStatusForBranch(branchInfoId) {
-    return axios.get(`/branches-info/${branchInfoId}/findings-metadata`);
+  async getFindingsCountByStatusForBranch(branchId) {
+    return axios.get(`/branches/${branchId}/findings-metadata`);
   },
 };
 export default BranchService;

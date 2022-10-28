@@ -26,17 +26,17 @@ def test_findings_filter_multiple_values():
 def test_findings_filter_valid_date_range():
 
     findings_filter = FindingsFilter(
-        start_date_range=datetime.strptime("1970-11-11T00:00:00", "%Y-%m-%dT%H:%M:%S"),
-        end_date_range=datetime.strptime("1970-11-11T00:00:01", "%Y-%m-%dT%H:%M:%S")
+        start_date_time=datetime.strptime("1970-11-11T00:00:00", "%Y-%m-%dT%H:%M:%S"),
+        end_date_time=datetime.strptime("1970-11-11T00:00:01", "%Y-%m-%dT%H:%M:%S")
     )
     assert findings_filter
 
 
 def test_findings_filter_invalid_date_range():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError) as value_error:
         FindingsFilter(
-            start_date_range=datetime.strptime("1970-11-11T00:00:01", "%Y-%m-%dT%H:%M:%S"),
-            end_date_range=datetime.strptime("1970-11-11T00:00:00", "%Y-%m-%dT%H:%M:%S")
+            start_date_time=datetime.strptime("1970-11-11T00:00:01", "%Y-%m-%dT%H:%M:%S"),
+            end_date_time=datetime.strptime("1970-11-11T00:00:00", "%Y-%m-%dT%H:%M:%S")
         )
 
-        assert "the start of the date range needs to be prior to the end of it." in str(excinfo.value)
+        assert "the start of the date range needs to be prior to the end of it." in str(value_error.value)

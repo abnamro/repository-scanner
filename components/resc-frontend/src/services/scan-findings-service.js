@@ -4,14 +4,14 @@ const axios = require('axios');
 axiosRetry(axios, { retries: 3 });
 
 const ScanFindingsService = {
-  async getRepositoryInfoById(repositoryInfoId) {
-    return axios.get(`/repositories-info/${repositoryInfoId}`);
+  async getRepositoryById(repositoryId) {
+    return axios.get(`/repositories/${repositoryId}`);
   },
-  async getScanInfoById(scanId) {
+  async getScanById(scanId) {
     return axios.get(`/scans/${scanId}`);
   },
-  async getBranchInfoById(brancheInfoId) {
-    return axios.get(`/branches-info/${brancheInfoId}`);
+  async getBranchById(brancheId) {
+    return axios.get(`/branches/${brancheId}`);
   },
 
   async getRulesByScanIds(scanIds) {
@@ -29,7 +29,7 @@ const ScanFindingsService = {
   },
 
   async getScansByBranchId(branchId, perPage, skipRowCount) {
-    return axios.get(`/branches-info/${branchId}/scans`, {
+    return axios.get(`/branches/${branchId}/scans`, {
       params: {
         skip: skipRowCount,
         limit: perPage,

@@ -8,15 +8,15 @@
     <!-- Spinner -->
     <Spinner :active="spinnerActive" />
 
-    <!-- Repository Info Panel -->
+    <!-- Repository Panel -->
     <div class="col-md-3 ml-3 mt-4 text-left">
-      <RepositoryInfoPanel
-        :repositoryInfo="{
-          project_key: repositoryInfo.project_key,
-          repository_name: repositoryInfo.repository_name,
+      <RepositoryPanel
+        :repository="{
+          project_key: repository.project_key,
+          repository_name: repository.repository_name,
           vcs_instance_name: vcsInstance.name,
         }"
-      ></RepositoryInfoPanel>
+      ></RepositoryPanel>
     </div>
 
     <div>
@@ -37,7 +37,7 @@
 
       <!-- Filters -->
       <ScanFindingsFilter
-        :repositoryInfo="repositoryInfo"
+        :repository="repository"
         @on-filter-change="handleFilterChange"
         @previous-scans-checked="onPreviousScanChecked"
         @include-previous-scans="displayPreviousScans"
@@ -120,7 +120,7 @@
 
         <!-- Expand Table Row To Display Finding Panel -->
         <template v-slot:row-details="{ item }">
-          <FindingPanel :finding="item" :repositoryInfo="repositoryInfo"></FindingPanel>
+          <FindingPanel :finding="item" :repository="repository"></FindingPanel>
         </template>
       </b-table>
 
@@ -145,7 +145,7 @@ import Config from '@/configuration/config';
 import FindingPanel from '@/components/ScanFindings/FindingPanel.vue';
 import FindingStatusBadge from '@/components/Common/FindingStatusBadge.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import RepositoryInfoPanel from '@/components/ScanFindings/RepositoryInfoPanel.vue';
+import RepositoryPanel from '@/components/ScanFindings/RepositoryPanel.vue';
 import ScanFindingsFilter from '@/components/Filters/ScanFindingsFilter.vue';
 import ScanFindingsService from '@/services/scan-findings-service';
 import ScanTypeBadge from '@/components/Common/ScanTypeBadge.vue';
@@ -166,10 +166,10 @@ export default {
       scanType: '',
       previousScanList: [],
       incrementNumber: null,
-      repositoryInfoId: null,
+      repositoryId: null,
       branchName: '',
       branchId: null,
-      repositoryInfo: {},
+      repository: {},
       vcsInstance: {},
       selectedCheckBoxIds: [],
       allSelected: false,
@@ -280,7 +280,7 @@ export default {
       }
     },
     fetchVCSInstance() {
-      VCSInstanceService.getVCSInstance(this.repositoryInfo.vcs_instance)
+      VCSInstanceService.getVCSInstance(this.repository.vcs_instance)
         .then((res) => {
           this.vcsInstance = res.data;
         })
@@ -288,11 +288,11 @@ export default {
           AxiosConfig.handleError(error);
         });
     },
-    fetchRepositoryInfo() {
-      ScanFindingsService.getRepositoryInfoById(this.repositoryInfoId)
+    fetchRepository() {
+      ScanFindingsService.getRepositoryById(this.repositoryId)
         .then((response) => {
-          this.repositoryInfo = response.data;
-          this.repositoryInfo.branch_name = this.branchName;
+          this.repository = response.data;
+          this.repository.branch_name = this.branchName;
           this.fetchVCSInstance();
           this.hideSpinner();
         })
@@ -300,26 +300,26 @@ export default {
           AxiosConfig.handleError(error);
         });
     },
-    fetchScanInfo() {
+    fetchScan() {
       this.showSpinner();
       this.selectedScanID = this.scanId;
-      ScanFindingsService.getScanInfoById(this.selectedScanID)
+      ScanFindingsService.getScanById(this.selectedScanID)
         .then((response) => {
-          this.branchId = response.data.branch_info_id;
+          this.branchId = response.data.branch_id;
           this.scanType = response.data.scan_type;
           this.incrementNumber = response.data.increment_number;
-          this.fetchBranchInfo();
+          this.fetchBranch();
         })
         .catch((error) => {
           AxiosConfig.handleError(error);
         });
     },
-    fetchBranchInfo() {
-      ScanFindingsService.getBranchInfoById(this.branchId)
+    fetchBranch() {
+      ScanFindingsService.getBranchById(this.branchId)
         .then((response) => {
-          this.repositoryInfoId = response.data.repository_info_id;
+          this.repositoryId = response.data.repository_id;
           this.branchName = response.data.branch_name;
-          this.fetchRepositoryInfo();
+          this.fetchRepository();
         })
         .catch((error) => {
           AxiosConfig.handleError(error);
@@ -327,7 +327,7 @@ export default {
     },
     fetchPaginatedFindingsByScanId() {
       this.showSpinner();
-      ScanFindingsService.getScanInfoById(this.selectedScanID)
+      ScanFindingsService.getScanById(this.selectedScanID)
         .then((response) => {
           this.scanType = response.data.scan_type;
           this.incrementNumber = response.data.increment_number;
@@ -441,14 +441,14 @@ export default {
     },
   },
   created() {
-    this.fetchScanInfo();
+    this.fetchScan();
   },
   components: {
     AuditModal,
     FindingPanel,
     FindingStatusBadge,
     Pagination,
-    RepositoryInfoPanel,
+    RepositoryPanel,
     ScanFindingsFilter,
     ScanTypeBadge,
     Spinner,

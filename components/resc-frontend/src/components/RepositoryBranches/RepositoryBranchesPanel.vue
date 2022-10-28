@@ -65,7 +65,7 @@ export default {
   name: 'RepositoryBranchesPanel',
   mixins: [spinnerMixin],
   props: {
-    repositoryInfo: {
+    repository: {
       type: Object,
       required: true,
     },
@@ -159,7 +159,7 @@ export default {
     fetchPaginatedBranches() {
       this.showSpinner();
       RepositoryService.getRepositoryBranches(
-        this.repositoryInfo.id_,
+        this.repository.id_,
         this.perPage,
         this.skipRowCount
       )

@@ -7,8 +7,8 @@ import requests
 from atlassian import Bitbucket
 
 # First Party
-from vcs_scraper.model import BranchInfo, RepositoryInfo
-from vcs_scraper.vcs_connectors.bitbucket_data_mapper import map_bitbucket_branch_info, map_bitbucket_repository_info
+from vcs_scraper.model import Branch, Repository
+from vcs_scraper.vcs_connectors.bitbucket_data_mapper import map_bitbucket_branch, map_bitbucket_repository
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -62,9 +62,9 @@ class BitbucketConnector(VCSConnector):
         return ""
 
     @staticmethod
-    def export_repository_info(repository_information: Dict, branches_information: List[Dict],
-                               vcs_instance_name: str) \
-            -> RepositoryInfo:
+    def export_repository(repository_information: Dict, branches_information: List[Dict],
+                          vcs_instance_name: str) \
+            -> Repository:
         """
         A method which generate a repositoryInfo object about a single bitbucket repository.
 
@@ -74,21 +74,21 @@ class BitbucketConnector(VCSConnector):
         :return RepositoryInfo object
         """
 
-        branches: List[BranchInfo] = []
+        branches: List[Branch] = []
         for branch_information in branches_information:
             if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
                 if branch_information["displayId"].lower() in ["main", "master"]:
-                    branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                             **map_bitbucket_branch_info(branch_information))
-                    branches.append(branch_info)
+                    branch = Branch(repository_id=repository_information["id"],
+                                    **map_bitbucket_branch(branch_information))
+                    branches.append(branch)
                     break
             else:
-                branch_info = BranchInfo(repository_info_id=repository_information["id"],
-                                         **map_bitbucket_branch_info(branch_information))
-                branches.append(branch_info)
+                branch = Branch(repository_id=repository_information["id"],
+                                **map_bitbucket_branch(branch_information))
+                branches.append(branch)
         http_clone_url = BitbucketConnector.get_clone_url(repository_information["links"]["clone"], "http")
-        repository_info = RepositoryInfo(branches_info=branches,
-                                         repository_url=http_clone_url,
-                                         vcs_instance_name=vcs_instance_name,
-                                         **map_bitbucket_repository_info(repository_information))
-        return repository_info
+        repository = Repository(branches=branches,
+                                repository_url=http_clone_url,
+                                vcs_instance_name=vcs_instance_name,
+                                **map_bitbucket_repository(repository_information))
+        return repository

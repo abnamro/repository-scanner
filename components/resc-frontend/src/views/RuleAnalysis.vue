@@ -104,7 +104,7 @@
         <template v-slot:row-details="{ item }">
           <FindingPanel
             :finding="item"
-            :repositoryInfo="{
+            :repository="{
               project_key: item.project_key,
               repository_name: item.repository_name,
               repository_url: item.repository_url,

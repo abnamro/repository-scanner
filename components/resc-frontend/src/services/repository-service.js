@@ -34,11 +34,11 @@ const RepositoryService = {
       queryParams = queryParams.slice(1);
     }
 
-    return axios.get(`/repositories-info/findings-metadata/?${queryParams}`);
+    return axios.get(`/repositories/findings-metadata/?${queryParams}`);
   },
 
   async getRepositoryBranches(repositoryId, perPage, skipRowCount) {
-    return axios.get(`/repositories-info/${repositoryId}/branches-info`, {
+    return axios.get(`/repositories/${repositoryId}/branches`, {
       params: {
         skip: skipRowCount,
         limit: perPage,
@@ -64,7 +64,7 @@ const RepositoryService = {
       queryParams = queryParams.slice(1);
     }
 
-    return axios.get(`/repositories-info/distinct-projects/?${queryParams}`);
+    return axios.get(`/repositories/distinct-projects/?${queryParams}`);
   },
 
   async getDistinctRepositories(vcsTypeList, projectFilter) {
@@ -81,7 +81,7 @@ const RepositoryService = {
       queryParams = queryParams.slice(1);
     }
 
-    return axios.get(`/repositories-info/distinct-repositories/?${queryParams}`);
+    return axios.get(`/repositories/distinct-repositories/?${queryParams}`);
   },
 };
 

@@ -29,7 +29,7 @@ class TestRule(unittest.TestCase):
     def tearDown(self):
         Base.metadata.drop_all(self.engine)
 
-    def test_query_all_repository_info(self):
+    def test_query_all_repository(self):
         expected = [self.rule]
         result = self.session.query(DBrule).all()
         self.assertEqual(result, expected)

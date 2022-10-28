@@ -54,9 +54,9 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
 
             scan_ids of type list Integer
 
-            start_date_range of type datetime with the following format: 1970-01-31T00:00:00
+            start_date_time of type datetime with the following format: 1970-01-31T00:00:00
 
-            end_date_range of type datetime with the following format: 1970-01-31T00:00:00
+            end_date_time of type datetime with the following format: 1970-01-31T00:00:00
 
     :param db_connection:
 

@@ -40,11 +40,11 @@ class FindingUpdate(BaseModel):
 
 
 class FindingCreate(FindingBase):
-    branch_info_id: conint(gt=0)
+    branch_id: conint(gt=0)
 
     @classmethod
-    def create_from_base_class(cls, base_object: FindingBase, branch_info_id: int):
-        return cls(**(dict(base_object)), branch_info_id=branch_info_id)
+    def create_from_base_class(cls, base_object: FindingBase, branch_id: int):
+        return cls(**(dict(base_object)), branch_id=branch_id)
 
 
 class Finding(FindingBase):
@@ -73,6 +73,6 @@ class FindingRead(FindingCreate):
             comment=db_finding.comment,
             event_sent_on=db_finding.event_sent_on,
             rule_name=db_finding.rule_name,
-            branch_info_id=db_finding.branch_info_id,
+            branch_id=db_finding.branch_id,
             scan_ids=scan_ids
         )

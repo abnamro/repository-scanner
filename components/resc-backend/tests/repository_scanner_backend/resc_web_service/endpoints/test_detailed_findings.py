@@ -164,42 +164,42 @@ class TestDetailedFindings(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_start_date_range(self, get_detailed_findings, get_total_findings_count):
-        start_date_range = "1970-11-11T00:00:00"
+        start_date_time = "1970-11-11T00:00:00"
         count = 0
         get_total_findings_count.return_value = count
         get_detailed_findings.return_value = []
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_DETAILED_FINDINGS}"
-                                   f"?skip=0&limit=1&query_string=start_date_range={start_date_range}")
+                                   f"?skip=0&limit=1&query_string=start_date_time={start_date_time}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data["data"]) == 0
         assert data["total"] == 0
         get_total_findings_count.assert_called_once_with(
             ANY, findings_filter=FindingsFilter(
-                start_date_range=datetime.strptime(start_date_range, "%Y-%m-%dT%H:%M:%S")))
+                start_date_time=datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S")))
         get_detailed_findings.assert_called_once_with(
             ANY, findings_filter=FindingsFilter(
-                start_date_range=datetime.strptime(start_date_range, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
+                start_date_time=datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_end_date_range(self, get_detailed_findings, get_total_findings_count):
-        end_date_range = "1970-11-11T00:00:00"
+        end_date_time = "1970-11-11T00:00:00"
         count = 0
         get_total_findings_count.return_value = count
         get_detailed_findings.return_value = []
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_DETAILED_FINDINGS}"
-                                   f"?skip=0&limit=1&query_string=end_date_range={end_date_range}")
+                                   f"?skip=0&limit=1&query_string=end_date_time={end_date_time}")
         assert response.status_code == 200, response.text
         data = response.json()
         assert len(data["data"]) == 0
         assert data["total"] == 0
         get_total_findings_count.assert_called_once_with(
             ANY, findings_filter=FindingsFilter(
-                end_date_range=datetime.strptime(end_date_range, "%Y-%m-%dT%H:%M:%S")))
+                end_date_time=datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S")))
         get_detailed_findings.assert_called_once_with(
             ANY, findings_filter=FindingsFilter(
-                end_date_range=datetime.strptime(end_date_range, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
+                end_date_time=datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
@@ -210,8 +210,8 @@ class TestDetailedFindings(unittest.TestCase):
         rule_names: List[str] = ["rule1", "rule2"]
         all_params = {"vcs_providers": vcs_providers,
                       "finding_statuses": finding_statuses,
-                      "start_date_range": "1970-11-11T00:00:00",
-                      "end_date_range": "1970-11-11T00:00:01",
+                      "start_date_time": "1970-11-11T00:00:00",
+                      "end_date_time": "1970-11-11T00:00:01",
                       "branch_name": "branch_name",
                       "project_name": "project_name",
                       "scan_ids": scan_ids,

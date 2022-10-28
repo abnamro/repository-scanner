@@ -62,7 +62,7 @@
 
         <!-- Expand Table Row To Display RepositoryBranches Panel -->
         <template v-slot:row-details="{ item }">
-          <RepositoryBranchesPanel :repositoryInfo="item"></RepositoryBranchesPanel>
+          <RepositoryBranchesPanel :repository="item"></RepositoryBranchesPanel>
         </template>
       </b-table>
 

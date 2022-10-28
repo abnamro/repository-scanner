@@ -5,27 +5,27 @@ from typing import List, Optional
 
 # Third Party
 from pydantic import BaseModel, conint, constr, validator
-from resc_backend.resc_web_service.schema.branch_info import BranchInfo
-from resc_backend.resc_web_service.schema.repository_info import RepositoryInfo
+from resc_backend.resc_web_service.schema.branch import Branch
+from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
-class RepositoryInfoRuntime(BaseModel):
+class RepositoryRuntime(BaseModel):
     repository_name: str
     repository_id: str
     repository_url: str
     project_key: str
     vcs_instance_name: str
-    branches_info: List[BranchInfo]
+    branches: List[Branch]
 
-    def convert_to_repository_info(self, vcs_instance_id: int) -> RepositoryInfo:
-        return RepositoryInfo(
+    def convert_to_repository(self, vcs_instance_id: int) -> Repository:
+        return Repository(
             project_key=self.project_key,
             repository_id=self.repository_id,
             repository_name=self.repository_name,
             repository_url=self.repository_url,
             vcs_instance=vcs_instance_id,
-            branches_info=self.branches_info
+            branches=self.branches
         )
 
 

@@ -60,10 +60,10 @@ const FindingsService = {
       query_string += `&branch_name=${filter.branch}`;
     }
     if (filter.startDate) {
-      query_string += `&start_date_range=${filter.startDate}T00:00:00`;
+      query_string += `&start_date_time=${filter.startDate}T00:00:00`;
     }
     if (filter.endDate) {
-      query_string += `&end_date_range=${filter.endDate}T23:59:59`;
+      query_string += `&end_date_time=${filter.endDate}T23:59:59`;
     }
 
     if (query_string) {

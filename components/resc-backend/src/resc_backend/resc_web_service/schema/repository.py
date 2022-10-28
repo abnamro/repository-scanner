@@ -4,10 +4,10 @@ from pydantic import BaseModel, HttpUrl, conint, constr
 from pydantic.types import List
 
 # First Party
-from resc_backend.resc_web_service.schema.branch_info import BranchInfo
+from resc_backend.resc_web_service.schema.branch import Branch
 
 
-class RepositoryInfoBase(BaseModel):
+class RepositoryBase(BaseModel):
     project_key: constr(min_length=1, max_length=100)
     repository_id: constr(min_length=1, max_length=100)
     repository_name: constr(min_length=1, max_length=100)
@@ -15,15 +15,15 @@ class RepositoryInfoBase(BaseModel):
     vcs_instance: conint(gt=0)
 
 
-class RepositoryInfo(RepositoryInfoBase):
-    branches_info: List[BranchInfo]
+class Repository(RepositoryBase):
+    branches: List[Branch]
 
 
-class RepositoryInfoCreate(RepositoryInfoBase):
+class RepositoryCreate(RepositoryBase):
     pass
 
 
-class RepositoryInfoRead(RepositoryInfoBase):
+class RepositoryRead(RepositoryBase):
     id_: conint(gt=0)
 
     class Config:

@@ -18,11 +18,11 @@ class ScanBase(BaseModel):
 
 
 class ScanCreate(ScanBase):
-    branch_info_id: conint(gt=0)
+    branch_id: conint(gt=0)
 
     @classmethod
-    def create_from_base_class(cls, base_object: ScanBase, branch_info_id: int):
-        return cls(**(dict(base_object)), branch_info_id=branch_info_id)
+    def create_from_base_class(cls, base_object: ScanBase, branch_id: int):
+        return cls(**(dict(base_object)), branch_id=branch_id)
 
 
 class Scan(ScanBase):
