@@ -68,7 +68,7 @@ def test_write_incorrect_repository(warning, post):
     result = RESTAPIWriter(rws_url=url).write_repository(repository)
     assert result is None
     warning.assert_called_once()
-    warning.assert_called_with(f"Creating repository info failed with error: {404}->{expected_json}")
+    warning.assert_called_with(f"Creating repository failed with error: {404}->{expected_json}")
 
 
 # A test method to check the happy flow of the write_branch method.
@@ -132,7 +132,7 @@ def test_write_incorrect_branch(warning, post):
     result = RESTAPIWriter(rws_url=url).write_branch(repository, branch)
     assert result is None
     warning.assert_called_once()
-    warning.assert_called_with(f"Creating branch info failed with error: {404}->{expected_json}")
+    warning.assert_called_with(f"Creating branch failed with error: {404}->{expected_json}")
 
 
 @patch("requests.post")
