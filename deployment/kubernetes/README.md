@@ -1,15 +1,21 @@
-# RESC Infra
+# RESC Deployment - Kubernetes
 
-# Prerequisites
+## Prerequisites
 Ensure you have the rulepack config file in TOML format available, which needs to be provided as deployment argument.
+To download this GitLeaks rulepack you can execute the following command to get a default GitLeaks rule file:
 
-# 1 Testing templates
+```
+curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
+echo 'version = "0.0.1"' | cat - gitleaks.toml > temp && mv temp gitleaks.toml
+```
+
+## Testing templates
 In order to run (unit/linting) tests locally, you can use the following commands from project root folder:
 * `cd ./deployment/kubernetes/`
 * `helm lint . --set-file global.secretScanRulePackConfig=<path to rulepack config toml file>` to run helm linting.
 * `helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=<path to rulepack config toml file>` to run get a preview of the helm templates after the local values has been applied.
 
-# Deploying charts locally 
+## Deploying charts locally 
 Run the following commands from project root folder.
 * Ensure the namespace is created `kubectl create namespace resc`
 * `cd ./deployment/kubernetes/`
@@ -24,7 +30,7 @@ Run the following commands from project root folder.
   * `helm uninstall resc --namespace resc`
 * Upgrade the helm deployment using `helm upgrade --namespace resc resc . -f ./helm-context/example-values.yaml --set-file global.secretScanRulePackConfig=<path to rulepack config toml file>`
 
-# Trigger scanning
+## Trigger scanning
 By default RESC will start to scan based on the cron expression mentioned in example-values.yaml file which is `0 6 * * 6` at 06:00 on Saturday.
 You can adjust it or you can run below command after helm deployment to start the scan immediately.
 `kubectl create job --from=cronjob/resc-vcs-scraper-projects resc-vcs-scraper-projects -n resc`

@@ -1,79 +1,102 @@
-# RESC
-Repository Scanner framework
+# Repository Scanner Backend (RESC-Backend)
 
-[![Backend basic validation](https://github.com/ABNAMRO/repository-scanner/actions/workflows/backend-basic-validation.yaml/badge.svg)](https://github.com/ABNAMRO/repository-scanner/actions/workflows/backend-basic-validation.yaml)
+<!-- TABLE OF CONTENTS -->
+## Table of Contents
+1. [About The Component](#about-the-component)
+2. [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Run locally from source](#run-locally-from-source)
+    - [Run locally using docker](#run-locally-using-docker)
+3. [Testing](#testing)
+4. [Create a migration for database changes](#create-a-migration-for-database-changes)
+    - [Use Alembic to create a new migration script](#use-alembic-to-create-a-new-migration-script)
+    - [Use the --autogenerate parameter](#use-the---autogenerate-parameter)
+    - [Running migration and rollback](#running-migration-and-rollback)
+5. [Documentation](#documentation)
 
-# Local Setup
-Run the below command from project root folder if your IDE doesn't recognize resc_backend as a valid python package  
+<!-- ABOUT THE COMPONENT -->
+## About The Component
+The RESC-BACKEND component includes Database models, RESC Web service, Alembic scripts for database migration and RabbitMQ users and queue creation.
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+- Install Docker Desktop
+- Install [Python 3.9.0](https://www.python.org/downloads/release/python-390/)
+
+**For Deploying the RESC Web Service locally:**
+- Local automated deployment rely on a Makefile, so first you need to install make:
+  `brew install make`
+
+**For Deploying the database locally:**
+- To locally deploy the database associated with RESC it is key that you first install the odbc 17 sql server driver. On Linux you do this by running the following command: `sudo apt install unixodbc-dev`
+- If you're on a Windows machine, visit the following link: https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
+- If you're on a different OS, visit the following link: https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16#17
+- Upon installing the driver, it is important that you properly set the following environment variables in the `db.env` file. Not doing so will result in an error in the database/not being able to load it properly.
+
+  MSSQL_PASSWORD : Password for local database
+
+### Run locally from source
+
+Run the below command from the project root folder if your IDE doesn't recognize repository_scanner_backend as a valid Python package
 ```
-export PIP_CONFIG_FILE=pip.conf
 pip install -e .
 ```
 
-## Deploying the Secret Tracking Service API locally:
+1. For Running the RESC Web Service:
 
-### Prerequisites
-
-- Local automated deployment rely on a Makefile, so first you need to install make:
-`brew install make`
-- Make sure Docker is running locally
-
-### Deploying the database locally:
-In order to run the database on a local environment (macOS) you first need to install the mssql driver:
-`brew install msodbcsql17`
-
-You also need to set the following environment variables in the file `db.env`
-MSSQL_PASSWORD : Password for local database
-RULE_PACK_VERSION_TAG: Tag from resc-rules repository
-VCS_ACCESS_TOKEN: Personal access token to clone resc-rules repository
-
-Then run the following command:
-`make db`
-
-This target will run a local MSSQL instance in a container called *resc-db* and create and populate the resc database schema using alembic and the sql script located in `test_data/database_dummy_data.sql`
-Note: this target will also try to remove the DB container if it already exists.
+    1. Create Python virtual environment: `venv`
+    2. Install repository_scanner_backend using: `make env`
+    3. Then you can run the STS api by running: `make sts`
 
 
-If you want to remove this container you can run: `make cleandb` 
+2. For Deploying the database locally, run the following command:
+   `make db`
 
-### Running the Repository scanner Web service:
-First you need to make sure the python virtual environment is created under `venv` and `resc_backend` is installed there using:
-`make env`
+   This target will run a local MSSQL instance in a container called *resc-db* and create and populate the resc database schema using alembic and the sql script located in `test_data/database_dummy_data.sql`
 
-Then you can run the RWS api by running: `make rws`
+   ***Note***: This target will also try to remove the DB container if it already exists.
 
-# Deployment
-Deployment is done via Kubernetes, for local testing the easiest solution for this is enabling the kubernetes feature in Docker desktop and installing kubectl.
+   If you want to remove this container you can run: `make cleandb`
 
+### Run locally using docker
 
-- Build the RESC base image locally by running the following command (base image version parameter defaults to 1.0.0): 
+Build the RESC Backend docker image locally by running the following commands (Keep the image version parameter in mind):
+
+- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-backend:0.0.1`
+- Build the docker image by running:`docker build -t abnamro/resc-backend:0.0.1`
+- Run the RESC backend by using the following command: `docker run --name resc-backend abnamro/resc-backend:0.0.1`
+
+## Testing
+[(Back to top)](#table-of-contents)
+
+In order to run (unit/linting) tests locally, there are several command specified below on how to run these tests.
+To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
+
+To make sure the unit tests are running and that the code matches quality standards run:
 ```
-./rebuild.sh <base image version>
+pip install tox      # install tox locally
+
+tox -v -e sort       # Run this command to validate the import sorting
+tox -v -e lint       # Run this command to lint the code according to this repository's standard
+tox -v -e -e pytest  # Run this command to run the unittests
+tox -v               # Run this command to run all the tests above
 ```
-- If you are using Apple M1 Pro, then build the RESC docker image locally by running command 
-```
-./rebuild_for_AppleM1Pro.sh <base image version>
-```
-- Deploy locally by referring README section of resc-infra repository:  
 
+## Create a migration for database changes
+[(Back to top)](#table-of-contents)
 
-#Testing
-In order to run (unit/linting) tests locally, you can use the following commands:
-* `make test` to run all tests.
-* `export PIP_CONFIG_FILE=pip.conf && tox -e lint` for linting
-* `export PIP_CONFIG_FILE=pip.conf && tox -e pytest` for unit testing
-* `export PIP_CONFIG_FILE=pip.conf && tox -e sort` for detecting issues in the sorting (and in order to fix sorting just run: `isort src/ tests/`)
-
-# Create a migration for database changes
-
-## Use Alembic to create a new migration script
+### Use Alembic to create a new migration script
 
 This command will create a new revision script in the ./alembic/versions directory
 ```
 alembic revision -m "<revision summary>"
 ```
 The filename is prefixed with the revision identifier used by Alembic to keep track of the revision history.
-Make sure that the down_revision variable contains the identifier of the previous revision:
+Make sure that the down_revision variable contains the identifier of the previous revision.
 For instance:
 
 ```
@@ -90,7 +113,7 @@ down_revision = 'd330d086edfe'
 The generated script contains two functions: The upgrade() function that contain the revision changes, and the
 downgrade() function that revert these changes.
 
-## Use the --autogenerate parameter
+### Use the --autogenerate parameter
 
 Alembic provide a --autogenerate parameter to help revision scripts creation. By comparing the current database schema
 and the model stated in python, it can output the necessary changes to apply. To create that revision make sure you have
@@ -98,12 +121,12 @@ a connection to a running database with a up-to-date schema version
 ```
 alembic revision --autogenerate -m "<revision summary>"
 ```
-However, autogenerate cannot detect all the required changes and therefore the created revision script has to be 
+However, autogenerate cannot detect all the required changes and therefore the created revision script has to be
 carefully checked and tested.
 
-## Running migration and rollback
+### Running migration and rollback
 
-To upgrade/downgrade the database schema use the following
+To upgrade/downgrade the database schema use the following:
 ```
 # Upgrade to specified revision identifier
 alembic upgrade <revision_identifier>
@@ -124,64 +147,26 @@ alembic downgrade base
 alembic downgrade -1
 ```
 Note that during the first revision, in addition to changes to be made a table containing alembic revision history
-will also be created
+will also be created.
 
 
-You can also check current revision information
+You can also check current revision information:
 ```
 alembic current
 ```
 
-And the revision history
+And the revision history:
 ```
 alembic history --verbose
 ```
 
-## Generating migration scripts locally
-Step-1: Run a mssql docker container locally  
-```
-docker run --name RESC_DB_LOCAL -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=<enter a strong password>" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-CU12-ubuntu-20.04
-```
 
-Step-2: Set following env variables.  
-Windows:
-```
-SET MSSQL_DB_HOST=localhost
-SET MSSQL_DB_PORT=1433
-SET MSSQL_SCHEMA=master
-SET MSSQL_USERNAME=sa
-SET MSSQL_PASSWORD=<password>
-SET MSSQL_ODBC_DRIVER=SQL Server
-```
+## Documentation
+[(Back to top)](#table-of-contents)
 
-Mac:  
-```
-export MSSQL_DB_HOST=localhost
-export MSSQL_DB_PORT=1433
-export MSSQL_SCHEMA=master
-export MSSQL_USERNAME=sa
-export MSSQL_PASSWORD=<password>
-export MSSQL_ODBC_DRIVER="ODBC Driver 17 for SQL Server"
-```  
-
-Step-3: Run migration script for latest revison to keep your local DB up to date.
-```
-alembic upgrade <last_revision_identifier>
-```
-
-Step-4: Generate revision for any change.  
-```
-alembic revision --autogenerate -m "<comment>"
-```
-
-To connect and view the tables from Intellij IDEA Ultimate edition refer the steps mentioned here.
-https://www.jetbrains.com/help/idea/db-tutorial-connecting-to-ms-sql-server.html#connect-by-using-sql-server-authentication  
-
-####Known issue:  
-While auto generating revision script, Alembic is now including the changes for default master schema.
-This needs to be fixed by creating a new schema called resc, then connecting to resc and run the revision script.
-
-
-## References
 [Alembic documentation](https://alembic.sqlalchemy.org/en/latest/index.html)
-How to create a connection string: https://docs.sqlalchemy.org/en/14/core/engines.html
+
+[How to create a connection string](https://docs.sqlalchemy.org/en/14/core/engines.html)
+
+[To connect and view the tables from Intellij IDEA Ultimate edition](https://www.jetbrains.com/help/idea/db-tutorial-connecting-to-ms-sql-server.html#connect-by-using-sql-server-authentication)
+  
