@@ -1,9 +1,6 @@
 # Standard Library
 from typing import List
 
-# Third Party
-from sqlalchemy.exc import IntegrityError
-
 # First Party
 from resc_backend.db import model
 from resc_backend.db.connection import Session
@@ -15,26 +12,18 @@ def create_scan_findings(db_connection: Session, scan_findings: List[DBscanFindi
     if len(scan_findings) < 1:
         # Function is called with an empty list of findings
         return 0
+
+    # load existing scan findings for this scan into the session
+    scan_id = scan_findings[0].scan_id
+    _ = db_connection.query(model.DBscanFinding).filter(DBscanFinding.scan_id == scan_id).all()
+
+    # merge the new scan findings into the session, ignoring duplicates
     for scan_finding in scan_findings:
+        db_connection.merge(scan_finding)
 
-        try:
-            with db_connection.begin_nested():
-                db_connection.merge(scan_finding)
-                db_connection.flush()
-            db_connection.commit()
-        except IntegrityError as integrity_error:
-
-            if "uc_scan_finding" not in str(integrity_error):
-                raise integrity_error
+    db_connection.commit()
 
     return len(scan_findings)
-
-
-def create_scan_finding(db_connection: Session, scan_finding: DBscanFinding) -> DBscanFinding:
-
-    db_connection.add_all(scan_finding)
-    db_connection.commit()
-    return scan_finding
 
 
 def delete_scan_finding(db_connection: Session, finding_id: int) -> List[DBscanFinding]:

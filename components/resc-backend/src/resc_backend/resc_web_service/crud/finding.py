@@ -6,7 +6,6 @@ from typing import List
 
 # Third Party
 from sqlalchemy import extract, func
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 # First Party
@@ -75,35 +74,46 @@ def audit_finding(db_connection: Session, db_finding: finding_schema.FindingRead
 
 
 def create_findings(db_connection: Session, findings: List[finding_schema.FindingCreate]) -> List[model.DBfinding]:
-    db_findings = []
     if len(findings) < 1:
         # Function is called with an empty list of findings
         return []
+    branch_id = findings[0].branch_id
 
+    # get a list of known / registered findings for this branch
+    db_branch_findings = db_connection.query(model.DBfinding).filter(model.DBfinding.branch_id == branch_id).all()
+
+    # Compare new findings list with findings in the db
+    new_findings = findings[:]
+    db_findings = []
     for finding in findings:
-        db_finding = model.finding.DBfinding.create_from_finding(finding)
+        for branch_finding in db_branch_findings:
+            # Compare based on the unique key in the findings table
+            if branch_finding.commit_id == finding.commit_id and \
+                    branch_finding.rule_name == finding.rule_name and \
+                    branch_finding.file_path == finding.file_path and \
+                    branch_finding.line_number == finding.line_number:
+                # Store the already known finding
+                db_findings.append(branch_finding)
+                # Remove from the db_branch_findings to increase performance for the next loop
+                db_branch_findings.remove(branch_finding)
+                # Remove from the to be created findings
+                new_findings.remove(finding)
+                break
+    logger.info(f"create_findings branch {branch_id}, Requested: {len(findings)}. "
+                f"New findings: {len(new_findings)}. Already in db: {len(db_findings)}")
 
-        try:
-            with db_connection.begin_nested():
-                db_connection.add(db_finding)
-                db_connection.flush()
-            db_connection.commit()
-            db_connection.refresh(db_finding)
-
-        except IntegrityError as integrity_error:
-
-            if "uc_finding_per_branch" not in str(integrity_error):
-                raise integrity_error
-            logger.warning(f"Already existing finding in branch: '{db_finding.branch_id}' "
-                           f"filepath: '{db_finding.file_path}' for rule: '{db_finding.rule_name}' was ignored")
-            db_finding = db_connection.query(model.DBfinding).filter_by(
-                file_path=db_finding.file_path,
-                branch_id=db_finding.branch_id,
-                line_number=db_finding.line_number,
-                rule_name=db_finding.rule_name,
-                commit_id=db_finding.commit_id
-            ).first()
-        db_findings.append(db_finding)
+    db_create_findings = []
+    # Map the to be created findings to the DBfinding type object
+    for new_finding in new_findings:
+        db_create_finding = model.finding.DBfinding.create_from_finding(new_finding)
+        db_create_findings.append(db_create_finding)
+    # Store all the to be created findings in the database
+    if len(db_create_findings) >= 1:
+        db_connection.add_all(db_create_findings)
+        db_connection.flush()
+        db_connection.commit()
+        db_findings.extend(db_create_findings)
+    # Return the known findings that are part of the request and the newly created findings
     return db_findings
 
 
