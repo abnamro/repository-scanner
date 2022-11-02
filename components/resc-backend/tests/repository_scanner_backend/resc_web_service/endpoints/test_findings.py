@@ -179,7 +179,7 @@ class TestFindings(unittest.TestCase):
         assert response.status_code == 200, response.text
         self.assert_db_finding(response.json(), db_finding, db_scan_findings)
         get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-        delete_scan_finding.assert_called_once_with(ANY, db_finding.id_)
+        delete_scan_finding.assert_called_once_with(ANY, finding_id=db_finding.id_, scan_id=None)
         delete_finding.assert_called_once_with(ANY, db_finding.id_)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
