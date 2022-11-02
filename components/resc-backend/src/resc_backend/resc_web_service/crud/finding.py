@@ -83,7 +83,7 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
     db_branch_findings = db_connection.query(model.DBfinding).filter(model.DBfinding.branch_id == branch_id).all()
 
     # Compare new findings list with findings in the db
-    to_be_created_findings = findings[:]
+    new_findings = findings[:]
     db_findings = []
     for finding in findings:
         for branch_finding in db_branch_findings:
@@ -92,23 +92,28 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
                     branch_finding.rule_name == finding.rule_name and \
                     branch_finding.file_path == finding.file_path and \
                     branch_finding.line_number == finding.line_number:
+                # Store the already known finding
                 db_findings.append(branch_finding)
+                # Remove from the db_branch_findings to increase performance for the next loop
                 db_branch_findings.remove(branch_finding)
-                to_be_created_findings.remove(finding)
+                # Remove from the to be created findings
+                new_findings.remove(finding)
                 break
     logger.info(f"create_findings branch {branch_id}, Requested: {len(findings)}. "
-                f"New findings: {len(to_be_created_findings)}. Already in db: {len(db_findings)}")
+                f"New findings: {len(new_findings)}. Already in db: {len(db_findings)}")
 
     db_create_findings = []
-    for to_be_created_finding in to_be_created_findings:
-        db_create_finding = model.finding.DBfinding.create_from_finding(to_be_created_finding)
+    # Map the to be created findings to the DBfinding type object
+    for new_finding in new_findings:
+        db_create_finding = model.finding.DBfinding.create_from_finding(new_finding)
         db_create_findings.append(db_create_finding)
+    # Store all the to be created findings in the database
     if len(db_create_findings) >= 1:
         db_connection.add_all(db_create_findings)
         db_connection.flush()
         db_connection.commit()
         db_findings.extend(db_create_findings)
-
+    # Return the known findings that are part of the request and the newly created findings
     return db_findings
 
 
