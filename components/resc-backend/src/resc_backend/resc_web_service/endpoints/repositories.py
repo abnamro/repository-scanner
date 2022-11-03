@@ -113,10 +113,24 @@ def update_repository(
 @router.delete("/{repository_id}",
                status_code=status.HTTP_200_OK)
 def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Delete a repository object
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository to delete
+    :return:
+        The output will contain a success or error message based on the success of the deletion
+    """
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
-    return repository_crud.delete_repository(db_connection, repository_id)
+    repository_crud.delete_scan_finding_by_repository_id(db_connection, repository_id=repository_id)
+    repository_crud.delete_findings_by_repository_id(db_connection, repository_id=repository_id)
+    repository_crud.delete_scans_by_repository_id(db_connection, repository_id=repository_id)
+    repository_crud.delete_branches_by_repository_id(db_connection, repository_id=repository_id)
+    repository_crud.delete_repository(db_connection, repository_id=repository_id)
+    return {"ok": True}
 
 
 @router.get("/{repository_id}"f"{RWS_ROUTE_BRANCHES}",

@@ -134,13 +134,6 @@ def create_repository_if_not_exists(db_connection: Session,
     return create_repository(db_connection, repository)
 
 
-def delete_repository(db_connection: Session, repository_id: int):
-    db_repository = db_connection.query(model.DBrepository).filter_by(id_=repository_id).first()
-    db_connection.delete(db_repository)
-    db_connection.commit()
-    return db_repository
-
-
 def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] = None, repository_filter: str = ""):
     """
         Retrieve all unique project names
@@ -219,3 +212,87 @@ def get_findings_metadata_by_repository_id(db_connection: Session, repository_id
         }
 
     return findings_metadata
+
+
+def delete_repository(db_connection: Session, repository_id: int):
+    """
+        Delete a repository object
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository to be deleted
+    """
+    if repository_id:
+        db_connection.query(model.DBrepository) \
+            .filter(model.repository.DBrepository.id_ == repository_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_branches_by_repository_id(db_connection: Session, repository_id: int):
+    """
+        Delete branches for a given repository
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository
+    """
+    if repository_id:
+        db_connection.query(model.DBbranch) \
+            .filter(model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id,
+                    model.repository.DBrepository.id_ == repository_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scans_by_repository_id(db_connection: Session, repository_id: int):
+    """
+        Delete scans for a given repository
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository
+    """
+    if repository_id:
+        db_connection.query(model.DBscan) \
+            .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.id_ == repository_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_findings_by_repository_id(db_connection: Session, repository_id: int):
+    """
+        Delete findings for a given repository
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository
+    """
+    if repository_id:
+        db_connection.query(model.DBfinding) \
+            .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.id_ == repository_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan_finding_by_repository_id(db_connection: Session, repository_id: int):
+    """
+        Delete scan findings for a given repository
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository
+    """
+    if repository_id:
+        db_connection.query(model.DBscanFinding) \
+            .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
+                    model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
+                    model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.id_ == repository_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()

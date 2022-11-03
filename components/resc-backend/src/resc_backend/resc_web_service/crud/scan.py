@@ -113,13 +113,6 @@ def create_scan(db_connection: Session, scan: scan_schema.ScanCreate) -> model.D
     return db_scan
 
 
-def delete_scan(db_connection: Session, scan_id: int):
-    db_scan = db_connection.query(model.DBscan).filter_by(id_=scan_id).first()
-    db_connection.delete(db_scan)
-    db_connection.commit()
-    return db_scan
-
-
 def get_latest_scan_for_repository_for_master_branch(db_connection: Session, repository_id: int) -> model.DBscan:
     """
         Retrieve the most recent scan of a given repository object
@@ -200,3 +193,54 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
     }
 
     return findings_metadata
+
+
+def delete_branch_findings_not_linked_to_any_scan(db_connection: Session, branch_id: int):
+    """
+        Delete findings for a given branch which are not linked to any scans
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch
+    """
+    if branch_id:
+        sub_query = db_connection.query(model.DBscanFinding.finding_id).distinct()
+        db_connection.query(model.DBfinding) \
+            .filter(model.finding.DBfinding.id_.not_in(sub_query), model.finding.DBfinding.branch_id == branch_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan(db_connection: Session, scan_id: int):
+    """
+        Delete a scan object
+    :param db_connection:
+        Session of the database connection
+    :param scan_id:
+        id of the scan to be deleted
+    """
+    if scan_id:
+        db_connection.query(model.DBscan) \
+            .filter(model.scan.DBscan.id_ == scan_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan_finding(db_connection: Session, finding_id: int = None, scan_id: int = None):
+    """
+        Delete scan findings when finding id or scan id provided
+    :param db_connection:
+        Session of the database connection
+    :param finding_id:
+        optional, id of the finding
+    :param scan_id:
+        optional, id of the scan
+    """
+    if finding_id or scan_id:
+        query = db_connection.query(model.DBscanFinding)
+        if finding_id:
+            query = query.filter(model.scan_finding.DBscanFinding.finding_id == finding_id)
+        if scan_id:
+            query = query.filter(model.scan_finding.DBscanFinding.scan_id == scan_id)
+        query.delete(synchronize_session=False)
+        db_connection.commit()

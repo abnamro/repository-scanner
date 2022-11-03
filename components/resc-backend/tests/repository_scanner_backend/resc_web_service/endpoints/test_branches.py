@@ -157,17 +157,22 @@ class TestBranches(unittest.TestCase):
         update_branch.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.branch.delete_branch")
+    @patch("resc_backend.resc_web_service.crud.branch.delete_scans_by_branch_id")
+    @patch("resc_backend.resc_web_service.crud.branch.delete_findings_by_branch_id")
+    @patch("resc_backend.resc_web_service.crud.branch.delete_scan_finding_by_branch_id")
     @patch("resc_backend.resc_web_service.crud.branch.get_branch")
-    def test_delete_branches(self, get_branch, delete_branch):
+    def test_delete_branches(self, get_branch, delete_scan_finding_by_branch_id, delete_findings_by_branch_id,
+                             delete_scans_by_branch_id, delete_branch):
         branch_id = 1
         get_branch.return_value = self.db_branches[branch_id]
-        delete_branch.return_value = self.db_branches[branch_id]
         response = self.client.delete(
             f"{RWS_VERSION_PREFIX}{RWS_ROUTE_BRANCHES}/{branch_id}")
         assert response.status_code == 200, response.text
-        self.assert_branch(response.json(), self.db_branches[branch_id])
         get_branch.assert_called_once_with(ANY, branch_id=branch_id)
-        delete_branch.assert_called_once_with(ANY, branch_id)
+        delete_scan_finding_by_branch_id.assert_called_once_with(ANY, branch_id=branch_id)
+        delete_findings_by_branch_id.assert_called_once_with(ANY, branch_id=branch_id)
+        delete_scans_by_branch_id.assert_called_once_with(ANY, branch_id=branch_id)
+        delete_branch.assert_called_once_with(ANY, branch_id=branch_id)
 
     @patch("resc_backend.resc_web_service.crud.branch.delete_branch")
     @patch("resc_backend.resc_web_service.crud.branch.get_branch")

@@ -137,4 +137,10 @@ def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(g
     db_vcs_instance = vcs_instance_crud.get_vcs_instance(db_connection, vcs_instance_id=vcs_instance_id)
     if db_vcs_instance is None:
         raise HTTPException(status_code=404, detail="VCS instance not found")
-    return vcs_instance_crud.delete_vcs_instance(db_connection, vcs_instance_id)
+    vcs_instance_crud.delete_scan_finding_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+    vcs_instance_crud.delete_findings_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+    vcs_instance_crud.delete_scans_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+    vcs_instance_crud.delete_branches_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+    vcs_instance_crud.delete_repositories_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+    vcs_instance_crud.delete_vcs_instance(db_connection, vcs_instance_id=vcs_instance_id)
+    return {"ok": True}

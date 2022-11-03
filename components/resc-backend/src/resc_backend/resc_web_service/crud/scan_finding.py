@@ -8,7 +8,6 @@ from resc_backend.db.model import DBscanFinding
 
 
 def create_scan_findings(db_connection: Session, scan_findings: List[DBscanFinding]) -> int:
-
     if len(scan_findings) < 1:
         # Function is called with an empty list of findings
         return 0
@@ -24,20 +23,6 @@ def create_scan_findings(db_connection: Session, scan_findings: List[DBscanFindi
     db_connection.commit()
 
     return len(scan_findings)
-
-
-def delete_scan_finding(db_connection: Session, finding_id: int, scan_id: int) -> List[DBscanFinding]:
-    if finding_id and scan_id:
-        db_scan_findings = db_connection.query(model.DBscanFinding).filter_by(finding_id=finding_id).filter_by(
-            scan_id=scan_id).all()
-    if finding_id:
-        db_scan_findings = db_connection.query(model.DBscanFinding).filter_by(finding_id=finding_id).all()
-    if scan_id:
-        db_scan_findings = db_connection.query(model.DBscanFinding).filter_by(scan_id=scan_id).all()
-    for db_scan_finding in db_scan_findings:
-        db_connection.delete(db_scan_finding)
-    db_connection.commit()
-    return db_scan_findings
 
 
 def get_scan_findings(db_connection: Session, finding_id: int) -> List[DBscanFinding]:

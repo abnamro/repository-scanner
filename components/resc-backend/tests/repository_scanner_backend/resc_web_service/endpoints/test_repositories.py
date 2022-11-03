@@ -151,17 +151,25 @@ class TestRepositories(unittest.TestCase):
                                          self.db_repositories[1]), repository_id=repository_id)
 
     @patch("resc_backend.resc_web_service.crud.repository.get_repository")
+    @patch("resc_backend.resc_web_service.crud.repository.delete_scan_finding_by_repository_id")
+    @patch("resc_backend.resc_web_service.crud.repository.delete_findings_by_repository_id")
+    @patch("resc_backend.resc_web_service.crud.repository.delete_scans_by_repository_id")
+    @patch("resc_backend.resc_web_service.crud.repository.delete_branches_by_repository_id")
     @patch("resc_backend.resc_web_service.crud.repository.delete_repository")
-    def test_delete_repositories(self, delete_repository, get_repository):
+    def test_delete_repositories(self, delete_repository, delete_branches_by_repository_id,
+                                 delete_scans_by_repository_id, delete_findings_by_repository_id,
+                                 delete_scan_finding_by_repository_id, get_repository):
         repository_id = 1
         get_repository.return_value = self.db_repositories[repository_id]
-        delete_repository.return_value = get_repository.return_value
         response = self.client.delete(f"{RWS_VERSION_PREFIX}"
                                       f"{RWS_ROUTE_REPOSITORIES}/{repository_id}")
         assert response.status_code == 200, response.text
-        self.assert_repository(response.json(), self.db_repositories[repository_id])
         get_repository.assert_called_once_with(ANY, repository_id=repository_id)
-        delete_repository.assert_called_once_with(ANY, repository_id)
+        delete_scan_finding_by_repository_id.assert_called_once_with(ANY, repository_id=repository_id)
+        delete_findings_by_repository_id.assert_called_once_with(ANY, repository_id=repository_id)
+        delete_scans_by_repository_id.assert_called_once_with(ANY, repository_id=repository_id)
+        delete_branches_by_repository_id.assert_called_once_with(ANY, repository_id=repository_id)
+        delete_repository.assert_called_once_with(ANY, repository_id=repository_id)
 
     @patch("resc_backend.resc_web_service.crud.repository.create_repository")
     def test_post_repositories_no_body(self, create_repository):

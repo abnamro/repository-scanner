@@ -13,7 +13,7 @@ def get_branches(db_connection: Session, skip: int = 0,
                  limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT):
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
     branches = db_connection.query(model.DBbranch).order_by(
-            model.branch.DBbranch.id_).offset(skip).limit(limit_val).all()
+        model.branch.DBbranch.id_).offset(skip).limit(limit_val).all()
     return branches
 
 
@@ -34,8 +34,8 @@ def get_branches_for_repository(db_connection: Session, repository_id: int, skip
         or an empty list if no branch was found for the given repository_id
     """
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-    branches = db_connection.query(model.DBbranch)\
-        .filter(model.DBbranch.repository_id == repository_id)\
+    branches = db_connection.query(model.DBbranch) \
+        .filter(model.DBbranch.repository_id == repository_id) \
         .order_by(model.branch.DBbranch.id_).offset(skip).limit(limit_val).all()
     return branches
 
@@ -62,14 +62,14 @@ def get_branches_count_for_repository(db_connection: Session, repository_id: int
     :return: total_count
         count of branches
     """
-    total_count = db_connection.query(func.count(model.DBbranch.id_))\
-        .filter(model.DBbranch.repository_id == repository_id)\
+    total_count = db_connection.query(func.count(model.DBbranch.id_)) \
+        .filter(model.DBbranch.repository_id == repository_id) \
         .scalar()
     return total_count
 
 
 def get_branch(db_connection: Session, branch_id: int):
-    branch = db_connection.query(model.DBbranch)\
+    branch = db_connection.query(model.DBbranch) \
         .filter(model.branch.DBbranch.id_ == branch_id).first()
     return branch
 
@@ -110,13 +110,6 @@ def create_branch_if_not_exists(db_connection: Session, branch: branch_schema.Br
     return create_branch(db_connection, branch)
 
 
-def delete_branch(db_connection: Session, branch_id: int):
-    db_branch = db_connection.query(model.DBbranch).filter_by(id_=branch_id).first()
-    db_connection.delete(db_branch)
-    db_connection.commit()
-    return db_branch
-
-
 def get_findings_metadata_by_branch_id(db_connection: Session, branch_id: int):
     """
         Retrieves the finding metadata for a branch id from the database with most recent scan information
@@ -132,7 +125,7 @@ def get_findings_metadata_by_branch_id(db_connection: Session, branch_id: int):
 
     if latest_scan is not None:
         findings_metadata = scan_crud.get_branch_findings_metadata_for_latest_scan(
-                db_connection, branch_id=latest_scan.branch_id, scan_timestamp=latest_scan.timestamp)
+            db_connection, branch_id=latest_scan.branch_id, scan_timestamp=latest_scan.timestamp)
     else:
         findings_metadata = {
             "true_positive": 0,
@@ -144,3 +137,66 @@ def get_findings_metadata_by_branch_id(db_connection: Session, branch_id: int):
         }
 
     return findings_metadata
+
+
+def delete_branch(db_connection: Session, branch_id: int):
+    """
+        Delete a branch object
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch to be deleted
+    """
+    if branch_id:
+        db_connection.query(model.DBbranch) \
+            .filter(model.branch.DBbranch.id_ == branch_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scans_by_branch_id(db_connection: Session, branch_id: int):
+    """
+        Delete scans for a given branch
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch
+    """
+    if branch_id:
+        db_connection.query(model.DBscan) \
+            .filter(model.scan.DBscan.branch_id == branch_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan_finding_by_branch_id(db_connection: Session, branch_id: int):
+    """
+        Delete scan findings for a given branch
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch
+    """
+    if branch_id:
+        db_connection.query(model.DBscanFinding) \
+            .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
+                    model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
+                    model.scan.DBscan.branch_id == model.finding.DBfinding.branch_id,
+                    model.scan.DBscan.branch_id == branch_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_findings_by_branch_id(db_connection: Session, branch_id: int):
+    """
+        Delete findings for a given branch
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch
+    """
+    if branch_id:
+        db_connection.query(model.DBfinding) \
+            .filter(model.finding.DBfinding.branch_id == branch_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()

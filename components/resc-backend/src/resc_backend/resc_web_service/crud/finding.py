@@ -117,13 +117,6 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
     return db_findings
 
 
-def delete_finding(db_connection: Session, finding_id: int):
-    db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
-    db_connection.delete(db_finding)
-    db_connection.commit()
-    return db_finding
-
-
 def get_finding(db_connection: Session, finding_id: int):
     finding = db_connection.query(model.DBfinding)
     finding = finding.filter(model.finding.DBfinding.id_ == finding_id).first()
@@ -467,3 +460,38 @@ def get_distinct_rules_from_scans(db_connection: Session, scan_ids: List[int] = 
 
     rules = query.distinct().order_by(model.DBfinding.rule_name).all()
     return rules
+
+
+def delete_finding(db_connection: Session, finding_id: int):
+    """
+        Delete a finding object
+    :param db_connection:
+        Session of the database connection
+    :param finding_id:
+        id of the finding to be deleted
+    """
+    if finding_id:
+        db_connection.query(model.DBfinding) \
+            .filter(model.finding.DBfinding.id_ == finding_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan_finding(db_connection: Session, finding_id: int = None, scan_id: int = None):
+    """
+        Delete scan findings when finding id or scan id provided
+    :param db_connection:
+        Session of the database connection
+    :param finding_id:
+        optional, id of the finding
+    :param scan_id:
+        optional, id of the scan
+    """
+    if finding_id or scan_id:
+        query = db_connection.query(model.DBscanFinding)
+        if finding_id:
+            query = query.filter(model.scan_finding.DBscanFinding.finding_id == finding_id)
+        if scan_id:
+            query = query.filter(model.scan_finding.DBscanFinding.scan_id == scan_id)
+        query.delete(synchronize_session=False)
+        db_connection.commit()

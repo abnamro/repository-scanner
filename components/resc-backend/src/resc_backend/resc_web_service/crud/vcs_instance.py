@@ -20,7 +20,7 @@ def get_vcs_instance(db_connection: Session, vcs_instance_id: int):
 
 
 def get_vcs_instances(db_connection: Session, skip: int = 0, limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT,
-                      vcs_provider_type: VCSProviders = None, vcs_instance_name: str = None)\
+                      vcs_provider_type: VCSProviders = None, vcs_instance_name: str = None) \
         -> List[model.DBVcsInstance]:
     """
         Retrieve all vcs_instances records
@@ -95,7 +95,7 @@ def update_vcs_instance(
     return db_vcs_instance
 
 
-def create_vcs_instance(db_connection: Session, vcs_instance: vcs_instance_schema.VCSInstanceCreate)\
+def create_vcs_instance(db_connection: Session, vcs_instance: vcs_instance_schema.VCSInstanceCreate) \
         -> model.DBVcsInstance:
     db_vcs_instance = model.vcs_instance.DBVcsInstance(
         name=vcs_instance.name,
@@ -129,7 +129,103 @@ def create_vcs_instance_if_not_exists(db_connection: Session, vcs_instance: vcs_
 
 
 def delete_vcs_instance(db_connection: Session, vcs_instance_id: int) -> model.DBVcsInstance:
+    """
+        Delete a vcs instance object
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance to be deleted
+    """
     db_vcs_instance = db_connection.query(model.DBVcsInstance).filter_by(id_=vcs_instance_id).first()
     db_connection.delete(db_vcs_instance)
     db_connection.commit()
     return db_vcs_instance
+
+
+def delete_repositories_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete repositories for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    if vcs_instance_id:
+        db_connection.query(model.DBrepository) \
+            .filter(model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                    model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_branches_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete branches for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    if vcs_instance_id:
+        db_connection.query(model.DBbranch) \
+            .filter(model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id,
+                    model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                    model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scans_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete scans for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    if vcs_instance_id:
+        db_connection.query(model.DBscan) \
+            .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                    model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_findings_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete findings for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    if vcs_instance_id:
+        db_connection.query(model.DBfinding) \
+            .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                    model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
+
+
+def delete_scan_finding_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete scan findings for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    if vcs_instance_id:
+        db_connection.query(model.DBscanFinding) \
+            .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
+                    model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
+                    model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
+                    model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                    model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                    model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+            .delete(synchronize_session=False)
+        db_connection.commit()
