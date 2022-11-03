@@ -9,3 +9,5 @@ data:
   {{ if .Values.rabbitMQ.config.vhost }}
   RABBITMQ_DEFAULT_VHOST: "{{ .Values.rabbitMQ.config.vhost }}"
   {{ end }}
+  rabbitmq.conf: |
+    consumer_timeout = 7200000

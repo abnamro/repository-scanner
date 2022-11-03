@@ -25,6 +25,9 @@ spec:
       serviceAccountName: {{ .Values.global.serviceAccountName }}
       {{ end }}
       volumes:
+        - name: {{ .Values.global.appName }}-rabbitmq-config-volume
+          configMap:
+            name: {{ .Values.global.appName }}-rabbitmq-config
         - name: {{ .Values.global.appName }}-mq-pv-storage
           persistentVolumeClaim:
             claimName: {{ .Values.global.appName }}-mq-pv-volume-claim
@@ -54,6 +57,9 @@ spec:
           ports:
             - containerPort: {{ .Values.rabbitMQ.config.port}}
           volumeMounts:
+            - name: {{ .Values.global.appName }}-rabbitmq-config-volume
+              mountPath: /etc/rabbitmq/rabbitmq.conf
+              subPath: rabbitmq.conf
             - mountPath: "/var/lib/rabbitmq/mnesia"
               subPath: "var/lib/rabbitmq/mnesia"
               name: {{ .Values.global.appName }}-mq-pv-storage
