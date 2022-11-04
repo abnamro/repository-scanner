@@ -277,13 +277,11 @@ class TestVCSInstances(unittest.TestCase):
     def test_delete_vcs_instance(self, delete_vcs_instance, get_vcs_instance):
         vcs_instance_id = 1
         get_vcs_instance.return_value = self.db_vcs_instances[vcs_instance_id]
-        delete_vcs_instance.return_value = get_vcs_instance.return_value
         response = self.client.delete(f"{RWS_VERSION_PREFIX}"
                                       f"{RWS_ROUTE_VCS}/{vcs_instance_id}")
         assert response.status_code == 200, response.text
-        self.assert_vcs_instance(response.json(), self.db_vcs_instances[vcs_instance_id])
         get_vcs_instance.assert_called_once_with(ANY, vcs_instance_id=vcs_instance_id)
-        delete_vcs_instance.assert_called_once_with(ANY, vcs_instance_id)
+        delete_vcs_instance.assert_called_once_with(ANY, vcs_instance_id=vcs_instance_id, delete_related=True)
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.get_vcs_instance")
     @patch("resc_backend.resc_web_service.crud.vcs_instance.delete_vcs_instance")

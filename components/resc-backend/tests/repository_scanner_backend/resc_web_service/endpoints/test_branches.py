@@ -161,13 +161,11 @@ class TestBranches(unittest.TestCase):
     def test_delete_branches(self, get_branch, delete_branch):
         branch_id = 1
         get_branch.return_value = self.db_branches[branch_id]
-        delete_branch.return_value = self.db_branches[branch_id]
         response = self.client.delete(
             f"{RWS_VERSION_PREFIX}{RWS_ROUTE_BRANCHES}/{branch_id}")
         assert response.status_code == 200, response.text
-        self.assert_branch(response.json(), self.db_branches[branch_id])
         get_branch.assert_called_once_with(ANY, branch_id=branch_id)
-        delete_branch.assert_called_once_with(ANY, branch_id)
+        delete_branch.assert_called_once_with(ANY, branch_id=branch_id, delete_related=True)
 
     @patch("resc_backend.resc_web_service.crud.branch.delete_branch")
     @patch("resc_backend.resc_web_service.crud.branch.get_branch")

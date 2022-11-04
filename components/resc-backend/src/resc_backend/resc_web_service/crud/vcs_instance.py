@@ -9,6 +9,11 @@ from sqlalchemy.orm import Session
 # First Party
 from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db import model
+from resc_backend.resc_web_service.crud import branch as branch_crud
+from resc_backend.resc_web_service.crud import finding as finding_crud
+from resc_backend.resc_web_service.crud import repository as repository_crud
+from resc_backend.resc_web_service.crud import scan as scan_crud
+from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.schema import vcs_instance as vcs_instance_schema
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
@@ -20,7 +25,7 @@ def get_vcs_instance(db_connection: Session, vcs_instance_id: int):
 
 
 def get_vcs_instances(db_connection: Session, skip: int = 0, limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT,
-                      vcs_provider_type: VCSProviders = None, vcs_instance_name: str = None)\
+                      vcs_provider_type: VCSProviders = None, vcs_instance_name: str = None) \
         -> List[model.DBVcsInstance]:
     """
         Retrieve all vcs_instances records
@@ -95,7 +100,7 @@ def update_vcs_instance(
     return db_vcs_instance
 
 
-def create_vcs_instance(db_connection: Session, vcs_instance: vcs_instance_schema.VCSInstanceCreate)\
+def create_vcs_instance(db_connection: Session, vcs_instance: vcs_instance_schema.VCSInstanceCreate) \
         -> model.DBVcsInstance:
     db_vcs_instance = model.vcs_instance.DBVcsInstance(
         name=vcs_instance.name,
@@ -128,8 +133,22 @@ def create_vcs_instance_if_not_exists(db_connection: Session, vcs_instance: vcs_
     return create_vcs_instance(db_connection, vcs_instance)
 
 
-def delete_vcs_instance(db_connection: Session, vcs_instance_id: int) -> model.DBVcsInstance:
+def delete_vcs_instance(db_connection: Session, vcs_instance_id: int, delete_related: bool = False):
+    """
+        Delete a vcs instance object
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance to be deleted
+    :param delete_related:
+        if related records need to be deleted
+    """
+    if delete_related:
+        scan_finding_crud.delete_scan_finding_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+        finding_crud.delete_findings_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+        scan_crud.delete_scans_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+        branch_crud.delete_branches_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
+        repository_crud.delete_repositories_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
     db_vcs_instance = db_connection.query(model.DBVcsInstance).filter_by(id_=vcs_instance_id).first()
     db_connection.delete(db_vcs_instance)
     db_connection.commit()
-    return db_vcs_instance

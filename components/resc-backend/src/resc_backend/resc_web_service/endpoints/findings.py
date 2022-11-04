@@ -132,15 +132,20 @@ def update_finding(
 @router.delete("/{finding_id}",
                status_code=status.HTTP_200_OK)
 def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
+    """
+        Delete a finding object
+    :param db_connection:
+        Session of the database connection
+    :param finding_id:
+        id of the finding to delete
+    :return:
+        The output will contain a success or error message based on the success of the deletion
+    """
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
-    deleted_db_scan_findings = scan_finding_crud.delete_scan_finding(db_connection, finding_id)
-    deleted_db_finding = finding_crud.delete_finding(db_connection, finding_id)
-    deleted_finding = FindingRead.create_from_db_entities(
-        deleted_db_finding, [f.scan_id for f in deleted_db_scan_findings]
-    )
-    return deleted_finding
+    finding_crud.delete_finding(db_connection, finding_id=finding_id, delete_related=True)
+    return {"ok": True}
 
 
 @router.get(f"{RWS_ROUTE_TOTAL_COUNT_BY_RULE}""/{rule_name}",

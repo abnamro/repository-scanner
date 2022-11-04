@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 # First Party
 from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db import model
+from resc_backend.resc_web_service.crud import branch as branch_crud
+from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
+from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.schema import repository as repository_schema
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
@@ -134,13 +137,6 @@ def create_repository_if_not_exists(db_connection: Session,
     return create_repository(db_connection, repository)
 
 
-def delete_repository(db_connection: Session, repository_id: int):
-    db_repository = db_connection.query(model.DBrepository).filter_by(id_=repository_id).first()
-    db_connection.delete(db_repository)
-    db_connection.commit()
-    return db_repository
-
-
 def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] = None, repository_filter: str = ""):
     """
         Retrieve all unique project names
@@ -219,3 +215,39 @@ def get_findings_metadata_by_repository_id(db_connection: Session, repository_id
         }
 
     return findings_metadata
+
+
+def delete_repository(db_connection: Session, repository_id: int, delete_related: bool = False):
+    """
+        Delete a repository object
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository to be deleted
+    :param delete_related:
+        if related records need to be deleted
+    """
+    if delete_related:
+        scan_finding_crud.delete_scan_finding_by_repository_id(db_connection, repository_id=repository_id)
+        finding_crud.delete_findings_by_repository_id(db_connection, repository_id=repository_id)
+        scan_crud.delete_scans_by_repository_id(db_connection, repository_id=repository_id)
+        branch_crud.delete_branches_by_repository_id(db_connection, repository_id=repository_id)
+    db_connection.query(model.DBrepository) \
+        .filter(model.repository.DBrepository.id_ == repository_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
+
+
+def delete_repositories_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete repositories for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    db_connection.query(model.DBrepository) \
+        .filter(model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()

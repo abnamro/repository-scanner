@@ -100,10 +100,20 @@ def update_scan(
 @router.delete("/{scan_id}",
                status_code=status.HTTP_200_OK)
 def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Delete a scan object
+    :param db_connection:
+        Session of the database connection
+    :param scan_id:
+        id of the scan to delete
+    :return:
+        The output will contain a success or error message based on the success of the deletion
+    """
     db_scan = scan_crud.get_scan(db_connection, scan_id=scan_id)
     if db_scan is None:
         raise HTTPException(status_code=404, detail="Scan not found")
-    return scan_crud.delete_scan(db_connection, scan_id)
+    scan_crud.delete_scan(db_connection, branch_id=db_scan.branch_id, scan_id=scan_id, delete_related=True)
+    return {"ok": True}
 
 
 @router.post("/{scan_id}"f"{RWS_ROUTE_FINDINGS}",

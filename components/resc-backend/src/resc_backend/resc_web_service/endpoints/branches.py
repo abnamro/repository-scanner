@@ -87,10 +87,20 @@ def update_branch(
 @router.delete("/{branch_id}",
                status_code=status.HTTP_200_OK)
 def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Delete a branch object
+    :param db_connection:
+        Session of the database connection
+    :param branch_id:
+        id of the branch to delete
+    :return:
+        The output will contain a success or error message based on the success of the deletion
+    """
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
         raise HTTPException(status_code=404, detail="Branch not found")
-    return branch_crud.delete_branch(db_connection, branch_id)
+    branch_crud.delete_branch(db_connection, branch_id=branch_id, delete_related=True)
+    return {"ok": True}
 
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_SCANS}",

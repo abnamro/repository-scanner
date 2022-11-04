@@ -155,13 +155,11 @@ class TestRepositories(unittest.TestCase):
     def test_delete_repositories(self, delete_repository, get_repository):
         repository_id = 1
         get_repository.return_value = self.db_repositories[repository_id]
-        delete_repository.return_value = get_repository.return_value
         response = self.client.delete(f"{RWS_VERSION_PREFIX}"
                                       f"{RWS_ROUTE_REPOSITORIES}/{repository_id}")
         assert response.status_code == 200, response.text
-        self.assert_repository(response.json(), self.db_repositories[repository_id])
         get_repository.assert_called_once_with(ANY, repository_id=repository_id)
-        delete_repository.assert_called_once_with(ANY, repository_id)
+        delete_repository.assert_called_once_with(ANY, repository_id=repository_id, delete_related=True)
 
     @patch("resc_backend.resc_web_service.crud.repository.create_repository")
     def test_post_repositories_no_body(self, create_repository):
