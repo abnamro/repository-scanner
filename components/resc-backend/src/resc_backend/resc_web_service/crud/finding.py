@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 # First Party
 from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db import model
+from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.schema import finding as finding_schema
 from resc_backend.resc_web_service.schema.date_filter import DateFilter
@@ -462,36 +463,67 @@ def get_distinct_rules_from_scans(db_connection: Session, scan_ids: List[int] = 
     return rules
 
 
-def delete_finding(db_connection: Session, finding_id: int):
+def delete_finding(db_connection: Session, finding_id: int, delete_related: bool = False):
     """
         Delete a finding object
     :param db_connection:
         Session of the database connection
     :param finding_id:
         id of the finding to be deleted
+    :param delete_related:
+        if related records need to be deleted
     """
-    if finding_id:
-        db_connection.query(model.DBfinding) \
-            .filter(model.finding.DBfinding.id_ == finding_id) \
-            .delete(synchronize_session=False)
-        db_connection.commit()
+    if delete_related:
+        scan_finding_crud.delete_scan_finding(db_connection, finding_id=finding_id)
+
+    db_connection.query(model.DBfinding) \
+        .filter(model.finding.DBfinding.id_ == finding_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
 
 
-def delete_scan_finding(db_connection: Session, finding_id: int = None, scan_id: int = None):
+def delete_findings_by_branch_id(db_connection: Session, branch_id: int):
     """
-        Delete scan findings when finding id or scan id provided
+        Delete findings for a given branch
     :param db_connection:
         Session of the database connection
-    :param finding_id:
-        optional, id of the finding
-    :param scan_id:
-        optional, id of the scan
+    :param branch_id:
+        id of the branch
     """
-    if finding_id or scan_id:
-        query = db_connection.query(model.DBscanFinding)
-        if finding_id:
-            query = query.filter(model.scan_finding.DBscanFinding.finding_id == finding_id)
-        if scan_id:
-            query = query.filter(model.scan_finding.DBscanFinding.scan_id == scan_id)
-        query.delete(synchronize_session=False)
-        db_connection.commit()
+    db_connection.query(model.DBfinding) \
+        .filter(model.finding.DBfinding.branch_id == branch_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
+
+
+def delete_findings_by_repository_id(db_connection: Session, repository_id: int):
+    """
+        Delete findings for a given repository
+    :param db_connection:
+        Session of the database connection
+    :param repository_id:
+        id of the repository
+    """
+    db_connection.query(model.DBfinding) \
+        .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
+                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                model.repository.DBrepository.id_ == repository_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
+
+
+def delete_findings_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
+    """
+        Delete findings for a given vcs instance
+    :param db_connection:
+        Session of the database connection
+    :param vcs_instance_id:
+        id of the vcs instance
+    """
+    db_connection.query(model.DBfinding) \
+        .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
+                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()

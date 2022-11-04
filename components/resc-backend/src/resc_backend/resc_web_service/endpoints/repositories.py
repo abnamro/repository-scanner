@@ -125,11 +125,7 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
-    repository_crud.delete_scan_finding_by_repository_id(db_connection, repository_id=repository_id)
-    repository_crud.delete_findings_by_repository_id(db_connection, repository_id=repository_id)
-    repository_crud.delete_scans_by_repository_id(db_connection, repository_id=repository_id)
-    repository_crud.delete_branches_by_repository_id(db_connection, repository_id=repository_id)
-    repository_crud.delete_repository(db_connection, repository_id=repository_id)
+    repository_crud.delete_repository(db_connection, repository_id=repository_id, delete_related=True)
     return {"ok": True}
 
 

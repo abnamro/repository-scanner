@@ -99,10 +99,7 @@ def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connec
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
         raise HTTPException(status_code=404, detail="Branch not found")
-    branch_crud.delete_scan_finding_by_branch_id(db_connection, branch_id=branch_id)
-    branch_crud.delete_findings_by_branch_id(db_connection, branch_id=branch_id)
-    branch_crud.delete_scans_by_branch_id(db_connection, branch_id=branch_id)
-    branch_crud.delete_branch(db_connection, branch_id=branch_id)
+    branch_crud.delete_branch(db_connection, branch_id=branch_id, delete_related=True)
     return {"ok": True}
 
 

@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 # First Party
 from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db import model
+from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
+from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.schema import branch as branch_schema
 
 
@@ -139,64 +141,52 @@ def get_findings_metadata_by_branch_id(db_connection: Session, branch_id: int):
     return findings_metadata
 
 
-def delete_branch(db_connection: Session, branch_id: int):
+def delete_branch(db_connection: Session, branch_id: int, delete_related: bool = False):
     """
         Delete a branch object
     :param db_connection:
         Session of the database connection
     :param branch_id:
         id of the branch to be deleted
+    :param delete_related:
+        if related records need to be deleted
     """
-    if branch_id:
-        db_connection.query(model.DBbranch) \
-            .filter(model.branch.DBbranch.id_ == branch_id) \
-            .delete(synchronize_session=False)
-        db_connection.commit()
+    if delete_related:
+        scan_finding_crud.delete_scan_finding_by_branch_id(db_connection, branch_id=branch_id)
+        finding_crud.delete_findings_by_branch_id(db_connection, branch_id=branch_id)
+        scan_crud.delete_scans_by_branch_id(db_connection, branch_id=branch_id)
+    db_connection.query(model.DBbranch) \
+        .filter(model.branch.DBbranch.id_ == branch_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
 
 
-def delete_scans_by_branch_id(db_connection: Session, branch_id: int):
+def delete_branches_by_repository_id(db_connection: Session, repository_id: int):
     """
-        Delete scans for a given branch
+        Delete branches for a given repository
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        id of the branch
+    :param repository_id:
+        id of the repository
     """
-    if branch_id:
-        db_connection.query(model.DBscan) \
-            .filter(model.scan.DBscan.branch_id == branch_id) \
-            .delete(synchronize_session=False)
-        db_connection.commit()
+    db_connection.query(model.DBbranch) \
+        .filter(model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id,
+                model.repository.DBrepository.id_ == repository_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()
 
 
-def delete_scan_finding_by_branch_id(db_connection: Session, branch_id: int):
+def delete_branches_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int):
     """
-        Delete scan findings for a given branch
+        Delete branches for a given vcs instance
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        id of the branch
+    :param vcs_instance_id:
+        id of the vcs instance
     """
-    if branch_id:
-        db_connection.query(model.DBscanFinding) \
-            .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
-                    model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
-                    model.scan.DBscan.branch_id == model.finding.DBfinding.branch_id,
-                    model.scan.DBscan.branch_id == branch_id) \
-            .delete(synchronize_session=False)
-        db_connection.commit()
-
-
-def delete_findings_by_branch_id(db_connection: Session, branch_id: int):
-    """
-        Delete findings for a given branch
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the branch
-    """
-    if branch_id:
-        db_connection.query(model.DBfinding) \
-            .filter(model.finding.DBfinding.branch_id == branch_id) \
-            .delete(synchronize_session=False)
-        db_connection.commit()
+    db_connection.query(model.DBbranch) \
+        .filter(model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id,
+                model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
+                model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
+        .delete(synchronize_session=False)
+    db_connection.commit()

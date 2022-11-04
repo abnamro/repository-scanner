@@ -112,9 +112,7 @@ def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection
     db_scan = scan_crud.get_scan(db_connection, scan_id=scan_id)
     if db_scan is None:
         raise HTTPException(status_code=404, detail="Scan not found")
-    scan_crud.delete_scan_finding(db_connection, finding_id=None, scan_id=scan_id)
-    scan_crud.delete_scan(db_connection, scan_id)
-    scan_crud.delete_branch_findings_not_linked_to_any_scan(db_connection, branch_id=db_scan.branch_id)
+    scan_crud.delete_scan(db_connection, branch_id=db_scan.branch_id, scan_id=scan_id, delete_related=True)
     return {"ok": True}
 
 

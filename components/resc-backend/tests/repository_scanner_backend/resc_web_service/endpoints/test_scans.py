@@ -109,15 +109,13 @@ class TestScans(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.scan.get_scan")
     @patch("resc_backend.resc_web_service.crud.scan.delete_scan")
-    @patch("resc_backend.resc_web_service.crud.scan.delete_branch_findings_not_linked_to_any_scan")
-    def test_delete_scan(self, delete_branch_findings_not_linked_to_any_scan, delete_scan, get_scan):
+    def test_delete_scan(self, delete_scan, get_scan):
         db_scan = self.db_scans[0]
         get_scan.return_value = db_scan
         response = self.client.delete(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}/{db_scan.id_}")
         assert response.status_code == 200, response.text
         get_scan.assert_called_once_with(ANY, scan_id=db_scan.id_)
-        delete_scan.assert_called_once_with(ANY, db_scan.id_)
-        delete_branch_findings_not_linked_to_any_scan.assert_called_once_with(ANY, branch_id=db_scan.id_)
+        delete_scan.assert_called_once_with(ANY, branch_id=db_scan.branch_id, scan_id=db_scan.id_, delete_related=True)
 
     @patch("resc_backend.resc_web_service.crud.scan.get_scan")
     @patch("resc_backend.resc_web_service.crud.scan.delete_scan")

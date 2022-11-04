@@ -144,8 +144,7 @@ def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_conn
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
-    finding_crud.delete_scan_finding(db_connection, finding_id=finding_id, scan_id=None)
-    finding_crud.delete_finding(db_connection, finding_id)
+    finding_crud.delete_finding(db_connection, finding_id=finding_id, delete_related=True)
     return {"ok": True}
 
 

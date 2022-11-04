@@ -167,16 +167,14 @@ class TestFindings(unittest.TestCase):
         get_finding.assert_called_once_with(ANY, finding_id=finding.id_)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.delete_scan_finding")
     @patch("resc_backend.resc_web_service.crud.finding.delete_finding")
-    def test_delete_findings(self, delete_finding, delete_scan_finding, get_finding):
+    def test_delete_findings(self, delete_finding, get_finding):
         db_finding = self.db_findings[0]
         get_finding.return_value = db_finding
         response = self.client.delete(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{db_finding.id_}")
         assert response.status_code == 200, response.text
         get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-        delete_scan_finding.assert_called_once_with(ANY, finding_id=db_finding.id_, scan_id=None)
-        delete_finding.assert_called_once_with(ANY, db_finding.id_)
+        delete_finding.assert_called_once_with(ANY, finding_id=db_finding.id_, delete_related=True)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.delete_finding")
