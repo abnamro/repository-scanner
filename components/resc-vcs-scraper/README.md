@@ -5,7 +5,7 @@
 1. [About The Component](#about-the-component)
 2. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
-    - [Run locally](#run-locally)
+    - [Run locally from source](#run-locally-from-source)
     - [Usage](#usage)
     - [Run locally using docker](#run-locally-using-docker)
 3. [Testing](#testing)
@@ -27,15 +27,22 @@ These instructions will get you a copy of the project up and running on your loc
 - Install Docker Desktop;
 - Install [Python 3.9.0](https://www.python.org/downloads/release/python-390/)
 
-### Run locally
+### Run locally from source
 
-Please follow the below steps to run the project locally:
+Clone the repository and install the resc_vcs_scanner package locally:
 ```
+git clone -b <branch-name> <repository-scanner repo url>
+cd components/resc-vcs-scraper
 pip install -e .
+```
+
+Set all required environment variables and run the `collect_projects` task.  
+```
 <Set all required environment variables>
 collect_projects
 celery -A vcs_scraper.repository_collector.common worker --loglevel=INFO -E -Q projects
 ```
+
 The required environment variables are below (use the `export` command for Linux or `SET` for Windows Machines):
 >- *RABBITMQ_QUEUES_USERNAME*: The username used to connect to the rabbitmq project collector and repository collector topics.
 >- *RABBITMQ_QUEUES_PASSWORD*: The password used to connect to the rabbitmq project collector and repository collector topics.
@@ -158,11 +165,17 @@ Project definitions to be read from the 'projects' channel hosted on the same ra
 
 ### Run locally using docker
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-vcs-scraper:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-vcs-scraper:0.0.1`
-- Run the vcs-scraper by below command:
+- Pull the docker image from registry: 
 ```
-docker run -e RABBITMQ_QUEUES_USERNAME='test' -e RABBITMQ_QUEUES_PASSWORD='test' -e RESC_RABBITMQ_SERVICE_HOST='test-service-host' -e RABBITMQ_DEFAULT_VHOST='resc-rabbitmq' -e VCS_INSTANCES_FILE_PATH='<provide vcs_instance.json path>' --name resc-vcs-scraper resc/resc-vcs-scraper:local collect_projects
+docker pull ghcr.io/abnamro/resc-vcs-scraper:0.0.1
+```
+- Alternatively, build the docker image locally by running: 
+```
+docker build -t ghcr.io/abnamro/resc-vcs-scraper:0.0.1 .
+```
+- Run the vcs-scraper by using below command:
+```
+docker run -e RABBITMQ_QUEUES_USERNAME='test' -e RABBITMQ_QUEUES_PASSWORD='test' -e RESC_RABBITMQ_SERVICE_HOST='test-service-host' -e RABBITMQ_DEFAULT_VHOST='resc-rabbitmq' -e VCS_INSTANCES_FILE_PATH='<provide vcs_instance.json path>' --name resc-vcs-scraper ghcr.io/abnamro/resc-vcs-scraper:0.0.1 collect_projects
 ```
 
 ## Testing
@@ -177,6 +190,6 @@ pip install tox      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e -e pytest  # Run this command to run the unittests
-tox -v               # Run this command to run all the tests above
+tox -v -e -e pytest  # Run this command to run the unit tests
+tox -v               # Run this command to run all of the above tests
 ```

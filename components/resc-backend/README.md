@@ -29,20 +29,27 @@ These instructions will get you a copy of the project up and running on your loc
 
 **For Deploying the RESC Web Service locally:**
 - Local automated deployment rely on a Makefile, so first you need to install make:
-  `brew install make`
+  ```
+  brew install make
+  ```
 
 **For Deploying the database locally:**
-- To locally deploy the database associated with RESC it is key that you first install the odbc 17 sql server driver. On Linux you do this by running the following command: `sudo apt install unixodbc-dev`
-- If you're on a Windows machine, visit the following link: https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
-- If you're on a different OS, visit the following link: https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16#17
+- To locally deploy the database associated with RESC it is key that you first install the odbc 17 sql server driver. On Linux you do this by running the following command:  
+```
+sudo apt install unixodbc-dev
+```
+- If you're on a Windows machine, visit the following [link](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16):  
+- If you're on a different OS, visit the following [link](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16#17):  
 - Upon installing the driver, it is important that you properly set the following environment variables in the `db.env` file. Not doing so will result in an error in the database/not being able to load it properly.
 
   MSSQL_PASSWORD : Password for local database
 
 ### Run locally from source
 
-Run the below command from the project root folder if your IDE doesn't recognize repository_scanner_backend as a valid Python package
+Clone the repository and install the resc_backend package locally:
 ```
+git clone -b <branch-name> <repository-scanner repo url>
+cd components/resc-backend
 pip install -e .
 ```
 
@@ -66,9 +73,19 @@ pip install -e .
 
 Build the RESC Backend docker image locally by running the following commands (Keep the image version parameter in mind):
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-backend:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-backend:0.0.1`
-- Run the RESC backend by using the following command: `docker run --name resc-backend abnamro/resc-backend:0.0.1`
+- Pull the docker image from registry:  
+```
+docker pull ghcr.io/abnamro/resc-backend:0.0.1
+```
+- Alternatively, build the docker image locally by running following command:
+```
+cd repository-scanner/components/resc-backend
+docker build -t ghcr.io/abnamro/resc-backend:0.0.1 .
+```
+- Run the RESC backend by using the following command: 
+```
+docker run --name resc-backend ghcr.io/abnamro/resc-backend:0.0.1
+```
 
 ## Testing
 [(Back to top)](#table-of-contents)
@@ -82,8 +99,8 @@ pip install tox      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e -e pytest  # Run this command to run the unittests
-tox -v               # Run this command to run all the tests above
+tox -v -e -e pytest  # Run this command to run the unit tests
+tox -v               # Run this command to run all of the above tests
 ```
 
 ## Create a migration for database changes

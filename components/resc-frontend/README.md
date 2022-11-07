@@ -52,23 +52,32 @@ Now access the application using this url: http://localhost:8080/
 
 Build the RESC Frontend docker image locally by running the following commands (Keep the image version parameter in mind):
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-frontend:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-frontend:0.0.1`
-- Run the RESC frontend by using the following command: `docker run --name resc-frontend abnamro/resc-frontend:0.0.1`
+- Pull the docker image from registry: 
+```
+docker pull ghcr.io/abnamro/resc-frontend:0.0.1
+```
+- Alternatively, build the docker image locally by running:
+```
+docker build -t ghcr.io/abnamro/resc-frontend:0.0.1 .
+```
+- Run the RESC frontend by using the following command: 
+```
+docker run --name resc-frontend ghcr.io/abnamro/resc-frontend:0.0.1
+```
 
 Now access the application using this url: http://localhost:8080/
 
 ### Testing
 [(Back to top)](#table-of-contents)
 
-Run your unit tests:```npm run ut```
+Run your unit tests: ```npm run ut```
 
-Linting files:```npm run lint```
+Linting files: ```npm run lint```
 
-Linting and fixing files:```npm run lint:autofix```
+Linting and fixing files: ```npm run lint:autofix```
 
 ## Additional Information
 [(Back to top)](#table-of-contents)  
 
 ### Some Useful Commands
-Compiles and minifies for production:```npm run build```
+Compiles and minifies for production: ```npm run build```

@@ -23,17 +23,28 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Run locally from source
 
-Run the below command from the project root folder if your IDE doesn't recognize resc as a valid python package:
+Clone the repository and install the resc_vcs_scanner package locally:
 ```
+git clone -b <branch-name> <repository-scanner repo url>
+cd components/resc-vcs-scanner
 pip install -e .
 ```
 
 ### Run locally using Docker
 Build the resc-vcs-scanner docker image locally by running the following commands (Keep the image version parameter in mind):
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-vcs-scanner:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-vcs-scanner:0.0.1`
-- Run the RESC-VCS-SCANNER by using the following command: `docker run --name resc-vcs-scanner abnamro/resc-vcs-scanner:0.0.1`
+- Pull the docker image from registry: 
+```
+docker pull ghcr.io/abnamro/resc-vcs-scanner:0.0.1
+```
+- Alternatively, build the docker image locally by running: 
+```
+docker build -t ghcr.io/abnamro/resc-vcs-scanner:0.0.1 .
+```
+- Run the RESC-VCS-SCANNER by using the following command: 
+```
+docker run --name resc-vcs-scanner ghcr.io/abnamro/resc-vcs-scanner:0.0.1
+```
 
 ### Run locally using the CLI
 It is also possible to run the component through the CLI for a different approach to scanning VCS repositories. 
@@ -99,7 +110,7 @@ pip install tox      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e -e pytest  # Run this command to run the unittests
-tox -v               # Run this command to run all the tests above
+tox -v -e -e pytest  # Run this command to run the unit tests
+tox -v               # Run this command to run all of the above tests
 ```
 
