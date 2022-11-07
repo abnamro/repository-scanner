@@ -9,7 +9,8 @@ const RepositoryService = {
     skipRowCount,
     vcsTypeList,
     projectFilter,
-    repositoryFilter
+    repositoryFilter,
+    includeZeroFindingRepos = true
   ) {
     let queryParams = '';
     if (vcsTypeList) {
@@ -28,6 +29,9 @@ const RepositoryService = {
     }
     if (repositoryFilter) {
       queryParams += `&repositoryfilter=${repositoryFilter}`;
+    }
+    if (includeZeroFindingRepos == false) {
+      queryParams += `&onlyifhasfindings=true`;
     }
 
     if (queryParams) {
@@ -50,7 +54,7 @@ const RepositoryService = {
     return axios.get(`/supported-vcs-providers`);
   },
 
-  async getDistinctProjects(vcsTypeList, repositoryFilter) {
+  async getDistinctProjects(vcsTypeList, repositoryFilter, includeZeroFindingRepos = true) {
     let queryParams = '';
     if (vcsTypeList) {
       vcsTypeList.forEach((name) => {
@@ -60,6 +64,9 @@ const RepositoryService = {
     if (repositoryFilter) {
       queryParams += `&repositoryfilter=${repositoryFilter}`;
     }
+    if (includeZeroFindingRepos == false) {
+      queryParams += `&onlyifhasfindings=true`;
+    }
     if (queryParams) {
       queryParams = queryParams.slice(1);
     }
@@ -67,7 +74,7 @@ const RepositoryService = {
     return axios.get(`/repositories/distinct-projects/?${queryParams}`);
   },
 
-  async getDistinctRepositories(vcsTypeList, projectFilter) {
+  async getDistinctRepositories(vcsTypeList, projectFilter, includeZeroFindingRepos = true) {
     let queryParams = '';
     if (vcsTypeList) {
       vcsTypeList.forEach((name) => {
@@ -76,6 +83,9 @@ const RepositoryService = {
     }
     if (projectFilter) {
       queryParams += `&projectname=${projectFilter}`;
+    }
+    if (includeZeroFindingRepos == false) {
+      queryParams += `&onlyifhasfindings=true`;
     }
     if (queryParams) {
       queryParams = queryParams.slice(1);
