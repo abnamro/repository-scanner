@@ -10,12 +10,13 @@ from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.schema import repository as repository_schema
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
 def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = None, skip: int = 0,
                      limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT, project_filter: str = "",
-                     repository_filter: str = ""):
+                     repository_filter: str = "", only_if_has_findings: bool = False):
     """
         Retrieve repository records optionally filtered
     :param db_connection:
@@ -30,6 +31,8 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         optional, filter on project name. Is used as a string contains filter
     :param repository_filter:
         optional, filter on repository name. Is used as a string contains filter
+    :param only_if_has_findings:
+        optional, filter on repositories with findings
     :return: repositories
         list of DBrepository objects
     """
@@ -45,6 +48,35 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         .join(model.DBVcsInstance,
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
+    if only_if_has_findings:
+        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp == max_time_stmt_base)
+
+        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+
+        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
+
+        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
+            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
+            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
+            .distinct()
+        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
+            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
+
     if vcs_providers and vcs_providers is not None:
         query = query.filter(model.DBVcsInstance.provider_type.in_(vcs_providers))
 
@@ -55,11 +87,12 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         query = query.filter(model.DBrepository.repository_name == repository_filter)
 
     repositories = query.order_by(model.DBrepository.id_).offset(skip).limit(limit_val).all()
+
     return repositories
 
 
 def get_repositories_count(db_connection: Session, vcs_providers: [VCSProviders] = None, project_filter: str = "",
-                           repository_filter: str = "") -> int:
+                           repository_filter: str = "", only_if_has_findings: bool = False) -> int:
     """
         Retrieve count of repository records optionally filtered
     :param db_connection:
@@ -70,10 +103,41 @@ def get_repositories_count(db_connection: Session, vcs_providers: [VCSProviders]
         optional, filter on project name
     :param repository_filter:
         optional, filter on repository name
+    :param only_if_has_findings:
+        optional, filter on repositories with findings
     :return: total_count
         count of repositories
     """
     query = db_connection.query(func.count(model.DBrepository.id_))
+
+    if only_if_has_findings:
+        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp == max_time_stmt_base)
+
+        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+
+        scan_id_stmt = scan_id_stmt.union(scan_id_stmt_incr)
+
+        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
+            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
+            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
+            .distinct()
+        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
+            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
@@ -137,7 +201,8 @@ def create_repository_if_not_exists(db_connection: Session,
     return create_repository(db_connection, repository)
 
 
-def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] = None, repository_filter: str = ""):
+def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] = None, repository_filter: str = "",
+                          only_if_has_findings: bool = False):
     """
         Retrieve all unique project names
     :param db_connection:
@@ -146,10 +211,41 @@ def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] 
         optional, filter of supported vcs provider types
     :param repository_filter:
         optional, filter on repository name. Is used as a string contains filter
+    :param only_if_has_findings:
+        optional, filter on repositories that have findings
     :return: distinct_projects
         The output will contain a list of unique projects
     """
     query = db_connection.query(model.DBrepository.project_key)
+
+    if only_if_has_findings:
+        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp == max_time_stmt_base)
+
+        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+
+        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
+
+        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
+            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
+            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
+            .distinct()
+        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
+            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
@@ -163,7 +259,8 @@ def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] 
     return distinct_projects
 
 
-def get_distinct_repositories(db_connection: Session, vcs_providers: [VCSProviders] = None, project_name: str = ""):
+def get_distinct_repositories(db_connection: Session, vcs_providers: [VCSProviders] = None, project_name: str = "",
+                              only_if_has_findings: bool = False):
     """
         Retrieve all unique repository names
     :param db_connection:
@@ -172,10 +269,41 @@ def get_distinct_repositories(db_connection: Session, vcs_providers: [VCSProvide
         optional, filter of supported vcs provider types
     :param project_name:
         optional, filter on project name. Is used as a full string match filter
+    :param only_if_has_findings:
+        optional, filter on repositories that have findings
     :return: distinct_repositories
         The output will contain a list of unique repositories
     """
     query = db_connection.query(model.DBrepository.repository_name)
+
+    if only_if_has_findings:
+        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp == max_time_stmt_base)
+
+        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
+
+        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
+            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
+            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
+            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+
+        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
+
+        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
+            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
+            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
+            .distinct()
+        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
+            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
