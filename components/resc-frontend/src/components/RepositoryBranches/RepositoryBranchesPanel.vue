@@ -158,11 +158,7 @@ export default {
     },
     fetchPaginatedBranches() {
       this.showSpinner();
-      RepositoryService.getRepositoryBranches(
-        this.repository.id_,
-        this.perPage,
-        this.skipRowCount
-      )
+      RepositoryService.getRepositoryBranches(this.repository.id_, this.perPage, this.skipRowCount)
         .then((response) => {
           this.totalRows = response.data.total;
           //Add healthbar data

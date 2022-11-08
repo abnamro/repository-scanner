@@ -187,7 +187,7 @@ export default {
       this.vcsFilter = vcsProvider;
       this.projectFilter = project;
       this.repositoryFilter = repository;
-      this.includeZeroFindingRepos = includeZeroFindingRepos
+      this.includeZeroFindingRepos = includeZeroFindingRepos;
       this.currentPage = 1;
       this.fetchDistinctProjects();
       this.fetchDistinctRepositories();
@@ -233,7 +233,7 @@ export default {
         this.vcsFilter,
         this.projectFilter,
         this.includeZeroFindingRepos
-       )
+      )
         .then((response) => {
           this.repositoryNames = [];
           for (const repo_name of response.data) {
