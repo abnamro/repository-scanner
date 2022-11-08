@@ -205,6 +205,7 @@ def enrich_branch_with_latest_scan_data(db_connection: Session, branch: DBbranch
             status_code=status.HTTP_200_OK)
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                           repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+                          onlyifhasfindings: bool = Query(default=False),
                           db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all unique project names
@@ -214,13 +215,16 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
         optional, filter of supported vcs provider types
     :param repositoryfilter:
         optional, filter on repository name. Is used as a string contains filter
+    :param onlyifhasfindings:
+        optional, filter all projects that have findings
     :return: List[str]
         The output will contain a list of unique projects
     """
 
     distinct_projects = repository_crud.get_distinct_projects(db_connection,
                                                               vcs_providers=vcsproviders,
-                                                              repository_filter=repositoryfilter)
+                                                              repository_filter=repositoryfilter,
+                                                              only_if_has_findings=onlyifhasfindings)
     projects = [project.project_key for project in distinct_projects]
     return projects
 
@@ -230,6 +234,7 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
             status_code=status.HTTP_200_OK)
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                               projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+                              onlyifhasfindings: bool = Query(default=False),
                               db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all unique repository names
@@ -239,13 +244,16 @@ def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, ali
         optional, filter of supported vcs provider types
     :param projectname:
         optional, filter on project name. Is used as a full string match filter
+    :param onlyifhasfindings:
+        optional, filter all repositories that have findings
     :return: List[str]
         The output will contain a list of unique repositories
     """
 
     distinct_repositories = repository_crud.get_distinct_repositories(db_connection,
                                                                       vcs_providers=vcsproviders,
-                                                                      project_name=projectname)
+                                                                      project_name=projectname,
+                                                                      only_if_has_findings=onlyifhasfindings)
     repositories = [repo.repository_name for repo in distinct_repositories]
     return repositories
 
@@ -295,6 +303,7 @@ def get_all_repositories_with_findings_metadata(
                                              regex=r"^[A-z0-9 .\-_%]*$"),
         repositoryfilter: Optional[str] = Query('',
                                                 regex=r"^[A-z0-9 .\-_%]*$"),
+        onlyifhasfindings: bool = Query(default=False),
         db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[repository_enriched_schema.RepositoryEnrichedRead]:
     """
@@ -311,6 +320,8 @@ def get_all_repositories_with_findings_metadata(
         optional, filter on project name. Is used as a string contains filter
     :param repositoryfilter:
         optional, filter on repository name. Is used as a string contains filter
+    :param onlyifhasfindings:
+        optional, filter all repositories that have findings
     :return: [RepositoryEnrichedRead]
         The output will contain a PaginationModel containing the list of RepositoryEnrichedRead type objects,
         or an empty list if no repository
@@ -319,11 +330,13 @@ def get_all_repositories_with_findings_metadata(
     repositories = repository_crud.get_repositories(db_connection, skip=skip, limit=limit,
                                                     vcs_providers=vcsproviders,
                                                     project_filter=projectfilter,
-                                                    repository_filter=repositoryfilter)
+                                                    repository_filter=repositoryfilter,
+                                                    only_if_has_findings=onlyifhasfindings)
 
     total_repositories = repository_crud.get_repositories_count(db_connection, vcs_providers=vcsproviders,
                                                                 project_filter=projectfilter,
-                                                                repository_filter=repositoryfilter)
+                                                                repository_filter=repositoryfilter,
+                                                                only_if_has_findings=onlyifhasfindings)
     repository_list = []
     for repo in repositories:
         findings_meta_data = repository_crud.get_findings_metadata_by_repository_id(

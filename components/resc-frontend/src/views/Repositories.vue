@@ -108,6 +108,7 @@ export default {
       projectFilter: '',
       projectNames: [],
       repositoryNames: [],
+      includeZeroFindingRepos: false,
       fields: [
         {
           key: 'toggle_row',
@@ -182,10 +183,11 @@ export default {
         });
       }
     },
-    handleFilterChange(vcsProvider, project, repository) {
+    handleFilterChange(vcsProvider, project, repository, includeZeroFindingRepos) {
       this.vcsFilter = vcsProvider;
       this.projectFilter = project;
       this.repositoryFilter = repository;
+      this.includeZeroFindingRepos = includeZeroFindingRepos;
       this.currentPage = 1;
       this.fetchDistinctProjects();
       this.fetchDistinctRepositories();
@@ -198,7 +200,8 @@ export default {
         this.skipRowCount,
         this.vcsFilter,
         this.projectFilter,
-        this.repositoryFilter
+        this.repositoryFilter,
+        this.includeZeroFindingRepos
       )
         .then((response) => {
           this.totalRows = response.data.total;
@@ -210,7 +213,11 @@ export default {
         });
     },
     fetchDistinctProjects() {
-      RepositoryService.getDistinctProjects(this.vcsFilter, this.repositoryFilter)
+      RepositoryService.getDistinctProjects(
+        this.vcsFilter,
+        this.repositoryFilter,
+        this.includeZeroFindingRepos
+      )
         .then((response) => {
           this.projectNames = [];
           for (const project_key of response.data) {
@@ -222,7 +229,11 @@ export default {
         });
     },
     fetchDistinctRepositories() {
-      RepositoryService.getDistinctRepositories(this.vcsFilter, this.projectFilter)
+      RepositoryService.getDistinctRepositories(
+        this.vcsFilter,
+        this.projectFilter,
+        this.includeZeroFindingRepos
+      )
         .then((response) => {
           this.repositoryNames = [];
           for (const repo_name of response.data) {
