@@ -91,7 +91,7 @@ Here is an example to scan repositories from github.
   https://github.com/docker
   
   Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
-* exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is no exception.
+* exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 * usernameValue: Provide your github username
 * tokenValue: Provide your github personal access token
 

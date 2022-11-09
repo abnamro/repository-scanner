@@ -52,7 +52,7 @@ These instructions will get you a copy of the project up and running on your loc
  #### Install resc_backend package:
   ```bash
   pip install pyodbc==4.0.32
-  pip install -e 
+  pip install -e .
   ```
  #### Set environment variables:
   ```bash
@@ -68,7 +68,6 @@ These instructions will get you a copy of the project up and running on your loc
 
   Open http://127.0.0.1:8000 in browser to access the api.
 </details>
-&nbsp
 
 #### Run RESC Web service locally through make
 *Note:* This has ben only tested in Linux and Mac. This may not work in Apple M1 chip due to lack of support from MSSQL docker image.  
@@ -107,12 +106,11 @@ Prerequisites:
 make clean
 ```
 </details>
-&nbsp
 
 #### Run locally using docker
 <details>
   <summary>Preview</summary>
-  Build the RESC Backend docker image locally by running the following commands:
+  Run the RESC Backend docker image locally by running the following commands:
 
 - Pull the docker image from registry:  
 ```bash
@@ -138,7 +136,6 @@ docker run -p 8000:8000 -e DB_CONNECTION_STRING -e MSSQL_ODBC_DRIVER -e MSSQL_US
 
 Open http://127.0.0.1:8000 in browser to access the api.
 </details>
-&nbsp
 
 ## Testing
 [(Back to top)](#table-of-contents)
@@ -147,12 +144,12 @@ In order to run (unit/linting) tests locally, there are several command specifie
 To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
 
 To make sure the unit tests are running and that the code matches quality standards run:
-```
+```bash
 pip install tox      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e -e pytest  # Run this command to run the unit tests
+tox -v -e pytest     # Run this command to run the unit tests
 tox -v               # Run this command to run all of the above tests
 ```
 
