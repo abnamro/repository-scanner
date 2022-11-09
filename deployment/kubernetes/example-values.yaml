@@ -64,7 +64,7 @@ resc-web-service:
       dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
       dbSchema: "master" # <enter database schema name here, default to master>
       dbUser: "sa" # <enter database username here, default to sa>
-      dbPass: "Y0urStr0ngP!!sword" # <enter database password here, default to Y0urStr0ngP!!sword>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
     # To configure single sign on provide below values for ssoConfig attributes
     # These attributes will be used in the RESC API to validate access token
     ssoConfig:
@@ -79,7 +79,7 @@ resc-web-service-no-auth:
     config:
       dbSchema: "master" # <enter database schema name here, default to master>
       dbUser: "sa" # <enter database username here, default to sa>
-      dbPass: "Y0urStr0ngP!!sword" # <enter database password here, default to Y0urStr0ngP!!sword>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
 
 resc-database:
   hostOS: "windows" # possible values windows/linux
@@ -87,7 +87,7 @@ resc-database:
     exposeToHostPort: 30880
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/database" # "<enter path to store database data>" # Linux: /Users/<username>/var/resc/database, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/database
     config:
-      password: "Y0urStr0ngP!!sword" # <enter database system admin password here, default to Y0urStr0ngP!!sword>
+      password: "Y0urStr0ngPassword" # <enter database system admin password here, default to Y0urStr0ngPassword>
 
 resc-database-init:
   resc:
@@ -95,15 +95,15 @@ resc-database-init:
       dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
       dbSchema: "master" # <enter database schema name here, default to master>
       dbUser: "sa" # <enter database username here, default to sa>
-      dbPass: "Y0urStr0ngP!!sword" # <enter database password here, default to Y0urStr0ngP!!sword>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
 
 resc-rabbitmq:
   rabbitMQ:
     config:
       admin_username: "admin" # <enter rabbitmq admin username, default to admin>
-      admin_password: "Y0urStr0ngP!!sword" # <enter rabbitmq admin password, default to Y0urStr0ngP!!sword>
+      admin_password: "Y0urStr0ngPassword" # <enter rabbitmq admin password, default to Y0urStr0ngPassword>
       queues_username: "queue_user" # <enter queue username, default to queue_user>
-      queues_password: "Y0urStr0ngP!!sword" # <enter queue password, default to Y0urStr0ngP!!sword>
+      queues_password: "Y0urStr0ngPassword" # <enter queue password, default to Y0urStr0ngPassword>
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq" # "<enter path to store rabbitmq data>" # Linux: /Users/<username>/var/resc/rabbitmq, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq
   filemountType: "windows" # possible values windows/linux/azure
 
