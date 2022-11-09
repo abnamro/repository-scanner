@@ -1,4 +1,4 @@
-# Repository Scanner Frontend (RESC-FE)
+# Repository Scanner Frontend (RESC-FRONTEND)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
