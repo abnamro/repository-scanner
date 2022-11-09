@@ -30,9 +30,10 @@ These instructions will get you a copy of the project up and running on your loc
 ### Run locally from source
 <details>
   <summary>Preview</summary>
-  Prerequisites: RabbitMQ is up and running locally.  
-  If you have alreday deployed RESC through helm in Kubernetes, then rabbitmq is alreday running for you.  
-  Clone the repository, open git bash terminal from /components/resc-vcs-scraper folder and run below commands.
+  Prerequisites: RabbitMQ must be up and running locally.</br>
+  If you have alreday deployed RESC through helm in Kubernetes, then rabbitmq is alreday running for you.</br> 
+  Clone the repository, open git bash terminal from /components/resc-vcs-scraper folder and run below commands.  
+
   #### (1) Create virtual environment:
   ```bash
   cd components/resc-vcs-scraper
