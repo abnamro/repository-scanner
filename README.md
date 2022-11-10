@@ -127,7 +127,7 @@ These instructions will get you a copy of the project up and running on your loc
 [RESC-FRONTEND](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend)  
 
 
-## 💁🏽 Contribution Guidelines <a name = "contribution"></a>
+## 💁🏽 Contribution Guidelines <a name = "contribution-guide"></a>
 Contributing to the Repository Scanner tool is highly encouraged because innovating together can lead to the most
 incredible results and developments! To contribute to the project there are some guidelines in place that we expect 
 contributors to the project to follow and that are available on the [Contribution](https://github.com/abnamro/repository-scanner/blob/main/contributing.md)
