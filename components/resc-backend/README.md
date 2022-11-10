@@ -40,7 +40,7 @@ These instructions will get you a copy of the project up and running on your loc
 <details>
   <summary>Preview</summary>
   Ensure resc database is up and running locally. </br>
-  If you have alreday deployed RESC through helm in Kubernetes, then you can connect RESC web service to database.</br>
+  If you have already deployed RESC through helm in Kubernetes, then you can connect RESC web service to database.</br>
   Open git bash terminal from /components/resc-backend folder and run below commands.
 
   #### Create virtual environment:
@@ -119,7 +119,7 @@ docker pull ghcr.io/abnamro/resc-backend:0.0.1
 
 - Alternatively, build the docker image locally by running following command:
   Ensure resc database is up and running locally. </br>
-  If you have alreday deployed RESC through helm in Kubernetes, then you can connect RESC web service to database.</br>
+  If you have already deployed RESC through helm in Kubernetes, then you can connect RESC web service to database.</br>
 
   Open git bash terminal from /components/resc-backend folder and run below commands.  
   Update MSSQL_PASSWORD value in the docker run command.  

@@ -31,7 +31,7 @@ These instructions will get you a copy of the project up and running on your loc
 <details>
   <summary>Preview</summary>
   Prerequisites: RabbitMQ must be up and running locally.</br>
-  If you have alreday deployed RESC through helm in Kubernetes, then rabbitmq is alreday running for you.</br> 
+  If you have already deployed RESC through helm in Kubernetes, then rabbitmq is already running for you.</br> 
   Clone the repository, open git bash terminal from /components/resc-vcs-scraper folder and run below commands.  
 
   #### (1) Create virtual environment:
@@ -49,11 +49,11 @@ These instructions will get you a copy of the project up and running on your loc
 
  ```bash
   export RESC_RABBITMQ_SERVICE_HOST=127.0.0.1   #  The hostname/IP address of the rabbitmq server
-  export RESC_RABBITMQ_SERVICE_AMQP_PORT=30902  #  The amqp port of the rabbitmq server
+  export RESC_RABBITMQ_SERVICE_PORT_AMQP=30902  #  The amqp port of the rabbitmq server
   export RABBITMQ_DEFAULT_VHOST=resc-rabbitmq   #  The virtual host name of the rabbitmq server
   export RABBITMQ_QUEUES_USERNAME=queue_user    #  The username used to connect to the rabbitmq projects and repositories topics
   export RABBITMQ_QUEUES_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics, can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
-  export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances.json file containing the vcs instances definitions
+  export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances_config.json file containing the vcs instances definitions
   export GITHUB_PUBLIC_USERNAME="" # Your github username
   export GITHUB_PUBLIC_TOKEN="" #  Your github personal access token
  ```
@@ -68,8 +68,8 @@ These instructions will get you a copy of the project up and running on your loc
   collect_projects
 ```
 
-#### Structure of vcs instances json
-The vcs_instances.json file must have the following format: You can add multiple vcs instances though.
+#### Structure of vcs instances config json
+The vcs_instances_config.json file must have the following format: You can add multiple vcs instances though.
 
 <details>
   <summary>Preview</summary>
@@ -87,7 +87,7 @@ Example:
     "scheme": "https",
     "username": "GITHUB_PUBLIC_USERNAME",
     "token": "GITHUB_PUBLIC_TOKEN",
-    "organization": "org"
+    "organization": ""
   }
 }
 ```
@@ -135,10 +135,10 @@ docker build -t ghcr.io/abnamro/resc-vcs-scraper:0.0.1 .
 
 - Run the vcs-scraper by using below command:
 ```bash
-docker run -v "<path to vcs_instances.json in your local system>":/tmp/vcs_instances.json -e RESC_RABBITMQ_SERVICE_HOST=127.0.0.1 -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper ghcr.io/abnamro/resc-vcs-scraper:0.0.1 collect_projects  
+docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper ghcr.io/abnamro/resc-vcs-scraper:0.0.1 collect_projects  
 ```
 
-To create vcs_instances.json file please refer: [Structure of vcs_instances.json](#structure-of-vcs-instances-json)
+To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
 </details>
 
 ## Testing
