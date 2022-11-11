@@ -42,11 +42,13 @@ code.
 * [Links](#links)
 * [Versions](#versions)
 * [Technical Information](#technical-information)
+* [Getting Started](#getting-started)
 * [Contribution Guidelines](#contribution-guide)
 * [Contact](#contact)
 * [License](#license)
+* [Acknowledgments](#acknowledgement)
 
-## 🔗 Links
+## 🔗 Links <a name = "links"></a>
 Throughout the process of open sourcing the project, the ABN AMRO Bank made a series of articles describing the
 capabilities of the Repository Scanner (RESC) tool, the architectural decisions behind it and the road to open sourcing a
 project like the Repository Scanner. The articles can be very useful for users of the RESC tool to get a better 
@@ -55,7 +57,7 @@ understanding of the tool and get a real look "behind the scenes".
 --ToDo: Add links to the blog(s) where the product is better described so the viewers can read that and get a better
 idea of the product. Also think of other links that could prove useful and add them here.
 
-## ⚙️Versions
+## ⚙️ Versions <a name = "versions"></a>
 The [SemVer](https://semver.org/) numbering is used for the releases of the Repository Scanner tool. In which a version
 consists of a MAJOR.MINOR.PATCH number (e.g. v1.2.4). Where the **MAJOR** part of the number is reserved for the biggest 
 of updates to the Repository Scanner tool like an enormous change in the backend that alters the flow and behavior of 
@@ -76,7 +78,7 @@ the [Releases](https://github.com/abnamro/repository-scanner/releases) page:
     * A statistic page that gives an overview of findings and how they increase/decrease monthly along with the amount of times a finding appears;
     * The ability to import your own rulepack with custom rules to fit your personal means!
 
-## 🛠️ Technical Information
+## 🛠️ Technical Information <a name = "technical-information"></a>
 The Repository Scanner is a very technical tool that consists of a lot of different components which in turn 
 uses different technologies to make these components work as efficient as possible. These technologies are listed below
 to give a clear picture of what is being used for the Repository Scanner. There is also a reference to each individual
@@ -113,17 +115,29 @@ are run as Docker containers in a Kubernetes ecosystem.
 ![product-screenshot!](images/RESC_HighLevel_Diagram.png)
 
 
-## 💁🏽 Contribution Guidelines
+## 🛠️ Getting Started <a name = "getting-started"></a>
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.  
+* Running RESC  
+[Deployment through helm](https://github.com/abnamro/repository-scanner/tree/main/deployment/kubernetes)  
+
+* Running individual components  
+[RESC-BACKEND](https://github.com/abnamro/repository-scanner/tree/main/components/resc-backend)  
+[RESC-VCS-SCRAPER](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scraper)  
+[RESC-VCS-SCANNER](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner)  
+[RESC-FRONTEND](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend)  
+
+
+## 💁🏽 Contribution Guidelines <a name = "contribution-guide"></a>
 Contributing to the Repository Scanner tool is highly encouraged because innovating together can lead to the most
 incredible results and developments! To contribute to the project there are some guidelines in place that we expect 
 contributors to the project to follow and that are available on the [Contribution](https://github.com/abnamro/repository-scanner/blob/main/contributing.md)
 page. By contributing to the project you also agree with the [Code of Conduct](https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md).
 
-## 📧    Contact
+## 📧    Contact <a name = "contact"></a>
 In the event that you need to get in contact with the maintainers of the Repository Scanner tool, please do so by contacting 
 the following e-mail address: [resc@nl.abnamro.com](mailto:resc@nl.abnamro.com).
 
-## ⚖️License
+## ⚖️ License <a name = "license"></a>
 The Repository Scanner (RESC) Tool is licensed under the [MIT](https://github.com/abnamro/repository-scanner/blob/main/LICENSE.md) License.
 
 <!-- MARKDOWN LINKS & IMAGES -->
@@ -140,3 +154,6 @@ The Repository Scanner (RESC) Tool is licensed under the [MIT](https://github.co
 [Vue-url]: https://vuejs.org/
 [RabbitMQ.com]: https://img.shields.io/badge/RabbitMQ-ff6600?style=for-the-badge&logo=rabbitmq&logoColor=white
 [RabbitMQ-url]: https://rabbitmq.com/
+
+## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/zricethezav/gitleaks), we want to give Zachary Rice credits for creating and maintaining GitLeaks. GitLeaks has helped many organizations in securing their codebases for any leaked secrets.

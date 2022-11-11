@@ -1,4 +1,4 @@
-# Repository Scanner Frontend (RESC-FE)
+# Repository Scanner Frontend (RESC-FRONTEND)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -30,45 +30,55 @@ These instructions will get you a copy of the project up and running on your loc
 - Install [Node.js](https://nodejs.org/en/) v16.13.0
 - Install Vue cli using command: `npm install -g @vue/cli`  
 - Install Vetur, ESLint and Prettier extensions to your VSCode IDE. 
-- Ensure RESC webservice is up and running at http://localhost:30000/ in order to visualize data.
+- Install [Docker](https://www.docker.com/)
+- Ensure RESC webservice is up and running in order to visualize data. Here in this case API is running at at http://localhost:30800/.  
 
 ### Run locally
 
-Follow the below steps to run the project locally:-
-```
-git clone -b <branch-name> <repository-scanner repo url>
+Clone the repository and refer the following steps to run the project locally.
+```bash
 
 cd components/resc-frontend
 
 npm install
 
 npm run serve
-
-Now access the application using this url: http://localhost:8080/
 ```
+Now access the application using this url: http://localhost:8080/  
+
 ***Note:***  Replace the actual values in the placeholders <branch-name> and <repository-scanner repo url>
 
 ### Run using docker
 
-Build the RESC Frontend docker image locally by running the following commands (Keep the image version parameter in mind):
+Build the RESC Frontend docker image locally by running the following commands.
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-frontend:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-frontend:0.0.1`
-- Run the RESC frontend by using the following command: `docker run --name resc-frontend abnamro/resc-frontend:0.0.1`
+- Pull the docker image from registry: 
+```bash
+docker pull ghcr.io/abnamro/resc-frontend:0.0.1
+```
+- Alternatively, build the docker image locally by running:
+```bash
+docker build -t ghcr.io/abnamro/resc-frontend:0.0.1 .
+```
+- Run the RESC frontend by using the following command: 
+
+```bash
+docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend ghcr.io/abnamro/resc-frontend:0.0.1
+```
 
 Now access the application using this url: http://localhost:8080/
 
 ### Testing
 [(Back to top)](#table-of-contents)
 
-Run your unit tests:```npm run ut```
+Run your unit tests: ```npm run ut```
 
-Linting files:```npm run lint```
+Linting files: ```npm run lint```
 
-Linting and fixing files:```npm run lint:autofix```
+Linting and fixing files: ```npm run lint:autofix```
 
 ## Additional Information
 [(Back to top)](#table-of-contents)  
 
 ### Some Useful Commands
-Compiles and minifies for production:```npm run build```
+Compiles and minifies for production: ```npm run build```

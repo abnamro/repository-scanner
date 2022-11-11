@@ -1,26 +1,27 @@
 global:
   # Authentication is disabled by default, to enable it set authenticationEnabled to true and provide correct values for ssoConfig attributes
   authenticationEnabled: "false"
+  enableInClusterRabbitMqMgmt: "true"
   resc:
     image:
       repository: ghcr.io/
       name: abnamro/resc-backend
-      tag: 0.0.0
+      tag: 0.0.1
   rescFrontend:
     image:
       repository: ghcr.io/
       name: abnamro/resc-frontend
-      tag: 0.0.0
+      tag: 0.0.1
   VCSScraper:
     image:
       repository: ghcr.io/
       name: abnamro/resc-vcs-scraper
-      tag: 0.0.0
+      tag: 0.0.1
   rescSecretScanner:
     image:
       repository: ghcr.io/
       name: abnamro/resc-vcs-scanner
-      tag: 0.0.0
+      tag: 0.0.1
 
 resc-vcs-scraper-projects:
   config:
@@ -30,7 +31,6 @@ resc-vcs-scraper-projects:
 
 resc-vcs-scraper-repositories:
   config:
-    schedule: "0 6 * * 6"
     scan_only_master_branch: true # Set this to false if you want to scan all branches
 
 resc-vcs-scanner-secrets:
@@ -63,9 +63,9 @@ resc-web-service:
   resc:
     config:
       dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
-      dbSchema: "<enter database schema name here>"
-      dbUser: "<enter database username here>"
-      dbPass: "<enter database password here>"
+      dbSchema: "master" # <enter database schema name here, default to master>
+      dbUser: "sa" # <enter database username here, default to sa>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
     # To configure single sign on provide below values for ssoConfig attributes
     # These attributes will be used in the RESC API to validate access token
     ssoConfig:
@@ -78,41 +78,44 @@ resc-web-service-no-auth:
   exposeToHostPort: 30900
   resc:
     config:
-      dbSchema: "<enter database schema name here>"
-      dbUser: "<enter database username here>"
-      dbPass: "<enter database password here>"
+      dbSchema: "master" # <enter database schema name here, default to master>
+      dbUser: "sa" # <enter database username here, default to sa>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
 
 resc-database:
-  hostOS: "linux" # possible values windows/linux
+  hostOS: "windows" # possible values windows/linux
   database:
     exposeToHostPort: 30880
-    pvc_path: "<enter path to store database data>" # Example: /Users/<username>/var/resc/database
+    pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/database" # "<enter path to store database data>" # Linux: /Users/<username>/var/resc/database, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/database
     config:
-      password: "<enter database system admin password here>"
+      password: "Y0urStr0ngPassword" # <enter database system admin password here, default to Y0urStr0ngPassword>
 
 resc-database-init:
   resc:
     config:
       dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
-      dbSchema: "<enter database schema name here>"
-      dbUser: "<enter database username here>"
-      dbPass: "<enter database password here>"
+      dbSchema: "master" # <enter database schema name here, default to master>
+      dbUser: "sa" # <enter database username here, default to sa>
+      dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
 
 resc-rabbitmq:
   rabbitMQ:
+    exposeToHostPort: 30901
+    exposeAmqpToHostPort: 30902
     config:
-      admin_username: "<enter rabbitmq admin username>"
-      admin_password: "<enter rabbitmq admin password>"
-      queues_username: "<enter queue username>"
-      queues_password: "<enter queue password>"
-    pvc_path: "<enter path to store rabbitmq data>" # Example: /Users/<username>/var/resc/rabbitmq
+      admin_username: "admin" # <enter rabbitmq admin username, default to admin>
+      admin_password: "Y0urStr0ngPassword" # <enter rabbitmq admin password, default to Y0urStr0ngPassword>
+      queues_username: "queue_user" # <enter queue username, default to queue_user>
+      queues_password: "Y0urStr0ngPassword" # <enter queue password, default to Y0urStr0ngPassword>
+    pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq" # "<enter path to store rabbitmq data>" # Linux: /Users/<username>/var/resc/rabbitmq, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq
   filemountType: "windows" # possible values windows/linux/azure
 
 resc-vcs-instances:
   vcsInstances:
+    ### Github ###
     - name: "GITHUB_PUBLIC"
-      scope: []
-      exceptions: []
+      scope: [] # Enter comma separated list of github accounts to scan
+      exceptions: [] # Enter comma separated list of github accounts to exclude from scan
       providerType: "GITHUB_PUBLIC"
       hostname: "github.com"
       port: "443"
@@ -122,27 +125,31 @@ resc-vcs-instances:
       organization: ""
       token: "GITHUB_PUBLIC_TOKEN"
       tokenValue: "<enter github personal access token here>"
-    - name: "AzureDevOps"
-      scope: []
-      exceptions: []
-      providerType: "AZURE_DEVOPS"
-      hostname: "<enter azuredevops host name here>" # Example - dev.azure.com
-      port: "443"
-      scheme: "https"
-      username: "AZURE_DEVOPS_USERNAME"
-      usernameValue: "NA"
-      organization: "<enter azuredevopsorganization name here>"
-      token: "AZURE_DEVOPS_TOKEN"
-      tokenValue: "<enter azuredevops personal access token here>"
-    - name: "BITBUCKET"
-      scope: []
-      exceptions: []
-      providerType: "BITBUCKET"
-      hostname: "<enter bitbucket host name here>"
-      port: "<enter bitbucket port number here>"
-      scheme: "https"
-      organization: ""
-      username: "BITBUCKET_USERNAME"
-      usernameValue: "<enter bitbucket username here>"
-      token: "BITBUCKET_TOKEN"
-      tokenValue: "<enter bitbucket personal access token here>"
+
+    ### AzureDevOps ###
+    # - name: "AzureDevOps"
+    #   scope: []
+    #   exceptions: []
+    #   providerType: "AZURE_DEVOPS"
+    #   hostname: "<enter azuredevops host name here>" # Example - dev.azure.com
+    #   port: "443"
+    #   scheme: "https"
+    #   username: "AZURE_DEVOPS_USERNAME"
+    #   usernameValue: "NA"
+    #   organization: "<enter azuredevopsorganization name here>"
+    #   token: "AZURE_DEVOPS_TOKEN"
+    #   tokenValue: "<enter azuredevops personal access token here>"
+
+    ### Bitbucket ###
+    # - name: "BITBUCKET"
+    #   scope: []
+    #   exceptions: []
+    #   providerType: "BITBUCKET"
+    #   hostname: "<enter bitbucket host name here>"
+    #   port: "<enter bitbucket port number here>"
+    #   scheme: "https"
+    #   organization: ""
+    #   username: "BITBUCKET_USERNAME"
+    #   usernameValue: "<enter bitbucket username here>"
+    #   token: "BITBUCKET_TOKEN"
+    #   tokenValue: "<enter bitbucket personal access token here>"

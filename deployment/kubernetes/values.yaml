@@ -3,6 +3,7 @@ global:
   deploymentEnvironment: "unknown"
   authenticationEnabled: "true"
   enableInClusterDatabase: "true"
+  enableInClusterRabbitMqMgmt: "false"
   namespace: resc
   appName: resc
   host:

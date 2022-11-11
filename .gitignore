@@ -82,3 +82,4 @@ MANIFEST
 # Infra
 resc-rules/
 values-local-no-commit.yaml
+RESC-RULE.toml

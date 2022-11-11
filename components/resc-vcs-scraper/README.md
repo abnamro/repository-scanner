@@ -5,8 +5,7 @@
 1. [About The Component](#about-the-component)
 2. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
-    - [Run locally](#run-locally)
-    - [Usage](#usage)
+    - [Run locally from source](#run-locally-from-source)
     - [Run locally using docker](#run-locally-using-docker)
 3. [Testing](#testing)
 
@@ -24,146 +23,123 @@ The project collector collects all projects and sends to projects queue. The rep
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-- Install Docker Desktop;
-- Install [Python 3.9.0](https://www.python.org/downloads/release/python-390/)
+- [Git](https://git-scm.com/downloads)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Python 3.9.0](https://www.python.org/downloads/release/python-390/)
 
-### Run locally
+### Run locally from source
+<details>
+  <summary>Preview</summary>
+  Prerequisites: RabbitMQ must be up and running locally.</br>
+  If you have already deployed RESC through helm in Kubernetes, then rabbitmq is already running for you.</br> 
+  Clone the repository, open git bash terminal from /components/resc-vcs-scraper folder and run below commands.  
 
-Please follow the below steps to run the project locally:
+  #### (1) Create virtual environment:
+  ```bash
+  cd components/resc-vcs-scraper
+  pip install virtualenv
+  virtualenv venv
+  source venv/Scripts/activate
+  ```
+ #### (2) Install resc_vcs_scraper package:
+  ```bash
+  pip install -e .
+  ```
+ #### (3) Set below environment variables:
+
+ ```bash
+  export RESC_RABBITMQ_SERVICE_HOST=127.0.0.1   #  The hostname/IP address of the rabbitmq server
+  export RESC_RABBITMQ_SERVICE_PORT_AMQP=30902  #  The amqp port of the rabbitmq server
+  export RABBITMQ_DEFAULT_VHOST=resc-rabbitmq   #  The virtual host name of the rabbitmq server
+  export RABBITMQ_QUEUES_USERNAME=queue_user    #  The username used to connect to the rabbitmq projects and repositories topics
+  export RABBITMQ_QUEUES_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics, can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
+  export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances_config.json file containing the vcs instances definitions
+  export GITHUB_PUBLIC_USERNAME="" # Your github username
+  export GITHUB_PUBLIC_TOKEN="" #  Your github personal access token
+ ```
+ 
+ You need to replace with correct values for RABBITMQ_QUEUES_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME and GITHUB_PUBLIC_TOKEN.  
+
+ #### (4) Run the `collect_projects` task:  
+  `collect_projects` task collects all projects from a given Version Control System Instance, then writes the found projects to a RabbitMQ channel called 'projects'. 
+
+  This can be done via the command  
+  ```bash
+  collect_projects
 ```
-pip install -e .
-<Set all required environment variables>
-collect_projects
-celery -A vcs_scraper.repository_collector.common worker --loglevel=INFO -E -Q projects
-```
-The required environment variables are below (use the `export` command for Linux or `SET` for Windows Machines):
->- *RABBITMQ_QUEUES_USERNAME*: The username used to connect to the rabbitmq project collector and repository collector topics.
->- *RABBITMQ_QUEUES_PASSWORD*: The password used to connect to the rabbitmq project collector and repository collector topics.
->- *RESC_RABBITMQ_SERVICE_HOST*: The hostname/IP address of the rabbitmq server.
->- *RABBITMQ_DEFAULT_VHOST*: The virtual host name of the rabbitmq server.
->- *VCS_INSTANCES_FILE_PATH*: The absolute path to the json file containing the vcs_instances_definitions.
 
-### Usage
+#### Structure of vcs instances config json
+The vcs_instances_config.json file must have the following format: You can add multiple vcs instances though.
 
-The vcs-scraper offers 2 main functionalities:
+<details>
+  <summary>Preview</summary>
 
-1. Collecting all projects from a given Version Control System Instance, the default behavior is to write the found projects to a RabbitMQ channel called 'projects'.
-   This can be done via the command: `collect_projects`
-
-   > This command takes the following environment variables as **input** (use the `export` command for Linux or `SET` for Windows Machines):
-   >- *RABBITMQ_QUEUES_USERNAME*: The username used to connect to the rabbitmq project collector and repository collector topics.
-   >- *RABBITMQ_QUEUES_PASSWORD*: The password used to connect to the rabbitmq project collector and repository collector topics.
-   >- *RESC_RABBITMQ_SERVICE_HOST*: The hostname/IP address of the rabbitmq server.
-   >- *RABBITMQ_DEFAULT_VHOST*: The virtual host name of the rabbitmq server.
-   >- *VCS_INSTANCES_FILE_PATH*: The absolute path to the json file containing the vcs_instances_definitions.
-
-This JSON file must have the following format:
-```
+Example:
+```json
 {
   "vcs_instance_1": {
-    "name": "vcs_instance_1",
+    "name": "GITHUB_PUBLIC",
+	"scope": ["kubernetes"], 
     "exceptions": [],
-    "provider_type": "AZURE_DEVOPS",
-    "hostname": "dev.azure.com",
+    "provider_type": "GITHUB_PUBLIC",
+    "hostname": "github.com",
     "port": "443",
     "scheme": "https",
-    "username": "VCS_INSTANCE_USERNAME",
-    "token": "VCS_INSTANCE_TOKEN",
-    "scope": [],
-    "organization": "org"
-  },
-  "vcs_instance_2": {
-    "name": "vcs_instance_2",
-    "exceptions": [],
-    "provider_type": "BITBUCKET",
-    "hostname": "bitbucket.com",
-    "port": "1234",
-    "scheme": "https",
-    "username": "VCS_INSTANCE_USERNAME",
-    "token": "VCS_INSTANCE_TOKEN",
-    "scope": []
+    "username": "GITHUB_PUBLIC_USERNAME",
+    "token": "GITHUB_PUBLIC_TOKEN",
+    "organization": ""
   }
 }
 ```
+* scope: List of github accounts you want to scan.
+  For example, lets'say you want to scan all the repositories for the following github accounts.
+  https://github.com/kubernetes  
+  https://github.com/docker
+  
+  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
+* exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 
-The **output** messages of this command have the following format:
+The **output** messages of `collect_projects` command has the following format:
 
-```
+```json
 {
-  "project_key": project_name,
-  "vcs_instance_name": vcs_instance_name,
+  "project_key": "kubernetes",
+  "vcs_instance_name": "GITHUB_PUBLIC",
 }
 ```
+</details>
 
-2. Collecting all repositories from a single VCS project, the default behavior is to write the found projects to a RabbitMQ channel called 'repositories'.
-   This can be done via the command:
-   `celery -A vcs_scraper.repository_collector.common worker --loglevel=INFO -E -Q projects`
+ #### (4) Run collect all repositories task:  
+  This task collects all repositories from a single VCS project, then writes the found repositories to a RabbitMQ channel called 'repositories'.
 
->This Celery worker takes the following environment variables as **input** (use the `export` command for Linux or `SET` for Windows Machines):
->- *RABBITMQ_QUEUES_USERNAME*: The username used to connect to the rabbitmq project collector and repository collector topics.
->- *RABBITMQ_QUEUES_PASSWORD*: The password used to connect to the rabbitmq project collector and repository collector topics.
->- *RESC_RABBITMQ_SERVICE_HOST*: The hostname/IP address of the rabbitmq server.
->- *RABBITMQ_DEFAULT_VHOST*: The virtual host name of the rabbitmq server.
->- *VCS_INSTANCES_FILE_PATH*: The absolute path to the json file containing the vcs_instances_definitions.
-
-This JSON file must have the following format:
-```
-{
-  "vcs_instance_1": {
-    "name": "vcs_instance_1",
-    "exceptions": [],
-    "provider_type": "AZURE_DEVOPS",
-    "hostname": "dev.azure.com",
-    "port": "443",
-    "scheme": "https",
-    "username": "VCS_INSTANCE_USERNAME",
-    "token": "VCS_INSTANCE_TOKEN",
-    "scope": [],
-    "organization": "org"
-  },
-  "vcs_instance_2": {
-    "name": "vcs_instance_2",
-    "exceptions": [],
-    "provider_type": "BITBUCKET",
-    "hostname": "bitbucket.com",
-    "port": "1234",
-    "scheme": "https",
-    "username": "VCS_INSTANCE_USERNAME",
-    "token": "VCS_INSTANCE_TOKEN",
-    "scope": []
-  }
-}
-```
-Project definitions to be read from the 'projects' channel hosted on the same rabbitmq instance as the output have the following format:
-```
-{
-  "repository_name": "test-repo",
-  "repository_id": 123,
-  "repository_url": "https://fake-btbk.com/scm/test/test-repo.git",
-  "project_key": "test",
-  "vcs_instance_name": "bitbucket acceptance",
-  "branches_info": [
-    {"repository_id": 123,
-      "branch_name": "master",
-      "branch_id": "refs/heads/master",
-      "last_scanned_commit": "e361cd94b5a4f3cc2fffffa9fdbdbc259c583ff9"},
-    {"repository_id": 123,
-      "branch_name": "main",
-      "branch_id": "refs/heads/main",
-      "last_scanned_commit": "e361cd94b5a4f3cc2fdfffa9fdbdbc259c583ff9"}
-  ]
-}
-
-```
+  This can be done via the command:
+   ```bash
+   celery -A vcs_scraper.repository_collector.common worker --loglevel=INFO -E -Q projects
+   ```
+</details>
 
 ### Run locally using docker
+<details>
+  <summary>Preview</summary>
+Run the RESC VCS Scraper docker image locally by running the following commands:
 
-- Install the docker image from the CLI: `docker pull ghcr.io/abnamro/resc-vcs-scraper:0.0.1`
-- Build the docker image by running:`docker build -t abnamro/resc-vcs-scraper:0.0.1`
-- Run the vcs-scraper by below command:
+- Pull the docker image from registry: 
+```bash
+docker pull ghcr.io/abnamro/resc-vcs-scraper:0.0.1
 ```
-docker run -e RABBITMQ_QUEUES_USERNAME='test' -e RABBITMQ_QUEUES_PASSWORD='test' -e RESC_RABBITMQ_SERVICE_HOST='test-service-host' -e RABBITMQ_DEFAULT_VHOST='resc-rabbitmq' -e VCS_INSTANCES_FILE_PATH='<provide vcs_instance.json path>' --name resc-vcs-scraper resc/resc-vcs-scraper:local collect_projects
+
+- Alternatively, build the docker image locally by running: 
+```bash
+docker build -t ghcr.io/abnamro/resc-vcs-scraper:0.0.1 .
 ```
+
+- Run the vcs-scraper by using below command:
+```bash
+docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper ghcr.io/abnamro/resc-vcs-scraper:0.0.1 collect_projects  
+```
+
+To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
+</details>
 
 ## Testing
 [(Back to top)](#table-of-contents)
@@ -172,11 +148,11 @@ In order to run (unit/linting) tests locally, there are several command specifie
 To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
 
 To make sure the unit tests are running and that the code matches quality standards run:
-```
+```bash
 pip install tox      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e -e pytest  # Run this command to run the unittests
-tox -v               # Run this command to run all the tests above
+tox -v -e pytest     # Run this command to run the unit tests
+tox -v               # Run this command to run all of the above tests
 ```
