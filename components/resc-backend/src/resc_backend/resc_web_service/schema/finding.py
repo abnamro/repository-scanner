@@ -4,9 +4,10 @@ import datetime
 from typing import List, Optional
 
 # Third Party
-from pydantic import BaseModel, conint, constr
+from pydantic import BaseModel, conint, conlist, constr
 
 # First Party
+from resc_backend.constants import MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db.model import DBfinding
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
@@ -53,7 +54,7 @@ class Finding(FindingBase):
 
 class FindingRead(FindingCreate):
     id_: conint(gt=0)
-    scan_ids: Optional[List[conint(gt=0)]]
+    scan_ids: Optional[conlist(conint(gt=0), min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)]
 
     class Config:
         orm_mode = True

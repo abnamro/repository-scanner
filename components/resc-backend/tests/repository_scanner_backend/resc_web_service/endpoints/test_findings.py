@@ -578,14 +578,14 @@ class TestFindings(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
     @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
     def test_audit_findings(self, audit_findings, get_scan_findings, get_finding):
-        audit_multiple = AuditMultiple(finding_ids=[0, 1], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
-        get_scan_findings.return_value = [self.db_scan_findings[0]]
-        get_finding.return_value = self.db_findings[0]
-        audit_findings.return_value = self.db_findings[1]
+        audit_multiple = AuditMultiple(finding_ids=[1, 2], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
+        get_scan_findings.return_value = [self.db_scan_findings[1]]
+        get_finding.return_value = self.db_findings[1]
+        audit_findings.return_value = self.db_findings[2]
         response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
                                    json=self.create_json_body_multiple_audit(audit_multiple))
         assert response.status_code == 200, response.text
-        get_finding.assert_has_calls([call(ANY, finding_id=0), call(ANY, finding_id=1)], any_order=False)
+        get_finding.assert_has_calls([call(ANY, finding_id=1), call(ANY, finding_id=2)], any_order=False)
         audit_findings.assert_has_calls([call(db_connection=ANY, db_finding=get_finding.return_value,
                                               status=audit_multiple.status, comment=audit_multiple.comment),
                                          call(db_connection=ANY, db_finding=get_finding.return_value,
@@ -595,12 +595,12 @@ class TestFindings(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
     def test_audit_findings_non_existing(self, audit_findings, get_finding):
-        audit_multiple = AuditMultiple(finding_ids=[0, 1], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
+        audit_multiple = AuditMultiple(finding_ids=[1, 2], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
         get_finding.return_value = None
         response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
                                    json=self.create_json_body_multiple_audit(audit_multiple))
         assert response.status_code == 404, response.text
-        get_finding.assert_called_once_with(ANY, finding_id=0)
+        get_finding.assert_called_once_with(ANY, finding_id=1)
         audit_findings.assert_not_called()
 
     def test_get_supported_statuses(self):

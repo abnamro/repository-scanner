@@ -1,12 +1,12 @@
 # pylint: disable=no-name-in-module
 # Standard Library
-from typing import List, Optional
+from typing import Optional
 
 # Third Party
-from pydantic import BaseModel, conint, constr, validator
+from pydantic import BaseModel, conint, conlist, constr, validator
 
 # First Party
-from resc_backend.constants import AZURE_DEVOPS
+from resc_backend.constants import AZURE_DEVOPS, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
@@ -17,9 +17,9 @@ class VCSInstanceBase(BaseModel):
     hostname: constr(max_length=200)
     port: conint(gt=-0, lt=65536)
     scheme: constr(max_length=20)
-    exceptions: Optional[List[str]] = []
-    scope: Optional[List[str]] = []
-    organization: Optional[str]
+    exceptions: Optional[conlist(item_type=str, min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)]
+    scope: Optional[conlist(item_type=str, min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)]
+    organization: Optional[constr(max_length=200)]
 
     @validator("scheme", pre=True)
     @classmethod
