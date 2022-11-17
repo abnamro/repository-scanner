@@ -21,25 +21,17 @@ from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 logger = logging.getLogger(__name__)
 
 
-def update_finding(db_connection: Session, finding_id: int, finding: finding_schema.FindingCreate):
+def update_finding(db_connection: Session, finding_id: int, finding: finding_schema.FindingUpdate):
     db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
-    db_finding.file_path = finding.file_path
-    db_finding.line_number = finding.line_number
-    db_finding.commit_id = finding.commit_id
-    db_finding.commit_message = finding.commit_message
-    db_finding.commit_timestamp = finding.commit_timestamp
-    db_finding.author = finding.author
-    db_finding.email = finding.email
     db_finding.status = finding.status
     db_finding.comment = finding.comment
-    db_finding.event_sent_on = finding.event_sent_on
 
     db_connection.commit()
     db_connection.refresh(db_finding)
     return db_finding
 
 
-def patch_finding(db_connection: Session, finding_id: int, finding_update: finding_schema.FindingUpdate):
+def patch_finding(db_connection: Session, finding_id: int, finding_update: finding_schema.FindingPatch):
     db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
 
     finding_update_dict = finding_update.dict(exclude_unset=True)

@@ -27,17 +27,12 @@ class FindingBase(BaseModel):
 
 
 class FindingUpdate(BaseModel):
-    file_path: Optional[constr(max_length=500)]
-    line_number: Optional[conint(gt=-1)]
-    commit_id: Optional[constr(max_length=120)]
-    commit_message: Optional[str]
-    commit_timestamp: Optional[datetime.datetime]
-    author: Optional[constr(max_length=200)]
-    email: Optional[constr(max_length=100)]
-    status: Optional[FindingStatus]
-    comment: Optional[constr(max_length=255)]
-    event_sent_on: Optional[datetime.datetime]
-    rule_name: Optional[constr(max_length=400)]
+    status: FindingStatus
+    comment: constr(max_length=255)
+
+
+class FindingPatch(BaseModel):
+    event_sent_on: datetime.datetime
 
 
 class FindingCreate(FindingBase):

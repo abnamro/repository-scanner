@@ -88,7 +88,9 @@ def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connec
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
-    return db_finding
+    db_scan_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
+    scan_ids = [x.scan_id for x in db_scan_findings]
+    return FindingRead.create_from_db_entities(db_finding=db_finding, scan_ids=scan_ids)
 
 
 @router.patch("/{finding_id}",
@@ -96,7 +98,7 @@ def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connec
               status_code=status.HTTP_200_OK)
 def patch_finding(
         finding_id: int,
-        finding_update: finding_schema.FindingUpdate,
+        finding_update: finding_schema.FindingPatch,
         db_connection: Session = Depends(get_db_connection)
 ):
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
@@ -115,7 +117,7 @@ def patch_finding(
             status_code=status.HTTP_200_OK)
 def update_finding(
         finding_id: int,
-        finding: finding_schema.FindingCreate,
+        finding: finding_schema.FindingUpdate,
         db_connection: Session = Depends(get_db_connection)
 ):
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
