@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, conint, conlist, constr, validator
 
 # First Party
-from resc_backend.constants import AZURE_DEVOPS, MAX_RECORDS_PER_PAGE_LIMIT
+from resc_backend.constants import AZURE_DEVOPS
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
@@ -17,8 +17,8 @@ class VCSInstanceBase(BaseModel):
     hostname: constr(max_length=200)
     port: conint(gt=-0, lt=65536)
     scheme: constr(max_length=20)
-    exceptions: Optional[conlist(item_type=str, min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)]
-    scope: Optional[conlist(item_type=str, min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)]
+    exceptions: Optional[conlist(item_type=str, min_items=None, max_items=500)]
+    scope: Optional[conlist(item_type=str, min_items=None, max_items=500)]
     organization: Optional[constr(max_length=200)]
 
     @validator("scheme", pre=True)

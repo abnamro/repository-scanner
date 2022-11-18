@@ -6,9 +6,6 @@ from typing import Generic, TypeVar
 from pydantic import BaseModel, conint, conlist
 from pydantic.generics import GenericModel
 
-# First Party
-from resc_backend.constants import MAX_RECORDS_PER_PAGE_LIMIT
-
 Model = TypeVar("Model", bound=BaseModel)
 
 
@@ -20,7 +17,7 @@ class PaginationModel(GenericModel, Generic[Model]):
         Type of the object in the data list
     """
     # data: List[Model]
-    data: conlist(item_type=Model, min_items=None, max_items=MAX_RECORDS_PER_PAGE_LIMIT)
+    data: conlist(item_type=Model, min_items=None, max_items=500)
     total: conint(gt=-1)
     limit: conint(gt=-1)
     skip: conint(gt=-1)
