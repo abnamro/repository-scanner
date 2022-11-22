@@ -2,6 +2,7 @@
 # Standard Library
 import logging
 import os
+import urllib
 
 # Third Party
 from sqlalchemy import create_engine
@@ -15,7 +16,13 @@ logger = logging.getLogger(__name__)
 
 DB_CONNECTION_STRING = os.environ.get("DB_CONNECTION_STRING")
 try:
-    DB_CONNECTION_STRING = DB_CONNECTION_STRING.format(**os.environ)
+    env_variables = {}
+    for key, value in os.environ.items():
+        if "pass" in key.lower():
+            env_variables[key] = urllib.parse.quote(value)
+        else:
+            env_variables[key] = value
+    DB_CONNECTION_STRING = DB_CONNECTION_STRING.format(**env_variables)
 except AttributeError:
     logger.warning("Missing DB Connection environment variables, using SQLite database")
     DB_CONNECTION_STRING = ""
