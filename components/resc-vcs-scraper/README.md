@@ -125,17 +125,17 @@ Run the RESC VCS Scraper docker image locally by running the following commands:
 
 - Pull the docker image from registry: 
 ```bash
-docker pull ghcr.io/abnamro/resc-vcs-scraper:0.0.1
+docker pull rescabnamro/resc-vcs-scraper:0.0.1
 ```
 
 - Alternatively, build the docker image locally by running: 
 ```bash
-docker build -t ghcr.io/abnamro/resc-vcs-scraper:0.0.1 .
+docker build -t rescabnamro/resc-vcs-scraper:0.0.1 .
 ```
 
 - Run the vcs-scraper by using below command:
 ```bash
-docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper ghcr.io/abnamro/resc-vcs-scraper:0.0.1 collect_projects  
+docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper rescabnamro/resc-vcs-scraper:0.0.1 collect_projects  
 ```
 
 To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)

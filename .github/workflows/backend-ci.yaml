@@ -14,8 +14,8 @@ on:
 
 env:
   RESC_BACKEND_DIR: components/resc-backend
-  CONTAINER_REGISTRY: ghcr.io
-  IMAGE_NAME: abnamro/resc-backend
+  CONTAINER_REGISTRY: rescabnamro
+  IMAGE_NAME: resc-backend
   IMAGE_TAG: 0.0.1
 
 jobs:
@@ -161,9 +161,8 @@ jobs:
       - name: Log in to Container Registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
-          registry: ${{ env.CONTAINER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.__DOCKER_HUB_USER__ }}
+          password: ${{ secrets.__DOCKER_HUB_PASS__ }}
       
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
