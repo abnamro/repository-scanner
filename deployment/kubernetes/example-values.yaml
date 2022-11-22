@@ -4,23 +4,23 @@ global:
   enableInClusterRabbitMqMgmt: "true"
   resc:
     image:
-      repository: ghcr.io/
-      name: abnamro/resc-backend
+      repository: rescabnamro/
+      name: resc-backend
       tag: 0.0.1
   rescFrontend:
     image:
-      repository: ghcr.io/
-      name: abnamro/resc-frontend
+      repository: rescabnamro/
+      name: resc-frontend
       tag: 0.0.1
   VCSScraper:
     image:
-      repository: ghcr.io/
-      name: abnamro/resc-vcs-scraper
+      repository: rescabnamro/
+      name: resc-vcs-scraper
       tag: 0.0.1
   rescSecretScanner:
     image:
-      repository: ghcr.io/
-      name: abnamro/resc-vcs-scanner
+      repository: rescabnamro/
+      name: resc-vcs-scanner
       tag: 0.0.1
 
 resc-vcs-scraper-projects:
