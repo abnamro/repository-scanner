@@ -2,8 +2,8 @@
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
-1. [About the Component](#about-the-component)
-2. [Getting Started](#getting-started)
+1. [About the component](#about-the-component)
+2. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Run RESC Web service locally from source](#run-resc-web-service-locally-from-source)
     - [Run RESC Web service locally through Make](#run-resc-web-service-locally-through-make)
