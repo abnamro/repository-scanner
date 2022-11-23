@@ -64,10 +64,10 @@ consists of a MAJOR.MINOR.PATCH number (e.g. v1.2.4):
   - other newsworthy changes in the tool. 
    
  - The **PATCH** part captures all other changes: 
- - small content edits. 
- - bug fixes. 
- - information corrections.
- - updated broken links.
+   - small content edits. 
+  - bug fixes. 
+  - information corrections.
+  - updated broken links.
 
 ### Major releases
 Every notable release of the Repository Scanner tool, the changes that come with the release, and the release date are listed below. The full list of all releases can be found on the [Releases](https://github.com/abnamro/repository-scanner/releases) page:
