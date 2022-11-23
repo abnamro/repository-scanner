@@ -51,9 +51,6 @@ Throughout the process of open sourcing this project, the ABN AMRO Bank created 
 capabilities of the Repository Scanner (RESC) tool, the architectural decisions behind it, and the road to open sourcing 
 RESC. With the articles, users can look "behind the scenes" and gain a deeper understanding of the tool. 
 
---ToDo: Add links to the blog(s) where the product is better described so the viewers can read that and get a better
-idea of the product. Also think of other links that could prove useful and add them here.
-
 ## ⚙️ Versions <a name = "versions"></a>
 The [SemVer](https://semver.org/) numbering is used for the releases of the Repository Scanner tool. A version
 consists of a MAJOR.MINOR.PATCH number (e.g. v1.2.4): 
@@ -94,7 +91,7 @@ components of RESC.
 * [![RabbitMQ][RabbitMQ.com]][RabbitMQ-url]
 
 ### VCS Scanner Worker flow diagram
-The flow diagram below shows the different stages that a VCS Scanner Worker goes through and the choises it is confronted with to
+The flow diagram below shows the different stages that a VCS Scanner Worker goes through and the choices it is confronted with to
 come to the desired result. It first picks up a branch from the queue where it is decided, in conjuction with user input, what type of scan to run. 
 If it is a base scan, a full scan of all commits will be carried out to look for secrets. Possible findings are stored inside the database along with the last scanned commit hash of the branch. An incremental scan, where the branch was scanned earlier, only looks at the commits that were made after the last scanned commit hash. The process of finding secrets and storing them in the database is similar as previously described. 
 
