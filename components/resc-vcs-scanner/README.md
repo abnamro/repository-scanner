@@ -1,19 +1,19 @@
 # Repository Scanner Version Control System Scanner (RESC-VCS-SCANNER)
 <!-- TABLE OF CONTENTS -->
-## Table of Contents
-1. [About The Component](#about-the-component)
-2. [Getting Started](#getting-started)
+## Table of contents
+1. [About the component](#about-the-component)
+2. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Run locally from source](#run-locally-from-source)
     - [Run locally using docker](#run-locally-using-docker)
 3. [Testing](#testing)
 
 <!-- ABOUT THE COMPONENT -->
-## About The Component
+## About the component
 The RESC-VCS-Scanner component uses the Gitleaks binary file to scan the source code for secrets.
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -39,27 +39,27 @@ These instructions will get you a copy of the project up and running on your loc
   sed -i '1s/^/version = "0.0.1"\n/' /tmp/temp_resc_rule.toml
   ```
 
-  Clone the repository, open git bash terminal from /components/resc-vcs-scanner folder and run below commands.  
+  Clone the repository, open the git bash terminal from /components/resc-vcs-scanner folder, and run below commands.  
 
-  #### (1) Create virtual environment:
+  #### 1. Create virtual environment:
   ```bash
   cd components/resc-vcs-scanner
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
   ```
- #### (2) Install resc_vcs_scanner package:
+ #### 2. Install resc_vcs_scanner package:
   ```bash
   pip install -e .
   ```
- #### (3) Set below environment variables:
+ #### 3. Set below environment variables:
 
  ```bash
   export RESC_RABBITMQ_SERVICE_HOST=127.0.0.1   #  The hostname/IP address of the rabbitmq server
   export RESC_RABBITMQ_SERVICE_PORT_AMQP=30902  #  The amqp port of the rabbitmq server
   export RABBITMQ_DEFAULT_VHOST=resc-rabbitmq   #  The virtual host name of the rabbitmq server
   export RABBITMQ_USERNAME=queue_user    #  The username used to connect to the rabbitmq projects and repositories topics
-  export RABBITMQ_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics, can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
+  export RABBITMQ_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
   export RABBITMQ_QUEUE=repositories # The name of the queue from which secret scanner will read repositories
   export RESC_API_NO_AUTH_SERVICE_HOST=127.0.0.1 #  The hostname/IP address where RESC web service is running
   export RESC_API_NO_AUTH_SERVICE_PORT=30900  #  The port number where RESC web service is running
@@ -72,7 +72,8 @@ These instructions will get you a copy of the project up and running on your loc
  You need to replace with correct values for RABBITMQ_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME, GITHUB_PUBLIC_TOKEN and GITLEAKS_PATH.  
 
  #### Structure of vcs instances config json
-The vcs_instances_config.json file must have the following format: You can add multiple vcs instances though.
+The vcs_instances_config.json file must have the following format: 
+_**Note:**_ You can add multiple vcs instances.
 
 <details>
   <summary>Preview</summary>
@@ -99,7 +100,7 @@ Example:
   https://github.com/kubernetes  
   https://github.com/docker
   
-  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
+  Then you need to add those accounts to scope like: ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 
 The **output** messages of `collect_projects` command has the following format:
@@ -112,10 +113,10 @@ The **output** messages of `collect_projects` command has the following format:
 ```
 </details>
 
- #### (4) Run the secret scan task:  
+ #### 4. Run the secret scan task:  
   This task reads the repositories from a RabbitMQ channel called 'repositories', runs scan using [Gitleaks](https://github.com/zricethezav/gitleaks) and saves the findings metadata to database. 
 
-  This can be done via the command  
+  This can be done via the following command:  
   ```bash
   celery  -A  vcs_scanner.secret_scanners.celery_worker worker --loglevel=INFO -E -Q repositories --concurrency=1  --prefetch-multiplier=1
 ```
@@ -150,18 +151,18 @@ To create vcs_instances_config.json file please refer: [Structure of vcs_instanc
   <summary>Preview</summary>
 
   It is also possible to run the component as a CLI tool to scan VCS repositories.
-  #### (1) Create virtual environment:
+  #### 1. Create virtual environment:
   ```bash
   cd components/resc-vcs-scanner
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
   ```
- #### (2) Install resc_vcs_scanner package:
+ #### 2. Install resc_vcs_scanner package:
   ```bash
   pip install -e .
   ```
- #### (3) Run CLI scanner:
+ #### 3. Run CLI scanner:
   ```bash
   secret_scanner --help
   ```
@@ -171,11 +172,10 @@ To create vcs_instances_config.json file please refer: [Structure of vcs_instanc
   ```
 </details>
 
-## Testing
-In order to run (unit/linting) tests locally, there are several command specified below on how to run these tests.
-To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
+## Testing 
+Run below commands to make sure that the unit tests are running and that the code matches quality standards:
 
-To make sure the unit tests are running and that the code matches quality standards run:
+_**Note:**_ To run these tests you need to install [tox](https://pypi.org/project/tox/). This can be done on Linux and Windows with Git Bash.
 ```bash
 pip install tox      # install tox locally
 
