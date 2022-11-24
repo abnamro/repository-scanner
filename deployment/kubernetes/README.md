@@ -26,18 +26,18 @@ This component contains templates and charts for deploying the Repository Scanne
 <!-- GETTING STARTED -->
 ## Getting started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 #### 1. Install Software
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Kubernetes](https://docs.docker.com/desktop/kubernetes/) - To onstall Kubernetes, enable it in Docker Desktop. If you install Kubernetes using minikube, ensure the version is 1.21 or later.
+* [Kubernetes](https://docs.docker.com/desktop/kubernetes/) - To install Kubernetes, enable it in Docker Desktop. If you install Kubernetes using minikube, ensure the version is 1.21 or later.
 * [Helm](https://helm.sh/docs/intro/install/)
 
 #### 2. Populate RESC-RULE.toml file
 RESC uses rules from [Gitleaks](https://github.com/zricethezav/gitleaks) to detect secrets.
 Ensure you have the rule pack config file in TOML format available, which needs to be provided as deployment argument.
-To download this GitLeaks rule you need to execute the following command in a Git Bash or Linux terminal.
+To download this GitLeaks rule you need to execute the following command in a Git Bash or Linux terminal:
 
 ```
 cd ./deployment/kubernetes/
@@ -87,14 +87,14 @@ resc-rabbitmq:
 You need to provide at least one vcs instance detail to start scanning.
 Below is an example for how to scan repositories from GitHub.
 * scope: List of GitHub accounts you want to scan.
-  For example, lets'say you want to scan all the repositories for the following github accounts.
+  For example, lets'say you want to scan all the repositories for the following GitHub accounts.
   https://github.com/kubernetes  
   https://github.com/docker
   
   Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
-* usernameValue: Provide your github username
-* tokenValue: Provide your github personal access token
+* usernameValue: Provide your GitHub username.
+* tokenValue: Provide your GitHub personal access token.
 
 
 
@@ -117,7 +117,7 @@ resc-vcs-instances:
 ```
 
 ## Testing templates
-In order to run (unit/linting) tests locally, naviagate to deployment/kubernetes folder.:
+In order to run (unit/linting) tests locally, naviagate to deployment/kubernetes folder:
 ```
 cd ./deployment/kubernetes/
 ```
@@ -144,7 +144,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   cd ./deployment/kubernetes/
   ```
 
-* Deploy the helm charts  
+* Deploy the helm charts.  
   ```
   helm install --namespace resc resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
@@ -154,24 +154,24 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   kubectl config set-context --current --namespace=resc
   ```
 
-* Wait for two minutes, then run below commands to verify the installation
+* Wait for two minutes, then run below commands to verify the installation.
   ```
   helm list -n resc
   kubectl get pods -n resc
   ```
   ![deployment-status-screenshot!](images/deployment-status.png)
-* To upgrade the deployment run 
+* To upgrade the deployment run. 
   ```
   helm upgrade --namespace resc resc . -f ./helm-context/example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
-* To uninstall or delete the deployment run
+* To uninstall or delete the deployment run.
   ```
   helm uninstall resc --namespace resc
   ```
 
 ## Additional information
 ### Trigger scanning
-By default RESC will start to scan based on the cron expression mentioned in example-values.yaml file which is `0 6 * * 6` at 06:00 on Saturday.
+By default RESC will start to scan according to the cron expression mentioned in example-values.yaml file which is `0 6 * * 6` at 06:00 on Saturday.
 You can adjust it or you can run below command after helm deployment to start the scan immediately.
 ```
 kubectl create job --from=cronjob/resc-vcs-scraper-projects resc-vcs-scraper-projects -n resc
