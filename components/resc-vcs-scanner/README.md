@@ -30,7 +30,7 @@ These instructions will get you a copy of the project up and running on your loc
   * RabbitMQ and RESC web service must be up and running locally.</br>
   If you have already deployed RESC through helm in Kubernetes, then rabbitmq and resc webservice are already running for you.</br> 
   * Install Gitleaks [v8.8.8](https://github.com/zricethezav/gitleaks/releases/tag/v8.8.8) on your system.
-  * Download the rule config toml file to `/tmp/temp_resc_rule.toml` location by running below command from a git bash terminal.
+  * Download the rule config toml file to `/tmp/temp_resc_rule.toml` location by running below command from a Git Bash terminal.
   * Send some repositories to 'repositories' topics of RabbitMQ server by referring the README of RESC-VCS-SCRAPER component.
 
   ```bash
@@ -39,7 +39,7 @@ These instructions will get you a copy of the project up and running on your loc
   sed -i '1s/^/version = "0.0.1"\n/' /tmp/temp_resc_rule.toml
   ```
 
-  Clone the repository, open the git bash terminal from /components/resc-vcs-scanner folder, and run below commands.  
+  Clone the repository, open the Git Bash terminal from /components/resc-vcs-scanner folder, and run below commands.  
 
   #### 1. Create virtual environment:
   ```bash
@@ -95,8 +95,8 @@ Example:
   }
 }
 ```
-* scope: List of github accounts you want to scan.
-  For example, lets'say you want to scan all the repositories for the following github accounts.
+* scope: List of GitHub accounts you want to scan.
+  For example, lets'say you want to scan all the repositories for the following GitHub accounts.
   https://github.com/kubernetes  
   https://github.com/docker
   
