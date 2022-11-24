@@ -20,7 +20,7 @@ The project collector collects all projects and sends them to the project queue.
 <!-- GETTING STARTED -->
 ## Getting started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)
@@ -96,7 +96,7 @@ Example:
   https://github.com/kubernetes  
   https://github.com/docker
   
-  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
+  Then you need to add to the scope the following accounts like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 
 The **output** messages of `collect_projects` command has the following format:
@@ -118,17 +118,17 @@ The **output** messages of `collect_projects` command has the following format:
    ```
 </details>
 
-### Run locally using docker
+### Run locally using Docker
 <details>
   <summary>Preview</summary>
-Run the RESC VCS Scraper docker image locally by running the following commands:
+Run the RESC VCS Scraper Docker image locally by running the following commands:
 
-- Pull the docker image from registry: 
+- Pull the Docker image from registry: 
 ```bash
 docker pull rescabnamro/resc-vcs-scraper:0.0.1
 ```
 
-- Alternatively, build the docker image locally by running: 
+- Alternatively, build the Docker image locally by running: 
 ```bash
 docker build -t rescabnamro/resc-vcs-scraper:0.0.1 .
 ```
