@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List
 
 # Third Party
-from sqlalchemy import extract, func
+from sqlalchemy import and_, extract, func
 from sqlalchemy.orm import Session
 
 # First Party
@@ -191,6 +191,20 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                       model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
                 .join(model.DBVcsInstance,
                       model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+        elif findings_filter.rule_tags:
+            max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
+                                                    func.max(model.DBscanFinding.scan_id).label("scan_id"))
+            max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
+            total_count_query = total_count_query.join(max_scan_subquery,
+                                                       model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id)\
+                .join(model.DBscan, model.scan.DBscan.id_ == max_scan_subquery.c.scan_id)
+
+        if findings_filter.rule_tags:
+            total_count_query = total_count_query.join(model.DBrule,
+                                                       and_(model.DBrule.rule_name == model.DBfinding.rule_name,
+                                                            model.DBrule.rule_pack == model.DBscan.rule_pack))
+            for tag in findings_filter.rule_tags:
+                total_count_query = total_count_query.filter(model.DBrule.tags.like(f"%{tag}%"))
 
         if findings_filter.start_date_time:
             total_count_query = total_count_query.filter(

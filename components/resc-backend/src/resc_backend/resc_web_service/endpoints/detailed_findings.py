@@ -46,6 +46,8 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
 
             rule_names of type [String]
 
+            rule_tags of type [String]
+
             project_name of type String
 
             repository_names of type [String]
@@ -88,6 +90,9 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
     if parsed_query_string_params.get('rule_names'):
         parsed_query_string_params['rule_names'] = json.loads(parsed_query_string_params['rule_names']
                                                               .replace('\'', '"'))
+    if parsed_query_string_params.get('rule_tags'):
+        parsed_query_string_params['rule_tags'] = json.loads(parsed_query_string_params['rule_tags']
+                                                             .replace('\'', '"'))
     findings_filter = FindingsFilter(**parsed_query_string_params)
 
     findings = detailed_finding_crud.get_detailed_findings(
