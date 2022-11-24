@@ -46,8 +46,6 @@ npm run serve
 ```
 Now access the application using this url: http://localhost:8080/  
 
-***Note:***  Replace the actual values in the placeholders <branch-name> and <repository-scanner repo url>
-
 ### Run using docker
 
 Build the RESC Frontend docker image locally by running the following commands.
