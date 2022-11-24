@@ -2,8 +2,8 @@
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
-1. [About The Component](#about-the-component)
-2. [Getting Started](#getting-started)
+1. [About the component](#about-the-component)
+2. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Run locally from source](#run-locally-from-source)
     - [Run locally using docker](#run-locally-using-docker)
@@ -11,14 +11,14 @@
 
 
 <!-- ABOUT THE COMPONENT -->
-## About The Component
-The RESC-VCS-SCRAPER component collects all projects and repositories from multiple VCS providers. The supported VCS providers are Bitbucket, Azure Repos and GitHub.
+## About the component
+The RESC-VCS-Scraper component collects all projects and repositories from multiple VCS providers. The supported VCS providers are Bitbucket, Azure Repos, and GitHub.
 
-This component includes two main modules such as project collector and repository collector.
-The project collector collects all projects and sends to projects queue. The repository collector collects projects from projects queue, fetches its corresponding repositories and send those to repositories queue.
+This component includes two main modules, the project collector and the repository collector.
+The project collector collects all projects and sends them to the project queue. The repository collector collects projects from the projects queue, fetches its corresponding repositories, and sends them to the repository queue.
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -32,20 +32,20 @@ These instructions will get you a copy of the project up and running on your loc
   <summary>Preview</summary>
   Prerequisites: RabbitMQ must be up and running locally.</br>
   If you have already deployed RESC through helm in Kubernetes, then rabbitmq is already running for you.</br> 
-  Clone the repository, open git bash terminal from /components/resc-vcs-scraper folder and run below commands.  
+  Clone the repository, open the Git Bash terminal from /components/resc-vcs-scraper folder, and run below commands.  
 
-  #### (1) Create virtual environment:
+  #### 1. Create virtual environment:
   ```bash
   cd components/resc-vcs-scraper
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
   ```
- #### (2) Install resc_vcs_scraper package:
+ #### 2. Install resc_vcs_scraper package:
   ```bash
   pip install -e .
   ```
- #### (3) Set below environment variables:
+ #### 3. Set below environment variables:
 
  ```bash
   export RESC_RABBITMQ_SERVICE_HOST=127.0.0.1   #  The hostname/IP address of the rabbitmq server
@@ -54,13 +54,13 @@ These instructions will get you a copy of the project up and running on your loc
   export RABBITMQ_QUEUES_USERNAME=queue_user    #  The username used to connect to the rabbitmq projects and repositories topics
   export RABBITMQ_QUEUES_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics, can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
   export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances_config.json file containing the vcs instances definitions
-  export GITHUB_PUBLIC_USERNAME="" # Your github username
-  export GITHUB_PUBLIC_TOKEN="" #  Your github personal access token
+  export GITHUB_PUBLIC_USERNAME="" # Your GitHub username
+  export GITHUB_PUBLIC_TOKEN="" #  Your GitHub personal access token
  ```
  
  You need to replace with correct values for RABBITMQ_QUEUES_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME and GITHUB_PUBLIC_TOKEN.  
 
- #### (4) Run the `collect_projects` task:  
+ #### 4. Run the `collect_projects` task:  
   `collect_projects` task collects all projects from a given Version Control System Instance, then writes the found projects to a RabbitMQ channel called 'projects'. 
 
   This can be done via the command  
@@ -69,8 +69,8 @@ These instructions will get you a copy of the project up and running on your loc
 ```
 
 #### Structure of vcs instances config json
-The vcs_instances_config.json file must have the following format: You can add multiple vcs instances though.
-
+The vcs_instances_config.json file must have the following format. 
+_**Note:**_ You can add multiple vcs instances.
 <details>
   <summary>Preview</summary>
 
@@ -91,7 +91,7 @@ Example:
   }
 }
 ```
-* scope: List of github accounts you want to scan.
+* scope: List of GitHub accounts you want to scan.
   For example, lets'say you want to scan all the repositories for the following github accounts.
   https://github.com/kubernetes  
   https://github.com/docker
@@ -109,8 +109,8 @@ The **output** messages of `collect_projects` command has the following format:
 ```
 </details>
 
- #### (4) Run collect all repositories task:  
-  This task collects all repositories from a single VCS project, then writes the found repositories to a RabbitMQ channel called 'repositories'.
+ #### 5. Run collect all repositories task:  
+ This task collects all repositories from a single VCS project, then writes the found repositories to a RabbitMQ channel called 'repositories'.
 
   This can be done via the command:
    ```bash
@@ -138,16 +138,15 @@ docker build -t rescabnamro/resc-vcs-scraper:0.0.1 .
 docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_AMQP_PORT=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_QUEUES_USERNAME=queue_user -e RABBITMQ_QUEUES_PASSWORD="<the password of queue_user>" -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" --name resc-vcs-scraper rescabnamro/resc-vcs-scraper:0.0.1 collect_projects  
 ```
 
-To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
+To create vcs_instances_config.json file, refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
 </details>
 
 ## Testing
 [(Back to top)](#table-of-contents)
 
-In order to run (unit/linting) tests locally, there are several command specified below on how to run these tests.
-To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
+Run below commands to make sure that the unit tests are running and that the code matches quality standards:
 
-To make sure the unit tests are running and that the code matches quality standards run:
+_**Note:**_ To run these tests you need to install [tox](https://pypi.org/project/tox/). This can be done on Linux and Windows with Git Bash.
 ```bash
 pip install tox      # install tox locally
 
