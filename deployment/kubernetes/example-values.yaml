@@ -114,17 +114,17 @@ resc-vcs-instances:
   vcsInstances:
     ### Github ###
     - name: "GITHUB_PUBLIC"
-      scope: [] # Enter comma separated list of github accounts to scan
+      scope: ["kubernetes", "docker"] # Enter comma separated list of github accounts to scan, For example: ["kubernetes", "docker"] for https://github.com/kubernetes and https://github.com/docker
       exceptions: [] # Enter comma separated list of github accounts to exclude from scan
       providerType: "GITHUB_PUBLIC"
       hostname: "github.com"
       port: "443"
       scheme: "https"
       username: "GITHUB_PUBLIC_USERNAME"
-      usernameValue: "<enter github username here>"
+      usernameValue: "<enter your github username here>"
       organization: ""
       token: "GITHUB_PUBLIC_TOKEN"
-      tokenValue: "<enter github personal access token here>"
+      tokenValue: "<enter your github personal access token here>"
 
     ### AzureDevOps ###
     # - name: "AzureDevOps"

@@ -3,7 +3,7 @@
 from typing import List
 
 # Third Party
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
 # First Party
@@ -69,8 +69,13 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         .join(model.DBrepository,
               model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id)\
         .join(model.DBVcsInstance,
-              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
-        .order_by(model.finding.DBfinding.id_)
+              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+
+    if findings_filter.rule_tags:
+        query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
+                                              model.DBrule.rule_pack == model.DBscan.rule_pack))
+        for tag in findings_filter.rule_tags:
+            query = query.filter(model.DBrule.tags.like(f"%{tag}%"))
 
     if findings_filter.start_date_time:
         query = query.filter(model.scan.DBscan.timestamp >= findings_filter.start_date_time)
@@ -95,6 +100,8 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         query = query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
     if findings_filter.finding_statuses:
         query = query.filter(model.finding.DBfinding.status.in_(findings_filter.finding_statuses))
+
+    query = query.order_by(model.finding.DBfinding.id_)
     findings: List[detailed_finding_schema.DetailedFindingRead] = query.offset(skip).limit(limit_val).all()
 
     return findings
