@@ -22,7 +22,7 @@ The RESC-BACKEND component includes Database models, RESC Web service, Alembic s
 <!-- GETTING STARTED -->
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)
@@ -70,7 +70,7 @@ These instructions will get you a copy of the project up and running on your loc
 </details>
 
 #### Run RESC Web service locally through make
-*Note:* This has ben only tested in Linux and Mac. This may not work in Apple M1 chip due to lack of support from MSSQL docker image.  
+*Note:* This procedure has ben only tested in Linux and Mac. It may not work in Apple M1 chip due to lack of support from MSSQL docker image.  
 
 Prerequisites: 
 1. Install make on your system.  
@@ -179,7 +179,7 @@ revision = 'e653f899efgh'
 down_revision = 'd330d086edfe'
 ```
 
-The generated script contains two functions: The upgrade() function that contain the revision changes, and the
+The generated script contains two functions: The upgrade() function that contains the revision changes, and the
 downgrade() function that revert these changes.
 </details>
 &nbsp
