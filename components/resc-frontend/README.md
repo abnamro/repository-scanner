@@ -13,7 +13,7 @@
 
 <!-- ABOUT THE COMPONENT -->
 ## About the component
-Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and BootstrapVue framework. It includes screens such as Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
+Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and BootstrapVue framework. It includes such screens as Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
 
 <!-- TECHNOLOGY STACK -->
 ## Technology stack
@@ -24,7 +24,7 @@ Repository Scanner (RESC) Frontend is a fully responsive dashboard application d
 <!-- GETTING STARTED -->
 ## Getting started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - Install [Node.js](https://nodejs.org/en/) v16.13.0
