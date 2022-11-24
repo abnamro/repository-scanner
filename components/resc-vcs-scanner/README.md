@@ -145,7 +145,7 @@ docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_
 To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
 </details>
 
-### Run locally as a CLI tool (Still in Development) 
+### Run locally as a CLI tool (Still in development) 
 
 <details>
   <summary>Preview</summary>
