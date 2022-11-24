@@ -15,7 +15,7 @@ The RESC-VCS-Scanner component uses the Gitleaks binary file to scan the source 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)
@@ -41,18 +41,18 @@ These instructions will get you a copy of the project up and running on your loc
 
   Clone the repository, open git bash terminal from /components/resc-vcs-scanner folder and run below commands.  
 
-  #### (1) Create virtual environment:
+  #### 1. Create virtual environment:
   ```bash
   cd components/resc-vcs-scanner
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
   ```
- #### (2) Install resc_vcs_scanner package:
+ #### 2. Install resc_vcs_scanner package:
   ```bash
   pip install -e .
   ```
- #### (3) Set below environment variables:
+ #### 3. Set below environment variables:
 
  ```bash
   export RESC_RABBITMQ_SERVICE_HOST=127.0.0.1   #  The hostname/IP address of the rabbitmq server
@@ -112,7 +112,7 @@ The **output** messages of `collect_projects` command has the following format:
 ```
 </details>
 
- #### (4) Run the secret scan task:  
+ #### 4. Run the secret scan task:  
   This task reads the repositories from a RabbitMQ channel called 'repositories', runs scan using [Gitleaks](https://github.com/zricethezav/gitleaks) and saves the findings metadata to database. 
 
   This can be done via the command  
@@ -150,18 +150,18 @@ To create vcs_instances_config.json file please refer: [Structure of vcs_instanc
   <summary>Preview</summary>
 
   It is also possible to run the component as a CLI tool to scan VCS repositories.
-  #### (1) Create virtual environment:
+  #### 1. Create virtual environment:
   ```bash
   cd components/resc-vcs-scanner
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
   ```
- #### (2) Install resc_vcs_scanner package:
+ #### 2. Install resc_vcs_scanner package:
   ```bash
   pip install -e .
   ```
- #### (3) Run CLI scanner:
+ #### 3. Run CLI scanner:
   ```bash
   secret_scanner --help
   ```
