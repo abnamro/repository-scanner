@@ -54,8 +54,8 @@ capabilities of the Repository Scanner (RESC) tool, the architectural decisions 
 project like the Repository Scanner. The articles can be very useful for users of the RESC tool to get a better 
 understanding of the tool and get a real look "behind the scenes".
 
---ToDo: Add links to the blog(s) where the product is better described so the viewers can read that and get a better
-idea of the product. Also think of other links that could prove useful and add them here.
+<!--- ToDo: Add links to the blog(s) where the product is better described so the viewers can read that and get a better
+idea of the product. Also think of other links that could prove useful and add them here. --->
 
 ## ⚙️ Versions <a name = "versions"></a>
 The [SemVer](https://semver.org/) numbering is used for the releases of the Repository Scanner tool. In which a version
