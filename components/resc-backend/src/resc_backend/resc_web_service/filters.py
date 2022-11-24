@@ -17,6 +17,7 @@ class FindingsFilter:
     vcs_providers: List[VCSProviders] = None
     finding_statuses: List[FindingStatus] = None
     rule_names: List[str] = None
+    rule_tags: List[str] = None
     project_name: str = None
     repository_name: str = None
     branch_name: str = None

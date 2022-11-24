@@ -1,19 +1,19 @@
 # Repository Scanner Version Control System Scanner (RESC-VCS-SCANNER)
 <!-- TABLE OF CONTENTS -->
-## Table of Contents
-1. [About The Component](#about-the-component)
-2. [Getting Started](#getting-started)
+## Table of contents
+1. [About the component](#about-the-component)
+2. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Run locally from source](#run-locally-from-source)
     - [Run locally using docker](#run-locally-using-docker)
 3. [Testing](#testing)
 
 <!-- ABOUT THE COMPONENT -->
-## About The Component
+## About the component
 The RESC-VCS-Scanner component uses the Gitleaks binary file to scan the source code for secrets.
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting started
 
 These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -30,7 +30,7 @@ These instructions will help you to get a copy of the project up and running on 
   * RabbitMQ and RESC web service must be up and running locally.</br>
   If you have already deployed RESC through helm in Kubernetes, then rabbitmq and resc webservice are already running for you.</br> 
   * Install Gitleaks [v8.8.8](https://github.com/zricethezav/gitleaks/releases/tag/v8.8.8) on your system.
-  * Download the rule config toml file to `/tmp/temp_resc_rule.toml` location by running below command from a git bash terminal.
+  * Download the rule config toml file to `/tmp/temp_resc_rule.toml` location by running below command from a Git Bash terminal.
   * Send some repositories to 'repositories' topics of RabbitMQ server by referring the README of RESC-VCS-SCRAPER component.
 
   ```bash
@@ -39,7 +39,7 @@ These instructions will help you to get a copy of the project up and running on 
   sed -i '1s/^/version = "0.0.1"\n/' /tmp/temp_resc_rule.toml
   ```
 
-  Clone the repository, open git bash terminal from /components/resc-vcs-scanner folder and run below commands.  
+  Clone the repository, open the Git Bash terminal from /components/resc-vcs-scanner folder, and run below commands.  
 
   #### 1. Create virtual environment:
   ```bash
@@ -59,20 +59,21 @@ These instructions will help you to get a copy of the project up and running on 
   export RESC_RABBITMQ_SERVICE_PORT_AMQP=30902  #  The amqp port of the rabbitmq server
   export RABBITMQ_DEFAULT_VHOST=resc-rabbitmq   #  The virtual host name of the rabbitmq server
   export RABBITMQ_USERNAME=queue_user    #  The username used to connect to the rabbitmq projects and repositories topics
-  export RABBITMQ_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics, can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
+  export RABBITMQ_PASSWORD="" # The password used to connect to the rabbitmq projects and repositories topics can be found for the value of queues_password field in /deployment/kubernetes/example-values.yaml file
   export RABBITMQ_QUEUE=repositories # The name of the queue from which secret scanner will read repositories
   export RESC_API_NO_AUTH_SERVICE_HOST=127.0.0.1 #  The hostname/IP address where RESC web service is running
   export RESC_API_NO_AUTH_SERVICE_PORT=30900  #  The port number where RESC web service is running
   export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances_config.json file containing the vcs instances definitions
-  export GITHUB_PUBLIC_USERNAME="" # Your github username
-  export GITHUB_PUBLIC_TOKEN="" #  Your github personal access token
+  export GITHUB_PUBLIC_USERNAME="" # Your GitHub username
+  export GITHUB_PUBLIC_TOKEN="" #  Your GitHub personal access token
   export GITLEAKS_PATH="" # The absolute path to gitleaks binary executable
  ```
  
  You need to replace with correct values for RABBITMQ_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME, GITHUB_PUBLIC_TOKEN and GITLEAKS_PATH.  
 
  #### Structure of vcs instances config json
-The vcs_instances_config.json file must have the following format: You can add multiple vcs instances though.
+The vcs_instances_config.json file must have the following format: 
+_**Note:**_ You can add multiple vcs instances.
 
 <details>
   <summary>Preview</summary>
@@ -94,12 +95,12 @@ Example:
   }
 }
 ```
-* scope: List of github accounts you want to scan.
-  For example, lets'say you want to scan all the repositories for the following github accounts.
+* scope: List of GitHub accounts you want to scan.
+  For example, lets'say you want to scan all the repositories for the following GitHub accounts.
   https://github.com/kubernetes  
   https://github.com/docker
   
-  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
+  Then you need to add those accounts to scope like: ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 
 The **output** messages of `collect_projects` command has the following format:
@@ -115,7 +116,7 @@ The **output** messages of `collect_projects` command has the following format:
  #### 4. Run the secret scan task:  
   This task reads the repositories from a RabbitMQ channel called 'repositories', runs scan using [Gitleaks](https://github.com/zricethezav/gitleaks) and saves the findings metadata to database. 
 
-  This can be done via the command  
+  This can be done via the following command:  
   ```bash
   celery  -A  vcs_scanner.secret_scanners.celery_worker worker --loglevel=INFO -E -Q repositories --concurrency=1  --prefetch-multiplier=1
 ```
@@ -144,7 +145,7 @@ docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_
 To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
 </details>
 
-### Run locally as a CLI tool (Still in Development) 
+### Run locally as a CLI tool (Still in development) 
 
 <details>
   <summary>Preview</summary>
@@ -171,11 +172,10 @@ To create vcs_instances_config.json file please refer: [Structure of vcs_instanc
   ```
 </details>
 
-## Testing
-In order to run (unit/linting) tests locally, there are several command specified below on how to run these tests.
-To run these tests you need to install tox this can be done on Linux and Windows, where or the latter you can use GIT Bash.
+## Testing 
+Run below commands to make sure that the unit tests are running and that the code matches quality standards:
 
-To make sure the unit tests are running and that the code matches quality standards run:
+_**Note:**_ To run these tests you need to install [tox](https://pypi.org/project/tox/). This can be done on Linux and Windows with Git Bash.
 ```bash
 pip install tox      # install tox locally
 
