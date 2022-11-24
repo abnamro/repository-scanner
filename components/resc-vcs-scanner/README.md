@@ -64,8 +64,8 @@ These instructions will get you a copy of the project up and running on your loc
   export RESC_API_NO_AUTH_SERVICE_HOST=127.0.0.1 #  The hostname/IP address where RESC web service is running
   export RESC_API_NO_AUTH_SERVICE_PORT=30900  #  The port number where RESC web service is running
   export VCS_INSTANCES_FILE_PATH="" # The absolute path to vcs_instances_config.json file containing the vcs instances definitions
-  export GITHUB_PUBLIC_USERNAME="" # Your github username
-  export GITHUB_PUBLIC_TOKEN="" #  Your github personal access token
+  export GITHUB_PUBLIC_USERNAME="" # Your GitHub username
+  export GITHUB_PUBLIC_TOKEN="" #  Your GitHub personal access token
   export GITLEAKS_PATH="" # The absolute path to gitleaks binary executable
  ```
  
