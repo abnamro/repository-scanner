@@ -47,9 +47,11 @@ instances of exposed sensitive information in the source code.
 * [Acknowledgments](#acknowledgement)
 
 ## 🔗 Links <a name = "links"></a>
+
 Throughout the process of open sourcing this project, the ABN AMRO Bank created a series of articles that describe the
 capabilities of the Repository Scanner (RESC) tool, the architectural decisions behind it, and the road to open sourcing 
 RESC. With the articles, users can look "behind the scenes" and gain a deeper understanding of the tool. 
+
 
 ## ⚙️ Versions <a name = "versions"></a>
 The [SemVer](https://semver.org/) numbering is used for the releases of the Repository Scanner tool. A version

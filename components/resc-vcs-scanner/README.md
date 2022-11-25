@@ -15,7 +15,7 @@ The RESC-VCS-Scanner component uses the Gitleaks binary file to scan the source 
 <!-- GETTING STARTED -->
 ## Getting started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)

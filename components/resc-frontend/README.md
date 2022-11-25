@@ -13,7 +13,7 @@
 
 <!-- ABOUT THE COMPONENT -->
 ## About the component
-Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and, BootstrapVue framework. It includes screens such as Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
+Repository Scanner (RESC) Frontend is a fully responsive dashboard application developed using Vue.js 2 and BootstrapVue framework. It includes such screens as Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
 
 <!-- TECHNOLOGY STACK -->
 ## Technology stack
@@ -24,18 +24,18 @@ Repository Scanner (RESC) Frontend is a fully responsive dashboard application d
 <!-- GETTING STARTED -->
 ## Getting started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 - Install [Node.js](https://nodejs.org/en/) v16.13.0
 - Install Vue cli using command: `npm install -g @vue/cli`  
 - Install Vetur, ESLint and Prettier extensions to your VSCode IDE. 
 - Install [Docker](https://www.docker.com/)
-- Ensure RESC webservice is up and running in order to visualize data. This API is running at at http://localhost:30800/.  
+- Ensure RESC webservice is up and running in order to visualize data. This API is running at http://localhost:30800/.  
 
 ### Run locally
 
-Clone the repository and refer the following steps to run the project locally.
+1. Clone the repository and refer the following steps to run the project locally.
 ```bash
 
 cd components/resc-frontend
@@ -44,11 +44,13 @@ npm install
 
 npm run serve
 ```
-Now access the application using this url: http://localhost:8080/  
+2. Access the application using this url: http://localhost:8080/  
 
-### Run using docker
+***Note:***  Replace the actual values in the placeholders <branch-name> and <repository-scanner repo url>
 
-Build the RESC Frontend docker image locally by running the following commands.
+### Run using Docker
+
+Build the RESC Frontend Docker image locally by running the following commands.
 
 - Pull the docker image from registry: 
 ```bash
@@ -64,7 +66,7 @@ docker build -t rescabnamro/resc-frontend:0.0.1 .
 docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend rescabnamro/resc-frontend:0.0.1
 ```
 
-Now access the application using this url: http://localhost:8080/
+ Access the application using this url: http://localhost:8080/
 
 ### Testing
 [(Back to top)](#table-of-contents)
