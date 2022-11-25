@@ -69,7 +69,7 @@ These instructions will help you to get a copy of the project up and running on 
   export GITLEAKS_PATH="" # The absolute path to gitleaks binary executable
  ```
  
- You need to replace with correct values for RABBITMQ_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME, GITHUB_PUBLIC_TOKEN and GITLEAKS_PATH.  
+ You need to replace the following values with your custom values: RABBITMQ_PASSWORD, VCS_INSTANCES_FILE_PATH, GITHUB_PUBLIC_USERNAME, GITHUB_PUBLIC_TOKEN and GITLEAKS_PATH.  
 
  #### Structure of vcs instances config json
 The vcs_instances_config.json file must have the following format: 
@@ -142,7 +142,7 @@ docker build -t rescabnamro/resc-vcs-scanner:0.0.1 .
 docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_PORT_AMQP=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_USERNAME=queue_user -e RABBITMQ_PASSWORD="<the password of queue_user>" -e RABBITMQ_QUEUE="repositories" -e RESC_API_NO_AUTH_SERVICE_HOST="host.docker.internal" -e RESC_API_NO_AUTH_SERVICE_PORT=30900 -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" -e GITLEAKS_PATH="/vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64" --name resc-vcs-scanner rescabnamro/resc-vcs-scanner:0.0.1 celery  -A vcs_scanner.secret_scanners.celery_worker worker --loglevel=INFO -E -Q repositories --concurrency=1  --prefetch-multiplier=1
 ```
 
-To create vcs_instances_config.json file please refer: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
+To create vcs_instances_config.json file please refer to: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
 </details>
 
 ### Run locally as a CLI tool (Still in development) 
