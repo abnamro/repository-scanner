@@ -23,6 +23,7 @@
         :fields="fields"
         primary-key="rule_name"
         responsive
+        small
         head-variant="light"
         @row-clicked="goToRuleAnalysisPage"
       >

@@ -102,9 +102,27 @@
   cursor: default !important;
 }
 
+.b-table-details {
+  border-left: 2px solid #b3daeb !important;
+  border-right: 2px solid #b3daeb !important;
+  border-bottom: 2px solid #b3daeb !important;
+}
+
+.b-table-details td{
+  padding: 0;
+}
+
+.b-table-has-details{
+  border-top: 2px solid #b3daeb !important;
+  border-left: 2px solid #b3daeb !important;
+  border-right: 2px solid #b3daeb !important;
+  background-color: #e4f9f5;
+}
+
 /* Tabs */
 .card-header {
   background-color: #e4f9f5;
+  display: none;
 }
 .nav-pills .tab-pills .nav-link:not(.active) {
   background-color: transparent !important;
@@ -114,6 +132,10 @@
 .nav-pills .tab-pills .nav-link {
   background-color: #38aba1 !important;
   font-weight: bold;
+}
+.card-text {
+  margin: 10px;
+  font-size: small;
 }
 
 /* Pagination */
