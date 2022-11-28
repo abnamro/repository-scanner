@@ -41,6 +41,7 @@
         primary-key="version"
         v-model="currentItems"
         responsive
+        small
         head-variant="light"
       >
         <!-- Version Column -->

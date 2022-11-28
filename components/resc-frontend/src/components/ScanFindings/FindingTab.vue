@@ -5,6 +5,12 @@
         <!-- Finding info -->
         <div class="col-md-6">
           <b-card-text
+            ><span class="font-weight-bold">Commit ID: </span
+            ><a class="custom-link" v-bind:href="finding.commit_url" target="_blank">{{
+              finding.commit_id
+            }}</a></b-card-text
+          >
+          <b-card-text
             ><span class="font-weight-bold">File Path: </span>{{ finding.file_path }}</b-card-text
           >
           <b-card-text
@@ -18,18 +24,12 @@
             ><span class="font-weight-bold">Email: </span>{{ finding.email }}</b-card-text
           >
           <b-card-text
-            ><span class="font-weight-bold">Commit ID: </span
-            ><a class="custom-link" v-bind:href="finding.commit_url" target="_blank">{{
-              finding.commit_id
-            }}</a></b-card-text
+            ><span class="font-weight-bold">Commit Time: </span
+            >{{ finding.commit_timestamp }}</b-card-text
           >
           <b-card-text
             ><span class="font-weight-bold">Commit Message: </span
-            >{{ finding.commit_message }}</b-card-text
-          >
-          <b-card-text
-            ><span class="font-weight-bold">Commit Time: </span
-            >{{ finding.commit_timestamp }}</b-card-text
+            >{{ finding.commit_message | truncate(50, '...') }}</b-card-text
           >
           <b-card-text
             ><span class="font-weight-bold">Rulepack: </span>{{ finding.rule_pack }}</b-card-text
@@ -43,11 +43,12 @@
               <b-form-group
                 label="Status"
                 label-for="status-select"
-                label-class="mr-sm-2 font-weight-bold"
+                label-class="mr-sm-2 font-weight-bold small"
               >
                 <b-form-select
                   id="status-select"
                   class="mb-2 mr-sm-2 mb-sm-0"
+                  size="sm"
                   v-model="form.status"
                   @change="checkFormValidity"
                 >
@@ -59,7 +60,7 @@
               <b-form-group
                 label="Comment"
                 label-for="comment-textarea"
-                label-class="mr-sm-2 font-weight-bold"
+                label-class="mr-sm-2 font-weight-bold small"
                 invalid-feedback="Maximum 255 characters are allowed"
                 :state="commentState"
               >
@@ -67,6 +68,7 @@
                   id="comment-textarea"
                   v-model="form.comment"
                   placeholder="Enter Comment"
+                  size="sm"
                   rows="3"
                   trim
                   :state="commentState"
@@ -110,6 +112,15 @@ export default {
     repository: {
       type: Object,
       required: true,
+    },
+  },
+  filters: {
+    truncate: function (text, length, suffix) {
+      if (text.length > length) {
+        return text.substring(0, length) + suffix;
+      } else {
+        return text;
+      }
     },
   },
   methods: {

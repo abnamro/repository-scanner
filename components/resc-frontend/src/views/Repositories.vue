@@ -34,6 +34,7 @@
         primary-key="id_"
         v-model="currentItems"
         responsive
+        small
         head-variant="light"
         @row-clicked="toggleRepositoryDetails"
       >
