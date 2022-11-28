@@ -62,7 +62,7 @@ def get_all_findings(skip: int = Query(default=0, ge=0),
 @router.post("",
              response_model=int,
              status_code=status.HTTP_201_CREATED)
-def create_findings(findings: List[finding_schema.FindingCreate], db_connection: Session = Depends(get_db_connection))\
+def create_findings(findings: List[finding_schema.FindingCreate], db_connection: Session = Depends(get_db_connection)) \
         -> int:
     """
           Create new findings
@@ -184,36 +184,6 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
     return PaginationModel[finding_schema.FindingRead](data=findings, total=total_findings, limit=limit, skip=skip)
 
 
-@router.put("/{finding_id}"f"{RWS_ROUTE_AUDIT}",
-            response_model=finding_schema.FindingRead,
-            status_code=status.HTTP_200_OK)
-def audit_finding(
-        finding_id: int,
-        audit: audit_schema.AuditSingle,
-        db_connection: Session = Depends(get_db_connection)
-) -> finding_schema.FindingRead:
-    """
-        Audit single finding, updating the status and comment
-    :param db_connection:
-        Session of the database connection
-    :param finding_id:
-        Name of the rule to filter the findings by
-    :param audit:
-        audit object, containing the status to set and the comment
-    :return: FindingRead
-        The output will contain the findings that was updated
-    """
-    db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
-    db_scan_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
-    scan_ids = [x.scan_id for x in db_scan_findings]
-    if db_finding is None:
-        raise HTTPException(status_code=404, detail="Finding not found")
-    return FindingRead.create_from_db_entities(
-        finding_crud.audit_finding(db_connection=db_connection, db_finding=db_finding,
-                                   status=audit.status, comment=audit.comment),
-        scan_ids=scan_ids)
-
-
 @router.put(f"{RWS_ROUTE_AUDIT}/",
             response_model=List[finding_schema.FindingRead],
             status_code=status.HTTP_200_OK)
@@ -222,7 +192,7 @@ def audit_findings(
         db_connection: Session = Depends(get_db_connection)
 ) -> List[finding_schema.FindingRead]:
     """
-        Audit multiple findings, updating the status and comment
+        Audit single/multiple findings, updating the status and comment
     :param db_connection:
         Session of the database connection
     :param audit:

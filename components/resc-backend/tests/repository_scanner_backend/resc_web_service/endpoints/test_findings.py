@@ -22,7 +22,7 @@ from resc_backend.db.model import DBfinding, DBscanFinding
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 from resc_backend.resc_web_service.filters import FindingsFilter
-from resc_backend.resc_web_service.schema.audit import AuditMultiple, AuditSingle
+from resc_backend.resc_web_service.schema.audit import AuditMultiple
 from resc_backend.resc_web_service.schema.date_filter import DateFilter
 from resc_backend.resc_web_service.schema.finding import (
     Finding,
@@ -55,7 +55,7 @@ class TestFindings(unittest.TestCase):
                                 event_sent_on=datetime.utcnow(),
                                 branch_id=1)
             self.db_findings.append(finding)
-            self.db_findings[i-1].id_ = i
+            self.db_findings[i - 1].id_ = i
             self.db_scan_findings.append(DBscanFinding(
                 scan_id=i,
                 finding_id=i
@@ -155,10 +155,6 @@ class TestFindings(unittest.TestCase):
     @staticmethod
     def create_json_body(finding: DBfinding, scan_findings: List[DBscanFinding]):
         return json.loads(TestFindings.cast_db_finding_to_finding_create(finding, scan_findings).json())
-
-    @staticmethod
-    def create_json_body_single_audit(audit_single: AuditSingle):
-        return json.loads(audit_single.json())
 
     @staticmethod
     def create_json_body_multiple_audit(audit_multiple: AuditMultiple):
@@ -543,41 +539,6 @@ class TestFindings(unittest.TestCase):
         assert data["detail"][0]["loc"] == ["query", "limit"]
         assert data["detail"][0]["msg"] == "ensure this value is greater than or equal to 1"
         get_findings_by_rule.assert_not_called()
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
-    @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
-    def test_audit_finding(self, audit_finding, get_scan_findings, get_finding):
-        finding_id = 1
-        db_finding = self.db_findings[1]
-        db_finding_audit = self.db_findings[2]
-        db_scan_findings = [self.db_scan_findings[2]]
-        get_scan_findings.return_value = db_scan_findings
-        audit_single = AuditSingle(status=FindingStatus.TRUE_POSITIVE, comment="Hello World!")
-        db_finding_audit.status = audit_single.status
-        db_finding_audit.comment = audit_single.comment
-        get_finding.return_value = db_finding
-        audit_finding.return_value = db_finding_audit
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}{RWS_ROUTE_AUDIT}",
-                                   json=self.create_json_body_single_audit(audit_single))
-        assert response.status_code == 200, response.text
-        self.assert_db_finding(response.json(), db_finding_audit, db_scan_findings)
-        get_finding.assert_called_once_with(ANY, finding_id=finding_id)
-        audit_finding.assert_called_once_with(db_connection=ANY, db_finding=db_finding, status=audit_single.status,
-                                              comment=audit_single.comment)
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
-    def test_audit_finding_non_existing(self, audit_finding, get_finding):
-        finding_id = -1
-        audit_single = AuditSingle(status=FindingStatus.TRUE_POSITIVE, comment="Hello World!")
-        get_finding.return_value = None
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}{RWS_ROUTE_AUDIT}",
-                                   json=self.create_json_body_single_audit(audit_single))
-        assert response.status_code == 404, response.text
-        assert response.json()["detail"] == "Finding not found"
-        get_finding.assert_called_once_with(ANY, finding_id=finding_id)
-        audit_finding.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
