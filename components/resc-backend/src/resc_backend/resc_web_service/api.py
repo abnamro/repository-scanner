@@ -26,6 +26,7 @@ from resc_backend.resc_web_service.endpoints import (
     health,
     repositories,
     rules,
+    rule_packs,
     scans,
     vcs_instances
 )
@@ -86,6 +87,7 @@ tags_metadata = [
     {"name": "health", "description": "Checks health for API"},
     {"name": "resc-common", "description": "Manage common information"},
     {"name": "resc-rules", "description": "Manage rule information"},
+    {"name": "resc-rule-packs", "description": "Manage rule pack information"},
     {"name": "resc-repositories", "description": "Manage repository information"},
     {"name": "resc-branches", "description": "Manage branch information"},
     {"name": "resc-scans", "description": "Manage scan information"},
@@ -115,6 +117,7 @@ app.include_router(health.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(common.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(branches.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(rules.router, prefix=RWS_VERSION_PREFIX)
+app.include_router(rule_packs.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)

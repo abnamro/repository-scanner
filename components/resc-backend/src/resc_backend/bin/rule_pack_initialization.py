@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 # First Party
-from resc_backend.constants import RWS_ROUTE_HEALTH, RWS_ROUTE_RULES, RWS_ROUTE_UPLOAD_RULE_PACK, RWS_VERSION_PREFIX
+from resc_backend.constants import RWS_ROUTE_HEALTH, RWS_ROUTE_RULE_PACKS, RWS_VERSION_PREFIX
 from resc_backend.helpers.git_operation import clone_repository
 from resc_backend.resc_web_service_interface.rules import upload_rule_pack_toml_file
 
@@ -66,7 +66,7 @@ def load_toml_rule_into_db(api_base_url: str):
         repository_name = repository_url.split("/")[-1]
         repo_clone_path = f"{tmp_directory}/{repository_name}@{rule_pack_version_tag}"
         toml_file_path = f"{repo_clone_path}/resc_config/RESC-SECRETS-RULE.toml"
-        api_url = f"{api_base_url}{RWS_VERSION_PREFIX}{RWS_ROUTE_RULES}{RWS_ROUTE_UPLOAD_RULE_PACK}"
+        api_url = f"{api_base_url}{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}"
 
         clone_repository(repository_url=repository_url,
                          branch_name=rule_pack_version_tag,
