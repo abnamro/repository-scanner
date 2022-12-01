@@ -89,7 +89,7 @@ import Config from '@/configuration/config';
 import Spinner from '@/components/Common/Spinner.vue';
 import RulePackUploadModal from '@/components/RulePack/RulePackUploadModal.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import RuleService from '@/services/rule-service';
+import RulePackService from '@/services/rule-pack-service';
 import spinnerMixin from '@/mixins/spinner.js';
 
 export default {
@@ -152,7 +152,7 @@ export default {
     },
     fetchPaginatedRulePacks() {
       this.showSpinner();
-      RuleService.getRulePacks()
+      RulePackService.getRulePacks()
         .then((response) => {
           this.rulePackList = response.data.data.sort().reverse();
           this.totalRows = response.data.total;
@@ -173,7 +173,7 @@ export default {
     downloadRulePack(rulePackVersion) {
       this.showSpinner();
       const title = `RESC-SECRETS-RULE_v${rulePackVersion}.TOML`;
-      RuleService.downloadRulePack(rulePackVersion)
+      RulePackService.downloadRulePack(rulePackVersion)
         .then((response) => {
           this.forceFileDownload(response, title);
           this.hideSpinner();

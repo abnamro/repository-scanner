@@ -44,7 +44,7 @@
 import AxiosConfig from '@/configuration/axios-config.js';
 import Spinner from '@/components/Common/Spinner.vue';
 import PushNotification from '@/utils/push-notification';
-import RuleService from '@/services/rule-service';
+import RulePackService from '@/services/rule-pack-service';
 import spinnerMixin from '@/mixins/spinner.js';
 
 export default {
@@ -76,7 +76,7 @@ export default {
     },
     submitForm() {
       this.showSpinner();
-      RuleService.uploadRulePack(this.file)
+      RulePackService.uploadRulePack(this.file)
         .then((response) => {
           this.$emit('on-file-upload-suceess');
           if (response && response.status === 200) {
