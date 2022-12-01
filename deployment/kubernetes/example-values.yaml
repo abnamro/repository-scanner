@@ -1,5 +1,6 @@
 global:
   # Authentication is disabled by default, to enable it set authenticationEnabled to true and provide correct values for ssoConfig attributes
+  rulePackVersion: "0.0.1" # Default rule pack version set to 0.0.1, increment the version for any rule pack change
   authenticationEnabled: "false"
   enableInClusterRabbitMqMgmt: "true"
   resc:

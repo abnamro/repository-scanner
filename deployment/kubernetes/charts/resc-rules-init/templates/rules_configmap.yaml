@@ -6,6 +6,9 @@ metadata:
   labels:
     app: {{ .Values.global.appName }}
 data:
+  {{ if .Values.global.rulePackVersion }}
+  RULE_PACK_VERSION: {{ .Values.global.rulePackVersion | default "0.0.1" }}
+  {{ end }}
   {{ if .Values.global.secretScanRulePackConfig }}
   RESC-SECRETS-RULE.toml:
     {{ .Values.global.secretScanRulePackConfig | b64enc }}

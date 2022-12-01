@@ -21,7 +21,7 @@ spec:
           image: {{ .Values.resc.image.repository | default .Values.global.resc.image.repository }}{{ .Values.resc.image.name | default .Values.global.resc.image.name }}:{{ .Values.resc.image.tag | default .Values.global.resc.image.tag }}
           imagePullPolicy: {{ .Values.resc.image.pullPolicy | default .Values.global.resc.image.pullPolicy }}
           command: ["sh", "-c"]
-          args: [ "cat /tmp/RESC-SECRETS-RULE.toml | base64 -d > /resc_backend/RESC-SECRETS-RULE.toml; curl --retry 5 --retry-delay 1 -F 'rule_file=@/resc_backend/RESC-SECRETS-RULE.toml' http://$RESC_API_NO_AUTH_SERVICE_HOST:$RESC_API_SERVICE_PORT/resc/v1/rules/upload-rule-pack"]
+          args: [ "cat /tmp/RESC-SECRETS-RULE.toml | base64 -d > /resc_backend/RESC-SECRETS-RULE.toml; curl --retry 5 --retry-delay 1 -F 'rule_file=@/resc_backend/RESC-SECRETS-RULE.toml' http://$RESC_API_NO_AUTH_SERVICE_HOST:$RESC_API_SERVICE_PORT/resc/v1/rule-packs?version=$RULE_PACK_VERSION"]
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
