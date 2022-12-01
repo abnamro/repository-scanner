@@ -33,7 +33,6 @@ jobs:
       run: |
         cd ${{ env.KUBERNETES_INFRA_DIR }}
         curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
-        echo 'version = "0.0.1"' | cat - gitleaks.toml > temp && mv temp gitleaks.toml
 
     - name: Helm Dependency Update
       run: |

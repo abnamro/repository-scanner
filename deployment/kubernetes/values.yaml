@@ -1,6 +1,6 @@
 # Default values for resc.
 global:
-  deploymentEnvironment: "unknown"
+  rulePackVersion: "1.0.0"
   authenticationEnabled: "true"
   enableInClusterDatabase: "true"
   enableInClusterRabbitMqMgmt: "false"

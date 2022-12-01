@@ -1,28 +1,28 @@
 global:
   # Authentication is disabled by default, to enable it set authenticationEnabled to true and provide correct values for ssoConfig attributes
-  rulePackVersion: "0.0.1" # Default rule pack version set to 0.0.1, increment the version for any rule pack change
+  rulePackVersion: "1.0.0" # Default rule pack version set to 1.0.0, increment the version for any rule pack change
   authenticationEnabled: "false"
   enableInClusterRabbitMqMgmt: "true"
   resc:
     image:
       repository: rescabnamro/
       name: resc-backend
-      tag: 0.0.1
+      tag: 1.0.0
   rescFrontend:
     image:
       repository: rescabnamro/
       name: resc-frontend
-      tag: 0.0.1
+      tag: 1.0.0
   VCSScraper:
     image:
       repository: rescabnamro/
       name: resc-vcs-scraper
-      tag: 0.0.1
+      tag: 1.0.0
   rescSecretScanner:
     image:
       repository: rescabnamro/
       name: resc-vcs-scanner
-      tag: 0.0.1
+      tag: 1.0.0
 
 resc-vcs-scraper-projects:
   config:
