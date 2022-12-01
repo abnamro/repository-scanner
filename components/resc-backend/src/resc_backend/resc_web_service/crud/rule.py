@@ -3,19 +3,26 @@ import logging
 from typing import List
 
 # Third Party
-from packaging.version import Version
 from sqlalchemy.orm import Session
 
 # First Party
 from resc_backend.db import model
 from resc_backend.resc_web_service.schema import rule_allow_list as rule_allow_list_schema
-from resc_backend.resc_web_service.schema import rule_pack as rule_pack_schema
 from resc_backend.resc_web_service.schema.rule import RuleCreate, RuleRead
 
 logger = logging.getLogger(__name__)
 
 
 def get_rules_by_scan_id(db_connection: Session, scan_id: int) -> List[RuleRead]:
+    """
+        Get rules by scan id
+    :param db_connection:
+        Session of the database connection
+    :param scan_id:
+        scan id for which rules need to be fetched
+    :return: List[RuleRead]
+        The output contains list of rules
+    """
     rule_query = db_connection.query(model.DBrule)
     rule_query = rule_query.join(model.DBscan, model.DBscan.rule_pack == model.DBrule.rule_pack)
     rule_query = rule_query.filter(model.DBscan.id_ == scan_id)
@@ -23,19 +30,14 @@ def get_rules_by_scan_id(db_connection: Session, scan_id: int) -> List[RuleRead]
     return rules
 
 
-def get_newest_rule_pack(db_connection: Session) -> rule_pack_schema.RulePackRead:
-
-    rule_packs = db_connection.query(model.DBrulePack).all()
-    newest_rule_pack = None
-    if rule_packs:
-        newest_rule_pack: rule_pack_schema.RulePackRead = rule_packs[0]
-        for rule_pack in rule_packs[1:]:
-            if Version(rule_pack.version) > Version(newest_rule_pack.version):
-                newest_rule_pack = rule_pack
-    return newest_rule_pack
-
-
 def create_rule_allow_list(db_connection: Session, rule_allow_list: rule_allow_list_schema.RuleAllowList):
+    """
+        Create rule allow list in database
+    :param db_connection:
+        Session of the database connection
+    :param rule_allow_list:
+        RuleAllowList object to be created
+    """
     db_rule_allow_list = model.rule_allow_list.DBruleAllowList(
         description=rule_allow_list.description,
         regexes=rule_allow_list.regexes,
@@ -49,19 +51,14 @@ def create_rule_allow_list(db_connection: Session, rule_allow_list: rule_allow_l
     return db_rule_allow_list
 
 
-# def create_rule_pack_version(db_connection: Session, rule_pack: rule_pack_schema.RulePackCreate):
-#     db_rule_pack = model.rule_pack.DBrulePack(
-#         version=rule_pack.version,
-#         global_allow_list=rule_pack.global_allow_list,
-#         active=rule_pack.active
-#     )
-#     db_connection.add(db_rule_pack)
-#     db_connection.commit()
-#     db_connection.refresh(db_rule_pack)
-#     return db_rule_pack
-
-
 def create_rule(db_connection: Session, rule: RuleCreate):
+    """
+        Create rule in database
+    :param db_connection:
+        Session of the database connection
+    :param rule:
+        RuleCreate object to be created
+    """
     db_rule = model.rule.DBrule(
         rule_name=rule.rule_name,
         description=rule.description,
@@ -81,37 +78,16 @@ def create_rule(db_connection: Session, rule: RuleCreate):
     return db_rule
 
 
-# def get_rule_pack(db_connection: Session, version: Optional[str]) -> rule_pack_schema.RulePackRead:
-#     """
-#     Returns the rule pack information of the specified version if specified, return that of the active one otherwise.
-#     """
-#     query = db_connection.query(model.rule_pack.DBrulePack)
-#     if version:
-#         query = query.filter(model.rule_pack.DBrulePack.version == version)
-#     else:
-#         logger.debug("rule pack version not specified, fetching currently active one")
-#         query = query.filter(model.rule_pack.DBrulePack.active == true())
-#     rule_pack = query.first()
-#     return rule_pack
-
-
-# def get_all_rule_packs(db_connection: Session, skip: int = 0,
-#                        limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT) -> List[model.rule_pack.DBrulePack]:
-#     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-#     query = db_connection.query(model.rule_pack.DBrulePack)
-#
-#     rule_packs = query.order_by(model.rule_pack.DBrulePack.version).offset(skip).limit(limit_val).all()
-#     return rule_packs
-
-
-# def get_rule_packs_count(db_connection: Session) -> int:
-#     query = db_connection.query(func.count(model.rule_pack.DBrulePack.version))
-#
-#     total_count = query.scalar()
-#     return total_count
-
-
 def get_rules_by_rule_pack_version(db_connection: Session, rule_pack_version: str) -> List[str]:
+    """
+        Fetch rules by rule pack version
+    :param db_connection:
+        Session of the database connection
+    :param rule_pack_version:
+        rule pack version
+    :return: List[str]
+        The output contains list of strings of global allow list
+    """
     query = db_connection.query(
         model.DBrule.id_,
         model.DBrule.rule_pack,
@@ -137,6 +113,15 @@ def get_rules_by_rule_pack_version(db_connection: Session, rule_pack_version: st
 
 
 def get_global_allow_list_by_rule_pack_version(db_connection: Session, rule_pack_version: str) -> List[str]:
+    """
+        Retrieve global allow list by rule pack version
+    :param db_connection:
+        Session of the database connection
+    :param rule_pack_version:
+        rule pack version
+    :return: List[str]
+        The output contains list of strings of global allow list
+    """
     query = db_connection.query(
         model.rule_pack.DBrulePack.version,
         model.rule_allow_list.DBruleAllowList.description,
@@ -150,10 +135,3 @@ def get_global_allow_list_by_rule_pack_version(db_connection: Session, rule_pack
         model.rule_pack.DBrulePack.version == rule_pack_version).order_by(
         model.rule_allow_list.DBruleAllowList.id_).first()
     return db_global_allow_list
-
-
-# def make_older_rule_packs_to_inactive(latest_rule_pack_version: str, db_connection: Session):
-#     db_connection.execute(update(model.rule_pack.DBrulePack)
-#                           .where(model.rule_pack.DBrulePack.version != latest_rule_pack_version)
-#                           .values(active=False))
-#     db_connection.commit()

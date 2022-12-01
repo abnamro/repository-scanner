@@ -18,7 +18,13 @@ logger = logging.getLogger(__name__)
 
 def get_rule_pack(db_connection: Session, version: Optional[str]) -> rule_pack_schema.RulePackRead:
     """
-    Returns the rule pack information of the specified version if specified, return that of the active one otherwise.
+        Get active rule pack from database
+    :param db_connection:
+        Session of the database connection
+    :param version:
+        optional, version of the rule pack to be fetched else latest rule pack version will be fetched
+    :return: RulePackRead
+        The output returns RulePackRead type object
     """
     query = db_connection.query(model.rule_pack.DBrulePack)
     if version:
@@ -31,6 +37,13 @@ def get_rule_pack(db_connection: Session, version: Optional[str]) -> rule_pack_s
 
 
 def create_rule_pack_version(db_connection: Session, rule_pack: rule_pack_schema.RulePackCreate):
+    """
+        Create rule pack version in database
+    :param db_connection:
+        Session of the database connection
+    :param rule_pack:
+        RulePackCreate object to be created
+    """
     db_rule_pack = model.rule_pack.DBrulePack(
         version=rule_pack.version,
         global_allow_list=rule_pack.global_allow_list,
@@ -43,6 +56,13 @@ def create_rule_pack_version(db_connection: Session, rule_pack: rule_pack_schema
 
 
 def get_newest_rule_pack(db_connection: Session) -> rule_pack_schema.RulePackRead:
+    """
+        Fetch the newest rule pack from database
+    :param db_connection:
+        Session of the database connection
+    :return: RulePackRead
+        The output returns RulePackRead type object
+    """
     rule_packs = db_connection.query(model.DBrulePack).all()
     newest_rule_pack = None
     if rule_packs:
@@ -55,6 +75,20 @@ def get_newest_rule_pack(db_connection: Session) -> rule_pack_schema.RulePackRea
 
 def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
                    limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT) -> List[model.rule_pack.DBrulePack]:
+    """
+        Retrieve rule packs from database
+    :param db_connection:
+        Session of the database connection
+    :param version:
+        optional, filter on rule pack version
+    :param skip:
+        integer amount of records to skip, to support pagination
+    :param limit:
+        integer amount of records to return, to support pagination
+    :return: [RulePackRead]
+        The output will contain a PaginationModel containing the list of RulePackRead type objects,
+        or an empty list if no rule pack was found
+    """
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
     query = db_connection.query(model.rule_pack.DBrulePack)
 
@@ -65,6 +99,15 @@ def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
 
 
 def get_total_rule_packs_count(db_connection: Session, version: str = None) -> int:
+    """
+        Retrieve total count of rule packs from database
+    :param db_connection:
+        Session of the database connection
+    :param version:
+        optional, filter on rule pack version
+    :return: int
+        The output contains total count of rule packs
+    """
     total_count_query = db_connection.query(func.count(model.rule_pack.DBrulePack.version))
     if version:
         total_count_query = total_count_query.filter(model.rule_pack.DBrulePack.version == version)
@@ -74,6 +117,13 @@ def get_total_rule_packs_count(db_connection: Session, version: str = None) -> i
 
 
 def make_older_rule_packs_to_inactive(latest_rule_pack_version: str, db_connection: Session):
+    """
+        Make older rule packs to inactive
+    :param latest_rule_pack_version:
+        latest rule pack version
+    :param db_connection:
+        Session of the database connection
+    """
     db_connection.execute(update(model.rule_pack.DBrulePack)
                           .where(model.rule_pack.DBrulePack.version != latest_rule_pack_version)
                           .values(active=False))

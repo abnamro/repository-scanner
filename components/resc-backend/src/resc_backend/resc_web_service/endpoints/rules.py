@@ -70,6 +70,8 @@ def get_distinct_rules_from_findings(
 def get_rules_finding_status_count(db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """
         Retrieve all detected rules with finding counts per supported status
+    :param db_connection:
+        Session of the database connection
     :return: List[str]
         The output will contain a list of strings of unique rules in the findings table
     """
@@ -105,5 +107,12 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
 def create_rule(
         rule: RuleCreate,
         db_connection: Session = Depends(get_db_connection)):
+    """
+        Create rule in database
+    :param rule:
+        RuleCreate object to be created
+    :param db_connection:
+        Session of the database connection
+    """
     return rule_crud.create_rule(db_connection=db_connection,
                                  rule=rule)

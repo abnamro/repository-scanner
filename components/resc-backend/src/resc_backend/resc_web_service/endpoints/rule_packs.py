@@ -39,7 +39,21 @@ logger = logging.getLogger(__name__)
 def get_all_rule_packs(version: Optional[str] = Query('', regex=r"^\d+(?:\.\d+){2}$"),
                        skip: int = Query(default=0, ge=0),
                        limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                       db_connection: Session = Depends(get_db_connection)):
+                       db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
+    """
+        Retrieve all rule packs from database
+    :param version:
+        optional, filter on rule pack version
+    :param skip:
+        integer amount of records to skip, to support pagination
+    :param limit:
+        integer amount of records to return, to support pagination
+    :param db_connection:
+        Session of the database connection
+    :return: [RulePackRead]
+        The output will contain a PaginationModel containing the list of RulePackRead type objects,
+        or an empty list if no rule pack was found
+    """
     rule_packs = rule_pack_crud.get_rule_packs(db_connection=db_connection, version=version, skip=skip, limit=limit)
     total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version)
     return PaginationModel[RulePackRead](data=rule_packs, total=total_rule_packs_count, limit=limit, skip=skip)
@@ -48,6 +62,15 @@ def get_all_rule_packs(version: Optional[str] = Query('', regex=r"^\d+(?:\.\d+){
 @router.get("", status_code=status.HTTP_200_OK)
 async def download_rule_pack_toml_file(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
                                        db_connection: Session = Depends(get_db_connection)) -> FileResponse:
+    """
+        Download rule pack in TOML format
+    :param version:
+        optional, filter on rule pack version
+    :param db_connection:
+        Session of the database connection
+    :return: [FileResponse]
+        The output returns rule pack file downloaded in TOML format
+    """
     if not version:
         logger.info("rule pack version not specified, downloading the currently active version")
     rule_pack_from_db = read_rule_pack(version=version, db_connection=db_connection)
@@ -70,6 +93,17 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
 def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
                                rule_file: UploadFile = File(...),
                                db_connection: Session = Depends(get_db_connection)) -> dict:
+    """
+        Upload rule pack to database in TOML format
+    :param version:
+        version of the rule pack to be uploaded
+    :param rule_file:
+        TOML rule pack file to be uploaded
+    :param db_connection:
+        Session of the database connection
+    :return: dict
+        The output returns uploaded rule pack name in dictionary format
+    """
     content = validate_uploaded_file_and_read_content(rule_file)
     toml_rule_dictionary = tomlkit.loads(content)
 
@@ -114,7 +148,16 @@ def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\
 
 
 def read_rule_pack(version: Optional[str] = None,
-                   db_connection: Session = Depends(get_db_connection)):
+                   db_connection: Session = Depends(get_db_connection)) -> RulePackRead:
+    """
+        Read active rule pack from database
+    :param version:
+        optional, version of the rule pack to be fetched else latest rule pack version will be fetched
+    :param db_connection:
+        Session of the database connection
+    :return: RulePackRead
+        The output returns RulePackRead type object
+    """
     if version:
         regex = re.compile(r"^\d+(?:\.\d+){2}$")
         if not re.fullmatch(regex, version):
@@ -126,6 +169,13 @@ def read_rule_pack(version: Optional[str] = None,
 def create_rule_pack_version(
         rule_pack: RulePackCreate,
         db_connection: Session = Depends(get_db_connection)):
+    """
+        Create rule pack version in database
+    :param rule_pack:
+        RulePackCreate object to be created
+    :param db_connection:
+        Session of the database connection
+    """
     return rule_pack_crud.create_rule_pack_version(db_connection=db_connection,
                                                    rule_pack=rule_pack)
 
@@ -133,6 +183,13 @@ def create_rule_pack_version(
 def create_rule_allow_list(
         rule_allow_list: RuleAllowList,
         db_connection: Session = Depends(get_db_connection)):
+    """
+        Create rule allow list in database
+    :param rule_allow_list:
+        RuleAllowList object to be created
+    :param db_connection:
+        Session of the database connection
+    """
     if rule_allow_list.paths or rule_allow_list.commits or rule_allow_list.stop_words \
             or rule_allow_list.description or rule_allow_list.regexes:
         return rule_crud.create_rule_allow_list(db_connection=db_connection, rule_allow_list=rule_allow_list)
@@ -140,6 +197,15 @@ def create_rule_allow_list(
 
 
 def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Session = Depends(get_db_connection)):
+    """
+        Create rules in database
+    :param version:
+        version of the rule pack
+    :param toml_rule_dictionary:
+        rule pack toml in dictionary format
+    :param db_connection:
+        Session of the database connection
+    """
     if "rules" in toml_rule_dictionary:
         rule_list = toml_rule_dictionary.get("rules")
         for rule in rule_list:
@@ -182,7 +248,17 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
                 logger.warning(f"Creating rule failed for Rule: {rule_name}")
 
 
-def determine_uploaded_rule_pack_activation(requested_rule_pack_version: str, latest_rule_pack_from_db: RulePackRead):
+def determine_uploaded_rule_pack_activation(requested_rule_pack_version: str,
+                                            latest_rule_pack_from_db: RulePackRead) -> bool:
+    """
+        Determine if rule pack needs to be activated
+    :param requested_rule_pack_version:
+        version of the rule pack uploaded
+    :param latest_rule_pack_from_db:
+        latest rule pack in RulePackRead object
+    :return: boolean
+        The output returns true if rule pack needs to be activated else returns false
+    """
     if latest_rule_pack_from_db:
         if Version(latest_rule_pack_from_db.version) < Version(requested_rule_pack_version):
             logger.info(f"Uploaded rule pack is of version '{requested_rule_pack_version}', using it to replace "
