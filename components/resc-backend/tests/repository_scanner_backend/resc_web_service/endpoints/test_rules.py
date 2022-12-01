@@ -215,35 +215,20 @@ class TestRules(unittest.TestCase):
                 assert data[i]["finding_statuses_count"][status]["count"] == self.db_status_count[status][1]
 
     @patch("resc_backend.resc_web_service.crud.rule.create_rule")
-    def test_post_rule(self, create_rule):
+    def test_create_rule(self, create_rule):
         db_rule = self.db_rule_list[0]
         create_rule.return_value = db_rule
-        input_json = self.create_json_body_for_rule(db_rule)
-        response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULES}",
-                                    json=input_json)
-        assert response.status_code == 201, response.text
-        create_rule.assert_called_once_with(db_connection=ANY,
-                                            rule=self.cast_db_rule_to_rule_create(db_rule))
 
-    @patch("resc_backend.resc_web_service.crud.rule.create_rule")
-    def test_post_rule_no_body(self, create_rule):
-        response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULES}")
-        assert response.status_code == 422, response.text
-        data = response.json()
-        assert data["detail"][0]["loc"] == ["body"]
-        assert data["detail"][0]["msg"] == "field required"
-        create_rule.assert_not_called()
+        rule = create_rule(db_connection=ANY, rule=db_rule)
 
-    @patch("resc_backend.resc_web_service.crud.rule.create_rule")
-    def test_post_rule_empty_body(self, create_rule):
-        response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULES}",
-                                    json={})
-        assert response.status_code == 422, response.text
-        data = response.json()
-        assert data["detail"][0]["loc"] == ['body', 'rule_name']
-        assert data["detail"][0]["msg"] == "field required"
-        assert data["detail"][0]["type"] == "value_error.missing"
-        assert data["detail"][1]["loc"] == ['body', 'rule_pack']
-        assert data["detail"][1]["msg"] == "field required"
-        assert data["detail"][1]["type"] == "value_error.missing"
-        create_rule.assert_not_called()
+        assert rule.allow_list == db_rule.allow_list
+        assert rule.description == db_rule.description
+        assert rule.entropy == db_rule.entropy
+        assert rule.id_ == db_rule.id_
+        assert rule.path == db_rule.path
+        assert rule.regex == db_rule.regex
+        assert rule.rule_name == db_rule.rule_name
+        assert rule.rule_pack == db_rule.rule_pack
+        assert rule.secret_group == db_rule.secret_group
+        assert rule.tags == db_rule.tags
+        create_rule.assert_called_once_with(db_connection=ANY, rule=db_rule)

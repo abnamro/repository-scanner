@@ -120,8 +120,6 @@ def read_rule_pack(version: Optional[str] = None,
         if not re.fullmatch(regex, version):
             raise HTTPException(status_code=422, detail=f"Version {version} is not a valid semantic version")
     db_rule_pack = rule_pack_crud.get_rule_pack(db_connection=db_connection, version=version)
-    if db_rule_pack is None:
-        raise HTTPException(status_code=404, detail=f"No rule pack found with version {version}")
     return db_rule_pack
 
 

@@ -94,11 +94,9 @@ class TestRules(unittest.TestCase):
         get_rule_pack.return_value = None
         version = "999.999.999"
 
-        with self.assertRaises(HTTPException) as exc_info:
-            read_rule_pack(version=version, db_connection=ANY)
-        assert isinstance(exc_info.exception, HTTPException)
-        assert exc_info.exception.status_code == 404
-        assert exc_info.exception.detail == f"No rule pack found with version {version}"
+        rule_pack = read_rule_pack(version=version, db_connection=ANY)
+        assert rule_pack is None
+        get_rule_pack.assert_called_once_with(version=version, db_connection=ANY)
 
     @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_pack")
     def test_get_rule_pack_version_when_invalid_version_provided(self, get_rule_pack):

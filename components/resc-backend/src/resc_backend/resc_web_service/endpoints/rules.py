@@ -13,7 +13,7 @@ from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
-from resc_backend.resc_web_service.schema.rule import RuleCreate, RuleRead
+from resc_backend.resc_web_service.schema.rule import RuleCreate
 from resc_backend.resc_web_service.schema.rule_count_model import RuleFindingCountModel
 from resc_backend.resc_web_service.schema.status_count import StatusCount
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
@@ -102,9 +102,6 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
     return rule_findings_counts
 
 
-@router.post(f"{RWS_ROUTE_RULES}",
-             response_model=RuleRead,
-             status_code=status.HTTP_201_CREATED)
 def create_rule(
         rule: RuleCreate,
         db_connection: Session = Depends(get_db_connection)):
