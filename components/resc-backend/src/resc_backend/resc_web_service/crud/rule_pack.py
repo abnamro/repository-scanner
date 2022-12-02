@@ -94,7 +94,7 @@ def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
 
     if version:
         query = query.filter(model.rule_pack.DBrulePack.version == version)
-    rule_packs = query.order_by(model.rule_pack.DBrulePack.version).offset(skip).limit(limit_val).all()
+    rule_packs = query.order_by(model.rule_pack.DBrulePack.version.desc()).offset(skip).limit(limit_val).all()
     return rule_packs
 
 
