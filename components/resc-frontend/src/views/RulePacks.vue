@@ -154,7 +154,7 @@ export default {
       this.showSpinner();
       RulePackService.getRulePacks()
         .then((response) => {
-          this.rulePackList = response.data.data.sort().reverse();
+          this.rulePackList = response.data.data;
           this.totalRows = response.data.total;
           this.hideSpinner();
         })

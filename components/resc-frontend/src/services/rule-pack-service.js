@@ -13,10 +13,10 @@ const RulePackService = {
     });
   },
 
-  async uploadRulePack(ruleFile) {
+  async uploadRulePack(version, ruleFile) {
     const formData = new FormData();
     formData.append('rule_file', ruleFile);
-    return axios.post(`/rule-packs`, formData, {
+    return axios.post(`/rule-packs?version=${version}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

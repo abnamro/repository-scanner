@@ -82,9 +82,10 @@ describe('function uploadRulePack', () => {
   describe('when uploadRulePack API call is successful', () => {
     it('should upload the rulepack', async () => {
       let ruleFile = new File([''], 'dummy_rule.TOML');
+      let version = '0.0.1';
       axios.post.mockResolvedValueOnce({ status: 200 });
 
-      const response = await RulePackService.uploadRulePack(ruleFile);
+      const response = await RulePackService.uploadRulePack(version, ruleFile);
 
       expect(response).toBeDefined();
       expect(response).not.toBeNull();
