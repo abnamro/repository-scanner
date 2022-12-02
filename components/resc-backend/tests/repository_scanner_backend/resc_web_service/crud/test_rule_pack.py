@@ -5,10 +5,10 @@ from unittest.mock import MagicMock
 # First Party
 from resc_backend.db import model
 from resc_backend.db.model import DBrulePack
-from resc_backend.resc_web_service.crud.rule import (
-    get_all_rule_packs,
+from resc_backend.resc_web_service.crud.rule_pack import (
     get_newest_rule_pack,
-    get_rule_packs_count,
+    get_rule_packs,
+    get_total_rule_packs_count,
     make_older_rule_packs_to_inactive
 )
 
@@ -29,19 +29,19 @@ def test_get_newest_rule_pack():
     assert newest_rule_pack.version == "0.0.20"
 
 
-def test_get_rule_packs_count():
+def test_get_total_rule_packs_count():
     mock_conn = MagicMock()
     mock_conn.query.return_value.scalar.return_value = 1
-    _ = get_rule_packs_count(db_connection=mock_conn)
+    _ = get_total_rule_packs_count(db_connection=mock_conn)
     mock_conn.query.assert_called_once()
     mock_conn.query.return_value.scalar.assert_called_once()
 
 
-def test_get_all_rule_packs():
+def test_get_rule_packs():
     mock_conn = MagicMock()
     mock_conn.query.return_value.order_by.return_value.offset.return_value \
         .limit.return_value.all.return_value = rule_packs
-    _ = get_all_rule_packs(db_connection=mock_conn, skip=0, limit=5)
+    _ = get_rule_packs(db_connection=mock_conn, skip=0, limit=5)
     mock_conn.query.assert_called_once()
     mock_conn.query.return_value.order_by.return_value. \
         offset.return_value.limit.return_value.all.assert_called_once()

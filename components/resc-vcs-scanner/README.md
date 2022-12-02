@@ -35,8 +35,6 @@ These instructions will help you to get a copy of the project up and running on 
 
   ```bash
   curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > /tmp/temp_resc_rule.toml
-
-  sed -i '1s/^/version = "0.0.1"\n/' /tmp/temp_resc_rule.toml
   ```
 
   Clone the repository, open the Git Bash terminal from /components/resc-vcs-scanner folder, and run below commands.  
@@ -129,17 +127,17 @@ Run the RESC VCS Scanner docker image locally by running the following commands:
 
 - Pull the docker image from registry: 
 ```bash
-docker pull rescabnamro/resc-vcs-scanner:0.0.1
+docker pull rescabnamro/resc-vcs-scanner:1.0.0
 ```
 
 - Alternatively, build the docker image locally by running: 
 ```bash
-docker build -t rescabnamro/resc-vcs-scanner:0.0.1 .
+docker build -t rescabnamro/resc-vcs-scanner:1.0.0 .
 ```
 
 - Run the vcs-scanner by using below command: 
 ```bash
-docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_PORT_AMQP=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_USERNAME=queue_user -e RABBITMQ_PASSWORD="<the password of queue_user>" -e RABBITMQ_QUEUE="repositories" -e RESC_API_NO_AUTH_SERVICE_HOST="host.docker.internal" -e RESC_API_NO_AUTH_SERVICE_PORT=30900 -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" -e GITLEAKS_PATH="/vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64" --name resc-vcs-scanner rescabnamro/resc-vcs-scanner:0.0.1 celery  -A vcs_scanner.secret_scanners.celery_worker worker --loglevel=INFO -E -Q repositories --concurrency=1  --prefetch-multiplier=1
+docker run -v <path to vcs_instances_config.json in your local system>:/tmp/vcs_instances_config.json -e RESC_RABBITMQ_SERVICE_HOST="host.docker.internal" -e RESC_RABBITMQ_SERVICE_PORT_AMQP=30902 -e RABBITMQ_DEFAULT_VHOST=resc-rabbitmq -e RABBITMQ_USERNAME=queue_user -e RABBITMQ_PASSWORD="<the password of queue_user>" -e RABBITMQ_QUEUE="repositories" -e RESC_API_NO_AUTH_SERVICE_HOST="host.docker.internal" -e RESC_API_NO_AUTH_SERVICE_PORT=30900 -e VCS_INSTANCES_FILE_PATH="/tmp/vcs_instances_config.json" -e GITHUB_PUBLIC_USERNAME="<your github username>" -e GITHUB_PUBLIC_TOKEN="<your github personal access token>" -e GITLEAKS_PATH="/vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64" --name resc-vcs-scanner rescabnamro/resc-vcs-scanner:1.0.0 celery  -A vcs_scanner.secret_scanners.celery_worker worker --loglevel=INFO -E -Q repositories --concurrency=1  --prefetch-multiplier=1
 ```
 
 To create vcs_instances_config.json file please refer to: [Structure of vcs_instances_config.json](#structure-of-vcs-instances-config-json)
