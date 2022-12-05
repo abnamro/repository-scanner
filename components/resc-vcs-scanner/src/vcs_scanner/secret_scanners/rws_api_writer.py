@@ -18,7 +18,7 @@ from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate,
 from resc_backend.resc_web_service_interface.branches import create_branch, get_last_scan_for_branch
 from resc_backend.resc_web_service_interface.findings import create_findings_with_scan_id
 from resc_backend.resc_web_service_interface.repositories import create_repository
-from resc_backend.resc_web_service_interface.rules import download_rule_pack_toml_file
+from resc_backend.resc_web_service_interface.rule_packs import download_rule_pack_toml_file
 from resc_backend.resc_web_service_interface.scans import create_scan
 from resc_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -133,12 +133,17 @@ class RESTAPIWriter(OutputModule):
         if response.status_code == 200:
             filename = Path(TEMP_RULE_FILE)
             filename.write_bytes(response.content)
-            logger.debug(
-                f"Rule pack version: {rule_pack_version} has been successfully downloaded to location {TEMP_RULE_FILE}")
-            if not rule_pack_version:
+            if rule_pack_version:
+                logger.debug(
+                    f"Rule pack version: {rule_pack_version} has been successfully "
+                    f"downloaded to location {TEMP_RULE_FILE}")
+            else:
                 rule_pack_version = get_rule_pack_version_from_file(response.content)
                 if not rule_pack_version:
                     logger.warning("Unable to obtain the rule pack version from downloaded file, defaulting to '0.0.0'")
+                logger.debug(
+                    f"Latest rule pack version: {rule_pack_version} has been successfully "
+                    f"downloaded to location {TEMP_RULE_FILE}")
             return rule_pack_version
 
         logger.error(f"Aborting scan! Downloading rule pack version {rule_pack_version} failed with "

@@ -13,14 +13,39 @@
       @ok="handleOk"
     >
       <form ref="form" @submit.stop.prevent="submitForm">
-        <b-form-group>
-          <b-form-file
-            v-model="file"
-            placeholder="Choose a file or drop it here..."
-            drop-placeholder="Drop file here..."
-            accept=".toml"
-          ></b-form-file>
-        </b-form-group>
+        <div class="row">
+          <div class="col-md-7">
+            <b-form-group>
+              <b-form-input
+                id="version-input"
+                placeholder="Enter Version"
+                size="sm"
+                v-model="version"
+                :state="versionState"
+                v-on:keyup="validateVersion"
+                required
+              ></b-form-input>
+            </b-form-group>
+          </div>
+          <div class="col-md-5">
+            <small><a href="https://semver.org/" target="_blank">semver</a></small>
+            <small> Example: 1.0.0</small>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-7">
+            <b-form-group>
+              <b-form-file
+                v-model="file"
+                placeholder="Choose a file or drop it here..."
+                drop-placeholder="Drop file here..."
+                accept=".toml"
+                size="sm"
+              ></b-form-file>
+            </b-form-group>
+          </div>
+        </div>
       </form>
 
       <template #modal-footer>
@@ -29,7 +54,7 @@
             variant="prime"
             class="float-right"
             @click="handleOk"
-            :disabled="file.length == 0"
+            :disabled="(file && file.length == 0) || !versionState"
           >
             UPLOAD
           </b-button>
@@ -44,7 +69,7 @@
 import AxiosConfig from '@/configuration/axios-config.js';
 import Spinner from '@/components/Common/Spinner.vue';
 import PushNotification from '@/utils/push-notification';
-import RuleService from '@/services/rule-service';
+import RulePackService from '@/services/rule-pack-service';
 import spinnerMixin from '@/mixins/spinner.js';
 
 export default {
@@ -53,6 +78,8 @@ export default {
   data() {
     return {
       file: [],
+      version: null,
+      versionState: null,
     };
   },
   computed: {
@@ -65,10 +92,25 @@ export default {
       this.$refs.rule_pack_upload_modal.show();
     },
     hide() {
+      this.version = null;
+      this.file = [];
+      this.versionState = null;
       this.$refs.rule_pack_upload_modal.hide();
     },
     resetModal() {
+      this.version = null;
       this.file = [];
+      this.versionState = null;
+    },
+    validateVersion() {
+      let valid = false;
+      this.versionState = false;
+      const versionRegex = /^\d+(?:\.\d+){2}$/;
+      if (versionRegex.test(this.version)) {
+        valid = true;
+        this.versionState = true;
+      }
+      return valid;
     },
     handleOk(bvModalEvt) {
       bvModalEvt.preventDefault();
@@ -76,7 +118,7 @@ export default {
     },
     submitForm() {
       this.showSpinner();
-      RuleService.uploadRulePack(this.file)
+      RulePackService.uploadRulePack(this.version, this.file)
         .then((response) => {
           this.$emit('on-file-upload-suceess');
           if (response && response.status === 200) {

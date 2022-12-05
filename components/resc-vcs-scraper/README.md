@@ -125,12 +125,12 @@ Run the RESC VCS Scraper Docker image locally by running the following commands:
 
 - Pull the Docker image from registry: 
 ```bash
-docker pull rescabnamro/resc-vcs-scraper:0.0.1
+docker pull rescabnamro/resc-vcs-scraper:1.0.0
 ```
 
 - Alternatively, build the Docker image locally by running: 
 ```bash
-docker build -t rescabnamro/resc-vcs-scraper:0.0.1 .
+docker build -t rescabnamro/resc-vcs-scraper:1.0.0 .
 ```
 
 - Run the vcs-scraper by using below command:

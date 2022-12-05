@@ -54,16 +54,16 @@ Build the RESC Frontend Docker image locally by running the following commands.
 
 - Pull the docker image from registry: 
 ```bash
-docker pull rescabnamro/resc-frontend:0.0.1
+docker pull rescabnamro/resc-frontend:1.0.0
 ```
 - Alternatively, build the docker image locally by running:
 ```bash
-docker build -t rescabnamro/resc-frontend:0.0.1 .
+docker build -t rescabnamro/resc-frontend:1.0.0 .
 ```
 - Run the RESC frontend by using the following command: 
 
 ```bash
-docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend rescabnamro/resc-frontend:0.0.1
+docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend rescabnamro/resc-frontend:1.0.0
 ```
 
  Access the application using this url: http://localhost:8080/
