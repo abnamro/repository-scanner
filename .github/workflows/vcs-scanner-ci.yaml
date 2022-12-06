@@ -17,7 +17,7 @@ env:
   RESC_COMPONENTS: components
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-vcs-scanner
-  IMAGE_TAG: 0.0.1
+  IMAGE_TAG: 1.0.0
 
 jobs:
   python-basic-validation:
@@ -104,7 +104,7 @@ jobs:
         if: ${{ needs.python-basic-validation.outputs.branch_name == 'main' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.__TEST_PYPI_TOKEN__ }}
+          password: ${{ secrets.__PYPI_TOKEN__ }}
           packages_dir: ${{ env.RESC_VCS_SCANNER_DIR }}/dist
           skip_existing: true
           repository_url: https://test.pypi.org/legacy/
