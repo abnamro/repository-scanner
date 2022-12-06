@@ -95,6 +95,7 @@ export default {
   name: 'FindingTab',
   data() {
     return {
+      selectedFindingIds: [],
       statusList: [],
       commentState: null,
       form: {
@@ -135,9 +136,18 @@ export default {
     },
     onSubmit(event) {
       event.preventDefault();
+      this.selectedFindingIds = [];
+      if (this.finding.id_) {
+        this.selectedFindingIds.push(this.finding.id_);
+      }
       this.finding.status = this.form.status;
       this.finding.comment = this.form.comment;
-      FindingsService.auditSingleFinding(this.finding)
+
+      FindingsService.auditFindings(
+        this.selectedFindingIds,
+        this.finding.status,
+        this.finding.comment
+      )
         .then(() => {
           PushNotification.success('Audit saved successfully', 'Success', 5000);
         })
