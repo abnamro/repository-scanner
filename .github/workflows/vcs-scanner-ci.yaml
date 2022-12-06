@@ -107,7 +107,6 @@ jobs:
           password: ${{ secrets.__PYPI_TOKEN__ }}
           packages_dir: ${{ env.RESC_VCS_SCANNER_DIR }}/dist
           skip_existing: true
-          repository_url: https://test.pypi.org/legacy/
 
   dockerize:
     name: Build and Push Docker image
