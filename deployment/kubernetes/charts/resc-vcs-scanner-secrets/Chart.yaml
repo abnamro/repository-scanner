@@ -1,0 +1,9 @@
+apiVersion: v2
+name: resc-vcs-scanner-secrets
+description: A Helm chart for scanning secrets in by cloning repositories
+
+type: application
+
+version: 1.0.0
+
+appVersion: "1.0.0"

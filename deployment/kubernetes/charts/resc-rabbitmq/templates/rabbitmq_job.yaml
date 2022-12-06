@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.appName }}-mq-init
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      annotations:
+        {{- with include "resc.mqInitAnnotations" .}}
+          {{- nindent 8 .}}
+        {{- end }}
+    spec:
+      {{ if .Values.global.serviceAccountName }}
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+      {{ end }}
+      containers:
+        - name: {{ .Values.global.appName }}-mq-init
+          image: {{ .Values.mqInit.resc.image.repository | default .Values.global.resc.image.repository }}{{ .Values.mqInit.resc.image.name | default .Values.global.resc.image.name }}:{{ .Values.mqInit.resc.image.tag | default .Values.global.resc.image.tag }}
+          imagePullPolicy: {{ .Values.mqInit.resc.image.pullPolicy | default .Values.global.resc.image.pullPolicy }}
+          command: ["sh", "-c"]
+          args: ["{{ .Values.preStartUpCommand }} resc_initialize_rabbitmq_users"]
+          resources:
+            requests:
+              cpu: {{ .Values.mqInit.resources.requests.cpu }}
+              memory: {{ .Values.mqInit.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.mqInit.resources.limits.cpu }}
+              memory: {{ .Values.mqInit.resources.limits.memory }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.global.appName }}-rabbitmq-config
+            {{ if eq .Values.useKubernetesSecret "true"}}
+            - secretRef:
+                name: {{ .Values.global.appName }}-rabbitmq-user-secret
+            - secretRef:
+                name: {{ .Values.global.appName }}-rabbitmq-admin-secret
+            {{ end }}
+      restartPolicy: {{ .Values.mqInit.restartPolicy }}
+      {{ if .Values.global.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      {{ end }}
+  backoffLimit: {{ .Values.mqInit.backoffLimit }}

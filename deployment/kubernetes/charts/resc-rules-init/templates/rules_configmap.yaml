@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-rules-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  {{ if .Values.global.rulePackVersion }}
+  RULE_PACK_VERSION: {{ .Values.global.rulePackVersion }}
+  {{ end }}
+  {{ if .Values.global.secretScanRulePackConfig }}
+  RESC-SECRETS-RULE.toml:
+    {{ .Values.global.secretScanRulePackConfig | b64enc }}
+  {{ else }}
+    {{ fail "You need to supply rulepack config toml file!" }}
+  {{ end }}

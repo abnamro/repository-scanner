@@ -1,0 +1,9 @@
+apiVersion: v2
+name: resc-database-init
+description: A Helm chart for initializing the Repository Scanner Database
+
+type: application
+
+version: 1.0.0
+
+appVersion: "1.0.0"

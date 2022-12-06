@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.appName }}-rabbitmq
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+    tier: rabbitmq
+spec:
+  {{ if and (eq .Values.global.enableInClusterRabbitMqMgmt "true") (.Values.rabbitMQ.exposeAmqpToHostPort) (.Values.rabbitMQ.exposeToHostPort)}}
+  type: NodePort
+  {{ end }}
+  ports:
+    - port: {{ .Values.rabbitMQ.config.port}}
+      targetPort: {{ .Values.rabbitMQ.config.port}}
+      name: amqp
+      {{ if and (eq .Values.global.enableInClusterRabbitMqMgmt "true") (.Values.rabbitMQ.exposeAmqpToHostPort) }}
+      nodePort: {{ .Values.rabbitMQ.exposeAmqpToHostPort}}
+      {{ end }}
+    - port: {{ .Values.rabbitMQ.config.mgmtPort}}
+      targetPort: {{ .Values.rabbitMQ.config.mgmtPort}}
+      name: mgmt
+      {{ if and (eq .Values.global.enableInClusterRabbitMqMgmt "true") (.Values.rabbitMQ.exposeToHostPort) }}
+      nodePort: {{ .Values.rabbitMQ.exposeToHostPort}}
+      {{ end }}
+  selector:
+    app: {{ .Values.global.appName }}
+    tier: rabbitmq

@@ -1,0 +1,43 @@
+port: 8000
+replicas: 1
+workers: 1
+nameSuffix: "-no-auth"
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 400M
+  limits:
+    cpu: 750m
+    memory: 1G
+
+exposeToHostPort: 
+
+resc:
+  image:
+    repository:
+    name:
+    tag:
+    pullPolicy:
+  config:
+    dbHost: 
+    dbPort: 1433
+    dbSchema: 
+    dbUser: 
+    dbPass: 
+    odbcDriver: "ODBC Driver 17 for SQL Server"
+    dbDSN: "rescdb"
+  authRequired: "false"
+  ssoConfig:
+    ssoAccessTokenIssuerUrl: "notApplicable"
+    ssoAccessTokenJwksUrl: "notApplicable"
+  corsAllowedDomains: "notApplicable"
+  enableCORS: "false"
+
+ingress:
+  path: "/resc"
+
+additionalLabels:
+useKubernetesSecret: "true"
+enableIngress: "false"
+preStartUpCommand: "export MSSQL_DB_HOST=$RESC_MS_DATABASE_SERVICE_HOST;"

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-database-init-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  {{ if .Values.resc.config.dbSchema }}
+  MSSQL_SCHEMA: {{ .Values.resc.config.dbSchema }}
+  {{ end }}
+  {{ if .Values.resc.config.dbPort }}
+  MSSQL_DB_PORT: "{{ .Values.resc.config.dbPort }}"
+  {{ end }}
+  {{ if .Values.resc.config.dbUser }}
+  MSSQL_USERNAME: {{ .Values.resc.config.dbUser }}
+  {{ end }}
+  {{ if .Values.resc.config.odbcDriver }}
+  MSSQL_ODBC_DRIVER: {{ .Values.resc.config.odbcDriver }}
+  {{ end }}
+  {{ if .Values.resc.config.dbHost }}
+  MSSQL_DB_HOST: {{ .Values.resc.config.dbHost }}
+  {{ end }}
+  {{ if .Values.resc.config.dbDSN }}
+  MSSQL_DSN: {{ .Values.resc.config.dbDSN }}
+  {{ end }}
+  odbc.ini: |
+    [{{ .Values.resc.config.dbDSN }}]
+    Driver = {{ .Values.resc.config.odbcDriver }}
+    Server = tcp:{{ .Values.resc.config.dbHost }},{{ .Values.resc.config.dbPort }}
+    Authentication = ActiveDirectoryMsi

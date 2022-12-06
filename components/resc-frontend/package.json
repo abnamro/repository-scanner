@@ -1,0 +1,57 @@
+{
+  "name": "resc-frontend",
+  "version": "1.0.0",
+  "author": "ABN AMRO Bank",
+  "description": "Repository Scanner Frontend",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ABNAMRO/repository-scanner"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "coverage": "npm run ut",
+    "test": "npm run ut",
+    "ut": "vue-cli-service test:unit",
+    "lint": "vue-cli-service lint --no-fix --max-errors 1 --max-warnings 1",
+    "lint:autofix": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@cowwoc/requirements": "^3.0.3",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^2.0.6",
+    "axios": "^0.26.0",
+    "axios-retry": "^3.2.5",
+    "bootstrap": "^4.6.0",
+    "bootstrap-vue": "^2.21.2",
+    "chart.js": "^3.8.0",
+    "core-js": "^3.6.5",
+    "crypto-js": "^4.1.1",
+    "jose": "^4.5.0",
+    "qs": "^6.10.3",
+    "vue": "^2.6.11",
+    "vue-chartjs": "^4.1.1",
+    "vue-multiselect": "^2.1.6",
+    "vue-router": "^3.2.0",
+    "vue-sidebar-menu": "4.8.1",
+    "vuex": "^3.4.0",
+    "vuex-persistedstate": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-plugin-unit-jest": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/test-utils": "^1.0.3",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^6.2.2",
+    "prettier": "^2.2.1",
+    "vue-template-compiler": "^2.6.11"
+  }
+}

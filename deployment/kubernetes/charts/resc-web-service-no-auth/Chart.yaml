@@ -1,0 +1,9 @@
+apiVersion: v2
+name: resc-web-service-no-auth
+description: A Helm chart for the Repository Scanner Web Services with Authentication disabled
+
+type: application
+
+version: 1.0.0
+
+appVersion: "1.0.0"

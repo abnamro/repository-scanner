@@ -1,0 +1,24 @@
+image:
+  repository:
+  name:
+  tag:
+  pullPolicy:
+  gitleaks:
+    binaryPath: /vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64
+replicas: 1
+restartPolicy: "Always"
+config:
+  vcs_instance_file_path: "/tmp/vcs_instances_config.json"
+  rabbitmq_queue: "repositories"
+  force_base_scan: "false"
+  debug_value: "0"
+  loglevel: INFO
+resources:
+  requests:
+    cpu: 3
+    memory: 4G
+  limits:
+    cpu: 4
+    memory: 6G
+useKubernetesSecret: "true"
+preStartUpCommand: ""

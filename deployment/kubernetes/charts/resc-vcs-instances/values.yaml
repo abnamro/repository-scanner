@@ -1,0 +1,14 @@
+vcsInstances:
+  - name:
+    scope:
+    exceptions:
+    providerType:
+    hostname:
+    port:
+    scheme:
+    organization: 
+    username: 
+    usernameValue: 
+    token:
+    tokenValue:
+useKubernetesSecret: "true"

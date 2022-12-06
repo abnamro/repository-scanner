@@ -1,0 +1,42 @@
+rabbitMQ:
+  image:
+    repository:
+    name: rabbitmq
+    tag: 3.11.2-management-alpine
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 400m
+      memory: 750M
+    limits:
+      cpu: 500m
+      memory: 900M
+  config:
+    vhost: "resc-rabbitmq"
+    port: 5672
+    mgmtPort: 15672
+  pvc_path: "/var/resc/rabbitmq"
+  pvc_size: 10Gi
+
+mqInit:
+  resc:
+    image:
+      repository:
+      name:
+      tag:
+      pullPolicy:
+  restartPolicy: "OnFailure"
+  backoffLimit: 10
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100M
+    limits:
+      cpu: 200m
+      memory: 200M
+
+storageClass:
+  storageAccount:
+useKubernetesSecret: "true"
+filemountType: "linux"
+preStartUpCommand: ""

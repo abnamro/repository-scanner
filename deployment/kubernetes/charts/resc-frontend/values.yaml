@@ -1,0 +1,37 @@
+port: 8080
+replicas: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100M
+  limits:
+    cpu: 100m
+    memory: 100M
+
+exposeToHostPort: 
+enableIngress: 
+
+rescWebServiceUrl: 
+ssoConfig:
+  redirectUri: 
+  idTokenIssuerUrl: 
+  authorizationUrl: 
+  tokenEndPointUrl: 
+  idTokenJwksUrl: 
+  accessTokenJwksUrl:
+  ssoCodeChallengeMethod:
+  ssoJwtSigningAlgorithm:
+  ssoLoginPageMessage: "Please use the Login button"
+
+
+rescFrontend:
+  image:
+    repository:
+    name:
+    tag:
+    pullPolicy:
+
+ingress:
+  path: "/"
+  cspConnectSrc: 

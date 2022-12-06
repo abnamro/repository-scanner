@@ -1,0 +1,27 @@
+resc:
+  image:
+    repository:
+    name:
+    tag:
+    pullPolicy:
+  config:
+    dbConnectionString: "invalid"
+    dbHost:
+    dbPort: 1433
+    dbSchema:
+    dbUser:
+    dbPass:
+    odbcDriver: "ODBC Driver 17 for SQL Server"
+    dbDSN: "rescdb"
+  
+restartPolicy: "OnFailure"
+backoffLimit: 10
+resources:
+  requests:
+    cpu: 100m
+    memory: 100M
+  limits:
+    cpu: 300m
+    memory: 500M
+additionalLabels:
+preStartUpCommand: "export MSSQL_DB_HOST=$RESC_MS_DATABASE_SERVICE_HOST;"

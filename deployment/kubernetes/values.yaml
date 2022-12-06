@@ -1,0 +1,42 @@
+# Default values for resc.
+global:
+  rulePackVersion: "1.0.0"
+  authenticationEnabled: "true"
+  enableInClusterDatabase: "true"
+  enableInClusterRabbitMqMgmt: "false"
+  namespace: resc
+  appName: resc
+  host:
+  ingress:
+    secretName: ingress-tls
+
+  resc:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+        
+  rescFrontend:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+
+  VCSScraper:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+        
+  rescSecretScanner:
+    image:
+      repository: 
+      name: 
+      tag: 
+      pullPolicy: IfNotPresent
+
+  imagePullSecret: 
+  imagePullSecret_proxy: 
