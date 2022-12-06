@@ -49,9 +49,9 @@ def test_export_repository_all_branches():
     assert result.vcs_instance_name == "test server"
     assert len(result.branches) == 2
     assert result.branches[0].branch_id == "features/1"
-    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[0].latest_commit == "ABCDEFG"
     assert result.branches[1].branch_id == "/refs/heads/main"
-    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
 
 
 def test_export_repository_info_main_branch_only():
@@ -79,7 +79,7 @@ def test_export_repository_info_main_branch_only():
     assert result.vcs_instance_name == "test server"
     assert len(result.branches) == 1
     assert result.branches[0].branch_id == "/refs/heads/main"
-    assert result.branches[0].last_scanned_commit == "IJKLMNOP"
+    assert result.branches[0].latest_commit == "IJKLMNOP"
 
 
 def test_export_repository_info_main_branch_only_upper_casing():
@@ -107,7 +107,7 @@ def test_export_repository_info_main_branch_only_upper_casing():
     assert result.vcs_instance_name == "test server"
     assert len(result.branches) == 1
     assert result.branches[0].branch_id == "/refs/heads/MAIN"
-    assert result.branches[0].last_scanned_commit == "IJKLMNOP"
+    assert result.branches[0].latest_commit == "IJKLMNOP"
 
 
 def test_export_repository_info_main_branch_only_no_master():

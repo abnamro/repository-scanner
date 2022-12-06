@@ -86,11 +86,11 @@ def test_write_correct_branch(post):
 
     branch = BranchBase(branch_id=1,
                         branch_name="branch_name",
-                        last_scanned_commit="last_scanned_commit")
+                        latest_commit="latest_commit")
     expected_result = BranchRead(id_=1,
                                  branch_id=branch.branch_id,
                                  branch_name=branch.branch_name,
-                                 last_scanned_commit=branch.last_scanned_commit,
+                                 latest_commit=branch.latest_commit,
                                  repository_id=1)
 
     expected_json = expected_result.json()
@@ -117,11 +117,11 @@ def test_write_incorrect_branch(warning, post):
     )
     branch = BranchBase(branch_id=1,
                         branch_name="branch_name",
-                        last_scanned_commit="last_scanned_commit")
+                        latest_commit="latest_commit")
     expected_result = BranchRead(id_=1,
                                  branch_id=branch.branch_id,
                                  branch_name=branch.branch_name,
-                                 last_scanned_commit=branch.last_scanned_commit,
+                                 latest_commit=branch.latest_commit,
                                  repository_id=1)
 
     expected_json = expected_result.json()
@@ -182,7 +182,7 @@ def test_write_scan(post):
     branch = BranchRead(id_=2,
                         branch_id="branch.branch_id",
                         branch_name="branch.branch_name",
-                        last_scanned_commit="last_scanned_commit",
+                        latest_commit="latest_commit",
                         repository_id=1)
     expected_result = ScanRead(id_=1,
                                scan_type=ScanType.BASE,
@@ -209,7 +209,7 @@ def test_write_scan_unsuccessful(warning, post):
     branch = BranchRead(id_=2,
                         branch_id="branch.branch_id",
                         branch_name="branch.branch_name",
-                        last_scanned_commit="last_scanned_commit",
+                        latest_commit="latest_commit",
                         repository_id=1)
     expected_result = ScanRead(id_=1,
                                scan_type=ScanType.BASE,
@@ -238,7 +238,7 @@ def test_get_last_scanned_commit(get):
     branch = BranchRead(id_=1,
                         branch_id="branch.branch_id",
                         branch_name="branch.branch_name",
-                        last_scanned_commit="last_scanned_commit",
+                        latest_commit="latest_commit",
                         repository_id=1)
     expected_result = ScanRead(id_=1,
                                last_scanned_commit="561dsf651t34544",
@@ -262,7 +262,7 @@ def test_get_last_scanned_commit_invalid_id(warning, get):
     branch = BranchRead(id_=2,
                         branch_id="branch.branch_id",
                         branch_name="branch.branch_name",
-                        last_scanned_commit="last_scanned_commit",
+                        latest_commit="latest_commit",
                         repository_id=1)
     url = "https://nonexistingwebsite.com"
     error_text = "Unable to retrieve scan for id"

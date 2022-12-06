@@ -5,7 +5,7 @@ from vcs_scraper.dict_remapper import remap_dict_keys
 BITBUCKET_BRANCH_MAP = [
     [["id"], ["branch_id"]],
     [["displayId"], ["branch_name"]],
-    [["latestCommit"], ["last_scanned_commit"]],
+    [["latestCommit"], ["latest_commit"]],
 ]
 
 BITBUCKET_REPOSITORY_MAP = [

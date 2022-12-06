@@ -95,11 +95,11 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                 scan_type_to_run = ScanType.INCREMENTAL if last_scanned_commit else ScanType.BASE
 
             # Only insert in to scan and finding table if its BASE Scan or there is new commit, else skip
-            if scan_type_to_run == ScanType.BASE or last_scanned_commit != branch.last_scanned_commit:
+            if scan_type_to_run == ScanType.BASE or last_scanned_commit != branch.latest_commit:
                 # Insert in to scan table
                 scan_timestamp_start = datetime.utcnow()
                 created_scan = self._output_module.write_scan(
-                    scan_type_to_run, branch.last_scanned_commit,
+                    scan_type_to_run, branch.latest_commit,
                     scan_timestamp_start.isoformat(), created_branch,
                     rule_pack=self.rule_pack_version)
                 if not created_scan:

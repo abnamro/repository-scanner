@@ -55,11 +55,11 @@ def test_send_tasks_to_celery_queue(celery_send_task):
     project_tasks = []
 
     branches = [Branch(branch_id="/ref/head/main",
-                       last_scanned_commit="abc",
+                       latest_commit="abc",
                        repository_id=1,
                        branch_name="main"),
                 Branch(branch_id="/ref/head/master",
-                       last_scanned_commit="xyz",
+                       latest_commit="xyz",
                        repository_id=2,
                        branch_name="master")]
 
@@ -131,9 +131,9 @@ def test_extract_ado_project_information(mock_get_branches, mock_get_repos):
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
     assert result.branches[0].branch_id == "feature"
-    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[0].latest_commit == "ABCDEFG"
     assert result.branches[1].branch_id == "master"
-    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
 
 
 @patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_repos")
@@ -179,6 +179,6 @@ def test_extract_btbk_project_information(mock_get_branches, mock_get_repos):
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
     assert result.branches[0].branch_id == "features/1"
-    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[0].latest_commit == "ABCDEFG"
     assert result.branches[1].branch_id == "/refs/heads/main"
-    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[1].latest_commit == "QRSTUVWXYZ"

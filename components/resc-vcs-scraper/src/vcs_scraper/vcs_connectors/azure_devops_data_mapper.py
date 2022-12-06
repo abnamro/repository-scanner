@@ -5,7 +5,7 @@ from vcs_scraper.dict_remapper import remap_dict_keys
 AZURE_DEVOPS_BRANCH_MAP = [
     [["name"], ["branch_id"]],
     [["name"], ["branch_name"]],
-    [["commit", "commit_id"], ["last_scanned_commit"]],
+    [["commit", "commit_id"], ["latest_commit"]],
 ]
 
 AZURE_DEVOPS_REPOSITORY_MAP = [

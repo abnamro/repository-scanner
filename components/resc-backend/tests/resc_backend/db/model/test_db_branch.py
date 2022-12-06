@@ -1,20 +1,18 @@
 # Standard Library
 import sys
 import unittest
-from datetime import datetime
 
 # Third Party
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 # First Party
-from resc_backend.db.model import Base, DBbranch, DBrepository, DBscan, DBVcsInstance
-from resc_backend.db.model.rule_pack import DBrulePack
+from resc_backend.db.model import Base, DBbranch, DBrepository, DBVcsInstance
 
 sys.path.insert(0, "src")
 
 
-class TestScan(unittest.TestCase):
+class TestBranch(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(self.engine)
@@ -39,23 +37,14 @@ class TestScan(unittest.TestCase):
         self.branch = DBbranch(repository_id=1,
                                branch_name="test_temp",
                                branch_id='master',
-                               last_scanned_commit="FAKE_HASH")
+                               latest_commit="FAKE_HASH")
         self.session.add(self.branch)
-
-        self.rule_pack = DBrulePack(version="1.2")
-
-        self.scan = DBscan(branch_id=1, scan_type="BASE",
-                           last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(), rule_pack="1.2",
-                           increment_number=1)
-
-        self.session.add(self.scan)
-
         self.session.commit()
 
     def tearDown(self):
         Base.metadata.drop_all(self.engine)
 
-    def test_query_all_scan(self):
-        expected = [self.scan]
-        result = self.session.query(DBscan).all()
+    def test_query_all_branch(self):
+        expected = [self.branch]
+        result = self.session.query(DBbranch).all()
         self.assertEqual(result, expected)

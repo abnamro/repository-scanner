@@ -12,14 +12,14 @@ class DBbranch(Base):
     repository_id = Column(Integer, ForeignKey("repository.id"), nullable=False)
     branch_id = Column(String(200), nullable=False)
     branch_name = Column(String(200), nullable=False)
-    last_scanned_commit = Column(String(100), nullable=False)
+    latest_commit = Column(String(100), nullable=False)
     __table_args__ = (UniqueConstraint("branch_id", "repository_id", name="unique_branch_id_per_repository"),)
 
-    def __init__(self, repository_id, branch_id, branch_name, last_scanned_commit):
+    def __init__(self, repository_id, branch_id, branch_name, latest_commit):
         self.branch_id = branch_id
         self.repository_id = repository_id
         self.branch_name = branch_name
-        self.last_scanned_commit = last_scanned_commit
+        self.latest_commit = latest_commit
 
     @staticmethod
     def create_from_branch(branch: Branch, repository_id: int):
@@ -27,6 +27,6 @@ class DBbranch(Base):
             repository_id=repository_id,
             branch_id=branch.branch_id,
             branch_name=branch.branch_name,
-            last_scanned_commit=branch.last_scanned_commit
+            latest_commit=branch.latest_commit
         )
         return db_branch

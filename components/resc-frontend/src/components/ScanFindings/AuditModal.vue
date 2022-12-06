@@ -151,7 +151,7 @@ export default {
         return;
       }
 
-      FindingsService.auditMultipleFindings(this.selectedCheckBoxIds, this.status, this.comment)
+      FindingsService.auditFindings(this.selectedCheckBoxIds, this.status, this.comment)
         .then(() => {
           this.$emit('update-audit', this.status, this.comment);
           PushNotification.success('Audit saved successfully', 'Success', 5000);
