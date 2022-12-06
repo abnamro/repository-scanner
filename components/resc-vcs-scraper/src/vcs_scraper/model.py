@@ -19,7 +19,7 @@ class Branch:
     repository_id: int
     branch_name: str
     branch_id: str
-    last_scanned_commit: str
+    latest_commit: str
 
     def json(self):
         json_branch = json.dumps(dataclasses.asdict(self))

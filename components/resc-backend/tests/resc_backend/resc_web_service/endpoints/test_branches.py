@@ -23,7 +23,7 @@ class TestBranches(unittest.TestCase):
         for i in range(1, 6):
             self.db_branches.append(
                 DBbranch(repository_id=i, branch_id=f"branch_id_{i}", branch_name=f"branch_name_{i}",
-                         last_scanned_commit=f"last_scanned_commit_{i}"))
+                         latest_commit=f"latest_commit_{i}"))
             self.db_branches[i - 1].id_ = i
 
         self.db_scans = []
@@ -41,14 +41,14 @@ class TestBranches(unittest.TestCase):
     def cast_db_branch_to_branch_create(branch):
         return BranchCreate(branch_id=branch.branch_id,
                             branch_name=branch.branch_name,
-                            last_scanned_commit=branch.last_scanned_commit,
+                            latest_commit=branch.latest_commit,
                             repository_id=branch.repository_id)
 
     @staticmethod
     def assert_branch(data, branch):
         assert data["branch_id"] == branch.branch_id
         assert data["branch_name"] == branch.branch_name
-        assert data["last_scanned_commit"] == branch.last_scanned_commit
+        assert data["latest_commit"] == branch.latest_commit
         assert data["repository_id"] == branch.repository_id
         assert data["id_"] == branch.id_
 
@@ -102,7 +102,7 @@ class TestBranches(unittest.TestCase):
         assert data["detail"][0]["msg"] == "field required"
         assert data["detail"][1]["loc"] == ['body', 'branch_name']
         assert data["detail"][1]["msg"] == "field required"
-        assert data["detail"][2]["loc"] == ['body', 'last_scanned_commit']
+        assert data["detail"][2]["loc"] == ['body', 'latest_commit']
         assert data["detail"][2]["msg"] == "field required"
         assert data["detail"][3]["loc"] == ['body', 'repository_id']
         assert data["detail"][3]["msg"] == "field required"
@@ -135,7 +135,7 @@ class TestBranches(unittest.TestCase):
         assert data["detail"][0]["msg"] == "field required"
         assert data["detail"][1]["loc"] == ['body', 'branch_name']
         assert data["detail"][1]["msg"] == "field required"
-        assert data["detail"][2]["loc"] == ['body', 'last_scanned_commit']
+        assert data["detail"][2]["loc"] == ['body', 'latest_commit']
         assert data["detail"][2]["msg"] == "field required"
         assert data["detail"][3]["loc"] == ['body', 'repository_id']
         assert data["detail"][3]["msg"] == "field required"

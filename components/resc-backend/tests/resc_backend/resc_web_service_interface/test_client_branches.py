@@ -13,7 +13,7 @@ def test_create_branch(post):
 
     branch = BranchCreate(branch_id=1,
                           branch_name="branch_name",
-                          last_scanned_commit="last_scanned_commit",
+                          latest_commit="latest_commit",
                           repository_id=2)
     expected_json = branch.json()
 

@@ -6,20 +6,6 @@ import finding_count_per_week from '@/../tests/resources/mock_findings_count_per
 
 jest.mock('axios');
 
-describe('function auditSingleFinding', () => {
-  it('audit a single finding', async () => {
-    // Mock axios response
-    axios.put.mockResolvedValueOnce(findings.data[0]);
-
-    let finding = findings.data[0];
-    const response = await FindingsService.auditSingleFinding(finding);
-
-    expect(response).toBeDefined();
-    expect(response).not.toBeNull();
-    expect(response).toEqual(findings.data[0]);
-  });
-});
-
 describe('function getFindingById', () => {
   it('fetch a single finding', async () => {
     // Mock axios response
@@ -33,12 +19,12 @@ describe('function getFindingById', () => {
   });
 });
 
-describe('function auditMultipleFindings', () => {
+describe('function auditFindings', () => {
   it('update the status and comment of several findings (bulk update)', async () => {
     // Mock axios response
     axios.put.mockResolvedValueOnce(findings.data.slice(-2));
 
-    const response = await FindingsService.auditMultipleFindings([1, 2], 'FALSE_POSITIVE', 'test');
+    const response = await FindingsService.auditFindings([1, 2], 'FALSE_POSITIVE', 'test');
 
     expect(response).toBeDefined();
     expect(response).not.toBeNull();

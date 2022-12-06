@@ -8,7 +8,7 @@ INSERT INTO repository ( project_key, repository_id, repository_name, repository
     ( 'ado-proj2', 'r1', 'repo1', 'https://fake-ado.com/p2/r1', 1),
     ( 'btbk-proj1', 'r1', 'repo1', 'https://fake-bitbucket.com/p1/r1', 2);
 
-INSERT INTO branch ( repository_id, branch_id, branch_name, last_scanned_commit) VALUES
+INSERT INTO branch ( repository_id, branch_id, branch_name, latest_commit) VALUES
     ( 1, 'b1', 'branch1', 'qwerty123'),
     ( 1, 'b2', 'branch2', 'qwerty123'),
     ( 3, 'b1', 'branch1', 'qwerty123'),

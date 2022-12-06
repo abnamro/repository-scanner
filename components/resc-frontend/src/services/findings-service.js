@@ -11,16 +11,7 @@ const FindingsService = {
     return axios.get(`/findings/${findingId}`);
   },
 
-  async auditSingleFinding(finding) {
-    const comment = finding.comment == null ? '' : finding.comment;
-
-    return axios.put(`/findings/${finding.id_}/audit`, {
-      status: finding.status,
-      comment: comment,
-    });
-  },
-
-  async auditMultipleFindings(findingIds, findingStatus, comment) {
+  async auditFindings(findingIds, findingStatus, comment) {
     requireThat(findingIds, 'findingIds').isDefined().isNotNull().asArray().isNotEmpty();
     requireThat(findingStatus, 'findingStatus').isDefined().isNotNull();
     const commentVal = comment == null ? '' : comment;

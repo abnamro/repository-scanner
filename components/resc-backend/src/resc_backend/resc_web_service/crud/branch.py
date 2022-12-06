@@ -80,7 +80,7 @@ def update_branch(db_connection: Session, branch_id: int, branch: branch_schema.
     db_branch = db_connection.query(model.DBbranch).filter_by(id_=branch_id).first()
 
     db_branch.branch_name = branch.branch_name
-    db_branch.last_scanned_commit = branch.last_scanned_commit
+    db_branch.latest_commit = branch.latest_commit
 
     db_connection.commit()
     db_connection.refresh(db_branch)
@@ -92,7 +92,7 @@ def create_branch(db_connection: Session, branch: branch_schema.BranchCreate):
         repository_id=branch.repository_id,
         branch_id=branch.branch_id,
         branch_name=branch.branch_name,
-        last_scanned_commit=branch.last_scanned_commit
+        latest_commit=branch.latest_commit
     )
     db_connection.add(db_branch)
     db_connection.commit()

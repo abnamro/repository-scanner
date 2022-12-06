@@ -10,7 +10,7 @@ from pydantic import BaseModel, conint, constr
 class BranchBase(BaseModel):
     branch_id: constr(min_length=1, max_length=200)
     branch_name: constr(min_length=1, max_length=200)
-    last_scanned_commit: constr(min_length=1, max_length=100)
+    latest_commit: constr(min_length=1, max_length=100)
 
 
 class BranchCreate(BranchBase):

@@ -41,7 +41,7 @@ class TestFinding(unittest.TestCase):
         self.branch = DBbranch(repository_id=1,
                                branch_name="test_temp",
                                branch_id='master',
-                               last_scanned_commit="FAKE_HASH")
+                               latest_commit="FAKE_HASH")
         self.session.add(self.branch)
 
         self.rule_pack = DBrulePack(version="1.2")

@@ -81,14 +81,14 @@ class GithubPublicConnector(VCSConnector):
                 if branch_information.name.lower() in ["main", "master"]:
                     branch = Branch(repository_id=repository_information["id"],
                                     branch_name=branch_information.name,
-                                    last_scanned_commit=branch_information.latest_commit,
+                                    latest_commit=branch_information.latest_commit,
                                     branch_id=branch_information.name)
                     branches.append(branch)
                     break
             else:
                 branch = Branch(repository_id=repository_information["id"],
                                 branch_name=branch_information.name,
-                                last_scanned_commit=branch_information.latest_commit,
+                                latest_commit=branch_information.latest_commit,
                                 branch_id=branch_information.name)
                 branches.append(branch)
         repository = Repository(branches=branches,

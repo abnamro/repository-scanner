@@ -9,7 +9,7 @@ describe('function getFindingsCountByStatusForBranch', () => {
     data: {
       branch_id: 'b1',
       branch_name: 'master',
-      last_scanned_commit: 'dummy_commit',
+      latest_commit: 'dummy_commit',
       repository_id: 1,
       id_: 1,
     },
@@ -30,7 +30,7 @@ describe('function getFindingsCountByStatusForBranch', () => {
       expect(response).not.toBeNull();
       expect(response.data.branch_id).toBe('b1');
       expect(response.data.branch_name).toBe('master');
-      expect(response.data.last_scanned_commit).toBe('dummy_commit');
+      expect(response.data.latest_commit).toBe('dummy_commit');
       expect(response.data.repository_id).toBe(1);
       expect(response.data.id_).toBe(1);
       expect(response.true_positive).toBe(1);

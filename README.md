@@ -15,7 +15,7 @@
             <img src="https://img.shields.io/badge/maintainer-%40ABNAMRO-09996B?style=for-the-badge">
         </a>
         <a>
-            <img src="https://img.shields.io/badge/launched-MONTH%20YEAR-teal?style=for-the-badge">
+            <img src="https://img.shields.io/badge/launched-DEC%202022-teal?style=for-the-badge">
         </a>
         <a href="https://github.com/abnamro/repository-scanner/commits/main">
             <img src="https://img.shields.io/github/last-commit/abnamro/repository-scanner?style=for-the-badge&color=blue&label=updated">
@@ -67,14 +67,14 @@ consists of a MAJOR.MINOR.PATCH number (e.g. v1.2.4):
    
  - The **PATCH** part captures all other changes: 
    - small content edits. 
-  - bug fixes. 
-  - information corrections.
-  - updated broken links.
+   - bug fixes. 
+   - information corrections.
+   - updated broken links.
 
 ### Major releases
 Every notable release of the Repository Scanner tool, the changes that come with the release, and the release date are listed below. The full list of all releases can be found on the [Releases](https://github.com/abnamro/repository-scanner/releases) page:
 
-* **v1.0** – Initial release of the Repository Scanner:
+* **v1.0.0** – Initial release of the Repository Scanner:
     * Able to scan for secrets in repositories.
     * Complete overview of the found secrets through the User Interface with a direct link to the issue.
     * Able to sort the findings by secret type (tokens, certificates, passwords, etc.).
