@@ -39,7 +39,7 @@ def test_clone_repo(clone_from):
     for i in range(1, 6):
         branches.append(Branch(branch_id=i,
                                branch_name=f"branch_name{i}",
-                               last_scanned_commit=f"last_scanned_commit{i}"))
+                               latest_commit=f"latest_commit{i}"))
 
     repository = Repository(project_key="project_key",
                             repository_id=1,
@@ -79,7 +79,7 @@ def test_scan_repo(start_scan):
     for i in range(1, 6):
         branches.append(Branch(branch_id=i,
                                branch_name=f"branch_name{i}",
-                               last_scanned_commit=f"last_scanned_commit{i}"))
+                               latest_commit=f"latest_commit{i}"))
 
     repository = Repository(project_key="project_key",
                             repository_id=1,
@@ -98,7 +98,7 @@ def test_scan_repo(start_scan):
     )
     repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository.repository_name}@" \
                       f"{branches[0].branch_name}"
-    result = secret_scanner.scan_repo(ScanType.BASE, branches[0].branch_name, branches[0].last_scanned_commit,
+    result = secret_scanner.scan_repo(ScanType.BASE, branches[0].branch_name, branches[0].latest_commit,
                                       repo_clone_path)
     assert result is None
     start_scan.assert_called_once()

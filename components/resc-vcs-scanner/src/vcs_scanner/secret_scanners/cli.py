@@ -122,7 +122,7 @@ def scan_repository_from_cli():
     for i, branch in enumerate(args.branches):
         logger.info(f"Adding branch {branch} to the list of branches to be scanned")
         branches.append(
-            Branch(**{"branch_name": branch, "branch_id": i, "last_scanned_commit": FAKE_COMMIT})
+            Branch(**{"branch_name": branch, "branch_id": i, "latest_commit": FAKE_COMMIT})
         )
 
     vcs_type = guess_vcs_provider(args.repo_url)

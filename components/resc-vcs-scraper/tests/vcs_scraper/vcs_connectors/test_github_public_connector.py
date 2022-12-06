@@ -73,11 +73,11 @@ def test_export_repository_all_branches():
     assert result.branches[0].branch_id == "feature"
     assert result.branches[0].branch_name == "feature"
     assert result.branches[0].repository_id == 1
-    assert result.branches[0].last_scanned_commit == "ABCDEFG"
+    assert result.branches[0].latest_commit == "ABCDEFG"
     assert result.branches[1].branch_id == "master"
     assert result.branches[1].branch_name == "master"
     assert result.branches[1].repository_id == 1
-    assert result.branches[1].last_scanned_commit == "QRSTUVWXYZ"
+    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
 
 
 def test_create_github_client_from_vcs_instance():

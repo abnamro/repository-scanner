@@ -52,7 +52,7 @@ class TestRepositories(unittest.TestCase):
         for i in range(1, 6):
             self.db_branches.append(
                 DBbranch(repository_id=i, branch_id=f"branch_id_{i}", branch_name=f"branch_name_{i}",
-                         last_scanned_commit=f"last_scanned_commit_{i}"))
+                         latest_commit=f"latest_commit_{i}"))
             self.db_branches[i - 1].id_ = i
 
         self.db_scans = []
