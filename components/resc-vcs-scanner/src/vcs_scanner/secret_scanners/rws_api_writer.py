@@ -18,7 +18,7 @@ from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate,
 from resc_backend.resc_web_service_interface.branches import create_branch, get_last_scan_for_branch
 from resc_backend.resc_web_service_interface.findings import create_findings_with_scan_id
 from resc_backend.resc_web_service_interface.repositories import create_repository
-from resc_backend.resc_web_service_interface.rule_packs import download_rule_pack_toml_file
+from resc_backend.resc_web_service_interface.rule_packs import download_rule_pack_toml_file, get_rule_packs
 from resc_backend.resc_web_service_interface.scans import create_scan
 from resc_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -128,7 +128,46 @@ class RESTAPIWriter(OutputModule):
             logger.warning(f"Retrieving last scan details failed with error: {response.status_code}->{response.text}")
         return last_scanned_commit
 
+    @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(100))
+    def write_vcs_instances(self, vcs_instances_dict: Dict[str, VCSInstanceRuntime]) \
+            -> Dict[str, VCSInstanceRuntime]:
+        try:
+            for key in vcs_instances_dict:
+                vcs_instance = vcs_instances_dict[key]
+                vcs_instance_created = self.write_vcs_instance(vcs_instance)
+                if not vcs_instance_created:
+                    raise ValueError(f"Failed creating vcs instance {vcs_instance.name}")
+                vcs_instance.id_ = vcs_instance_created.id_
+                vcs_instances_dict[key] = vcs_instance
+            return vcs_instances_dict
+        except ValueError as ex:
+            logger.error(f"Failed creating vcs instances, is the API available? | {ex} | Retrying...")
+            raise
+
+    def get_active_rule_pack_version(self) -> str:
+        """
+            Retrieve active rule pack version from database
+        :return: str
+            Return active rule pack version
+        """
+        active_rule_pack_version = None
+        response = get_rule_packs(url=self.rws_url, active=True)
+        if response.status_code == 200:
+            json_body = json.loads(response.text)
+            active_rule_pack_version = json_body["data"][0]["version"] if json_body else None
+        else:
+            logger.warning(
+                f"Retrieving active rule pack version failed with error: {response.status_code}->{response.text}")
+        return active_rule_pack_version
+
     def download_rule_pack(self, rule_pack_version: Optional[str] = "") -> str:
+        """
+            Download rule pack
+        :param rule_pack_version:
+            optional, filter on rule pack version
+        :return: str
+            Return downloaded rule pack version
+        """
         response = download_rule_pack_toml_file(self.rws_url, rule_pack_version)
         if response.status_code == 200:
             filename = Path(TEMP_RULE_FILE)
@@ -150,18 +189,17 @@ class RESTAPIWriter(OutputModule):
                      f"error: {response.status_code}->{response.text}")
         sys.exit(-1)
 
-    @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(100))
-    def write_vcs_instances(self, vcs_instances_dict: Dict[str, VCSInstanceRuntime]) \
-            -> Dict[str, VCSInstanceRuntime]:
-        try:
-            for key in vcs_instances_dict:
-                vcs_instance = vcs_instances_dict[key]
-                vcs_instance_created = self.write_vcs_instance(vcs_instance)
-                if not vcs_instance_created:
-                    raise ValueError(f"Failed creating vcs instance {vcs_instance.name}")
-                vcs_instance.id_ = vcs_instance_created.id_
-                vcs_instances_dict[key] = vcs_instance
-            return vcs_instances_dict
-        except ValueError as ex:
-            logger.error(f"Failed creating vcs instances, is the API available? | {ex} | Retrying...")
-            raise
+    def check_active_rule_pack_version(self, rule_pack_version: str = None) -> str:
+        """
+            Check active rule pack version
+        :return: str
+            Return active rule pack version
+        """
+        if rule_pack_version:
+            rule_pack_version_from_db = self.get_active_rule_pack_version()
+
+            if rule_pack_version != rule_pack_version_from_db:
+                rule_pack_version = self.download_rule_pack(rule_pack_version_from_db)
+        else:
+            rule_pack_version = self.download_rule_pack()
+        return rule_pack_version

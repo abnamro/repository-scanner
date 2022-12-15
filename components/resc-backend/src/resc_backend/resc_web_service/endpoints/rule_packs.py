@@ -36,14 +36,17 @@ logger = logging.getLogger(__name__)
 @router.get("/versions",
             response_model=PaginationModel[RulePackRead],
             status_code=status.HTTP_200_OK)
-def get_all_rule_packs(version: Optional[str] = Query('', regex=r"^\d+(?:\.\d+){2}$"),
-                       skip: int = Query(default=0, ge=0),
-                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                       db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
+def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
+                   active: Optional[bool] = Query(None, description="Filter on active rule packs"),
+                   skip: int = Query(default=0, ge=0),
+                   limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
+                   db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
     """
-        Retrieve all rule packs from database
+        Retrieve rule packs from database
     :param version:
         optional, filter on rule pack version
+    :param active:
+        optional, filter on active rule pack
     :param skip:
         integer amount of records to skip, to support pagination
     :param limit:
@@ -54,8 +57,10 @@ def get_all_rule_packs(version: Optional[str] = Query('', regex=r"^\d+(?:\.\d+){
         The output will contain a PaginationModel containing the list of RulePackRead type objects,
         or an empty list if no rule pack was found
     """
-    rule_packs = rule_pack_crud.get_rule_packs(db_connection=db_connection, version=version, skip=skip, limit=limit)
-    total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version)
+    rule_packs = rule_pack_crud.get_rule_packs(db_connection=db_connection, version=version, active=active, skip=skip,
+                                               limit=limit)
+    total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version,
+                                                                       active=active)
     return PaginationModel[RulePackRead](data=rule_packs, total=total_rule_packs_count, limit=limit, skip=skip)
 
 

@@ -73,7 +73,7 @@ def get_newest_rule_pack(db_connection: Session) -> rule_pack_schema.RulePackRea
     return newest_rule_pack
 
 
-def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
+def get_rule_packs(db_connection: Session, version: str = None, active: bool = None, skip: int = 0,
                    limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT) -> List[model.rule_pack.DBrulePack]:
     """
         Retrieve rule packs from database
@@ -81,6 +81,8 @@ def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
         Session of the database connection
     :param version:
         optional, filter on rule pack version
+    :param active:
+        optional, filter on active rule pack
     :param skip:
         integer amount of records to skip, to support pagination
     :param limit:
@@ -94,23 +96,29 @@ def get_rule_packs(db_connection: Session, version: str = None, skip: int = 0,
 
     if version:
         query = query.filter(model.rule_pack.DBrulePack.version == version)
+    if active is not None:
+        query = query.filter(model.rule_pack.DBrulePack.active == active)
     rule_packs = query.order_by(model.rule_pack.DBrulePack.version.desc()).offset(skip).limit(limit_val).all()
     return rule_packs
 
 
-def get_total_rule_packs_count(db_connection: Session, version: str = None) -> int:
+def get_total_rule_packs_count(db_connection: Session, version: str = None, active: bool = None) -> int:
     """
         Retrieve total count of rule packs from database
     :param db_connection:
         Session of the database connection
     :param version:
         optional, filter on rule pack version
+    :param active:
+        optional, filter on active rule pack
     :return: int
         The output contains total count of rule packs
     """
     total_count_query = db_connection.query(func.count(model.rule_pack.DBrulePack.version))
     if version:
         total_count_query = total_count_query.filter(model.rule_pack.DBrulePack.version == version)
+    if active is not None:
+        total_count_query = total_count_query.filter(model.rule_pack.DBrulePack.active == active)
 
     total_count = total_count_query.scalar()
     return total_count
