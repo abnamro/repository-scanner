@@ -1,4 +1,5 @@
 # Standard Library
+import json
 import os
 from datetime import datetime
 from unittest.mock import patch
@@ -314,3 +315,68 @@ def test_download_rule_pack_unsuccessful(error, get):
         error.assert_called_once()
         error.assert_called_with(f"Aborting scan! Downloading rule pack version {rule_pack_version} failed with "
                                  f"error: {get.return_value.status_code}->{get.return_value.text}")
+
+
+@patch("vcs_scanner.secret_scanners.rws_api_writer.RESTAPIWriter.get_active_rule_pack_version")
+@patch("vcs_scanner.secret_scanners.rws_api_writer.RESTAPIWriter.download_rule_pack")
+def test_check_active_rule_pack_version_when_version_provided_equals_to_active_rule_pack_version(
+        download_rule_pack,
+        get_active_rule_pack_version):
+    url = "https://nonexistingwebsite.com"
+    version = "0.0.1"
+    get_active_rule_pack_version.return_value = "0.0.1"
+    download_rule_pack.return_value = "0.0.1"
+
+    rule_pack_version = RESTAPIWriter(rws_url=url).check_active_rule_pack_version(rule_pack_version=version)
+    assert rule_pack_version is get_active_rule_pack_version.return_value
+
+
+@patch("vcs_scanner.secret_scanners.rws_api_writer.RESTAPIWriter.get_active_rule_pack_version")
+@patch("vcs_scanner.secret_scanners.rws_api_writer.RESTAPIWriter.download_rule_pack")
+def test_check_active_rule_pack_version_when_version_provided_not_equals_to_active_rule_pack_version(
+        download_rule_pack,
+        get_active_rule_pack_version):
+    url = "https://nonexistingwebsite.com"
+    rule_pack_version = "0.0.1"
+    get_active_rule_pack_version.return_value = "0.0.2"
+    download_rule_pack.return_value = "0.0.2"
+
+    rule_pack_version = RESTAPIWriter(rws_url=url).check_active_rule_pack_version(rule_pack_version=rule_pack_version)
+    assert rule_pack_version is download_rule_pack.return_value
+
+
+@patch("vcs_scanner.secret_scanners.rws_api_writer.RESTAPIWriter.download_rule_pack")
+def test_check_active_rule_pack_version_when_rule_pack_version_not_provided(download_rule_pack):
+    url = "https://nonexistingwebsite.com"
+    rule_pack_version = None
+    download_rule_pack.return_value = "0.0.1"
+
+    rule_pack_version = RESTAPIWriter(rws_url=url).check_active_rule_pack_version(rule_pack_version=rule_pack_version)
+    assert rule_pack_version is download_rule_pack.return_value
+
+
+@patch("requests.get")
+def test_get_active_rule_pack_version_successful(get):
+    url = "https://nonexistingwebsite.com"
+    expected_result = '{"data": [ {"version": "1.0.0", "active": "true", "global_allow_list": 1}], "total": 1, ' \
+                      '"limit": 100, "skip": 0} '
+    get.return_value.status_code = 200
+    get.return_value.text = expected_result
+
+    result = RESTAPIWriter(rws_url=url).get_active_rule_pack_version()
+    assert result == json.loads(expected_result)["data"][0]["version"]
+
+
+@patch("requests.get")
+@patch("logging.Logger.warning")
+def test_get_active_rule_pack_version_unsuccessful(warning, get):
+    url = "https://nonexistingwebsite.com"
+    error_text = "Unable to retrieve active rule pack"
+    get.return_value.status_code = 404
+    get.return_value.text = error_text
+
+    result = RESTAPIWriter(rws_url=url).get_active_rule_pack_version()
+    assert result is None
+    warning.assert_called_once()
+    warning.assert_called_with(
+        f"Retrieving active rule pack version failed with error: {get.return_value.status_code}->{error_text}")

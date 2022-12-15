@@ -7,7 +7,7 @@ import requests
 from requests import Response
 
 # First Party
-from resc_backend.constants import RWS_ROUTE_RULE_PACKS, RWS_VERSION_PREFIX
+from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, RWS_ROUTE_RULE_PACKS, RWS_VERSION_PREFIX
 
 logger = logging.getLogger(__name__)
 
@@ -33,4 +33,14 @@ def download_rule_pack_toml_file(rws_url: str, rule_pack_version: Optional[str] 
     else:
         logger.error(f"Downloading rule pack version {rule_pack_version} failed with "
                      f"error: {response.status_code}->{response.text}")
+    return response
+
+
+def get_rule_packs(url: str, version: Optional[str] = None, active: Optional[bool] = None, skip: Optional[int] = 0,
+                   limit: Optional[int] = DEFAULT_RECORDS_PER_PAGE_LIMIT):
+    api_url = f"{url}{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions"
+    params = {"active": active, "skip": skip, "limit": limit}
+    if version:
+        params["version"] = version
+    response = requests.get(api_url, params=params, proxies={"http": "", "https": ""})
     return response

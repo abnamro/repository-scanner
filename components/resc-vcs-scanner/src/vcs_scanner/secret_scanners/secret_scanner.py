@@ -63,7 +63,9 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         return repo_clone_path
 
     def run_repository_scan(self) -> None:
-        logger.info(f"Started task for scanning {self.repository.repository_name}")
+        logger.info(
+            f"Started task for scanning {self.repository.repository_name} using "
+            f"rule pack version: {self.rule_pack_version}")
 
         # Insert in to repository table
         created_repository = self._output_module.write_repository(self.repository)
