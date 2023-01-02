@@ -21,6 +21,7 @@ from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.filters import FindingsFilter
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model400, Model404
 from resc_backend.resc_web_service.schema import finding as finding_schema
 from resc_backend.resc_web_service.schema import scan as scan_schema
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
@@ -33,7 +34,10 @@ logger = logging.getLogger(__name__)
 
 @router.get("",
             response_model=PaginationModel[scan_schema.ScanRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the scan objects"}
+            })
 def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                   db_connection: Session = Depends(get_db_connection)) -> PaginationModel[scan_schema.ScanRead]:
     """
@@ -57,7 +61,11 @@ def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default
 
 @router.post("",
              response_model=scan_schema.ScanRead,
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create a new scan"},
+                 400: {"model": Model400, "description": "Error creating a new scan"}
+             })
 def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(get_db_connection)):
     # Determine the increment number if needed and not supplied
     if scan.scan_type == ScanType.INCREMENTAL and (not scan.increment_number or scan.increment_number <= 0):
@@ -75,7 +83,11 @@ def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(g
 
 @router.get("/{scan_id}",
             response_model=scan_schema.ScanRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve scan <scan_id>"},
+                404: {"model": Model404, "description": "Scan <scan_id> not found"}
+            })
 def read_scan(scan_id: int, db_connection: Session = Depends(get_db_connection)):
     db_scan = scan_crud.get_scan(db_connection, scan_id=scan_id)
     if db_scan is None:
@@ -85,7 +97,11 @@ def read_scan(scan_id: int, db_connection: Session = Depends(get_db_connection))
 
 @router.put("/{scan_id}",
             response_model=scan_schema.ScanRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Update scan <scan_id>"},
+                404: {"model": Model404, "description": "Scan <scan_id> not found"}
+            })
 def update_scan(
         scan_id: int,
         scan: scan_schema.ScanCreate,
@@ -98,7 +114,11 @@ def update_scan(
 
 
 @router.delete("/{scan_id}",
-               status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_200_OK,
+               responses={
+                   200: {"description": "Delete scan <scan_id>"},
+                   404: {"model": Model404, "description": "Scan <scan_id> not found"}
+               })
 def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a scan object
@@ -118,7 +138,10 @@ def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection
 
 @router.post("/{scan_id}"f"{RWS_ROUTE_FINDINGS}",
              response_model=int,
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create findings and their associated scan_findings for scan <scan_id>"}
+             })
 def create_scan_findings(scan_id: int,
                          findings: List[finding_schema.FindingCreate],
                          db_connection: Session = Depends(get_db_connection)) \
@@ -151,7 +174,10 @@ def create_scan_findings(scan_id: int,
 
 @router.get("/{scan_id}"f"{RWS_ROUTE_FINDINGS}",
             response_model=PaginationModel[finding_schema.FindingRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve findings associated with scan <scan_id>"}
+            })
 def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                       rules: List[str] = Query([], regex=r"^[A-z0-9 .\-_%]*$", alias="rule", title="rule"),
@@ -187,7 +213,10 @@ def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
 
 @router.get(f"{RWS_ROUTE_FINDINGS}/",
             response_model=PaginationModel[finding_schema.FindingRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve findings associated with scan <scan_id>"}
+            })
 def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                        skip: int = Query(default=0, ge=0),
                        limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -224,7 +253,10 @@ def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="S
 
 @router.get(f"{RWS_ROUTE_DETECTED_RULES}/",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique rules associated with specified scans"}
+            })
 def get_distinct_rules_from_scans(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                                   db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """

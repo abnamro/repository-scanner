@@ -25,7 +25,10 @@ logger = logging.getLogger(__name__)
 
 @router.get(f"{RWS_ROUTE_DETECTED_RULES}",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique detected rules across all the findings"}
+            })
 def get_distinct_rules_from_findings(
         finding_statuses: List[FindingStatus] = Query(None, alias="findingstatus", title="FindingStatuses"),
         vcs_providers: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
@@ -66,7 +69,10 @@ def get_distinct_rules_from_findings(
 
 @router.get(f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}",
             response_model=List[RuleFindingCountModel],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the detected rules with counts per status"}
+            })
 def get_rules_finding_status_count(db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """
         Retrieve all detected rules with finding counts per supported status

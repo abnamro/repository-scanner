@@ -11,6 +11,7 @@ from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, RWS_ROUTE_VCS
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import vcs_instance as vcs_instance_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model400, Model404
 from resc_backend.resc_web_service.schema import vcs_instance as vcs_instance_schema
 from resc_backend.resc_web_service.schema.pagination_model import PaginationModel
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
@@ -19,7 +20,12 @@ router = APIRouter(prefix=f"{RWS_ROUTE_VCS}", tags=[VCS_TAG])
 logger = logging.getLogger(__name__)
 
 
-@router.post("", response_model=vcs_instance_schema.VCSInstanceRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=vcs_instance_schema.VCSInstanceRead,
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create new VCS instance"},
+                 400: {"model": Model400, "description": "Error creating new VCS instance"}
+             })
 def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
                         db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
@@ -42,7 +48,13 @@ def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
     return vcs_instance
 
 
-@router.get("/{vcs_instance_id}", response_model=vcs_instance_schema.VCSInstanceRead, status_code=status.HTTP_200_OK)
+@router.get("/{vcs_instance_id}",
+            response_model=vcs_instance_schema.VCSInstanceRead,
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve VCS Instance <vcs_instance_id>"},
+                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+            })
 def read_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
     """
@@ -61,7 +73,11 @@ def read_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get
     return vcs_instance
 
 
-@router.get("", response_model=PaginationModel[vcs_instance_schema.VCSInstanceRead], status_code=status.HTTP_200_OK)
+@router.get("", response_model=PaginationModel[vcs_instance_schema.VCSInstanceRead],
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the VCS Instances"}
+            })
 def get_all_vcs_instances(skip: int = Query(default=0, ge=0),
                           limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                           vcs_provider_type: Optional[VCSProviders] = Query(None),
@@ -98,7 +114,13 @@ def get_all_vcs_instances(skip: int = Query(default=0, ge=0),
                                                                 limit=limit, skip=skip)
 
 
-@router.put("/{vcs_instance_id}", response_model=vcs_instance_schema.VCSInstanceRead, status_code=status.HTTP_200_OK)
+@router.put("/{vcs_instance_id}",
+            response_model=vcs_instance_schema.VCSInstanceRead,
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Update VCS Instance <vcs_instance_id>"},
+                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+            })
 def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.VCSInstanceCreate,
                         db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
@@ -123,7 +145,11 @@ def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.
 
 
 @router.delete("/{vcs_instance_id}",
-               status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_200_OK,
+               responses={
+                   200: {"description": "Delete VCS Instance <vcs_instance_id>"},
+                   404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+               })
 def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a VCS instance object

@@ -14,6 +14,7 @@ from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import branch as branch_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
 from resc_backend.resc_web_service.schema import branch as branch_schema
 from resc_backend.resc_web_service.schema import scan as scan_schema
 from resc_backend.resc_web_service.schema.finding_count_model import FindingCountModel
@@ -24,7 +25,10 @@ router = APIRouter(prefix=f"{RWS_ROUTE_BRANCHES}", tags=[BRANCHES_TAG])
 
 @router.get("",
             response_model=PaginationModel[branch_schema.BranchRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all branches"}
+            })
 def get_all_branches(skip: int = Query(default=0, ge=0),
                      limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                      db_connection: Session = Depends(get_db_connection)) \
@@ -50,7 +54,11 @@ def get_all_branches(skip: int = Query(default=0, ge=0),
 
 
 @router.post("",
-             response_model=branch_schema.BranchRead, status_code=status.HTTP_201_CREATED)
+             response_model=branch_schema.BranchRead,
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create a new branch"}
+             })
 def create_branch(
         branch: branch_schema.BranchCreate, db_connection: Session = Depends(get_db_connection)):
     return branch_crud.create_branch_if_not_exists(db_connection=db_connection, branch=branch)
@@ -58,7 +66,11 @@ def create_branch(
 
 @router.get("/{branch_id}",
             response_model=branch_schema.BranchRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve branch <branch_id>"},
+                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+            })
 def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
@@ -68,12 +80,15 @@ def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connecti
 
 @router.put("/{branch_id}",
             response_model=branch_schema.BranchRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Update branch <branch_id>"},
+                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+            })
 def update_branch(
         branch_id: int,
         branch: branch_schema.BranchCreate,
-        db_connection: Session = Depends(get_db_connection)
-):
+        db_connection: Session = Depends(get_db_connection)):
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
         raise HTTPException(status_code=404, detail="Branch not found")
@@ -85,7 +100,11 @@ def update_branch(
 
 
 @router.delete("/{branch_id}",
-               status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_200_OK,
+               responses={
+                   200: {"description": "Delete branch <branch_id>"},
+                   404: {"model": Model404, "description": "Branch <branch_id> not found"}
+               })
 def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a branch object
@@ -105,7 +124,10 @@ def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connec
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_SCANS}",
             response_model=PaginationModel[scan_schema.ScanRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the scans related to a branch"}
+            })
 def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                          db_connection: Session = Depends(get_db_connection)) \
@@ -133,11 +155,14 @@ def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_LAST_SCAN}",
             response_model=scan_schema.ScanRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve the latest scan related to a branch"}
+            })
 def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> scan_schema.ScanRead:
     """
-        Retrieve latest scan object related to a branch
+        Retrieve the latest scan object related to a branch
     :param db_connection:
         Session of the database connection
     :param branch_id:
@@ -153,7 +178,11 @@ def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(ge
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_FINDINGS_METADATA}",
             response_model=FindingCountModel[branch_schema.BranchRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve findings metadata for branch <branch_id>"},
+                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+            })
 def get_findings_metadata_for_branch(branch_id: int,
                                      db_connection: Session = Depends(get_db_connection)) \
         -> FindingCountModel[branch_schema.BranchRead]:

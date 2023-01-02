@@ -23,6 +23,7 @@ from resc_backend.resc_web_service.crud import repository as repository_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.filters import FindingsFilter
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
 from resc_backend.resc_web_service.schema import branch as branch_schema
 from resc_backend.resc_web_service.schema import repository as repository_schema
 from resc_backend.resc_web_service.schema import repository_enriched as repository_enriched_schema
@@ -36,7 +37,10 @@ router = APIRouter(prefix=f"{RWS_ROUTE_REPOSITORIES}", tags=[REPOSITORIES_TAG])
 
 @router.get("",
             response_model=PaginationModel[repository_schema.RepositoryRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the repositories"}
+            })
 def get_all_repositories(skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                          vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
@@ -78,7 +82,10 @@ def get_all_repositories(skip: int = Query(default=0, ge=0),
 
 @router.post("",
              response_model=repository_schema.RepositoryRead,
-             status_code=status.HTTP_201_CREATED)
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create a new repository"}
+             })
 def create_repository(
         repository: repository_schema.RepositoryCreate,
         db_connection: Session = Depends(get_db_connection)):
@@ -87,7 +94,11 @@ def create_repository(
 
 @router.get("/{repository_id}",
             response_model=repository_schema.RepositoryRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+            })
 def read_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
@@ -97,7 +108,11 @@ def read_repository(repository_id: int, db_connection: Session = Depends(get_db_
 
 @router.put("/{repository_id}",
             response_model=repository_schema.RepositoryRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Update repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+            })
 def update_repository(
         repository_id: int,
         repository: repository_schema.RepositoryCreate,
@@ -111,7 +126,11 @@ def update_repository(
 
 
 @router.delete("/{repository_id}",
-               status_code=status.HTTP_200_OK)
+               status_code=status.HTTP_200_OK,
+               responses={
+                   200: {"description": "Delete repository <repository_id>"},
+                   404: {"model": Model404, "description": "Repository <repository_id> not found"}
+               })
 def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a repository object
@@ -131,7 +150,11 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
 
 @router.get("/{repository_id}"f"{RWS_ROUTE_BRANCHES}",
             response_model=PaginationModel[branch_schema.ViewableBranch],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the branches of a repository, enriched with the recent scan "
+                                     "information"}
+            })
 def get_branches_for_repository(repository_id: int, skip: int = Query(default=0, ge=0),
                                 limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                                 db_connection: Session = Depends(get_db_connection)) \
@@ -202,7 +225,10 @@ def enrich_branch_with_latest_scan_data(db_connection: Session, branch: DBbranch
 
 @router.get(f"{RWS_ROUTE_DISTINCT_PROJECTS}/",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique project-names"}
+            })
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                           repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                           onlyifhasfindings: bool = Query(default=False),
@@ -231,7 +257,10 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
 
 @router.get(f"{RWS_ROUTE_DISTINCT_REPOSITORIES}/",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique repository names"}
+            })
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                               projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                               onlyifhasfindings: bool = Query(default=False),
@@ -260,7 +289,11 @@ def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, ali
 
 @router.get("/{repository_id}"f"{RWS_ROUTE_FINDINGS_METADATA}",
             response_model=FindingCountModel[repository_schema.RepositoryRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve findings metadata for repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+            })
 def get_findings_metadata_for_repository(repository_id: int,
                                          db_connection: Session = Depends(get_db_connection)) \
         -> FindingCountModel[repository_schema.RepositoryRead]:
@@ -293,7 +326,10 @@ def get_findings_metadata_for_repository(repository_id: int,
 
 @router.get(f"{RWS_ROUTE_FINDINGS_METADATA}/",
             response_model=PaginationModel[repository_enriched_schema.RepositoryEnrichedRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the findings metadata for all the repositories"}
+            })
 def get_all_repositories_with_findings_metadata(
         skip: int = Query(default=0, ge=0),
         limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
