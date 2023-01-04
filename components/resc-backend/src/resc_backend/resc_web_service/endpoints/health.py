@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 @router.get(f"{RWS_ROUTE_HEALTH}",
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve the health status"}
+            })
 def health_check():
     return {"status": "OK"}

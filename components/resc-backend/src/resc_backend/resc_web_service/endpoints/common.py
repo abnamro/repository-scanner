@@ -13,7 +13,10 @@ router = APIRouter(tags=[COMMON_TAG])
 
 @router.get(f"{RWS_ROUTE_SUPPORTED_VCS_PROVIDERS}",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve the supported vcs-providers"}
+            })
 def get_supported_vcs_providers(response: Response) -> List[str]:
     """
         Retrieve all supported vcs providers
@@ -26,7 +29,10 @@ def get_supported_vcs_providers(response: Response) -> List[str]:
 
 
 @router.get(f"{RWS_ROUTE_AUTH_CHECK}",
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Validate authorization check from the access-token"}
+            })
 def auth_check():
     """
         Validates authorization check from the access token

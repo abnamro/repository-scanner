@@ -13,6 +13,7 @@ from resc_backend.resc_web_service.crud import detailed_finding as detailed_find
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.filters import FindingsFilter
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
 from resc_backend.resc_web_service.schema import detailed_finding as detailed_finding_schema
 from resc_backend.resc_web_service.schema.pagination_model import PaginationModel
 
@@ -22,7 +23,10 @@ logger = logging.getLogger(__name__)
 
 @router.get("",
             response_model=PaginationModel[detailed_finding_schema.DetailedFindingRead],
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the findings"}
+            })
 def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
                               limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                               db_connection: Session = Depends(get_db_connection),
@@ -106,7 +110,11 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
 
 @router.get("/{finding_id}",
             response_model=detailed_finding_schema.DetailedFindingRead,
-            status_code=status.HTTP_200_OK)
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve detailed finding <finding_id>"},
+                404: {"model": Model404, "description": "Finding <finding_id> not found"}
+            })
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> detailed_finding_schema.DetailedFindingRead:
     db_finding = detailed_finding_crud.get_detailed_finding(db_connection, finding_id=finding_id)
