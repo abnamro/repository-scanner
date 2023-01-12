@@ -25,6 +25,7 @@ router = APIRouter(prefix=f"{RWS_ROUTE_BRANCHES}", tags=[BRANCHES_TAG])
 
 @router.get("",
             response_model=PaginationModel[branch_schema.BranchRead],
+            summary="Get branches",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all branches"}
@@ -35,13 +36,11 @@ def get_all_branches(skip: int = Query(default=0, ge=0),
         -> PaginationModel[branch_schema.BranchRead]:
     """
         Retrieve all branch objects paginated
-    :param db_connection:
-        Session of the database connection
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :return: [BranchRead]
+
+    - **db_connection**: Session of the database connection
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [BranchRead]
         The output will contain a PaginationModel containing the list of BranchRead type objects,
         or an empty list if no branch was found
     """
@@ -55,23 +54,40 @@ def get_all_branches(skip: int = Query(default=0, ge=0),
 
 @router.post("",
              response_model=branch_schema.BranchRead,
+             summary="Create a branch",
              status_code=status.HTTP_201_CREATED,
              responses={
                  201: {"description": "Create a new branch"}
              })
 def create_branch(
         branch: branch_schema.BranchCreate, db_connection: Session = Depends(get_db_connection)):
+    """
+        Create a branch with all the information
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: branch id
+    - **branch_name**: branch name
+    - **latest_commit**: branch latest commit hash
+    - **repository_id**: repository id
+    """
     return branch_crud.create_branch_if_not_exists(db_connection=db_connection, branch=branch)
 
 
 @router.get("/{branch_id}",
             response_model=branch_schema.BranchRead,
+            summary="Fetch a branch by ID",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve branch <branch_id>"},
                 404: {"model": Model404, "description": "Branch <branch_id> not found"}
             })
 def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Read a branch by ID
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the branch for which details need to be fetched
+    """
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
         raise HTTPException(status_code=404, detail="Branch not found")
@@ -80,6 +96,7 @@ def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connecti
 
 @router.put("/{branch_id}",
             response_model=branch_schema.BranchRead,
+            summary="Update an existing branch",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update branch <branch_id>"},
@@ -89,6 +106,15 @@ def update_branch(
         branch_id: int,
         branch: branch_schema.BranchCreate,
         db_connection: Session = Depends(get_db_connection)):
+    """
+        Update an existing branch
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: branch id to update
+    - **branch_name**: branch name to update
+    - **latest_commit**: branch latest commit hash to update
+    - **repository_id**: repository id to update
+    """
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
         raise HTTPException(status_code=404, detail="Branch not found")
@@ -100,6 +126,7 @@ def update_branch(
 
 
 @router.delete("/{branch_id}",
+               summary="Delete a branch",
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete branch <branch_id>"},
@@ -108,12 +135,10 @@ def update_branch(
 def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a branch object
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the branch to delete
-    :return:
-        The output will contain a success or error message based on the success of the deletion
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the branch to delete
+    - **return**: The output will contain a success or error message based on the success of the deletion
     """
     db_branch = branch_crud.get_branch(db_connection, branch_id=branch_id)
     if db_branch is None:
@@ -123,6 +148,7 @@ def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connec
 
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_SCANS}",
+            summary="Get scans for branch",
             response_model=PaginationModel[scan_schema.ScanRead],
             status_code=status.HTTP_200_OK,
             responses={
@@ -134,15 +160,12 @@ def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
         -> PaginationModel[scan_schema.ScanRead]:
     """
         Retrieve all scan objects related to a branch paginated
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the parent branch object of which to retrieve scan objects
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :return: [ScanRead]
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [ScanRead]
         The output will contain a PaginationModel containing the list of ScanRead type objects,
         or an empty list if no scan was found
     """
@@ -155,6 +178,7 @@ def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_LAST_SCAN}",
             response_model=scan_schema.ScanRead,
+            summary="Get latest scan for branch",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve the latest scan related to a branch"}
@@ -163,11 +187,10 @@ def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(ge
         -> scan_schema.ScanRead:
     """
         Retrieve the latest scan object related to a branch
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the parent branch object of which to retrieve scan object
-    :return: ScanRead
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
+    - **return**: ScanRead
         The output will contain a ScanRead type object,
         or empty if no scan was found
     """
@@ -178,6 +201,7 @@ def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(ge
 
 @router.get("/{branch_id}"f"{RWS_ROUTE_FINDINGS_METADATA}",
             response_model=FindingCountModel[branch_schema.BranchRead],
+            summary="Get findings metadata for branch",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve findings metadata for branch <branch_id>"},
@@ -188,11 +212,10 @@ def get_findings_metadata_for_branch(branch_id: int,
         -> FindingCountModel[branch_schema.BranchRead]:
     """
         Retrieve findings metadata for a branch
-    :param branch_id:
-        id of the branch object for which findings metadata to be retrieved
-    :param db_connection:
-        Session of the database connection
-    :return: BranchedRead, findings count per status
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the branch object for which findings metadata to be retrieved
+    - **return**: BranchedRead, findings count per status
         The output will contain a BranchedRead type object along with findings count per status,
         or empty if no scan was found
     """

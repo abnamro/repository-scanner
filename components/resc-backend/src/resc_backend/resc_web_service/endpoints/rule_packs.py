@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/versions",
             response_model=PaginationModel[RulePackRead],
+            summary="Get rule packs",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the rule-packs"}
@@ -46,18 +47,14 @@ def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}
                    limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                    db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
     """
-        Retrieve rule packs from database
-    :param version:
-        optional, filter on rule pack version
-    :param active:
-        optional, filter on active rule pack
-    :param skip:
-        integer amount of records to skip, to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param db_connection:
-        Session of the database connection
-    :return: [RulePackRead]
+        Retrieve rule packs
+
+    - **db_connection**: Session of the database connection
+    - **version**: Optional, filter on rule pack version
+    - **active**: Optional, filter on active rule pack
+    - **skip**: Integer amount of records to skip, to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [RulePackRead]
         The output will contain a PaginationModel containing the list of RulePackRead type objects,
         or an empty list if no rule pack was found
     """
@@ -69,6 +66,7 @@ def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}
 
 
 @router.get("",
+            summary="Download rule pack in TOML format",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Download the rule-pack in TOML format"},
@@ -79,12 +77,10 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
                                        db_connection: Session = Depends(get_db_connection)) -> FileResponse:
     """
         Download rule pack in TOML format
-    :param version:
-        optional, filter on rule pack version
-    :param db_connection:
-        Session of the database connection
-    :return: [FileResponse]
-        The output returns rule pack file downloaded in TOML format
+
+    - **db_connection**: Session of the database connection
+    - **version**: Optional, filter on rule pack version
+    - **return**: [FileResponse] The output returns rule pack file downloaded in TOML format
     """
     if not version:
         logger.info("rule pack version not specified, downloading the currently active version")
@@ -104,9 +100,10 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
 
 
 @router.post("",
+             summary="Upload rule pack in TOML format",
              status_code=status.HTTP_200_OK,
              responses={
-                200: {"description": "Update the rule-pack in TOML format"},
+                200: {"description": "Upload the rule-pack in TOML format"},
                 400: {"model": Model400, "description": "No properties defined for rule allow list"},
                 409: {"model": Model409, "description": "Rule-pack version <version_id> already exists"},
                 422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"}
@@ -115,15 +112,12 @@ def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\
                                rule_file: UploadFile = File(...),
                                db_connection: Session = Depends(get_db_connection)) -> dict:
     """
-        Upload rule pack to database in TOML format
-    :param version:
-        version of the rule pack to be uploaded
-    :param rule_file:
-        TOML rule pack file to be uploaded
-    :param db_connection:
-        Session of the database connection
-    :return: dict
-        The output returns uploaded rule pack name in dictionary format
+        Upload TOML rule pack to database
+
+    - **db_connection**: Session of the database connection
+    - **version**: Version of the rule pack to be uploaded
+    - **rule_file**: TOML rule pack file to be uploaded
+    - **return**: dict The output returns uploaded rule pack name in dictionary format
     """
     content = validate_uploaded_file_and_read_content(rule_file)
     toml_rule_dictionary = tomlkit.loads(content)

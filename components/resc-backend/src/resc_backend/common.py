@@ -3,6 +3,9 @@ import logging.config
 from distutils.sysconfig import get_python_lib
 from os import path
 
+# Third Party
+import pkg_resources
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,3 +28,11 @@ def initialise_logs(log_file_path: str, debug=True):
     else:
         logger_config.setLevel(logging.INFO)
     return logger_config
+
+
+def get_package_version():
+    try:
+        version = pkg_resources.get_distribution("resc-backend").version
+    except pkg_resources.DistributionNotFound:
+        version = "1.0.0"
+    return version

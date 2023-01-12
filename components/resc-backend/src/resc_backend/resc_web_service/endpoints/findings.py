@@ -36,6 +36,7 @@ router = APIRouter(prefix=f"{RWS_ROUTE_FINDINGS}", tags=[FINDINGS_TAG])
 
 @router.get("",
             response_model=PaginationModel[finding_schema.FindingRead],
+            summary="Get findings",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the findings"}
@@ -46,13 +47,11 @@ def get_all_findings(skip: int = Query(default=0, ge=0),
         -> PaginationModel[finding_schema.FindingRead]:
     """
         Retrieve all findings objects paginated
-    :param db_connection:
-        Session of the database connection
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :return: [FindingRead]
+
+    - **db_connection**: Session of the database connection
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [FindingRead]
         The output will contain a PaginationModel containing the list of FindingRead type objects,
         or an empty list if no finding was found
     """
@@ -65,6 +64,7 @@ def get_all_findings(skip: int = Query(default=0, ge=0),
 
 @router.post("",
              response_model=int,
+             summary="Create a finding",
              status_code=status.HTTP_201_CREATED,
              responses={
                  201: {"description": "Create new findings"},
@@ -74,11 +74,22 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
         -> int:
     """
           Create new findings
-      :param db_connection:
-          Session of the database connection
-      :param findings:
-          List of findings to create
-      :return: int
+
+    - **db_connection**: Session of the database connection
+    - **file_path**: file path
+    - **line_number**: Line number
+    - **commit_id**: commit hash
+    - **commit_message**: Commit message
+    - **commit_timestamp**: Commit timestamp
+    - **author**: Author name
+    - **email**: Email of the author
+    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+    - **comment**: Comment
+    - **event_sent_on**: event sent timestamp
+    - **rule_name**: rule name
+    - **branch_id**: branch id of the finding
+    - **return**: int
           The output will contain the number of successful created findings
       """
     try:
@@ -91,12 +102,19 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
 
 @router.get("/{finding_id}",
             response_model=finding_schema.FindingRead,
+            summary="Fetch a finding by ID",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve finding <finding_id>"},
                 404: {"model": Model404, "description": "Finding <finding_id> not found"}
             })
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Read a finding by ID
+
+    - **db_connection**: Session of the database connection
+    - **finding_id**: ID of the finding for which details need to be fetched
+    """
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
@@ -107,6 +125,7 @@ def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connec
 
 @router.patch("/{finding_id}",
               response_model=finding_schema.FindingRead,
+              summary="Partially update a finding by ID",
               status_code=status.HTTP_200_OK,
               responses={
                   200: {"description": "Modify finding <finding_id>"},
@@ -117,6 +136,13 @@ def patch_finding(
         finding_update: finding_schema.FindingPatch,
         db_connection: Session = Depends(get_db_connection)
 ):
+    """
+        Partially update a finding by ID
+
+    - **db_connection**: Session of the database connection
+    - **finding_id**: ID of the finding for which details need to be updated
+    - **event_sent_on**: Event sent timestamp
+    """
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
     scan_ids = [x.scan_id for x in db_sca_findings]
@@ -130,6 +156,7 @@ def patch_finding(
 
 @router.put("/{finding_id}",
             response_model=finding_schema.FindingRead,
+            summary="Update a finding by ID",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update finding <finding_id>"},
@@ -140,6 +167,15 @@ def update_finding(
         finding: finding_schema.FindingUpdate,
         db_connection: Session = Depends(get_db_connection)
 ):
+    """
+        Update a finding by ID
+
+    - **db_connection**: Session of the database connection
+    - **finding_ids**: List of finding IDs for which details need to be updated
+    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+    - **comment**: Comment
+    """
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
     scan_ids = [x.scan_id for x in db_sca_findings]
@@ -152,6 +188,7 @@ def update_finding(
 
 
 @router.delete("/{finding_id}",
+               summary="Delete a finding",
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete finding <finding_id>"},
@@ -160,12 +197,10 @@ def update_finding(
 def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
     """
         Delete a finding object
-    :param db_connection:
-        Session of the database connection
-    :param finding_id:
-        id of the finding to delete
-    :return:
-        The output will contain a success or error message based on the success of the deletion
+
+    - **db_connection**: Session of the database connection
+    - **finding_id**: ID of the finding to delete
+    - **return**: The output will contain a success or error message based on the success of the deletion
     """
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     if db_finding is None:
@@ -175,17 +210,25 @@ def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_conn
 
 
 @router.get(f"{RWS_ROUTE_TOTAL_COUNT_BY_RULE}""/{rule_name}",
+            summary="Get total findings count by rule",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings of rule <rule_name>"}
+                200: {"description": "Retrieve total findings count of rule <rule_name>"}
             })
 def get_total_findings_count_by_rule(rule_name: str, db_connection: Session = Depends(get_db_connection)):
+    """
+        Retrieve total findings count for a given rule
+
+    - **db_connection**: Session of the database connection
+    - **rule_name**: name of the rule
+    """
     findings_filter = FindingsFilter(rule_names=[rule_name])
     return finding_crud.get_total_findings_count(db_connection, findings_filter=findings_filter)
 
 
 @router.get(f"{RWS_ROUTE_BY_RULE}""/{rule_name}",
             response_model=PaginationModel[finding_schema.FindingRead],
+            summary="Get findings by rule",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the findings of rule <rule_name>"}
@@ -196,15 +239,12 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
         -> PaginationModel[finding_schema.FindingRead]:
     """
         Retrieve all findings objects paginated by rule
-    :param db_connection:
-        Session of the database connection
-    :param rule_name:
-        Name of the rule to filter the findings by
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :return: [FindingRead]
+
+    - **db_connection**: Session of the database connection
+    - **rule_name**: Name of the rule to filter the findings by
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [FindingRead]
         The output will contain a PaginationModel containing the list of FindingRead type objects,
         or an empty list if no finding was found for the given rule
     """
@@ -216,6 +256,7 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
 
 @router.put(f"{RWS_ROUTE_AUDIT}/",
             response_model=List[finding_schema.FindingRead],
+            summary="audit single/multiple findings",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Audit finding(s) to update status and comments"},
@@ -227,11 +268,13 @@ def audit_findings(
 ) -> List[finding_schema.FindingRead]:
     """
         Audit single/multiple findings, updating the status and comment
-    :param db_connection:
-        Session of the database connection
-    :param audit:
-        audit object, containing the ids to audit, status to set and the comment
-    :return: [FindingRead]
+
+    - **db_connection**: Session of the database connection
+    - **finding_ids**: List of finding IDs for which audit to be performed
+    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+    - **comment**: Comment
+    - **return**: [FindingRead]
         The output will contain a list of the findings that where updated
     """
     audited_findings = []
@@ -253,6 +296,7 @@ def audit_findings(
 
 @router.get(f"{RWS_ROUTE_SUPPORTED_STATUSES}/",
             response_model=List[str],
+            summary="Get all supported statuses for findings",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the supported statuses for the findings"}
@@ -260,7 +304,8 @@ def audit_findings(
 def get_supported_statuses(response: Response) -> List[str]:
     """
         Retrieve all supported statuses for findings
-    :return: List[str]
+
+    - **return**: List[str]
         The output will contain a list of strings of unique statuses supported
     """
     response.headers["Cache-Control"] = CACHE_MAX_AGE
@@ -270,6 +315,7 @@ def get_supported_statuses(response: Response) -> List[str]:
 
 @router.get(f"{RWS_ROUTE_COUNT_BY_TIME}/""{time_type}",
             response_model=PaginationModel[DateCountModel],
+            summary="Get all the findings by time period",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the findings by time-period <time_type>"}
@@ -283,19 +329,14 @@ def get_count_by_time(time_type: DateFilter,
         -> PaginationModel[DateCountModel]:
     """
         Retrieve all findings count by time period objects paginated
-    :param db_connection:
-        Session of the database connection
-    :param time_type:
-        required, filter on time_type
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param start_date_time
-        Optional, filter on start date
-    :param end_date_time
-        Optional, filter on end date
-    :return: PaginationModel[DateCountModel]
+
+    - **db_connection**: Session of the database connection
+    - **time_type**: required, filter on time type. Available values: month, week, day
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **start_date_time**: Optional, filter on start date
+    - **end_date_time**: Optional, filter on end date
+    - **return**: PaginationModel[DateCountModel]
         The output will contain a PaginationModel containing the list of DateCountModel type objects,
         or an empty list if no data was found
     """

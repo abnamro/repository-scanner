@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 @router.get(f"{RWS_ROUTE_HEALTH}",
+            summary="Health check",
+            description="Retrieve the health status of RESC APIs",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve the health status"}
