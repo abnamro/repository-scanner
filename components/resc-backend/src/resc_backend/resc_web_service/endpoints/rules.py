@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 @router.get(f"{RWS_ROUTE_DETECTED_RULES}",
             response_model=List[str],
+            summary="Get unique rules from findings",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the unique detected rules across all the findings"}
@@ -39,22 +40,15 @@ def get_distinct_rules_from_findings(
         db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all uniquely detected rules across all findings in the database
-    :param finding_statuses:
-        optional, filter of supported finding statuses
-    :param vcs_providers:
-        optional, filter of supported vcs provider types
-    :param db_connection:
-        Session of the database connection
-    :param project_name:
-        optional, filter on project name. Is used as a full string match filter
-    :param repository_name:
-        Optional, filter on repository name. Is used as a string contains filter
-    :param start_date_time
-        Optional, filter on start date
-    :param end_date_time
-        Optional, filter on end date
-    :return: List[str]
-        The output will contain a list of strings of unique rules in the findings table
+
+    - **db_connection**: Session of the database connection
+    - **finding_statuses**: Optional, filter on supported finding statuses
+    - **vcs_providers**: Optional, filter on supported vcs provider types
+    - **project_name**: Optional, filter on project name. It is used as a full string match filter
+    - **repository_name**: Optional, filter on repository name. It is used as a string contains filter
+    - **start_date_time**: Optional, filter on start date
+    - **end_date_time**: Optional, filter on end date
+    - **return**: List[str] The output will contain a list of strings of unique rules in the findings table
     """
     distinct_rules = finding_crud.get_distinct_rules_from_findings(db_connection,
                                                                    finding_statuses=finding_statuses,
@@ -69,6 +63,7 @@ def get_distinct_rules_from_findings(
 
 @router.get(f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}",
             response_model=List[RuleFindingCountModel],
+            summary="Get detected rules with counts per status",
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the detected rules with counts per status"}
@@ -76,10 +71,9 @@ def get_distinct_rules_from_findings(
 def get_rules_finding_status_count(db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """
         Retrieve all detected rules with finding counts per supported status
-    :param db_connection:
-        Session of the database connection
-    :return: List[str]
-        The output will contain a list of strings of unique rules in the findings table
+
+    - **db_connection**: Session of the database connection
+    - **return**: List[str] The output will contain a list of strings of unique rules with counts per status
     """
     distinct_rules = finding_crud.get_distinct_rules_from_findings(db_connection)
 
