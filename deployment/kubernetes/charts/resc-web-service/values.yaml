@@ -26,7 +26,7 @@ resc:
     dbSchema: 
     dbUser: 
     dbPass: 
-    odbcDriver: "ODBC Driver 17 for SQL Server"
+    odbcDriver: "ODBC Driver 18 for SQL Server"
     dbDSN: "rescdb"
   authRequired: "true"
   ssoConfig:
