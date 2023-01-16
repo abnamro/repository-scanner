@@ -63,7 +63,7 @@ resc-web-service:
   exposeToHostPort: 30800
   resc:
     config:
-      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
+      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
       dbSchema: "master" # <enter database schema name here, default to master>
       dbUser: "sa" # <enter database username here, default to sa>
       dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
@@ -94,7 +94,7 @@ resc-database:
 resc-database-init:
   resc:
     config:
-      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}"
+      dbConnectionString: "mssql+pyodbc://{MSSQL_USERNAME}:{MSSQL_PASSWORD}@{MSSQL_DB_HOST}:{MSSQL_DB_PORT}/{MSSQL_SCHEMA}?driver={MSSQL_ODBC_DRIVER}&Encrypt=yes&TrustServerCertificate=yes"
       dbSchema: "master" # <enter database schema name here, default to master>
       dbUser: "sa" # <enter database username here, default to sa>
       dbPass: "Y0urStr0ngPassword" # <enter database password here, default to Y0urStr0ngPassword>
