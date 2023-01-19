@@ -17,7 +17,7 @@ env:
   RESC_COMPONENTS: components
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-vcs-scanner
-  IMAGE_TAG: 1.0.0
+  IMAGE_TAG: 1.0.1
 
 jobs:
   python-basic-validation:

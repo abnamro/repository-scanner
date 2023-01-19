@@ -16,7 +16,7 @@ env:
   RESC_VCS_SCRAPER_DIR: components/resc-vcs-scraper
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-vcs-scraper
-  IMAGE_TAG: 1.0.0
+  IMAGE_TAG: 1.0.1
 
 jobs:
   python-basic-validation:

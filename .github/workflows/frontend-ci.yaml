@@ -16,7 +16,7 @@ env:
   RESC_FRONTEND_DIR: components/resc-frontend
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-frontend
-  IMAGE_TAG: 1.0.0
+  IMAGE_TAG: 1.0.1
 
 jobs:
   nodejs-basic-validation:
