@@ -11,12 +11,12 @@ RUN apk -U upgrade \
 
 RUN mkdir /resc_backend && mkdir /vcs_scanner
 
-COPY ./components/resc-backend /resc_backend
+COPY ./resc-backend /resc_backend
 
 RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER" \
 && chown -R $RUN_AS_USER:$RUN_AS_USER ./resc_backend
 
-COPY /components/resc-vcs-scanner /vcs_scanner
+COPY ./resc-vcs-scanner /vcs_scanner
 
 RUN chown -R $RUN_AS_USER:$RUN_AS_USER ./vcs_scanner \
 && chmod +x ./vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64
