@@ -11,11 +11,18 @@ from packaging.version import Version
 from pydantic import Required
 
 # First Party
-from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, RULE_PACKS_TAG, RWS_ROUTE_RULE_PACKS
+from resc_backend.constants import (
+    DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    RULE_PACKS_TAG,
+    RWS_ROUTE_RULE_PACKS
+)
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.crud import rule_pack as rule_pack_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model400, Model404, Model409, Model422
 from resc_backend.resc_web_service.helpers.rule import (
     create_toml_dictionary,
     create_toml_rule_file,
@@ -35,41 +42,55 @@ logger = logging.getLogger(__name__)
 
 @router.get("/versions",
             response_model=PaginationModel[RulePackRead],
-            status_code=status.HTTP_200_OK)
-def get_all_rule_packs(version: Optional[str] = Query('', regex=r"^\d+(?:\.\d+){2}$"),
-                       skip: int = Query(default=0, ge=0),
-                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                       db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
+            summary="Get rule packs",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the rule-packs"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
+def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
+                   active: Optional[bool] = Query(None, description="Filter on active rule packs"),
+                   skip: int = Query(default=0, ge=0),
+                   limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
+                   db_connection: Session = Depends(get_db_connection)) -> PaginationModel[RulePackRead]:
     """
-        Retrieve all rule packs from database
-    :param version:
-        optional, filter on rule pack version
-    :param skip:
-        integer amount of records to skip, to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param db_connection:
-        Session of the database connection
-    :return: [RulePackRead]
+        Retrieve rule packs
+
+    - **db_connection**: Session of the database connection
+    - **version**: Optional, filter on rule pack version
+    - **active**: Optional, filter on active rule pack
+    - **skip**: Integer amount of records to skip, to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [RulePackRead]
         The output will contain a PaginationModel containing the list of RulePackRead type objects,
         or an empty list if no rule pack was found
     """
-    rule_packs = rule_pack_crud.get_rule_packs(db_connection=db_connection, version=version, skip=skip, limit=limit)
-    total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version)
+    rule_packs = rule_pack_crud.get_rule_packs(db_connection=db_connection, version=version, active=active, skip=skip,
+                                               limit=limit)
+    total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version,
+                                                                       active=active)
     return PaginationModel[RulePackRead](data=rule_packs, total=total_rule_packs_count, limit=limit, skip=skip)
 
 
-@router.get("", status_code=status.HTTP_200_OK)
+@router.get("",
+            summary="Download rule pack in TOML format",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Download the rule-pack in TOML format"},
+                404: {"model": Model404, "description": "No rule-pack of version <version_id> found"},
+                422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 async def download_rule_pack_toml_file(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
                                        db_connection: Session = Depends(get_db_connection)) -> FileResponse:
     """
         Download rule pack in TOML format
-    :param version:
-        optional, filter on rule pack version
-    :param db_connection:
-        Session of the database connection
-    :return: [FileResponse]
-        The output returns rule pack file downloaded in TOML format
+
+    - **db_connection**: Session of the database connection
+    - **version**: Optional, filter on rule pack version
+    - **return**: [FileResponse] The output returns rule pack file downloaded in TOML format
     """
     if not version:
         logger.info("rule pack version not specified, downloading the currently active version")
@@ -89,20 +110,26 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
 
 
 @router.post("",
-             status_code=status.HTTP_200_OK)
+             summary="Upload rule pack in TOML format",
+             status_code=status.HTTP_200_OK,
+             responses={
+                 200: {"description": "Upload the rule-pack in TOML format"},
+                 400: {"model": Model400, "description": "No properties defined for rule allow list"},
+                 409: {"model": Model409, "description": "Rule-pack version <version_id> already exists"},
+                 422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
+             })
 def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
                                rule_file: UploadFile = File(...),
                                db_connection: Session = Depends(get_db_connection)) -> dict:
     """
-        Upload rule pack to database in TOML format
-    :param version:
-        version of the rule pack to be uploaded
-    :param rule_file:
-        TOML rule pack file to be uploaded
-    :param db_connection:
-        Session of the database connection
-    :return: dict
-        The output returns uploaded rule pack name in dictionary format
+        Upload TOML rule pack to database
+
+    - **db_connection**: Session of the database connection
+    - **version**: Version of the rule pack to be uploaded
+    - **rule_file**: TOML rule pack file to be uploaded
+    - **return**: dict The output returns uploaded rule pack name in dictionary format
     """
     content = validate_uploaded_file_and_read_content(rule_file)
     toml_rule_dictionary = tomlkit.loads(content)

@@ -13,7 +13,6 @@ RWS_ROUTE_SCANS = "/scans"
 RWS_ROUTE_LAST_SCAN = "/last-scan"
 RWS_ROUTE_FINDINGS = "/findings"
 RWS_ROUTE_RULES = "/rules"
-RWS_ROUTE_RULE_PACKS = "/rule-packs"
 RWS_ROUTE_DETAILED_FINDINGS = "/detailed-findings"
 RWS_ROUTE_TOTAL_COUNT_BY_RULE = "/total-count-by-rule"
 RWS_ROUTE_BY_RULE = "/by-rule"
@@ -62,3 +61,7 @@ ALLOWED_EXTENSION = ".toml"
 # Logging
 LOG_FILE_PATH_RABBITMQ = "rabbitmq_initialization.log"
 LOGGING_FILE = "logging.ini"
+
+# Error message
+ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
+ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"

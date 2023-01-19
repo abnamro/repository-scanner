@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 # First Party
 from resc_backend.constants import (
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
     REPOSITORIES_TAG,
     RWS_ROUTE_BRANCHES,
     RWS_ROUTE_DISTINCT_PROJECTS,
@@ -23,6 +25,7 @@ from resc_backend.resc_web_service.crud import repository as repository_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.filters import FindingsFilter
+from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
 from resc_backend.resc_web_service.schema import branch as branch_schema
 from resc_backend.resc_web_service.schema import repository as repository_schema
 from resc_backend.resc_web_service.schema import repository_enriched as repository_enriched_schema
@@ -36,7 +39,13 @@ router = APIRouter(prefix=f"{RWS_ROUTE_REPOSITORIES}", tags=[REPOSITORIES_TAG])
 
 @router.get("",
             response_model=PaginationModel[repository_schema.RepositoryRead],
-            status_code=status.HTTP_200_OK)
+            summary="Get repositories",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the repositories"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_all_repositories(skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                          vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
@@ -46,19 +55,14 @@ def get_all_repositories(skip: int = Query(default=0, ge=0),
         -> PaginationModel[repository_schema.RepositoryRead]:
     """
         Retrieve all repository objects paginated
-    :param db_connection:
-        Session of the database connection
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param vcsproviders:
-        optional, filter of supported vcs provider types
-    :param projectfilter:
-        optional, filter on project name. Is used as a string contains filter
-    :param repositoryfilter:
-        optional, filter on repository name. Is used as a string contains filter
-    :return: [RepositoryRead]
+
+    - **db_connection**: Session of the database connection
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **vcsproviders**: Optional, filter on supported vcs provider types
+    - **projectfilter**: Optional, filter on project name. It is used as a string contains filter
+    - **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter
+    - **return**: [RepositoryRead]
         The output will contain a PaginationModel containing the list of RepositoryRead type objects,
         or an empty list if no repository
     """
@@ -78,17 +82,46 @@ def get_all_repositories(skip: int = Query(default=0, ge=0),
 
 @router.post("",
              response_model=repository_schema.RepositoryRead,
-             status_code=status.HTTP_201_CREATED)
+             summary="Create a repository",
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Create a new repository"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
+             })
 def create_repository(
         repository: repository_schema.RepositoryCreate,
         db_connection: Session = Depends(get_db_connection)):
+    """
+        Create a repository with all the information
+
+    - **db_connection**: Session of the database connection
+    - **project_key**: each repository must have a project name or key
+    - **repository_id**: repository id
+    - **repository_name**: repository name
+    - **repository_url**: repository url
+    - **vcs_instance**: vcs instance id
+    """
     return repository_crud.create_repository_if_not_exists(db_connection=db_connection, repository=repository)
 
 
 @router.get("/{repository_id}",
             response_model=repository_schema.RepositoryRead,
-            status_code=status.HTTP_200_OK)
+            summary="Fetch a repository by ID",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def read_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
+    """
+        Read a repository by ID
+
+    - **db_connection**: Session of the database connection
+    - **repository_id**: ID of the repository for which details need to be fetched
+    """
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
@@ -97,12 +130,30 @@ def read_repository(repository_id: int, db_connection: Session = Depends(get_db_
 
 @router.put("/{repository_id}",
             response_model=repository_schema.RepositoryRead,
-            status_code=status.HTTP_200_OK)
+            summary="Update an existing repository",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Update repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def update_repository(
         repository_id: int,
         repository: repository_schema.RepositoryCreate,
         db_connection: Session = Depends(get_db_connection)
 ):
+    """
+        Update an existing repository
+
+    - **db_connection**: Session of the database connection
+    - **repository_id**: ID of the repository
+    - **project_key**: project name that needs to be updated
+    - **repository_id**: repository id that needs to be updated
+    - **repository_name**: repository name that needs to be updated
+    - **repository_url**: repository url that needs to be updated
+    - **vcs_instance**: vcs instance id that needs to be updated
+    """
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
@@ -111,16 +162,21 @@ def update_repository(
 
 
 @router.delete("/{repository_id}",
-               status_code=status.HTTP_200_OK)
+               summary="Delete a repository",
+               status_code=status.HTTP_200_OK,
+               responses={
+                   200: {"description": "Delete repository <repository_id>"},
+                   404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
+               })
 def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     """
-        Delete a repository object
-    :param db_connection:
-        Session of the database connection
-    :param repository_id:
-        id of the repository to delete
-    :return:
-        The output will contain a success or error message based on the success of the deletion
+        Delete a repository
+
+    - **db_connection**: Session of the database connection
+    - **repository_id**: ID of the repository to delete
+    - **return**: The output will contain a success or error message based on the success of the deletion
     """
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
@@ -131,23 +187,26 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
 
 @router.get("/{repository_id}"f"{RWS_ROUTE_BRANCHES}",
             response_model=PaginationModel[branch_schema.ViewableBranch],
-            status_code=status.HTTP_200_OK)
+            summary="Get branches for a repository",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the branches of a repository, enriched with the recent scan "
+                                     "information"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_branches_for_repository(repository_id: int, skip: int = Query(default=0, ge=0),
                                 limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                                 db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[branch_schema.ViewableBranch]:
     """
-        Retrieve all branch child objects of a repository object from the database
-        enriched with most recent scan information
-    :param db_connection:
-        Session of the database connection
-    :param repository_id:
-        id of the parent repository object of which to retrieve branch objects
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :return: [ViewableBranch]
+        Retrieve all branches enriched with most recent scan information for a repository
+
+    - **db_connection**: Session of the database connection
+    - **repository_id**: ID of the parent repository object for which branch objects need to be retrieved
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [ViewableBranch]
         The output will contain a PaginationModel containing the list of ViewableBranch type objects,
         or an empty list if no branch was found for the given repository_id
     """
@@ -202,22 +261,25 @@ def enrich_branch_with_latest_scan_data(db_connection: Session, branch: DBbranch
 
 @router.get(f"{RWS_ROUTE_DISTINCT_PROJECTS}/",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            summary="Get all unique project names",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique project-names"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                           repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                           onlyifhasfindings: bool = Query(default=False),
                           db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all unique project names
-    :param db_connection:
-        Session of the database connection
-    :param vcsproviders:
-        optional, filter of supported vcs provider types
-    :param repositoryfilter:
-        optional, filter on repository name. Is used as a string contains filter
-    :param onlyifhasfindings:
-        optional, filter all projects that have findings
-    :return: List[str]
+
+    - **db_connection**: Session of the database connection
+    - **vcsproviders**: Optional, filter on supported vcs provider types
+    - **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter
+    - **onlyifhasfindings**: Optional, filter all projects those have findings
+    - **return**: List[str]
         The output will contain a list of unique projects
     """
 
@@ -231,22 +293,25 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
 
 @router.get(f"{RWS_ROUTE_DISTINCT_REPOSITORIES}/",
             response_model=List[str],
-            status_code=status.HTTP_200_OK)
+            summary="Get all unique repository names",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the unique repository names"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                               projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                               onlyifhasfindings: bool = Query(default=False),
                               db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all unique repository names
-    :param db_connection:
-        Session of the database connection
-    :param vcsproviders:
-        optional, filter of supported vcs provider types
-    :param projectname:
-        optional, filter on project name. Is used as a full string match filter
-    :param onlyifhasfindings:
-        optional, filter all repositories that have findings
-    :return: List[str]
+
+    - **db_connection**: Session of the database connection
+    - **vcsproviders**: Optional, filter of supported vcs provider types
+    - **projectname**: Optional, filter on project name. It is used as a full string match filter
+    - **onlyifhasfindings**: Optional, filter all repositories that have findings
+    - **return**: List[str]
         The output will contain a list of unique repositories
     """
 
@@ -260,17 +325,23 @@ def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, ali
 
 @router.get("/{repository_id}"f"{RWS_ROUTE_FINDINGS_METADATA}",
             response_model=FindingCountModel[repository_schema.RepositoryRead],
-            status_code=status.HTTP_200_OK)
+            summary="Get findings metadata for a repository",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve findings metadata for repository <repository_id>"},
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_findings_metadata_for_repository(repository_id: int,
                                          db_connection: Session = Depends(get_db_connection)) \
         -> FindingCountModel[repository_schema.RepositoryRead]:
     """
         Retrieve findings metadata for a repository
-    :param repository_id:
-        id of the repository object for which findings metadata to be retrieved
-    :param db_connection:
-        Session of the database connection
-    :return: RepositoryRead, findings count per status
+
+    - **db_connection**: Session of the database connection
+    - **repository_id**: ID of the repository object for which findings metadata to be retrieved
+    - **return**: RepositoryRead, findings count per status
         The output will contain a RepositoryRead type object along with findings count per status,
         or empty if no scan was found
     """
@@ -293,7 +364,13 @@ def get_findings_metadata_for_repository(repository_id: int,
 
 @router.get(f"{RWS_ROUTE_FINDINGS_METADATA}/",
             response_model=PaginationModel[repository_enriched_schema.RepositoryEnrichedRead],
-            status_code=status.HTTP_200_OK)
+            summary="Get all repositories with findings metadata",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the findings metadata for all the repositories"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
 def get_all_repositories_with_findings_metadata(
         skip: int = Query(default=0, ge=0),
         limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -308,21 +385,15 @@ def get_all_repositories_with_findings_metadata(
         -> PaginationModel[repository_enriched_schema.RepositoryEnrichedRead]:
     """
         Retrieve all repository objects paginated
-    :param db_connection:
-        Session of the database connection
-    :param skip:
-        integer amount of records to skip to support pagination
-    :param limit:
-        integer amount of records to return, to support pagination
-    :param vcsproviders:
-        optional, filter of supported vcs provider types
-    :param projectfilter:
-        optional, filter on project name. Is used as a string contains filter
-    :param repositoryfilter:
-        optional, filter on repository name. Is used as a string contains filter
-    :param onlyifhasfindings:
-        optional, filter all repositories that have findings
-    :return: [RepositoryEnrichedRead]
+
+    - **db_connection**: Session of the database connection
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **vcsproviders**: Optional, filter on supported vcs provider types
+    - **projectfilter**: Optional, filter on project name. It is used as a string contains filter
+    - **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter
+    - **onlyifhasfindings**: Optional, filter all repositories those have findings
+    - **return**: [RepositoryEnrichedRead]
         The output will contain a PaginationModel containing the list of RepositoryEnrichedRead type objects,
         or an empty list if no repository
     """

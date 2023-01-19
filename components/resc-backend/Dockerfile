@@ -1,66 +1,40 @@
-FROM python:3.9.13-alpine3.16
+FROM python:3.9.16-alpine3.17
 
 ARG NAME="resc_backend"
-ARG DESCRIPTION="Repository Scanner backend"
+ARG DESCRIPTION="Repository Scanner Backend"
 ARG VERSION=${VERSION}
 ARG RUN_AS_USER="apiuser"
 
-# hadolint ignore=DL3018
-RUN apk add --no-cache nginx build-base linux-headers pcre-dev
-
-# Adding dev dependencies for pyjwt
-# hadolint ignore=DL3018
-RUN apk add --no-cache --virtual .build-deps pcre-dev gcc musl-dev python3-dev libffi-dev openssl-dev
-
-# hadolint ignore=DL3017
-RUN apk upgrade -U -a
-
-# hadolint ignore=DL3018
-RUN apk add --no-cache git
-
-# Install MSSQL ODBC Drivers
-RUN apk add curl
-#Download the MSSQL ODBC Driver package(s)
-RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.apk
-RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.apk
-
-#Verify MSSQL ODBC Driver signature:
-RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.sig
-RUN curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/mssql-tools_17.8.1.1-1_amd64.sig
-
-RUN apk add gnupg
-RUN curl https://packages.microsoft.com/keys/microsoft.asc  | gpg --import -
-RUN gpg --verify msodbcsql17_17.8.1.1-1_amd64.sig msodbcsql17_17.8.1.1-1_amd64.apk
-RUN gpg --verify mssql-tools_17.8.1.1-1_amd64.sig mssql-tools_17.8.1.1-1_amd64.apk
-# hadolint ignore=DL3018
-RUN apk --purge del gnupg
-
-#Install the MSSQL ODBC Driver package(s)
-RUN apk add --allow-untrusted msodbcsql17_17.8.1.1-1_amd64.apk
-RUN apk add --allow-untrusted mssql-tools_17.8.1.1-1_amd64.apk
-
-# Install MSSQL Python Driver dependencies
-RUN apk add g++ unixodbc-dev
+RUN apk -U upgrade \
+&& apk add --no-cache curl git nginx build-base linux-headers \
+&& apk add --no-cache --virtual .build-deps pcre-dev gcc musl-dev python3-dev libffi-dev openssl-dev \
+&& curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/msodbcsql18_18.1.2.1-1_amd64.apk \
+&& curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/mssql-tools18_18.1.1.1-1_amd64.apk \
+&& curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/msodbcsql18_18.1.2.1-1_amd64.sig \
+&& curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/mssql-tools18_18.1.1.1-1_amd64.sig \
+&& apk add gnupg \
+&& curl https://packages.microsoft.com/keys/microsoft.asc  | gpg --import - \
+&& gpg --verify msodbcsql18_18.1.2.1-1_amd64.sig msodbcsql18_18.1.2.1-1_amd64.apk \
+&& gpg --verify mssql-tools18_18.1.1.1-1_amd64.sig mssql-tools18_18.1.1.1-1_amd64.apk \
+&& apk add --allow-untrusted msodbcsql18_18.1.2.1-1_amd64.apk \
+&& apk add --allow-untrusted mssql-tools18_18.1.1.1-1_amd64.apk \
+&& apk add g++ unixodbc-dev
 
 RUN mkdir /resc_backend
 
 COPY ./ /resc_backend
-RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER"
-RUN chown -R $RUN_AS_USER:$RUN_AS_USER ./resc_backend
+
+RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER" \
+&& chown -R $RUN_AS_USER:$RUN_AS_USER ./resc_backend
 
 USER $RUN_AS_USER
 ENV PATH=$PATH:/home/apiuser/.local/bin
-# hadolint ignore=DL3013
-RUN pip install -U pip
-# hadolint ignore=DL3013
-RUN pip install pyodbc==4.0.32
-# hadolint ignore=DL3013
-RUN pip install -e /resc_backend
 
-# Remove pyjwt dependencies, needs root
+RUN pip install --no-cache-dir --upgrade pyodbc==4.0.32 -e /resc_backend
+
 USER root
-# hadolint ignore=DL3018
-RUN apk --purge del .build-deps
+
+RUN apk --purge del gnupg .build-deps
 
 USER $RUN_AS_USER
 

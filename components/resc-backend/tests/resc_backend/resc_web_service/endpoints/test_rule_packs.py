@@ -109,7 +109,7 @@ class TestRules(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.rule_pack.get_total_rule_packs_count")
     @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
-    def test_multiple_rule_pack_versions(self, get_rule_packs, get_total_rule_packs_count):
+    def test_get_rule_packs(self, get_rule_packs, get_total_rule_packs_count):
         get_rule_packs.return_value = self.db_rule_packs[:2]
         get_total_rule_packs_count.return_value = len(self.db_rule_packs[:2])
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
@@ -123,8 +123,59 @@ class TestRules(unittest.TestCase):
         assert data["limit"] == 5
         assert data["skip"] == 0
 
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_total_rule_packs_count")
     @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
-    def test_multiple_rule_pack_versions_with_negative_skip(self, get_rule_packs):
+    def test_get_rule_packs_when_version_provided(self, get_rule_packs, get_total_rule_packs_count):
+        get_rule_packs.return_value = self.db_rule_packs[:1]
+        get_total_rule_packs_count.return_value = len(self.db_rule_packs[:1])
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
+                                   params={"version": "1.0.1", "skip": 0, "limit": 5})
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data["data"]) == 1
+        self.assert_rule_packs(data["data"][0], self.db_rule_packs[0])
+        assert data["data"][0]["version"], "1.0.1"
+        assert data["total"] == 1
+        assert data["limit"] == 5
+        assert data["skip"] == 0
+
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_total_rule_packs_count")
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
+    def test_get_rule_packs_when_version_and_active_provided(self, get_rule_packs, get_total_rule_packs_count):
+        get_rule_packs.return_value = self.db_rule_packs[:1]
+        get_total_rule_packs_count.return_value = len(self.db_rule_packs[:1])
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
+                                   params={"version": "1.0.1", "active": False, "skip": 0, "limit": 5})
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data["data"]) == 1
+        self.assert_rule_packs(data["data"][0], self.db_rule_packs[0])
+        assert data["data"][0]["version"], "1.0.1"
+        assert data["data"][0]["active"] is False
+        assert data["total"] == 1
+        assert data["limit"] == 5
+        assert data["skip"] == 0
+
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_total_rule_packs_count")
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
+    def test_get_rule_packs_when_active_provided(self, get_rule_packs, get_total_rule_packs_count):
+        get_rule_packs.return_value = self.db_rule_packs[:2]
+        get_total_rule_packs_count.return_value = len(self.db_rule_packs[:2])
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
+                                   params={"active": False, "skip": 0, "limit": 5})
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data["data"]) == 2
+        self.assert_rule_packs(data["data"][0], self.db_rule_packs[0])
+        self.assert_rule_packs(data["data"][1], self.db_rule_packs[1])
+        assert data["data"][0]["active"] is False
+        assert data["data"][1]["active"] is False
+        assert data["total"] == 2
+        assert data["limit"] == 5
+        assert data["skip"] == 0
+
+    @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
+    def test_get_rule_packs_with_negative_skip(self, get_rule_packs):
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
                                    params={"skip": -1, "limit": 5})
         assert response.status_code == 422, response.text
@@ -134,7 +185,7 @@ class TestRules(unittest.TestCase):
         get_rule_packs.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.rule_pack.get_rule_packs")
-    def test_multiple_rule_pack_versions_with_negative_limit(self, get_rule_packs):
+    def test_get_rule_packs_with_negative_limit(self, get_rule_packs):
         response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}/versions",
                                    params={"skip": 0, "limit": -1})
         assert response.status_code == 422, response.text

@@ -11,6 +11,7 @@ from starlette.status import HTTP_302_FOUND
 from tenacity import RetryError
 
 # First Party
+from resc_backend.common import get_package_version
 from resc_backend.constants import RWS_VERSION_PREFIX
 from resc_backend.db.connection import Session, engine
 from resc_backend.resc_web_service.dependencies import (
@@ -30,6 +31,7 @@ from resc_backend.resc_web_service.endpoints import (
     scans,
     vcs_instances
 )
+from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
 
 
 def generate_logger_config(log_file_path, debug=True):
@@ -98,9 +100,10 @@ tags_metadata = [
 # Check if authentication is required for api endpoints
 AUTH = [Depends(requires_no_auth)] if os.getenv('AUTHENTICATION_REQUIRED', '') == 'false' else [Depends(requires_auth)]
 
-app = FastAPI(title="Repository Scanner(RESC)",
+app = FastAPI(title="Repository Scanner (RESC)",
               description="RESC API helps you to perform several operations upon findings "
                           "obtained from multiple source code repositories.",
+              version=get_package_version(),
               openapi_tags=tags_metadata, dependencies=AUTH)
 
 if os.getenv('ENABLE_CORS', '') == 'true':
@@ -123,6 +126,9 @@ app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
+
+# Add exception handlers
+add_exception_handlers(app=app)
 
 
 @app.on_event("startup")

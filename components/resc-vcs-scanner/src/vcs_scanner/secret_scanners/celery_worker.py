@@ -49,11 +49,13 @@ rws_writer: RESTAPIWriter = RESTAPIWriter(rws_url=rws_url)
 vcs_instances_list = load_vcs_instances(env_variables[VCS_INSTANCES_FILE_PATH])
 vcs_instances = rws_writer.write_vcs_instances(vcs_instances_list)
 
-rule_pack_version = rws_writer.download_rule_pack()
+downloaded_rule_pack_version = rws_writer.download_rule_pack()
 
 
 @app.task(name="scan_repository", Queue=rabbitmq_queue)
 def scan_repository(repository):
+    active_rule_pack_version = rws_writer.check_active_rule_pack_version(rule_pack_version=downloaded_rule_pack_version)
+
     repository_runtime = RepositoryRuntime(**json.loads(repository))
 
     logger.info(f"Received repository to scan via the queue '{rabbitmq_queue}' => "
@@ -72,7 +74,7 @@ def scan_repository(repository):
         secret_scanner = SecretScanner(
             gitleaks_binary_path=env_variables[GITLEAKS_PATH],
             gitleaks_rules_path=TEMP_RULE_FILE,
-            rule_pack_version=rule_pack_version,
+            rule_pack_version=active_rule_pack_version,
             output_plugin=RESTAPIWriter(rws_url=rws_url),
             repository=repository,
             username=vcs_instance.username,

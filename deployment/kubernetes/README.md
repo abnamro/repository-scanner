@@ -182,13 +182,13 @@ docker pull mcr.microsoft.com/azure-sql-edge:1.0.5
 
 docker pull rabbitmq:3.11.2-management-alpine
 
-docker pull rescabnamro/resc-backend:1.0.0
+docker pull rescabnamro/resc-backend:1.0.1
 
-docker pull rescabnamro/resc-frontend:1.0.0
+docker pull rescabnamro/resc-frontend:1.0.1
 
-docker pull rescabnamro/resc-vcs-scraper:1.0.0
+docker pull rescabnamro/resc-vcs-scraper:1.0.1
 
-docker pull rescabnamro/resc-vcs-scanner:1.0.0
+docker pull rescabnamro/resc-vcs-scanner:1.0.1
 ```
 
 ### Trigger scanning
