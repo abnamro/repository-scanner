@@ -7,7 +7,13 @@ import urllib.parse
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 # First Party
-from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, FINDINGS_TAG, RWS_ROUTE_DETAILED_FINDINGS
+from resc_backend.constants import (
+    DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    FINDINGS_TAG,
+    RWS_ROUTE_DETAILED_FINDINGS
+)
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import detailed_finding as detailed_finding_crud
 from resc_backend.resc_web_service.crud import finding as finding_crud
@@ -26,7 +32,9 @@ logger = logging.getLogger(__name__)
             summary="Get all detailed findings",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings"}
+                200: {"description": "Retrieve all the findings"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
                               limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -115,7 +123,9 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve detailed finding <finding_id>"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> detailed_finding_schema.DetailedFindingRead:

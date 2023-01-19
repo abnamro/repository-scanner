@@ -61,3 +61,7 @@ ALLOWED_EXTENSION = ".toml"
 # Logging
 LOG_FILE_PATH_RABBITMQ = "rabbitmq_initialization.log"
 LOGGING_FILE = "logging.ini"
+
+# Error message
+ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
+ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"

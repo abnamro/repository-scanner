@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from resc_backend.constants import (
     BRANCHES_TAG,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
     RWS_ROUTE_BRANCHES,
     RWS_ROUTE_FINDINGS_METADATA,
     RWS_ROUTE_LAST_SCAN,
@@ -28,7 +30,9 @@ router = APIRouter(prefix=f"{RWS_ROUTE_BRANCHES}", tags=[BRANCHES_TAG])
             summary="Get branches",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all branches"}
+                200: {"description": "Retrieve all branches"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_branches(skip: int = Query(default=0, ge=0),
                      limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -57,7 +61,9 @@ def get_all_branches(skip: int = Query(default=0, ge=0),
              summary="Create a branch",
              status_code=status.HTTP_201_CREATED,
              responses={
-                 201: {"description": "Create a new branch"}
+                 201: {"description": "Create a new branch"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_branch(
         branch: branch_schema.BranchCreate, db_connection: Session = Depends(get_db_connection)):
@@ -79,7 +85,9 @@ def create_branch(
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve branch <branch_id>"},
-                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+                404: {"model": Model404, "description": "Branch <branch_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -100,7 +108,9 @@ def read_branch(branch_id: int, db_connection: Session = Depends(get_db_connecti
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update branch <branch_id>"},
-                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+                404: {"model": Model404, "description": "Branch <branch_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def update_branch(
         branch_id: int,
@@ -130,7 +140,9 @@ def update_branch(
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete branch <branch_id>"},
-                   404: {"model": Model404, "description": "Branch <branch_id> not found"}
+                   404: {"model": Model404, "description": "Branch <branch_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
                })
 def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -152,7 +164,9 @@ def delete_branch(branch_id: int, db_connection: Session = Depends(get_db_connec
             response_model=PaginationModel[scan_schema.ScanRead],
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the scans related to a branch"}
+                200: {"description": "Retrieve all the scans related to a branch"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -181,7 +195,9 @@ def get_scans_for_branch(branch_id: int, skip: int = Query(default=0, ge=0),
             summary="Get latest scan for branch",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve the latest scan related to a branch"}
+                200: {"description": "Retrieve the latest scan related to a branch"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> scan_schema.ScanRead:
@@ -205,7 +221,9 @@ def get_last_scan_for_branch(branch_id: int, db_connection: Session = Depends(ge
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve findings metadata for branch <branch_id>"},
-                404: {"model": Model404, "description": "Branch <branch_id> not found"}
+                404: {"model": Model404, "description": "Branch <branch_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_findings_metadata_for_branch(branch_id: int,
                                      db_connection: Session = Depends(get_db_connection)) \

@@ -11,7 +11,13 @@ from packaging.version import Version
 from pydantic import Required
 
 # First Party
-from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, RULE_PACKS_TAG, RWS_ROUTE_RULE_PACKS
+from resc_backend.constants import (
+    DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    RULE_PACKS_TAG,
+    RWS_ROUTE_RULE_PACKS
+)
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.crud import rule_pack as rule_pack_crud
@@ -39,7 +45,9 @@ logger = logging.getLogger(__name__)
             summary="Get rule packs",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the rule-packs"}
+                200: {"description": "Retrieve all the rule-packs"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
                    active: Optional[bool] = Query(None, description="Filter on active rule packs"),
@@ -71,7 +79,9 @@ def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}
             responses={
                 200: {"description": "Download the rule-pack in TOML format"},
                 404: {"model": Model404, "description": "No rule-pack of version <version_id> found"},
-                422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"}
+                422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 async def download_rule_pack_toml_file(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
                                        db_connection: Session = Depends(get_db_connection)) -> FileResponse:
@@ -103,10 +113,12 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
              summary="Upload rule pack in TOML format",
              status_code=status.HTTP_200_OK,
              responses={
-                200: {"description": "Upload the rule-pack in TOML format"},
-                400: {"model": Model400, "description": "No properties defined for rule allow list"},
-                409: {"model": Model409, "description": "Rule-pack version <version_id> already exists"},
-                422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"}
+                 200: {"description": "Upload the rule-pack in TOML format"},
+                 400: {"model": Model400, "description": "No properties defined for rule allow list"},
+                 409: {"model": Model409, "description": "Rule-pack version <version_id> already exists"},
+                 422: {"model": Model422, "description": "Version <version_id> is not a valid semantic version"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
                                rule_file: UploadFile = File(...),

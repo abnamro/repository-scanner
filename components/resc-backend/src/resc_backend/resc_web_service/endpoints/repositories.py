@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 # First Party
 from resc_backend.constants import (
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
     REPOSITORIES_TAG,
     RWS_ROUTE_BRANCHES,
     RWS_ROUTE_DISTINCT_PROJECTS,
@@ -40,7 +42,9 @@ router = APIRouter(prefix=f"{RWS_ROUTE_REPOSITORIES}", tags=[REPOSITORIES_TAG])
             summary="Get repositories",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the repositories"}
+                200: {"description": "Retrieve all the repositories"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_repositories(skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -81,7 +85,9 @@ def get_all_repositories(skip: int = Query(default=0, ge=0),
              summary="Create a repository",
              status_code=status.HTTP_201_CREATED,
              responses={
-                 201: {"description": "Create a new repository"}
+                 201: {"description": "Create a new repository"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_repository(
         repository: repository_schema.RepositoryCreate,
@@ -105,7 +111,9 @@ def create_repository(
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve repository <repository_id>"},
-                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -126,7 +134,9 @@ def read_repository(repository_id: int, db_connection: Session = Depends(get_db_
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update repository <repository_id>"},
-                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def update_repository(
         repository_id: int,
@@ -156,7 +166,9 @@ def update_repository(
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete repository <repository_id>"},
-                   404: {"model": Model404, "description": "Repository <repository_id> not found"}
+                   404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
                })
 def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -179,7 +191,9 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve all the branches of a repository, enriched with the recent scan "
-                                     "information"}
+                                     "information"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_branches_for_repository(repository_id: int, skip: int = Query(default=0, ge=0),
                                 limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -250,7 +264,9 @@ def enrich_branch_with_latest_scan_data(db_connection: Session, branch: DBbranch
             summary="Get all unique project names",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the unique project-names"}
+                200: {"description": "Retrieve all the unique project-names"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                           repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
@@ -280,7 +296,9 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
             summary="Get all unique repository names",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the unique repository names"}
+                200: {"description": "Retrieve all the unique repository names"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                               projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
@@ -311,7 +329,9 @@ def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, ali
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve findings metadata for repository <repository_id>"},
-                404: {"model": Model404, "description": "Repository <repository_id> not found"}
+                404: {"model": Model404, "description": "Repository <repository_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_findings_metadata_for_repository(repository_id: int,
                                          db_connection: Session = Depends(get_db_connection)) \
@@ -347,7 +367,9 @@ def get_findings_metadata_for_repository(repository_id: int,
             summary="Get all repositories with findings metadata",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings metadata for all the repositories"}
+                200: {"description": "Retrieve all the findings metadata for all the repositories"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_repositories_with_findings_metadata(
         skip: int = Query(default=0, ge=0),

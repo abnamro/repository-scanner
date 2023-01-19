@@ -9,6 +9,8 @@ from sqlalchemy.exc import IntegrityError
 # First Party
 from resc_backend.constants import (
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
     RWS_ROUTE_DETECTED_RULES,
     RWS_ROUTE_FINDINGS,
     RWS_ROUTE_SCANS,
@@ -37,7 +39,9 @@ logger = logging.getLogger(__name__)
             summary="Get scans",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the scan objects"}
+                200: {"description": "Retrieve all the scan objects"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                   db_connection: Session = Depends(get_db_connection)) -> PaginationModel[scan_schema.ScanRead]:
@@ -64,7 +68,9 @@ def get_all_scans(skip: int = Query(default=0, ge=0), limit: int = Query(default
              status_code=status.HTTP_201_CREATED,
              responses={
                  201: {"description": "Create a new scan"},
-                 400: {"model": Model400, "description": "Error creating a new scan"}
+                 400: {"model": Model400, "description": "Error creating a new scan"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(get_db_connection)):
     """
@@ -98,7 +104,9 @@ def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(g
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve scan <scan_id>"},
-                404: {"model": Model404, "description": "Scan <scan_id> not found"}
+                404: {"model": Model404, "description": "Scan <scan_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_scan(scan_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -119,7 +127,9 @@ def read_scan(scan_id: int, db_connection: Session = Depends(get_db_connection))
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update scan <scan_id>"},
-                404: {"model": Model404, "description": "Scan <scan_id> not found"}
+                404: {"model": Model404, "description": "Scan <scan_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def update_scan(
         scan_id: int,
@@ -149,7 +159,9 @@ def update_scan(
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete scan <scan_id>"},
-                   404: {"model": Model404, "description": "Scan <scan_id> not found"}
+                   404: {"model": Model404, "description": "Scan <scan_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
                })
 def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -171,7 +183,9 @@ def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection
              summary="Create scan findings",
              status_code=status.HTTP_201_CREATED,
              responses={
-                 201: {"description": "Create findings and their associated scan_findings for scan <scan_id>"}
+                 201: {"description": "Create findings and their associated scan_findings for scan <scan_id>"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_scan_findings(scan_id: int,
                          findings: List[finding_schema.FindingCreate],
@@ -217,7 +231,9 @@ def create_scan_findings(scan_id: int,
             summary="Get scan findings associated with a scan ID",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve findings associated with scan <scan_id>"}
+                200: {"description": "Retrieve findings associated with scan <scan_id>"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -252,7 +268,9 @@ def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
             summary="Get scan findings",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve findings associated with scan <scan_id>"}
+                200: {"description": "Retrieve findings associated with scan <scan_id>"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                        skip: int = Query(default=0, ge=0),
@@ -288,7 +306,9 @@ def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="S
             summary="Get unique rules from scans",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the unique rules associated with specified scans"}
+                200: {"description": "Retrieve all the unique rules associated with specified scans"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_distinct_rules_from_scans(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                                   db_connection: Session = Depends(get_db_connection)) -> List[str]:

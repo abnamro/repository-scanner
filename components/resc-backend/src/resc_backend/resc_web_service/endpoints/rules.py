@@ -7,7 +7,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, status
 
 # First Party
-from resc_backend.constants import RULES_TAG, RWS_ROUTE_DETECTED_RULES, RWS_ROUTE_FINDING_STATUS_COUNT, RWS_ROUTE_RULES
+from resc_backend.constants import (
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    RULES_TAG,
+    RWS_ROUTE_DETECTED_RULES,
+    RWS_ROUTE_FINDING_STATUS_COUNT,
+    RWS_ROUTE_RULES
+)
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import rule as rule_crud
@@ -28,7 +35,9 @@ logger = logging.getLogger(__name__)
             summary="Get unique rules from findings",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the unique detected rules across all the findings"}
+                200: {"description": "Retrieve all the unique detected rules across all the findings"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_distinct_rules_from_findings(
         finding_statuses: List[FindingStatus] = Query(None, alias="findingstatus", title="FindingStatuses"),
@@ -66,7 +75,9 @@ def get_distinct_rules_from_findings(
             summary="Get detected rules with counts per status",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the detected rules with counts per status"}
+                200: {"description": "Retrieve all the detected rules with counts per status"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_rules_finding_status_count(db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """

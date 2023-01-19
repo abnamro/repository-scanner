@@ -31,6 +31,7 @@ from resc_backend.resc_web_service.endpoints import (
     scans,
     vcs_instances
 )
+from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
 
 
 def generate_logger_config(log_file_path, debug=True):
@@ -125,6 +126,9 @@ app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
+
+# Add exception handlers
+add_exception_handlers(app=app)
 
 
 @app.on_event("startup")

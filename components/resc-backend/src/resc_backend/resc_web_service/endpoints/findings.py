@@ -9,6 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from resc_backend.constants import (
     CACHE_MAX_AGE,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
     FINDINGS_TAG,
     RWS_ROUTE_AUDIT,
     RWS_ROUTE_BY_RULE,
@@ -39,7 +41,9 @@ router = APIRouter(prefix=f"{RWS_ROUTE_FINDINGS}", tags=[FINDINGS_TAG])
             summary="Get findings",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings"}
+                200: {"description": "Retrieve all the findings"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_findings(skip: int = Query(default=0, ge=0),
                      limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -68,7 +72,9 @@ def get_all_findings(skip: int = Query(default=0, ge=0),
              status_code=status.HTTP_201_CREATED,
              responses={
                  201: {"description": "Create new findings"},
-                 400: {"model": Model400, "description": "Error creating findings"}
+                 400: {"model": Model400, "description": "Error creating findings"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_findings(findings: List[finding_schema.FindingCreate], db_connection: Session = Depends(get_db_connection)) \
         -> int:
@@ -106,7 +112,9 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve finding <finding_id>"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)):
     """
@@ -129,7 +137,9 @@ def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connec
               status_code=status.HTTP_200_OK,
               responses={
                   200: {"description": "Modify finding <finding_id>"},
-                  404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                  404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                  500: {"description": ERROR_MESSAGE_500},
+                  503: {"description": ERROR_MESSAGE_503}
               })
 def patch_finding(
         finding_id: int,
@@ -160,7 +170,9 @@ def patch_finding(
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update finding <finding_id>"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def update_finding(
         finding_id: int,
@@ -192,7 +204,9 @@ def update_finding(
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete finding <finding_id>"},
-                   404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                   404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
                })
 def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
     """
@@ -213,7 +227,9 @@ def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_conn
             summary="Get total findings count by rule",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve total findings count of rule <rule_name>"}
+                200: {"description": "Retrieve total findings count of rule <rule_name>"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_total_findings_count_by_rule(rule_name: str, db_connection: Session = Depends(get_db_connection)):
     """
@@ -231,7 +247,9 @@ def get_total_findings_count_by_rule(rule_name: str, db_connection: Session = De
             summary="Get findings by rule",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings of rule <rule_name>"}
+                200: {"description": "Retrieve all the findings of rule <rule_name>"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -260,7 +278,9 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Audit finding(s) to update status and comments"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"}
+                404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def audit_findings(
         audit: audit_schema.AuditMultiple,
@@ -299,7 +319,9 @@ def audit_findings(
             summary="Get all supported statuses for findings",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the supported statuses for the findings"}
+                200: {"description": "Retrieve all the supported statuses for the findings"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_supported_statuses(response: Response) -> List[str]:
     """
@@ -318,7 +340,9 @@ def get_supported_statuses(response: Response) -> List[str]:
             summary="Get all the findings by time period",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the findings by time-period <time_type>"}
+                200: {"description": "Retrieve all the findings by time-period <time_type>"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_count_by_time(time_type: DateFilter,
                       skip: int = Query(default=0, ge=0),

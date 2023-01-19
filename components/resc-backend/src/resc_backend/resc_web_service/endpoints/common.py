@@ -5,7 +5,14 @@ from typing import List
 from fastapi import APIRouter, Response, status
 
 # First Party
-from resc_backend.constants import CACHE_MAX_AGE, COMMON_TAG, RWS_ROUTE_AUTH_CHECK, RWS_ROUTE_SUPPORTED_VCS_PROVIDERS
+from resc_backend.constants import (
+    CACHE_MAX_AGE,
+    COMMON_TAG,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    RWS_ROUTE_AUTH_CHECK,
+    RWS_ROUTE_SUPPORTED_VCS_PROVIDERS
+)
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 router = APIRouter(tags=[COMMON_TAG])
@@ -17,7 +24,9 @@ router = APIRouter(tags=[COMMON_TAG])
             description="Retrieve the supported vcs-providers, example: Bitbucket, AzureDevOps, Github etc",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve the supported vcs-providers"}
+                200: {"description": "Retrieve the supported vcs-providers"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_supported_vcs_providers(response: Response) -> List[str]:
     """
@@ -35,7 +44,9 @@ def get_supported_vcs_providers(response: Response) -> List[str]:
             description="The output returns 200 OK if auth check is successful else returns 403 Forbidden",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Validate authorization check from the access-token"}
+                200: {"description": "Validate authorization check from the access-token"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def auth_check():
     """

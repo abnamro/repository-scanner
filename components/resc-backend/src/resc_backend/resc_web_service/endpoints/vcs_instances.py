@@ -7,7 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.exc import IntegrityError
 
 # First Party
-from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, RWS_ROUTE_VCS, VCS_TAG
+from resc_backend.constants import (
+    DEFAULT_RECORDS_PER_PAGE_LIMIT,
+    ERROR_MESSAGE_500,
+    ERROR_MESSAGE_503,
+    RWS_ROUTE_VCS,
+    VCS_TAG
+)
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import vcs_instance as vcs_instance_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
@@ -25,7 +31,9 @@ logger = logging.getLogger(__name__)
              status_code=status.HTTP_201_CREATED,
              responses={
                  201: {"description": "Create new VCS instance"},
-                 400: {"model": Model400, "description": "Error creating new VCS instance"}
+                 400: {"model": Model400, "description": "Error creating new VCS instance"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
              })
 def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
                         db_connection: Session = Depends(get_db_connection)) \
@@ -54,7 +62,9 @@ def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve VCS Instance <vcs_instance_id>"},
-                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def read_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
@@ -77,7 +87,9 @@ def read_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get
             summary="Get all VCS instances",
             status_code=status.HTTP_200_OK,
             responses={
-                200: {"description": "Retrieve all the VCS Instances"}
+                200: {"description": "Retrieve all the VCS Instances"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def get_all_vcs_instances(skip: int = Query(default=0, ge=0),
                           limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -117,7 +129,9 @@ def get_all_vcs_instances(skip: int = Query(default=0, ge=0),
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Update VCS Instance <vcs_instance_id>"},
-                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+                404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
             })
 def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.VCSInstanceCreate,
                         db_connection: Session = Depends(get_db_connection)) \
@@ -151,7 +165,9 @@ def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.
                status_code=status.HTTP_200_OK,
                responses={
                    200: {"description": "Delete VCS Instance <vcs_instance_id>"},
-                   404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"}
+                   404: {"model": Model404, "description": "VCS Instance <vcs_instance_id> not found"},
+                   500: {"description": ERROR_MESSAGE_500},
+                   503: {"description": ERROR_MESSAGE_503}
                })
 def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)):
     """
