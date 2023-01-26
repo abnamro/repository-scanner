@@ -9,6 +9,8 @@
     - [Run RESC Web service locally through Make](#run-resc-web-service-locally-through-make)
     - [Run locally using docker](#run-locally-using-docker)
 3. [Testing](#testing)
+    - [Run unit tests, linting and import checks locally](#run-unit-tests-linting-and-import-checks-locally)
+    - [Run Newman tests locally](#run-newman-tests-locally)
 4. [Create a migration for database changes](#create-a-migration-for-database-changes)
     - [Use Alembic to create a new migration script](#use-alembic-to-create-a-new-migration-script)
     - [Use the --autogenerate parameter](#use-the---autogenerate-parameter)
@@ -142,6 +144,7 @@ Open http://127.0.0.1:8000 in a browser to access the API.
 ## Testing
 [(Back to top)](#table-of-contents)
 
+### Run unit tests, linting and import checks locally:
 See below commands for running various (unit/linting) tests locally. To run these tests you need to install [tox](https://pypi.org/project/tox/). This can be done on Linux and Windows with Git Bash.
 
 Run below commands to make sure that the unit tests are running and that the code matches quality standards:
@@ -153,6 +156,23 @@ tox -v -e lint       # Run this command to lint the code according to this repos
 tox -v -e pytest     # Run this command to run the unit tests
 tox -v               # Run this command to run all of the above tests
 ```
+
+### Run Newman tests locally:
+If you don't provide any argument to the script, then the default image value will be used    
+```bash
+cd newman_tests
+./run_newman_tests.sh
+```
+
+If you can override the images by providing below arguments to the script.
+```bash
+cd newman_tests
+./run_newman_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -n <newman image:tag> 
+
+Example: ./run_integration_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
+```
+
+
 
 ## Create a migration for database changes
 [(Back to top)](#table-of-contents)

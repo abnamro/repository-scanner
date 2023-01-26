@@ -1,0 +1,243 @@
+{
+	"info": {
+		"_postman_id": "0ee77328-2689-4962-b332-409ca5214cca",
+		"name": "Repository Scanner (RESC)",
+		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "resc/v1",
+			"item": [
+				{
+					"name": "rules",
+					"item": [
+						{
+							"name": "Get Distinct Rules From Findings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successfull (200) GET request\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"const body = pm.response.json();",
+											"pm.test(\"Expects body: to be array\", function() {",
+											"    pm.expect(body).to.be.an(\"array\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detected-rules",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detected-rules"
+									]
+								},
+								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/detected-rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"detected-rules"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "common",
+					"item": [
+						{
+							"name": "Get Supported Vcs Providers",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successfull (200) GET request\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Expects response body of 3 elements\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(3);",
+											"    pm.expect(responseJson).to.eql([ 'AZURE_DEVOPS', 'BITBUCKET', 'GITHUB_PUBLIC' ] );",
+											"    pm.expect(responseJson).to.include(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson).to.include(\"BITBUCKET\");",
+											"    pm.expect(responseJson).to.include(\"GITHUB_PUBLIC\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/supported-vcs-providers",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"supported-vcs-providers"
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Auth Check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successfull (200) GET request\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Expects 200 OK response\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson.message).to.be.a(\"string\");",
+											"    pm.expect(responseJson.message).to.eql(\"OK\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/auth-check",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"auth-check"
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/resc/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"resc",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/",
+			"type": "string"
+		}
+	]
+}
