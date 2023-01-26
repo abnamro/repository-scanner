@@ -16,7 +16,6 @@ env:
   RESC_BACKEND_DIR: components/resc-backend
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-backend
-  IMAGE_TAG: 1.0.1
 
 jobs:
   python-basic-validation:
@@ -82,7 +81,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
-
+    outputs:
+      backend_version: ${{ steps.getversion.outputs.backend_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -107,6 +107,13 @@ jobs:
           packages_dir: ${{ env.RESC_BACKEND_DIR }}/dist
           skip_existing: true
 
+      - id: getversion
+        name: Get package version
+        run: | 
+          cd ${{ env.RESC_BACKEND_DIR }}
+          backend_version=$(python ./setup.py --version)
+          echo "backend_version=$backend_version" >> $GITHUB_OUTPUT
+
   dockerize:
     name: Build and Push Docker image
     needs: [python-basic-validation, python-build-and-publish]
@@ -125,12 +132,12 @@ jobs:
       - name: Build an image from Dockerfile
         run: |
           cd ${{ env.RESC_BACKEND_DIR }}
-          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}}
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
@@ -168,4 +175,4 @@ jobs:
         with:
           context: ${{ env.RESC_BACKEND_DIR }}/
           push: ${{ env.PUBLISH_IMAGE }}
-          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}}

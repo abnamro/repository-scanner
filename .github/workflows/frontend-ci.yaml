@@ -16,7 +16,6 @@ env:
   RESC_FRONTEND_DIR: components/resc-frontend
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-frontend
-  IMAGE_TAG: 1.0.1
 
 jobs:
   nodejs-basic-validation:
@@ -26,7 +25,8 @@ jobs:
     strategy:
       matrix:
         node-version: [16.13.0]
-
+    outputs:
+      frontend_version: ${{ steps.getversion.outputs.frontend_version }}
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -56,6 +56,13 @@ jobs:
         cd ${{ env.RESC_FRONTEND_DIR }}
         npx auditjs@latest ossi -q || true
 
+    - id: getversion
+      name: Get package version
+      run: | 
+        cd ${{ env.RESC_FRONTEND_DIR }}
+        frontend_version=$(npm pkg get version | sed 's/"//g')
+        echo "frontend_version=$frontend_version" >> $GITHUB_OUTPUT
+
   dockerize:
     name: Build and Push Docker image
     needs: nodejs-basic-validation
@@ -74,12 +81,12 @@ jobs:
       - name: Build an image from Dockerfile
         run: |
           cd ${{ env.RESC_FRONTEND_DIR }}
-          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
+          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.nodejs-basic-validation.outputs.frontend_version}} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.nodejs-basic-validation.outputs.frontend_version}}
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
@@ -117,4 +124,4 @@ jobs:
         with:
           context: ${{ env.RESC_FRONTEND_DIR }}/
           push: ${{ env.PUBLISH_IMAGE }}
-          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.nodejs-basic-validation.outputs.frontend_version}}
