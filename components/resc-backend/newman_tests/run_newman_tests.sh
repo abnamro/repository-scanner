@@ -63,7 +63,7 @@ docker run -d --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e MSSQL_SA_PASSWORD="$RES
 -p "$MSSQL_DB_PORT":"$MSSQL_DB_PORT" --name $RESC_DATABASE_CONTAINER "$RESC_DATABASE_IMAGE"
 
 # Retrieve RESC Database container IP address
-sleep 20
+sleep 25
 RESC_DATABASE_HOST_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $RESC_DATABASE_CONTAINER)
 echo "*** IP Address Of $RESC_DATABASE_CONTAINER Container is: $RESC_DATABASE_HOST_IP ***"
 
@@ -81,7 +81,9 @@ docker logs $RESC_BACKEND_CONTAINER
 RESC_API_HOST_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $RESC_BACKEND_CONTAINER)
 echo "*** IP Address Of $RESC_BACKEND_CONTAINER Container is: $RESC_API_HOST_IP ***"
 
-## Running Newman Tests
+# Running Newman Tests
+echo "*** Downloading latest gitleaks.toml rule file ***"
+curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
 echo "*** Running Newman Tests From $RESC_NEWMAN_CONTAINER Container ***"
 docker run --name $RESC_NEWMAN_CONTAINER -v "$PWD":/etc/newman "$RESC_NEWMAN_IMAGE" \
 run --color on ./RESC_web_service.postman_collection.json --env-var "baseUrl=http://$RESC_API_HOST_IP:$RESC_API_PORT"
@@ -95,3 +97,5 @@ echo "*** Running Clean Up: Removing Containers ***"
 docker rm -f $RESC_NEWMAN_CONTAINER || true
 docker rm -f $RESC_BACKEND_CONTAINER || true
 docker rm -f $RESC_DATABASE_CONTAINER || true
+echo "*** Running Clean Up: Removing test artifacts ***"
+rm -f $PWD/gitleaks.toml
