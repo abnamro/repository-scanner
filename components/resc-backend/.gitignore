@@ -16,4 +16,4 @@ self_signed_cert_generation/testca
 .DS_Store
 
 # Newman tests
-newman_tests/gitleaks.toml
+tests/newman_tests/gitleaks.toml
