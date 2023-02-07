@@ -144,6 +144,12 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
+      - name: Running Newman Tests
+        run: | 
+            cd ${{ env.RESC_BACKEND_DIR }}/tests/newman_tests
+            ./run_newman_tests.sh -b ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}} 
+        shell: bash
+
       - name: Get Branch Name
         run: |
           if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
