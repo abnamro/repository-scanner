@@ -50,7 +50,7 @@ set -o allexport;source test.env;set +o allexport
 # Generate password for RESC Database
 echo "*** Generating Random Password For RESC Database ***"
 # shellcheck disable=SC2002
-RESC_DATABASE_PASSWORD=$(cat /dev/urandom | strings | grep -Eoa "[a-zA-Z0-9!%$]*" | head -n 10 | tr -d '\n'| cut -c1-10)
+RESC_DATABASE_PASSWORD=$(date +%s | sha256sum | base64 | head -c 50)
 if [[ -z $RESC_DATABASE_PASSWORD ]]
 then
   echo "ERROR: Unable to generate password for RESC Database"
