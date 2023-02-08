@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
     paths:
       - .github/workflows/k8-infra-ci.yaml
-      - components/kubernetes/**
+      - deployment/kubernetes/**
 
 env:
   KUBERNETES_INFRA_DIR: deployment/kubernetes
