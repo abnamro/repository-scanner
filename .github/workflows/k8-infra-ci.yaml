@@ -72,6 +72,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    needs: helm-chart-validation
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -89,6 +90,5 @@ jobs:
       uses: helm/chart-releaser-action@v1.5.0
       with:
         charts_dir: deployment
-        config: cr.yaml
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
