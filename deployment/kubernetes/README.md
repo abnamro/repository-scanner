@@ -46,7 +46,7 @@ curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitlea
 ```
 
 #### 3. Create persistent volume and update it in example-values.yaml
-Create two folders in your user folder and name them _database_ and _raabitmq_ as described below.
+Create two folders in your user folder and name them _database_ and _rabbitmq_ as described below.
 
 Windows: C:\Users\<username>\resc\database and C:\Users\<username>\resc\rabbitmq  
 Linux: /Users/<username>/var/resc/database and /Users/<username>/var/resc/rabbitmq  
@@ -89,7 +89,7 @@ resc-rabbitmq:
 You need to provide at least one vcs instance detail to start scanning.
 Below is an example for how to scan repositories from GitHub.
 * scope: List of GitHub accounts you want to scan.
-  For example, lets'say you want to scan all the repositories for the following GitHub accounts.  
+  For example, let's say you want to scan all the repositories for the following GitHub accounts.  
   https://github.com/kubernetes  
   https://github.com/docker
   
@@ -119,7 +119,7 @@ resc-vcs-instances:
 ```
 
 ## Testing templates
-In order to run (unit/linting) tests locally, naviagate to deployment/kubernetes folder:
+In order to run (unit/linting) tests locally, navigate to deployment/kubernetes folder:
 ```bash
 cd ./deployment/kubernetes/
 ```

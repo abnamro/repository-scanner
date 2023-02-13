@@ -112,7 +112,7 @@ The **output** messages of `collect_projects` command has the following format:
 </details>
 
  #### 4. Run the secret scan task:  
-  This task reads the repositories from a RabbitMQ channel called 'repositories', runs scan using [Gitleaks](https://github.com/zricethezav/gitleaks) and saves the findings metadata to database. 
+  This task reads the repositories from a RabbitMQ channel called 'repositories', runs scan using [Gitleaks](https://github.com/zricethezav/gitleaks) and saves the findings' metadata to database. 
 
   This can be done via the following command:  
   ```bash
