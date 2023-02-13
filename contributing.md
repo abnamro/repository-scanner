@@ -8,12 +8,12 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Contributing tips
 ### Make sure your idea is unique
-Before doing anything, do a quick check to make sure your idea hasn't been discussed elsewhere. Skim the project’s README, issues (open and closed), mailing list, and Stack Overflow. You don’t have to spend hours going through everything, but a quick search for a few key terms goes a long way.
+Before doing anything, do a quick check to make sure your idea hasn't been discussed elsewhere. Skim the project's README, issues (open and closed), mailing list, and Stack Overflow. You don't have to spend hours going through everything, but a quick search for a few key terms goes a long way.
 
-If you can’t find your idea elsewhere, you’re ready to make a move. 
+If you can't find your idea elsewhere, you're ready to make a move. 
 
 ### Respect community decisions. 
-Your ideas may differ from the community’s priorities or vision. Community may offer feedback or decide not to pursue your idea. While you should discuss and look for compromise, maintainers have to live with your decision longer than you will. If you disagree with their direction, you can always work on your own fork or start your own project.
+Your ideas may differ from the community's priorities or vision. Community may offer feedback or decide not to pursue your idea. While you should discuss and look for compromise, maintainers have to live with your decision longer than you will. If you disagree with their direction, you can always work on your own fork or start your own project.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
