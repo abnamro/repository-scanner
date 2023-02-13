@@ -1,6 +1,6 @@
 # Contributing
 
-Hi! Let's innovate together! We are entusiastic that you'd like to contribute to our projects. Together we build the future of finance and IT. 
+Hi! Let's innovate together! We are enthusiastic that you'd like to contribute to our projects. Together we build the future of finance and IT. 
 
 Contributions to this project are released to the public under the project's open source license.
 
@@ -8,7 +8,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ## Contributing tips
 ### Make sure your idea is unique
-Before doing anything, do a quick check to make sure your idea hasn’t been discussed elsewhere. Skim the project’s README, issues (open and closed), mailing list, and Stack Overflow. You don’t have to spend hours going through everything, but a quick search for a few key terms goes a long way.
+Before doing anything, do a quick check to make sure your idea hasn't been discussed elsewhere. Skim the project’s README, issues (open and closed), mailing list, and Stack Overflow. You don’t have to spend hours going through everything, but a quick search for a few key terms goes a long way.
 
 If you can’t find your idea elsewhere, you’re ready to make a move. 
 

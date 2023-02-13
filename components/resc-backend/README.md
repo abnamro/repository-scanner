@@ -73,7 +73,7 @@ These instructions will help you to get a copy of the project up and running on 
 
 #### Run RESC Web service locally through make
 
-*Note:* This procedure has ben only tested in Linux and Mac. It may not work in machines running the Apple M1 chip due to lack of support from MSSQL docker image.  
+*Note:* This procedure has been only tested in Linux and Mac. It may not work in machines running the Apple M1 chip due to lack of support from MSSQL docker image.  
 
 
 Prerequisites: 
@@ -214,7 +214,7 @@ The generated script contains two functions:
 <details>
   <summary>Preview</summary>
 Alembic provide an --autogenerate parameter to help revision scripts creation. It can output the necessary changes to apply,  by comparing the current database schema
-and the model stated in Python. To create that revision make sure you have a connection to a running database with a up-to-date schema version.
+and the model stated in Python. To create that revision make sure you have a connection to a running database with an up-to-date schema version.
 
 ```bash
 alembic revision --autogenerate -m "<revision summary>"

@@ -29,7 +29,7 @@
 The Repository Scanner (RESC) is a tool used to detect secrets in source code management and version control systems 
 (e.g. GitHub, BitBucket, or Azure DevOps). Among the types of secrets that the Repository Scanner detects are credentials, 
 passwords, tokens, API keys, and certificates. The tool is maintained and updated by the ABN AMRO Bank to match the 
-constantly changing cybersecurity landscape. 
+constantly changing cyber security landscape. 
 
 The Repository Scanner was created to prevent that credentials and other sensitive information are left unprotected in code repositories.
 Exposing sensitive information in such a way can have severe consequences for the security posture of an organization. An attacker can use 
@@ -94,7 +94,7 @@ components of RESC.
 
 ### VCS Scanner Worker flow diagram
 The flow diagram below shows the different stages that a VCS Scanner Worker goes through and the choices it is confronted with to
-come to the desired result. It first picks up a branch from the queue where it is decided, in conjuction with user input, what type of scan to run. 
+come to the desired result. It first picks up a branch from the queue where it is decided, in conjunction with user input, what type of scan to run. 
 If it is a base scan, a full scan of all commits will be carried out to look for secrets. Possible findings are stored inside the database along with the last scanned commit hash of the branch. An incremental scan, where the branch was scanned earlier, only looks at the commits that were made after the last scanned commit hash. The process of finding secrets and storing them in the database is similar as previously described. 
 
 ![product-screenshot!](images/RESC_Scan_Flow_Diagram.png)
@@ -105,7 +105,7 @@ tool and the technologies that it utilizes are explained in detail here. As show
 are run as Docker containers in a Kubernetes ecosystem.
 
 * [RESC-Frontend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend): The RESC-Frontend is a fully responsive dashboard application developed using Vue.js 2 and the BootstrapVue framework. It has screens for Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
-* [RESC-Backend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-backend): The RESC-Backend is the backend of the Repository Scanner tool. The RESC-Backend consits of RabbitMQ users and queue creation, Database models, the RESC Web service, and Alembic scripts for database migration. The RESC Web service is created using FASTAPI.
+* [RESC-Backend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-backend): The RESC-Backend is the backend of the Repository Scanner tool. The RESC-Backend consists of RabbitMQ users and queue creation, Database models, the RESC Web service, and Alembic scripts for database migration. The RESC Web service is created using FASTAPI.
 * [RESC-VCS-Scanner](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner): RESC-VCS-Scanner, which runs as a celery worker, gathers repositories from the repositories queue and carries out a secret scan. Gitleaks is used as the scanner to find secrets.
 * [RESC-VCS-Scraper](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scraper): All projects and repositories from supported VCS providers such as Bitbucket, Azure Repos, and GitHub are gathered by the RESC-VCS-SCRAPER. This component contains the VCS-Scraper-Projects and VCS-Scraper-Repositories as its primary modules.
 

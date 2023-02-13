@@ -92,7 +92,7 @@ Example:
 }
 ```
 * scope: List of GitHub accounts you want to scan.
-  For example, lets'say you want to scan all the repositories for the following github accounts.
+  For example, let's say you want to scan all the repositories for the following Github accounts.
   https://github.com/kubernetes  
   https://github.com/docker
   
