@@ -192,9 +192,18 @@ helm repo update
 helm search repo <alias>
 ```
 
-* To install the chart name, run the following command:
+* At this time, to install the chart you need the RESC-RULES.toml file (done in the second step of the prerequisites) 
+AND the example-values.yaml file.
+
 ```
-helm install my-<chart-name> <alias>/resc
+curl https://raw.githubusercontent.com/abnamro/repository-scanner/main/deployment/kubernetes/example-values.yaml > example-values.yaml
+```
+
+* It is then important to add the information described in prerequisite step 3 in the example-values.yaml file. After 
+doing so you can install with the following command: 
+
+```
+helm install my-<chart-name> <alias>/resc -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
 * At any point if you wish to uninstall the chart:
