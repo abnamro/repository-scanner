@@ -13,7 +13,7 @@ Before doing anything, do a quick check to make sure your idea hasn't been discu
 If you can't find your idea elsewhere, you're ready to make a move. 
 
 ### Respect community decisions. 
-Your ideas may differ from the community's priorities or vision. Community may offer feedback or decide not to pursue your idea. While you should discuss and look for compromise, maintainers have to live with your decision longer than you will. If you disagree with their direction, you can always work on your own fork or start your own project.
+Your ideas may differ from the community's priorities or vision. The community may offer feedback or decide not to pursue your idea. While you should discuss and look for compromise, maintainers have to live with your decision longer than you do. If you disagree with their direction, you can always work on your own fork or start your own project.
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
