@@ -8,6 +8,7 @@
     - [Prerequisites](#prerequisites)
     - [Testing templates](#testing-templates)
     - [Deploying charts](#deploying-charts)
+    - [Github as Helm Chart Repository](#github-as-helm-chart-repository)
 4. [Additional Information](#additional-information)
     - [Trigger scanning](#trigger-scanning)
     - [Connect to database using Azure Data Studio](#connect-to-database-using-azure-data-studio)
@@ -172,44 +173,11 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   helm uninstall resc --namespace resc
   ```
   
-### GitHub as Chart Repository
+### GitHub as Helm Chart Repository
 It is now possible to directly download the files from the Repository Scanner (RESC) GitHub Repository since it now also
 acts as a helm repository! This helm repository allows for a quicker and easier way to obtain the helm charts and use them
-on your machine. The process in getting these helm charts is described in the steps below:
-
-* The first step, once helm has been set up correctly, is to add the repository in the following way:
-```
-helm repo add <alias> https://abnamro.github.io/repository-scanner/
-```
-
-* (Optional): If the repo was already added earlier, you can run the following command to update it and retrieve the latest packages:
-```
-helm repo update
-```
-
-* To make sure this went well, you can execute the following command to see the charts:
-```
-helm search repo <alias>
-```
-
-* At this time, to install the chart you need the RESC-RULES.toml file (done in the second step of the prerequisites) 
-AND the example-values.yaml file.
-
-```
-curl https://raw.githubusercontent.com/abnamro/repository-scanner/main/deployment/kubernetes/example-values.yaml > example-values.yaml
-```
-
-* It is then important to add the information described in prerequisite step 3 in the example-values.yaml file. After 
-doing so you can install with the following command: 
-
-```
-helm install my-<chart-name> <alias>/resc -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
-```
-
-* At any point if you wish to uninstall the chart:
-```
-helm delete my-<chart-name>
-```
+on your machine. For a full step-by-step approach on how to install the helm charts, visit the README on the "gh-pages" branch
+linked [here](https://github.com/abnamro/repository-scanner/blob/gh-pages/README.md).
 
 ## Additional Information
 ### Issue while pulling images?
