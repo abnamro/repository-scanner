@@ -138,6 +138,20 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                             f"{self.repository.project_key}/{self.repository.repository_name}"
                             f" no new commits found.")
 
+    def run_directory_scan(self) -> None:
+        logger.info(f"Started task for scanning {self.local_path} using rule pack version: {self.rule_pack_version}")
+
+        scan_timestamp_start = datetime.utcnow()
+        findings = self.scan_directory(self.local_path)
+        scan_timestamp_end = datetime.utcnow()
+        logger.info(f"Running local scan on {self.local_path} took {scan_timestamp_end - scan_timestamp_start} ms.")
+
+        if findings:
+            logger.info(f"Scan completed: {len(findings)} findings were found.")
+            self._output_module.write_findings(branch_id=0, scan_id=0, scan_findings=findings)
+        else:
+            logger.info(f"No findings registered in {self.local_path}.")
+
     def scan_repo(self, scan_type_to_run: str, branch_name: str, last_scanned_commit: str, repo_clone_path: str) \
             -> Optional[List[FindingBase]]:
 
@@ -195,4 +209,42 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
             if repo_clone_path and not self.local_path and os.path.exists(repo_clone_path):
                 logger.debug(f"Cleaning up the repository cloned directory: {repo_clone_path}")
                 shutil.rmtree(repo_clone_path)
+        return None
+
+    def scan_directory(self, directory_path: str) -> Optional[List[FindingBase]]:
+        """
+            Scan the given directory
+        :param directory_path:
+            Directory path to be scanned
+        :return: Optional[List[FindingBase]].
+            The output will contain a list of findings or an empty list if no finding was found
+        """
+        logger.debug(f"Started scanning {self.repo_display_name}:{directory_path}")
+        if not self.local_path:
+            report_filepath = f"{self._scan_tmp_directory}/{directory_path}_{str(uuid.uuid4().hex)}.json"
+        else:
+            report_filepath = f"{self.local_path}/{self.repo_display_name}_{str(uuid.uuid4().hex)}.json"
+        try:
+            gitleaks_command = GitLeaksWrapper(
+                scan_from=None,
+                gitleaks_path=self.gitleaks_binary_path,
+                repository_path=directory_path,
+                rules_filepath=self.gitleaks_rules_path,
+                report_filepath=report_filepath,
+                git_scan=False
+            )
+
+            before_scan = time.time()
+            findings: Optional[List[FindingBase]] = gitleaks_command.start_scan()
+            after_scan = time.time()
+            scan_duration = int(after_scan - before_scan)
+            logger.info(f"scan of repository {directory_path} took {scan_duration} seconds")
+            return findings
+        except BaseException as error:
+            logger.error(f"An exception occurred while scanning directory {directory_path} error: {error}")
+        finally:
+            # Make sure the tempfile is removed
+            logger.debug(f"Cleaning up the temporary report: {report_filepath}")
+            if os.path.exists(report_filepath):
+                os.remove(report_filepath)
         return None
