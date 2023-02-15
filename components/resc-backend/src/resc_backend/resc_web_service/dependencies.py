@@ -67,13 +67,13 @@ async def requires_auth(credentials: HTTPBasicCredentials = Depends(security)):
                             headers={"WWW-Authenticate": "Bearer"}) from error
     except jwt.InvalidIssuerError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Token’s issuer claim does not match with the expected issuer",
+                            detail="Token's issuer claim does not match with the expected issuer",
                             headers={"WWW-Authenticate": "Bearer"}) from error
     except jwt.ExpiredSignatureError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired",
                             headers={"WWW-Authenticate": "Bearer"}) from error
     except jwt.InvalidSignatureError as error:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token’s signature did not match",
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token's signature did not match",
                             headers={"WWW-Authenticate": "Bearer"}) from error
     except jwt.DecodeError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,

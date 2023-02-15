@@ -68,7 +68,7 @@ resc-database:
     pvc_path: "/Users/<username>/var/resc/database"
 ```
 
-Update persistent volume claim path and filemountType for rabbitmq.
+Update persistent volume claim path and filemountType for rabbitmq in your example-values.yaml file.
 ```
 Windows:
 --------------
@@ -86,7 +86,7 @@ resc-rabbitmq:
 ```
 
 #### 4. Provide details of the accounts/projects to scan
-You need to provide at least one vcs instance detail to start scanning.
+You need to provide at least one vcs (Version Control System) instance details to start scanning.
 Below is an example for how to scan repositories from GitHub.
 * scope: List of GitHub accounts you want to scan.
   For example, let's say you want to scan all the repositories for the following GitHub accounts.  
@@ -96,7 +96,7 @@ Below is an example for how to scan repositories from GitHub.
   Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 * usernameValue: Provide your GitHub username.
-* tokenValue: Provide your GitHub personal access token.
+* tokenValue: Provide your GitHub personal access token if you wish to scan private repositories.
 
 
 
@@ -119,14 +119,14 @@ resc-vcs-instances:
 ```
 
 ## Testing templates
-In order to run (unit/linting) tests locally, navigate to deployment/kubernetes folder:
+In order to run linting and rendering locally, navigate to deployment/kubernetes folder:
 ```bash
 cd ./deployment/kubernetes/
 ```
 
 helm lint: examine a chart for possible issues
 ```bash
-helm lint . --set-file global.secretScanRulePackConfig=./RESC-RULE.toml to run helm linting.
+helm lint . --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
 Render chart templates locally and display the output.
@@ -141,7 +141,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   ```bash
   kubectl create namespace resc
   ```
-* Naviagate to deployment/kubernetes folder.
+* Navigate to deployment/kubernetes folder.
   ```bash
   cd ./deployment/kubernetes/
   ```
@@ -156,25 +156,25 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   kubectl config set-context --current --namespace=resc
   ```
 
-* Wait for two minutes, then run below commands to verify the installation.
+* Wait for approximately two minutes, then run the below commands to verify the installation. All pods should be in `Running` state.
   ```bash
   helm list -n resc
   kubectl get pods -n resc
   ```
   ![deployment-status-screenshot!](images/deployment-status.png)
 
-* To upgrade the deployment run. 
+* To upgrade the deployment run the following command.
   ```bash
   helm upgrade --namespace resc resc . -f ./helm-context/example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
-* To uninstall or delete the deployment run.
+* To uninstall or delete the deployment run the following command.
   ```bash
   helm uninstall resc --namespace resc
   ```
 
 ## Additional Information
-### Issue in image pulling?
-If any image is not getting pulled automatically from registry, you can use `docker pull` command to pull that image manually.
+### Issue while pulling images?
+If any image is not getting pulled automatically from the registry, you can use `docker pull` command to pull that image manually.
 
 Examples:
 ```bash
@@ -192,8 +192,8 @@ docker pull rescabnamro/resc-vcs-scanner:1.0.1
 ```
 
 ### Trigger scanning
-By default RESC will start to scan according to the cron expression mentioned in example-values.yaml file which is `0 6 * * 6` at 06:00 on Saturday.
-You can adjust it or you can run below command after helm deployment to start the scan immediately.
+By default, RESC will start to scan according to the cron expression mentioned in example-values.yaml file which is `0 6 * * 6`, which is equal to 06:00 on Saturday.
+You can adjust it, or you can run the command below after the Helm deployment to start the scan immediately.
 ```bash
 kubectl create job --from=cronjob/resc-vcs-scraper-projects resc-vcs-scraper-projects -n resc
 ```
