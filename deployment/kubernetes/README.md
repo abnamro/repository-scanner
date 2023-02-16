@@ -8,6 +8,7 @@
     - [Prerequisites](#prerequisites)
     - [Testing templates](#testing-templates)
     - [Deploying charts](#deploying-charts)
+    - [Github as Helm Chart Repository](#github-as-helm-chart-repository)
 4. [Additional Information](#additional-information)
     - [Trigger scanning](#trigger-scanning)
     - [Connect to database using Azure Data Studio](#connect-to-database-using-azure-data-studio)
@@ -49,7 +50,7 @@ curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitlea
 Create two folders in your user folder and name them _database_ and _rabbitmq_ as described below.
 
 Windows: C:\Users\<username>\resc\database and C:\Users\<username>\resc\rabbitmq  
-Linux: /Users/<username>/var/resc/database and /Users/<username>/var/resc/rabbitmq  
+Linux: /Users/<username>/var/resc/database and /Users/<username>/var/resc/rabbitmq
 
 Update persistent volume claim path and hostOS for database.
 ```
@@ -92,8 +93,8 @@ Below is an example for how to scan repositories from GitHub.
   For example, let's say you want to scan all the repositories for the following GitHub accounts.  
   https://github.com/kubernetes  
   https://github.com/docker
-  
-  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned. 
+
+  Then you need to add those accounts to scope like : ["kubernetes", "docker"]. All the repositories from those accounts will be scanned.
 * exceptions (optional): If you want to exclude any account from scan, then add it to exceptions. Default is empty exception.
 * usernameValue: Provide your GitHub username.
 * tokenValue: Provide your GitHub personal access token if you wish to scan private repositories.
@@ -134,10 +135,10 @@ Render chart templates locally and display the output.
 helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
-## Deploying charts 
+## Deploying charts
 Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
-* Ensure the namespace is created, if not then run 
+* Ensure the namespace is created, if not then run
   ```bash
   kubectl create namespace resc
   ```
@@ -146,11 +147,11 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   cd ./deployment/kubernetes/
   ```
 
-* Deploy the helm charts.  
+* Deploy the helm charts.
   ```bash
   helm install --namespace resc resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
-  
+
 * Optionally, set the default namespace for all kubectl commands. Now you no longer need to specify the -n resc option for all the kubectl commands.
   ```bash
   kubectl config set-context --current --namespace=resc
@@ -171,6 +172,12 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   ```bash
   helm uninstall resc --namespace resc
   ```
+
+### GitHub as Helm Chart Repository
+It is now possible to directly download the files from the Repository Scanner (RESC) GitHub Repository since it now also
+acts as a helm repository! This helm repository allows for a quicker and easier way to obtain the helm charts and use them
+on your machine. For a full step-by-step approach on how to install the helm charts, visit the README on the "gh-pages" branch
+linked [here](https://github.com/abnamro/repository-scanner/blob/gh-pages/README.md).
 
 ## Additional Information
 ### Issue while pulling images?
