@@ -1,5 +1,6 @@
 # pylint: disable=R0902
 # Standard Library
+import html
 from datetime import datetime
 
 # Third Party
@@ -57,7 +58,7 @@ class DBfinding(Base):
             commit_timestamp=finding.commit_timestamp,
             author=finding.author,
             status=finding.status,
-            comment=finding.comment,
+            comment=html.escape(finding.comment),
             event_sent_on=finding.event_sent_on,
             branch_id=finding.branch_id
         )

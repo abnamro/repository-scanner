@@ -1,5 +1,6 @@
 # pylint: disable=R0916,R0912
 # Standard Library
+import html
 import logging
 from datetime import datetime
 from typing import List
@@ -24,8 +25,7 @@ logger = logging.getLogger(__name__)
 def update_finding(db_connection: Session, finding_id: int, finding: finding_schema.FindingUpdate):
     db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
     db_finding.status = finding.status
-    db_finding.comment = finding.comment
-
+    db_finding.comment = html.escape(finding.comment)
     db_connection.commit()
     db_connection.refresh(db_finding)
     return db_finding
@@ -59,7 +59,7 @@ def audit_finding(db_connection: Session, db_finding: finding_schema.FindingRead
         The output will contain the findings that was updated
     """
     db_finding.status = status
-    db_finding.comment = comment
+    db_finding.comment = html.escape(comment)
 
     db_connection.commit()
     db_connection.refresh(db_finding)
