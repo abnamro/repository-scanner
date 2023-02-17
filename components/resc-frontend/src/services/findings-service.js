@@ -1,4 +1,3 @@
-import { requireThat } from '@cowwoc/requirements';
 import axiosRetry from 'axios-retry';
 
 const axios = require('axios');
@@ -6,14 +5,10 @@ axiosRetry(axios, { retries: 3 });
 
 const FindingsService = {
   async getFindingById(findingId) {
-    requireThat(findingId, 'findingId').isDefined().isNotNull().asNumber().isNotNegative();
-
     return axios.get(`/findings/${findingId}`);
   },
 
   async auditFindings(findingIds, findingStatus, comment) {
-    requireThat(findingIds, 'findingIds').isDefined().isNotNull().asArray().isNotEmpty();
-    requireThat(findingStatus, 'findingStatus').isDefined().isNotNull();
     const commentVal = comment == null ? '' : comment;
 
     return axios.put(`/findings/audit/`, {

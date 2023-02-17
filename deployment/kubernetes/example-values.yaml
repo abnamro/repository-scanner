@@ -7,22 +7,22 @@ global:
     image:
       repository: rescabnamro/
       name: resc-backend
-      tag: 1.0.1
+      tag: latest
   rescFrontend:
     image:
       repository: rescabnamro/
       name: resc-frontend
-      tag: 1.0.1
+      tag: latest
   VCSScraper:
     image:
       repository: rescabnamro/
       name: resc-vcs-scraper
-      tag: 1.0.1
+      tag: latest
   rescSecretScanner:
     image:
       repository: rescabnamro/
       name: resc-vcs-scanner
-      tag: 1.0.1
+      tag: latest
 
 resc-vcs-scraper-projects:
   config:
