@@ -23,9 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 def update_finding(db_connection: Session, finding_id: int, finding: finding_schema.FindingUpdate):
+    sanitized_comment = html.escape(finding.comment) if finding.comment else finding.comment
     db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
     db_finding.status = finding.status
-    db_finding.comment = html.escape(finding.comment)
+    db_finding.comment = sanitized_comment
     db_connection.commit()
     db_connection.refresh(db_finding)
     return db_finding
@@ -58,8 +59,9 @@ def audit_finding(db_connection: Session, db_finding: finding_schema.FindingRead
     :return: FindingRead
         The output will contain the findings that was updated
     """
+    sanitized_comment = html.escape(comment) if comment else comment
     db_finding.status = status
-    db_finding.comment = html.escape(comment)
+    db_finding.comment = sanitized_comment
 
     db_connection.commit()
     db_connection.refresh(db_finding)
