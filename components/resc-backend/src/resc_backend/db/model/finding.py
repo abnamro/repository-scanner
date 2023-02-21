@@ -48,6 +48,7 @@ class DBfinding(Base):
 
     @staticmethod
     def create_from_finding(finding):
+        sanitized_comment = html.escape(finding.comment) if finding.comment else finding.comment
         db_finding = DBfinding(
             rule_name=finding.rule_name,
             file_path=finding.file_path,
@@ -58,7 +59,7 @@ class DBfinding(Base):
             commit_timestamp=finding.commit_timestamp,
             author=finding.author,
             status=finding.status,
-            comment=html.escape(finding.comment),
+            comment=sanitized_comment,
             event_sent_on=finding.event_sent_on,
             branch_id=finding.branch_id
         )
