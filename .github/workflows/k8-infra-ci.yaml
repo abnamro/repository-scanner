@@ -92,3 +92,4 @@ jobs:
         charts_dir: deployment
       env:
         CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        CR_SKIP_EXISTING: true

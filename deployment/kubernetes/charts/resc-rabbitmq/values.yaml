@@ -2,7 +2,7 @@ rabbitMQ:
   image:
     repository:
     name: rabbitmq
-    tag: 3.11.6-management-alpine
+    tag: 3.11.9-management-alpine
     pullPolicy: IfNotPresent
   resources:
     requests:
