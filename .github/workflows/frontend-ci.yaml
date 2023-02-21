@@ -6,11 +6,14 @@ on:
     paths:
       - .github/workflows/frontend-ci.yaml
       - components/resc-frontend/**
+      - '!**.md'
   pull_request:
     branches: [ "main" ]
     paths:
       - .github/workflows/frontend-ci.yaml
       - components/resc-frontend/**
+      - '!**.md'
+  workflow_dispatch:
 
 env:
   RESC_FRONTEND_DIR: components/resc-frontend
