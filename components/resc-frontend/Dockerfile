@@ -7,7 +7,7 @@ COPY ./ .
 RUN npm run build
 
 # production stage
-FROM nginx:1.23.2-alpine as production-stage
+FROM nginx:1.23.3-alpine as production-stage
 
 RUN mkdir /app
 COPY --from=build-stage /app/dist /app
