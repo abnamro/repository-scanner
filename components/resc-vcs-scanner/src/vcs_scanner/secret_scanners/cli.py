@@ -162,7 +162,7 @@ def scan_directory(args: Namespace):
         branches=[]
     )
 
-    output_plugin = STDOUTWriter()
+    output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path)
     with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
         rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:
@@ -208,7 +208,7 @@ def scan_repository(args: Namespace):
         rule_pack_version = output_plugin.download_rule_pack()
 
     else:
-        output_plugin = STDOUTWriter()
+        output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path)
         with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
             rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:

@@ -4,6 +4,8 @@ from datetime import datetime
 from typing import List, Optional
 
 # Third Party
+import tomlkit
+from prettytable import PrettyTable
 from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.finding import FindingCreate
 from resc_backend.resc_web_service.schema.repository import Repository
@@ -12,6 +14,7 @@ from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceRead
 
 # First Party
+from vcs_scanner.helpers.finding_action import FindingAction
 from vcs_scanner.model import VCSInstanceRuntime
 from vcs_scanner.output_module import OutputModule
 
@@ -19,6 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 class STDOUTWriter(OutputModule):
+
+    def __init__(self, toml_rule_file_path: str):
+        self.toml_rule_file_path: str = toml_rule_file_path
+
     def write_vcs_instance(self, vcs_instance_runtime: VCSInstanceRuntime) -> Optional[VCSInstanceRead]:
         vcs_instance = VCSInstanceRead(id_=1,
                                        name=vcs_instance_runtime.name,
@@ -40,31 +47,49 @@ class STDOUTWriter(OutputModule):
         logger.info(f"Scanning branch {branch.branch_name} of repository {repository.repository_name}")
         return branch
 
+    def _get_rule_tags(self) -> dict:
+        rule_tags = {}
+        # read toml
+        with open(self.toml_rule_file_path, encoding="utf-8") as toml_rule_file:
+            toml_rule_dictionary = tomlkit.loads(toml_rule_file.read())
+            # convert to dict
+            for toml_rule in toml_rule_dictionary["rules"]:
+                rule_id = toml_rule.get('id', None)
+                if rule_id:
+                    rule_tags[rule_id] = toml_rule.get('tags', [])
+        return rule_tags
+
     @staticmethod
-    def format_commit_message(finding: FindingCreate) -> str:
-        commit_message = (finding.commit_message[:40] + '..') \
-            if len(finding.commit_message) > 40 else finding.commit_message
-        return (f"Finding details:\n"
-                f"  -Filepath:        {finding.file_path}\n"
-                f"  -Line number:     {finding.line_number}\n"
-                f"  -Rule name:       {finding.rule_name}\n"
-                "Commit details:\n"
-                f"  -Commit ID:       {finding.commit_id}\n"
-                f"  -Commit Message:  {commit_message}\n"
-                f"  -Commit time:     {finding.commit_timestamp}\n"
-                "Author details:\n"
-                f"  -Author name:     {finding.author}\n"
-                f"  -Author email:    {finding.email}\n")
+    def _determine_finding_action(finding: FindingCreate, rule_tags: dict) -> FindingAction:
+        rule_action = FindingAction.INFO
+        if FindingAction.WARN in rule_tags[finding.rule_name]:
+            rule_action = FindingAction.WARN
+        if FindingAction.BLOCK in rule_tags[finding.rule_name]:
+            rule_action = FindingAction.BLOCK
+        return rule_action
 
-    def write_findings(
-            self,
-            scan_id: int,
-            branch_id: int,
-            scan_findings: List[FindingCreate],):
+    def write_findings(self, scan_id: int, branch_id: int, scan_findings: List[FindingCreate]):
+        # Initialize table
+        output_table = PrettyTable()
+        output_table.field_names = ['Level', 'Rule', 'Line', 'File path']
+        output_table.align = 'l'
+        output_table.align['Line'] = 'r'
+
+        scan_has_warnings = False
+        scan_has_blockers = False
+
+        rule_tags = self._get_rule_tags()
         for finding in scan_findings:
-            logger.debug(self.format_commit_message(finding))
+            finding_action = self._determine_finding_action(finding, rule_tags)
 
-        logger.info(f"Found {len(scan_findings)} issues during scan: {scan_id} ")
+            scan_has_warnings = True if finding_action == FindingAction.WARN else scan_has_warnings
+            scan_has_blockers = True if finding_action == FindingAction.BLOCK else scan_has_blockers
+
+            output_table.add_row([finding_action.value, finding.rule_name, finding.line_number, finding.file_path])
+
+        logger.info(f"\n{output_table.get_string(sortby='Rule')}")
+        logger.info(f"Found {len(scan_findings)} findings {self.toml_rule_file_path}"
+                    f" has_warnings {scan_has_warnings} has_blockers {scan_has_blockers}")
 
     def write_scan(
             self,
