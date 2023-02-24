@@ -16,7 +16,6 @@ from resc_backend.constants import (
 )
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import detailed_finding as detailed_finding_crud
-from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
@@ -57,6 +56,8 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
             - finding_statuses [enum of type FindingStatus], possible values are:NOT_ANALYZED,FALSE_POSITIVE,
               TRUE_POSITIVE. Will default to all if non-specified.
 
+            - rule_pack_versions of type [String]
+
             - rule_names of type [String]
 
             - rule_tags of type [String]
@@ -92,6 +93,7 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
     """
 
     parsed_query_string_params = dict(urllib.parse.parse_qsl(query_string))
+
     if parsed_query_string_params.get('scan_ids'):
         parsed_query_string_params['scan_ids'] = json.loads(parsed_query_string_params['scan_ids'])
     if parsed_query_string_params.get('vcs_providers'):
@@ -106,11 +108,15 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
     if parsed_query_string_params.get('rule_tags'):
         parsed_query_string_params['rule_tags'] = json.loads(parsed_query_string_params['rule_tags']
                                                              .replace('\'', '"'))
+    if parsed_query_string_params.get('rule_pack_versions'):
+        parsed_query_string_params['rule_pack_versions'] = json.loads(parsed_query_string_params['rule_pack_versions']
+                                                                      .replace('\'', '"'))
+
     findings_filter = FindingsFilter(**parsed_query_string_params)
 
     findings = detailed_finding_crud.get_detailed_findings(
         db_connection, findings_filter=findings_filter, skip=skip, limit=limit)
-    total_findings = finding_crud.get_total_findings_count(
+    total_findings = detailed_finding_crud.get_detailed_findings_count(
         db_connection, findings_filter=findings_filter)
 
     return PaginationModel[detailed_finding_schema.DetailedFindingRead](

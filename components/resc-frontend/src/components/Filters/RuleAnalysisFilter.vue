@@ -74,6 +74,14 @@
               ></b-form-datepicker>
             </b-form-group>
           </div>
+
+          <div class="col-md-4">
+            <RulePackFilter
+              :selectedRulePackVersionsList="selectedRulePackVersionsList"
+              :rulePackVersions="rulePackVersions"
+              @on-rule-pack-version-change="onRulePackVersionChange"
+            />
+          </div>
         </div>
       </b-collapse>
     </div>
@@ -89,6 +97,7 @@ import RuleFilter from '@/components/Filters/RuleFilter.vue';
 import RuleService from '@/services/rule-service';
 import Store from '@/store/index.js';
 import VcsProviderFilter from '@/components/Filters/VcsProviderFilter.vue';
+import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
 
 export default {
   name: 'RuleAnalysisFilter',
@@ -99,6 +108,16 @@ export default {
       default: () => [],
     },
     repositoryOptions: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    selectedRulePackVersionsList: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    rulePackVersions: {
       type: Array,
       required: false,
       default: () => [],
@@ -115,6 +134,7 @@ export default {
       selectedRepository: null,
       selectedBranch: null,
       selectedRule: null,
+      selectedRulePackVersions: [],
     };
   },
   computed: {
@@ -173,6 +193,12 @@ export default {
       this.handleFilterChange();
     },
 
+    onRulePackVersionChange(rulePackVersions) {
+      this.selectedRulePackVersions = rulePackVersions;
+      this.fetchAllDetectedRules();
+      this.handleFilterChange();
+    },
+
     handleFilterChange() {
       // Refresh table data in Rule Analysis page
       const filterObj = {};
@@ -184,6 +210,7 @@ export default {
       filterObj.repository = this.selectedRepository;
       filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
+      filterObj.rulePackVersions = this.selectedRulePackVersions;
       this.$emit('on-filter-change', filterObj);
     },
     fetchAllDetectedRules() {
@@ -193,7 +220,8 @@ export default {
         this.selectedProject,
         this.selectedRepository,
         this.startDate,
-        this.endDate
+        this.endDate,
+        this.selectedRulePackVersions
       )
         .then((response) => {
           this.rules = response.data;
@@ -224,11 +252,12 @@ export default {
         filterObj.repository = this.selectedRepository;
         filterObj.branch = this.selectedBranch;
         filterObj.rule = selectedRules;
+        filterObj.rulePackVersions = this.selectedRulePackVersions;
 
         //Populate rule analysis list based on rule filter
         this.$emit('on-filter-change', filterObj);
 
-        //Set rule fiter drowdown selected value
+        //Set rule fiter dropdown selected value
         this.selectedRule = selectedRules;
       } else {
         this.selectedRule = [];
@@ -246,6 +275,7 @@ export default {
     RepositoryFilter,
     RuleFilter,
     VcsProviderFilter,
+    RulePackFilter,
   },
 };
 </script>

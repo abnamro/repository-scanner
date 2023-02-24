@@ -10,7 +10,8 @@ const RuleService = {
     projectFilter,
     repositoryFilter,
     startDate,
-    endDate
+    endDate,
+    rulePackVersions
   ) {
     let queryParams = '';
     if (findingStatusList) {
@@ -34,6 +35,11 @@ const RuleService = {
     }
     if (endDate) {
       queryParams += `&end_date_time=${endDate}T23:59:59`;
+    }
+    if (rulePackVersions) {
+      rulePackVersions.forEach((version) => {
+        queryParams += `&rule_pack_version=${version}`;
+      });
     }
     if (queryParams) {
       queryParams = queryParams.slice(1);

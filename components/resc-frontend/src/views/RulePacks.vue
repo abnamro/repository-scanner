@@ -152,7 +152,7 @@ export default {
     },
     fetchPaginatedRulePacks() {
       this.showSpinner();
-      RulePackService.getRulePacks()
+      RulePackService.getRulePackVersions()
         .then((response) => {
           this.rulePackList = response.data.data;
           this.totalRows = response.data.total;

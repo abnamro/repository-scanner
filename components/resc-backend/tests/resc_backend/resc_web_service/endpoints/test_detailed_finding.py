@@ -89,7 +89,7 @@ class TestDetailedFindings(unittest.TestCase):
         self.assert_detailed_finding(response.json(), detailed_finding)
         get_finding.assert_called_once_with(ANY, finding_id=detailed_finding.id_)
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_multiple_findings(self, get_findings, get_findings_count):
         number_of_findings = 3
@@ -126,7 +126,7 @@ class TestDetailedFindings(unittest.TestCase):
         assert data["detail"][0]["msg"] == "ensure this value is greater than or equal to 1"
         get_findings.assert_not_called()
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_rule(self, get_detailed_findings, get_total_findings_count):
         rule_name = "['rule_name']"
@@ -143,7 +143,24 @@ class TestDetailedFindings(unittest.TestCase):
         get_detailed_findings.assert_called_once_with(ANY, findings_filter=FindingsFilter(rule_names=["rule_name"]),
                                                       skip=0, limit=1)
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
+    def test_get_detailed_findings_by_rule_pack_versions(self, get_detailed_findings, get_total_findings_count):
+        rule_pack_versions = "['2']"
+        count = 0
+        get_total_findings_count.return_value = count
+        get_detailed_findings.return_value = []
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_DETAILED_FINDINGS}"
+                                   f"?skip=0&limit=1&query_string=rule_pack_versions={rule_pack_versions}")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data["data"]) == 0
+        assert data["total"] == 0
+        get_total_findings_count.assert_called_once_with(ANY, findings_filter=FindingsFilter(rule_pack_versions=['2']))
+        get_detailed_findings.assert_called_once_with(ANY, findings_filter=FindingsFilter(rule_pack_versions=['2']),
+                                                      skip=0, limit=1)
+
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_vcs_provider(self, get_detailed_findings, get_total_findings_count):
         vcs_provider = "['BITBUCKET']"
@@ -161,7 +178,7 @@ class TestDetailedFindings(unittest.TestCase):
         get_detailed_findings.assert_called_once_with(
             ANY, findings_filter=FindingsFilter(vcs_providers=[VCSProviders.BITBUCKET]), skip=0, limit=1)
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_start_date_range(self, get_detailed_findings, get_total_findings_count):
         start_date_time = "1970-11-11T00:00:00"
@@ -181,7 +198,7 @@ class TestDetailedFindings(unittest.TestCase):
             ANY, findings_filter=FindingsFilter(
                 start_date_time=datetime.strptime(start_date_time, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_end_date_range(self, get_detailed_findings, get_total_findings_count):
         end_date_time = "1970-11-11T00:00:00"
@@ -201,7 +218,7 @@ class TestDetailedFindings(unittest.TestCase):
             ANY, findings_filter=FindingsFilter(
                 end_date_time=datetime.strptime(end_date_time, "%Y-%m-%dT%H:%M:%S")), skip=0, limit=1)
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
+    @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings_count")
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_findings")
     def test_get_detailed_findings_by_all_filters(self, get_detailed_findings, get_total_findings_count):
         scan_ids: List[int] = [1, 2]

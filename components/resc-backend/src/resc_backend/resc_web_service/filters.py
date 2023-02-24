@@ -25,6 +25,7 @@ class FindingsFilter:
     start_date_time: datetime = None
     end_date_time: datetime = None
     event_sent: bool = None
+    rule_pack_versions: List[str] = None
 
     @validator("end_date_time")
     @classmethod

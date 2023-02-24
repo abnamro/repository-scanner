@@ -46,6 +46,7 @@ def get_distinct_rules_from_findings(
         repository_name: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
         start_date_time: Optional[datetime] = Query(None),
         end_date_time: Optional[datetime] = Query(None),
+        rule_pack_versions: Optional[List[str]] = Query(None, alias="rule_pack_version", title="RulePackVersion"),
         db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
         Retrieve all uniquely detected rules across all findings in the database
@@ -57,6 +58,7 @@ def get_distinct_rules_from_findings(
     - **repository_name**: Optional, filter on repository name. It is used as a string contains filter
     - **start_date_time**: Optional, filter on start date
     - **end_date_time**: Optional, filter on end date
+    - **rule_pack_version**: Optional, filter on rule pack version
     - **return**: List[str] The output will contain a list of strings of unique rules in the findings table
     """
     distinct_rules = finding_crud.get_distinct_rules_from_findings(db_connection,
@@ -65,7 +67,8 @@ def get_distinct_rules_from_findings(
                                                                    project_name=project_name,
                                                                    repository_name=repository_name,
                                                                    start_date_time=start_date_time,
-                                                                   end_date_time=end_date_time)
+                                                                   end_date_time=end_date_time,
+                                                                   rule_pack_versions=rule_pack_versions)
     rules = [rule.rule_name for rule in distinct_rules]
     return rules
 

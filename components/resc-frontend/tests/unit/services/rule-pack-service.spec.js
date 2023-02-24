@@ -4,12 +4,12 @@ import rule_packs from '@/../tests/resources/mock_rule_packs.json';
 
 jest.mock('axios');
 
-describe('function getRulePacks', () => {
-  describe('when getRulePacks API call is successful', () => {
+describe('function getRulePackVersions', () => {
+  describe('when getRulePackVersions API call is successful', () => {
     it('should return all rule packs', async () => {
       axios.get.mockResolvedValueOnce(rule_packs);
 
-      const response = await RulePackService.getRulePacks(20, 0);
+      const response = await RulePackService.getRulePackVersions(20, 0);
 
       expect(response).toBeDefined();
       expect(response).not.toBeNull();
@@ -27,11 +27,11 @@ describe('function getRulePacks', () => {
     });
   });
 
-  describe('when getRulePacks API call fails', () => {
-    it('getRulePacks should return error', async () => {
+  describe('when getRulePackVersions API call fails', () => {
+    it('getRulePackVersions should return error', async () => {
       axios.get.mockResolvedValueOnce([]);
 
-      await RulePackService.getRulePacks('not_valid')
+      await RulePackService.getRulePackVersions('not_valid')
         .then((response) => {
           expect(response).toEqual([]);
           expect(response).not.toBeNull();

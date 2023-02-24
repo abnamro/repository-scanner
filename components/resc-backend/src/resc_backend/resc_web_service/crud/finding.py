@@ -262,7 +262,8 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
                                      project_name: str = "",
                                      repository_name: str = "",
                                      start_date_time: datetime = None,
-                                     end_date_time: datetime = None) -> \
+                                     end_date_time: datetime = None,
+                                     rule_pack_versions: [str] = None) -> \
         List[model.DBrule]:
     """
         Retrieve distinct rules detected
@@ -282,12 +283,15 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
         optional, filter on start date
     :param end_date_time:
         optional, filter on end date
+    :param rule_pack_versions:
+        optional, filter on rule pack version
     :return: rules
         List of unique rules
     """
     query = db_connection.query(model.DBfinding.rule_name)
 
-    if (vcs_providers or project_name or repository_name or start_date_time or end_date_time) and scan_id < 0:
+    if (vcs_providers or project_name or repository_name or start_date_time or end_date_time or rule_pack_versions) \
+            and scan_id < 0:
         query = query \
             .join(model.DBscanFinding,
                   model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
@@ -322,6 +326,9 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
 
         if end_date_time:
             query = query.filter(model.scan.DBscan.timestamp <= end_date_time)
+
+        if rule_pack_versions:
+            query = query.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
 
     rules = query.distinct().order_by(model.DBfinding.rule_name).all()
     return rules

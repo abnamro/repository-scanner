@@ -13,6 +13,8 @@
       <RuleAnalysisFilter
         :projectOptions="projectNames"
         :repositoryOptions="repositoryNames"
+        :selectedRulePackVersionsList="selectedRulePackVersionsList"
+        :rulePackVersions="rulePackVersions"
         @on-filter-change="handleFilterChange"
       ></RuleAnalysisFilter>
     </div>
@@ -141,6 +143,7 @@ import RepositoryService from '@/services/repository-service';
 import Spinner from '@/components/Common/Spinner.vue';
 import Pagination from '@/components/Common/Pagination.vue';
 import RuleAnalysisFilter from '@/components/Filters/RuleAnalysisFilter.vue';
+import RulePackService from '@/services/rule-pack-service';
 import spinnerMixin from '@/mixins/spinner.js';
 import Store from '@/store/index.js';
 
@@ -156,6 +159,7 @@ export default {
       perPage: Number(`${Config.value('defaultPageSize')}`),
       pageSizes: [20, 50, 100],
       requestedPageNumber: 1,
+      rulePackVersions: [],
       projectNames: [],
       repositoryNames: [],
       selectedStartDate: '',
@@ -166,6 +170,8 @@ export default {
       selectedRepository: null,
       selectedBranch: null,
       selectedRule: null,
+      selectedRulePackVersions: [],
+      selectedRulePackVersionsList: [],
       selectedCheckBoxIds: [],
       allSelected: false,
       fields: [
@@ -287,6 +293,7 @@ export default {
       filterObj.repository = this.selectedRepository;
       filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
+      filterObj.rulePackVersions = this.selectedRulePackVersions;
 
       FindingsService.getDetailedFindings(filterObj)
         .then((response) => {
@@ -320,6 +327,7 @@ export default {
       this.selectedRepository = filterObj.repository;
       this.selectedBranch = filterObj.branch;
       this.selectedRule = filterObj.rule;
+      this.selectedRulePackVersions = filterObj.rulePackVersions;
       this.currentPage = 1;
       this.allSelected = false;
       this.fetchDistinctProjects();
@@ -350,6 +358,33 @@ export default {
           AxiosConfig.handleError(error);
         });
     },
+    fetchRulePackVersions() {
+      RulePackService.getRulePackVersions(10000, 0)
+        .then((response) => {
+          this.rulePackVersions = [];
+          this.selectedRulePackVersions = [];
+          for (const index of response.data.data.keys()) {
+            const rulePackJson = {};
+            rulePackJson['id'] = index;
+            let data = response.data.data[index];
+            if (data.active) {
+              rulePackJson['label'] = data.version + ' ' + '(active)';
+              this.selectedRulePackVersions.push(data.version);
+              this.selectedRulePackVersionsList.push(rulePackJson);
+            } else {
+              rulePackJson['label'] = data.version;
+            }
+            this.rulePackVersions.push(rulePackJson);
+          }
+          //load findings when no filter values are provided from previous route
+          if (!Store.getters.previousRouteState) {
+            this.fetchPaginatedDetailedFindings();
+          }
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
   },
   filters: {
     truncate: function (text, length, suffix) {
@@ -360,14 +395,11 @@ export default {
       }
     },
   },
+
   created() {
+    this.fetchRulePackVersions();
     this.fetchDistinctProjects();
     this.fetchDistinctRepositories();
-
-    //load findings when no filter values are provided from previous route
-    if (!Store.getters.previousRouteState) {
-      this.fetchPaginatedDetailedFindings();
-    }
   },
   components: {
     AuditModal,

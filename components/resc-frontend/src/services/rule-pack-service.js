@@ -4,7 +4,7 @@ const axios = require('axios');
 axiosRetry(axios, { retries: 3 });
 
 const RulePackService = {
-  async getRulePacks(perPage, skipRowCount) {
+  async getRulePackVersions(perPage, skipRowCount) {
     return axios.get(`rule-packs/versions`, {
       params: {
         skip: skipRowCount,

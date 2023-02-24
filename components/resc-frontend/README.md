@@ -27,7 +27,7 @@ Repository Scanner (RESC) Frontend is a fully responsive dashboard application d
 These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-- Install [Node.js](https://nodejs.org/en/) v16.13.0
+- Install [Node.js](https://nodejs.org/en/) v16.17.0
 - Install Vue cli using command: `npm install -g @vue/cli`  
 - Install Vetur, ESLint and Prettier extensions to your VSCode IDE. 
 - Install [Docker](https://www.docker.com/)
