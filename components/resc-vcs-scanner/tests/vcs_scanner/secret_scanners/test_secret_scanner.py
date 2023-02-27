@@ -102,3 +102,28 @@ def test_scan_repo(start_scan):
                                       repo_clone_path)
     assert result is None
     start_scan.assert_called_once()
+
+
+@patch("vcs_scanner.secret_scanners.gitleaks_wrapper.GitLeaksWrapper.start_scan")
+def test_scan_directory(start_scan):
+    start_scan.return_value = None
+    rws_url = "https://fakeurl.com:8000"
+    repository = Repository(project_key="local",
+                            repository_id=1,
+                            repository_name="local",
+                            repository_url="https://repository.url",
+                            vcs_instance=1,
+                            branches=[])
+    secret_scanner = SecretScanner(
+        gitleaks_binary_path="/tmp/gitleaks",
+        gitleaks_rules_path="/rules.toml",
+        rule_pack_version="0.0.1",
+        output_plugin=RESTAPIWriter(rws_url=rws_url),
+        repository=repository,
+        username="",
+        personal_access_token=""
+    )
+    repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository.repository_name}"
+    result = secret_scanner.scan_directory(directory_path=repo_clone_path)
+    assert result is None
+    start_scan.assert_called_once()

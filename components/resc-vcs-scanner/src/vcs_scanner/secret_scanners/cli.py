@@ -43,6 +43,14 @@ def create_cli_argparser() -> ArgumentParser:
                                envvar="RESC_GITLEAKS_RULES_PATH", help="Path to the gitleaks rules file. "
                                                                        "Can also be set via the "
                                                                        "RESC_GITLEAKS_RULES_PATH environment variable")
+    parser_common.add_argument("-w", "--exit-code-warn", required=False, action=EnvDefault, default=2, type=int,
+                               envvar="RESC_EXIT_CODE_WARN",
+                               help="Exit code given if CLI encounters findings tagged with Warn, default 2. "
+                                    "Can also be set via the RESC_EXIT_CODE_WARN environment variable")
+    parser_common.add_argument("-b", "--exit-code-block", required=False, action=EnvDefault, default=1, type=int,
+                               envvar="RESC_EXIT_CODE_BLOCK",
+                               help="Exit code given if CLI encounters findings tagged with Block, default 1. "
+                                    "Can also be set via the RESC_EXIT_CODE_BLOCK environment variable")
     parser_common.add_argument("-v", "--verbose", required=False, action="store_true",
                                help="Enable more verbose logging")
 
@@ -162,7 +170,8 @@ def scan_directory(args: Namespace):
         branches=[]
     )
 
-    output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path)
+    output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
+                                 exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
     with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
         rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:
@@ -208,7 +217,8 @@ def scan_repository(args: Namespace):
         rule_pack_version = output_plugin.download_rule_pack()
 
     else:
-        output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path)
+        output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
+                                     exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
         with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
             rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:

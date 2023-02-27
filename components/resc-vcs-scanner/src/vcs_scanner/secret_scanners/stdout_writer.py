@@ -1,5 +1,6 @@
 # Standard Library
 import logging
+import sys
 from datetime import datetime
 from typing import List, Optional
 
@@ -23,8 +24,11 @@ logger = logging.getLogger(__name__)
 
 class STDOUTWriter(OutputModule):
 
-    def __init__(self, toml_rule_file_path: str):
+    def __init__(self, toml_rule_file_path: str, exit_code_warn: int, exit_code_block: int):
         self.toml_rule_file_path: str = toml_rule_file_path
+        self.exit_code_warn: int = exit_code_warn
+        self.exit_code_block: int = exit_code_block
+        self.exit_code_success = 0
 
     def write_vcs_instance(self, vcs_instance_runtime: VCSInstanceRuntime) -> Optional[VCSInstanceRead]:
         vcs_instance = VCSInstanceRead(id_=1,
@@ -62,9 +66,9 @@ class STDOUTWriter(OutputModule):
     @staticmethod
     def _determine_finding_action(finding: FindingCreate, rule_tags: dict) -> FindingAction:
         rule_action = FindingAction.INFO
-        if FindingAction.WARN in rule_tags[finding.rule_name]:
+        if FindingAction.WARN in rule_tags.get(finding.rule_name, []):
             rule_action = FindingAction.WARN
-        if FindingAction.BLOCK in rule_tags[finding.rule_name]:
+        if FindingAction.BLOCK in rule_tags.get(finding.rule_name, []):
             rule_action = FindingAction.BLOCK
         return rule_action
 
@@ -75,29 +79,27 @@ class STDOUTWriter(OutputModule):
         output_table.align = 'l'
         output_table.align['Line'] = 'r'
 
-        scan_has_warnings = False
-        scan_has_blockers = False
+        exit_code = self.exit_code_success
 
         rule_tags = self._get_rule_tags()
         for finding in scan_findings:
             finding_action = self._determine_finding_action(finding, rule_tags)
 
-            scan_has_warnings = True if finding_action == FindingAction.WARN else scan_has_warnings
-            scan_has_blockers = True if finding_action == FindingAction.BLOCK else scan_has_blockers
+            if exit_code != self.exit_code_block:
+                if exit_code == self.exit_code_success and finding_action == FindingAction.WARN:
+                    exit_code = self.exit_code_warn
+                elif finding_action == FindingAction.BLOCK:
+                    exit_code = self.exit_code_block
 
             output_table.add_row([finding_action.value, finding.rule_name, finding.line_number, finding.file_path])
 
         logger.info(f"\n{output_table.get_string(sortby='Rule')}")
-        logger.info(f"Found {len(scan_findings)} findings {self.toml_rule_file_path}"
-                    f" has_warnings {scan_has_warnings} has_blockers {scan_has_blockers}")
+        logger.info(f"Found {len(scan_findings)} findings {self.toml_rule_file_path}")
 
-    def write_scan(
-            self,
-            scan_type_to_run: ScanType,
-            last_scanned_commit: str,
-            scan_timestamp: datetime,
-            branch: Branch,
-            rule_pack: str) -> Optional[ScanRead]:
+        sys.exit(exit_code)
+
+    def write_scan(self, scan_type_to_run: ScanType, last_scanned_commit: str, scan_timestamp: datetime,
+                   branch: Branch, rule_pack: str) -> Optional[ScanRead]:
         logger.info(f"Running {scan_type_to_run} scan on branch {branch.branch_name}")
         return ScanRead(last_scanned_commit="NONE",
                         timestamp=datetime.now(),
