@@ -52,6 +52,11 @@ class STDOUTWriter(OutputModule):
         return branch
 
     def _get_rule_tags(self) -> dict:
+        """
+            Get the tags per rule from the .toml rule file, from self.toml_rule_file_path
+        :return: dict.
+            The output will contain a dictionary with the rule id as the key and the tags as a list in the value
+        """
         rule_tags = {}
         # read toml
         with open(self.toml_rule_file_path, encoding="utf-8") as toml_rule_file:
@@ -65,6 +70,15 @@ class STDOUTWriter(OutputModule):
 
     @staticmethod
     def _determine_finding_action(finding: FindingCreate, rule_tags: dict) -> FindingAction:
+        """
+            Determine the action to take for the finding, based on the rule tags
+        :param finding:
+            FindingCreate instance of the finding
+        :param rule_tags:
+            Dictionary continuing all the rules and there respective tags
+        :return: FindingAction.
+            FindingAction to take for this finding
+        """
         rule_action = FindingAction.INFO
         if FindingAction.WARN in rule_tags.get(finding.rule_name, []):
             rule_action = FindingAction.WARN
@@ -73,6 +87,15 @@ class STDOUTWriter(OutputModule):
         return rule_action
 
     def write_findings(self, scan_id: int, branch_id: int, scan_findings: List[FindingCreate]):
+        """
+            Write the findings to the STDOUT in a nice table and set the exit code based on the FindingActions found
+        :param scan_id:
+            id of the scan in question
+        :param branch_id:
+            id of the branch in question
+        :param scan_findings:
+            List of FindingCreate of all the findings from the scan
+        """
         # Initialize table
         output_table = PrettyTable()
         output_table.field_names = ['Level', 'Rule', 'Line', 'File path']

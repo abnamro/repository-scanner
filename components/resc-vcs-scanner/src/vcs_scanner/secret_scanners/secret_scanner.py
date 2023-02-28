@@ -139,6 +139,9 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                             f" no new commits found.")
 
     def run_directory_scan(self) -> None:
+        """
+            Scan the given non-git directory, set in the self.local_path variable
+        """
         logger.info(f"Started task for scanning {self.local_path} using rule pack version: {self.rule_pack_version}")
 
         scan_timestamp_start = datetime.utcnow()

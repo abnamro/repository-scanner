@@ -35,6 +35,11 @@ def deserialize_repository_from_file(filepath: str) -> RepositoryRuntime:
 
 
 def create_cli_argparser() -> ArgumentParser:
+    """
+        Create ArgumentParser for CLI arguments
+    :return: ArgumentParser.
+        ArgumentParser instance with all arguments as expected for RESC
+    """
     parser_common = ArgumentParser(add_help=False)
     parser_common.add_argument("--gitleaks-path", type=pathlib.Path, action=EnvDefault, envvar="RESC_GITLEAKS_PATH",
                                required=True, help="Path to the gitleaks binary. "
@@ -105,6 +110,13 @@ def create_cli_argparser() -> ArgumentParser:
 
 
 def get_repository_name_from_url(repo_url: str) -> str:
+    """
+        Get repository name from given URL, taking the last segment of the url as name
+    :param repo_url:
+        Full url to the repository
+    :return: str.
+        The output will the name of the repository based on the url
+    """
     url = urlparse(repo_url)
     if url.path.split("/")[-1] == "":
         return url.path.split("/")[-2]
@@ -112,6 +124,13 @@ def get_repository_name_from_url(repo_url: str) -> str:
 
 
 def validate_cli_arguments(args: Namespace):  # pylint: disable=R0912
+    """
+        Validate the CLI arguments given
+    :param args:
+        Namespace object containing the arguments parsed from the CLI
+    :return: args or False.
+        The output will be the args given, unless validation fails then it contains False
+    """
     valid_arguments = True
     # Prompt for the password for a remote repo if username is specified
     if args.command == "repo" and args.repository_location == "remote" and args.username:
@@ -137,6 +156,9 @@ def validate_cli_arguments(args: Namespace):  # pylint: disable=R0912
 
 
 def scan_repository_from_cli():
+    """
+        Startup command for the CLI, parsing arguments and starting the process
+    """
     parser: ArgumentParser = create_cli_argparser()
     args: Namespace = parser.parse_args()
     args = validate_cli_arguments(args)
@@ -161,6 +183,11 @@ def scan_repository_from_cli():
 
 
 def scan_directory(args: Namespace):
+    """
+        Start the process of scanning a non-git directory
+    :param args:
+        Namespace object containing the CLI arguments
+    """
     repository = RepositoryRuntime(
         repository_url=FAKE_URL,
         repository_name="local",
@@ -192,6 +219,11 @@ def scan_directory(args: Namespace):
 
 
 def scan_repository(args: Namespace):
+    """
+        Start the process of scanning a git repository (remote or local)
+    :param args:
+        Namespace object containing the CLI arguments
+    """
     branches = []
     for i, branch in enumerate(args.branches):
         logger.info(f"Adding branch {branch} to the list of branches to be scanned")
@@ -240,6 +272,13 @@ def scan_repository(args: Namespace):
 
 
 def guess_vcs_provider(repo_url: str) -> VCSProviders:
+    """
+        Guess the vcs provider based on the url given, defaulted to bitbucket
+    :param repo_url:
+        Full url of the repository
+    :return: VCSProviders.
+        The output will contain the guessed VCSProviders enum value
+    """
     url = urlparse(repo_url)
     if "bitbucket" in url.netloc:
         return VCSProviders.BITBUCKET
@@ -250,6 +289,15 @@ def guess_vcs_provider(repo_url: str) -> VCSProviders:
 
 
 def determine_vcs_name(repo_url: str, vcs_type: VCSProviders) -> str:
+    """
+        Determine the vcs provider name based on the vcs_type given, defaulted to CLI_VCS_LOCAL_SCAN
+    :param repo_url:
+        Full url of the repository
+    :param vcs_type:
+        VCSProviders type of the repository
+    :return: str.
+        The output will contain the name of the vcs provider
+    """
     vcs_name = CLI_VCS_LOCAL_SCAN
     if repo_url and repo_url is not FAKE_URL:
         if vcs_type == VCSProviders.AZURE_DEVOPS:
