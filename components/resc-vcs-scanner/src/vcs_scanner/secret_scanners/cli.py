@@ -1,10 +1,9 @@
-
 # Standard Library
 import getpass
 import json
 import logging.config
 import os
-import sys
+import pathlib
 from argparse import ArgumentParser, Namespace
 from urllib.parse import urlparse
 
@@ -15,8 +14,8 @@ from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 # First Party
 from vcs_scanner.common import get_rule_pack_version_from_file, initialise_logs
 from vcs_scanner.constants import CLI_VCS_AZURE, CLI_VCS_BITBUCKET, CLI_VCS_LOCAL_SCAN, LOG_FILE_PATH_CLI
+from vcs_scanner.helpers.env_default import EnvDefault
 from vcs_scanner.model import RepositoryRuntime
-from vcs_scanner.secret_scanners.configuration import GITLEAKS_PATH
 from vcs_scanner.secret_scanners.rws_api_writer import RESTAPIWriter
 from vcs_scanner.secret_scanners.secret_scanner import SecretScanner
 from vcs_scanner.secret_scanners.stdout_writer import STDOUTWriter
@@ -36,34 +35,88 @@ def deserialize_repository_from_file(filepath: str) -> RepositoryRuntime:
 
 
 def create_cli_argparser() -> ArgumentParser:
+    """
+        Create ArgumentParser for CLI arguments
+    :return: ArgumentParser.
+        ArgumentParser instance with all arguments as expected for RESC
+    """
+    parser_common = ArgumentParser(add_help=False)
+    parser_common.add_argument("--gitleaks-path", type=pathlib.Path, action=EnvDefault, envvar="RESC_GITLEAKS_PATH",
+                               required=True, help="Path to the gitleaks binary. "
+                                                   "Can also be set via the RESC_GITLEAKS_PATH environment variable")
+    parser_common.add_argument("--gitleaks-rules-path", type=pathlib.Path, action=EnvDefault, required=True,
+                               envvar="RESC_GITLEAKS_RULES_PATH", help="Path to the gitleaks rules file. "
+                                                                       "Can also be set via the "
+                                                                       "RESC_GITLEAKS_RULES_PATH environment variable")
+    parser_common.add_argument("-w", "--exit-code-warn", required=False, action=EnvDefault, default=2, type=int,
+                               envvar="RESC_EXIT_CODE_WARN",
+                               help="Exit code given if CLI encounters findings tagged with Warn, default 2. "
+                                    "Can also be set via the RESC_EXIT_CODE_WARN environment variable")
+    parser_common.add_argument("-b", "--exit-code-block", required=False, action=EnvDefault, default=1, type=int,
+                               envvar="RESC_EXIT_CODE_BLOCK",
+                               help="Exit code given if CLI encounters findings tagged with Block, default 1. "
+                                    "Can also be set via the RESC_EXIT_CODE_BLOCK environment variable")
+    parser_common.add_argument("-v", "--verbose", required=False, action="store_true",
+                               help="Enable more verbose logging")
+
+    repository_common = ArgumentParser(add_help=False)
+    repository_common.add_argument("--repo-name", type=str, required=False, action=EnvDefault, envvar="RESC_REPO_NAME",
+                                   help="The name of the repository. "
+                                        "Can also be set via the RESC_REPO_NAME environment variable")
+    repository_common.add_argument("--branches", default=["master", "main"], nargs="+", required=False,
+                                   help="The name of the branches to scan, default main and master")
+    repository_common.add_argument("--force-base-scan", required=False, action="store_true")
+
+    repository_common.add_argument("--rws-url", type=str, required=False, action=EnvDefault, envvar="RESC_RWS_URL",
+                                   help="The URL to the secret tracking service to which the scan results should "
+                                        "be written. "
+                                        "Can also be set via the RESC_RWS_URL environment variable")
+
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument("--repo-info", type=str,
-                        help="Path to the JSON file containing the repository info")
-    parser.add_argument("--repo-url", type=str,
-                        help="url to repository you want to scan", default=FAKE_URL)
-    parser.add_argument("--repo-dir", type=str,
-                        help="The path to the directory where the repo is located")
-    parser.add_argument("--repo-name", type=str,
-                        help="The name of the repository")
-    parser.add_argument("--rws-url", type=str,
-                        help="The URL to the secret tracking service to which the scan results should be written")
-    parser.add_argument("--vcs-instances", type=str,
-                        help="Path to the json file containing the vcs instances definitions")
-    parser.add_argument("--temporary-path", type=str, default="/tmp")
-    parser.add_argument("--username", type=str, required=False)
-    parser.add_argument("--password", action='store_true', required=False)
-    parser.add_argument("--branches", default=["master"], nargs="+")
-    parser.add_argument("--gitleaks-path", default="./gitleaks",
-                        help=f"Path to the gitleaks binary. Can also be provided via the {GITLEAKS_PATH} "
-                             f"environment variable")
-    parser.add_argument("--gitleaks-rules-path", required=True,
-                        help="Path to the gitleaks rules file.")
-    parser.add_argument("--force-base-scan", action="store_true")
+
+    subparser = parser.add_subparsers(title="command", dest="command", required=True, help="Options dir, repo")
+    directory = subparser.add_parser("dir", description="Scan a directory", help="Scan a directory",
+                                     parents=[parser_common])
+    repository = subparser.add_parser("repo", description="Scan a Git repository", help="Scan a Git repository")
+
+    directory.add_argument("--dir", type=pathlib.Path, required=True, action=EnvDefault, envvar="RESC_SCAN_PATH",
+                           help="The path to the directory where the scan target. "
+                                "Can also be set via the RESC_SCAN_PATH environment variable")
+
+    repository_subparser = repository.add_subparsers(title="repository_location", dest="repository_location",
+                                                     required=True, help="Options local, remote")
+    repository_local = repository_subparser.add_parser("local", description="Scan a locally already cloned repository",
+                                                       help="Scan a locally already cloned repository",
+                                                       parents=[parser_common, repository_common])
+    repository_remote = repository_subparser.add_parser("remote", description="Scan a remote repository",
+                                                        help="Scan a remote repository",
+                                                        parents=[parser_common, repository_common])
+
+    repository_local.add_argument("--dir", type=pathlib.Path, required=True, action=EnvDefault, envvar="RESC_SCAN_PATH",
+                                  help="The path to the directory where the repo is located. "
+                                       "Can also be set via the RESC_SCAN_PATH environment variable")
+
+    repository_remote.add_argument("--repo-url", type=str, required=True, action=EnvDefault, envvar="RESC_REPO_URL",
+                                   help="url to repository you want to scan. "
+                                        "Can also be set via the RESC_REPO_URL environment variable")
+    repository_remote.add_argument("--username", type=str, required=False,
+                                   action=EnvDefault, envvar="RESC_REPO_USERNAME",
+                                   help="The username used for cloning the repository, "
+                                        "you will be prompted for the password. "
+                                        "Can also be set via the RESC_REPO_USERNAME & RESC_REPO_PASSWORD environment "
+                                        "variable")
 
     return parser
 
 
 def get_repository_name_from_url(repo_url: str) -> str:
+    """
+        Get repository name from given URL, taking the last segment of the url as name
+    :param repo_url:
+        Full url to the repository
+    :return: str.
+        The output will the name of the repository based on the url
+    """
     url = urlparse(repo_url)
     if url.path.split("/")[-1] == "":
         return url.path.split("/")[-2]
@@ -71,39 +124,31 @@ def get_repository_name_from_url(repo_url: str) -> str:
 
 
 def validate_cli_arguments(args: Namespace):  # pylint: disable=R0912
+    """
+        Validate the CLI arguments given
+    :param args:
+        Namespace object containing the arguments parsed from the CLI
+    :return: args or False.
+        The output will be the args given, unless validation fails then it contains False
+    """
     valid_arguments = True
-    if not (args.repo_dir or args.repo_url is not FAKE_URL):
-        logger.error("A repository url or a repository directory need to be specified")
-        valid_arguments = False
-    if args.repo_dir and (args.password or args.username):
-        logger.error("Credentials should not be provided for scanning locally cloned repository")
-        valid_arguments = False
-    if args.username and not args.password or args.password and not args.username:
-        logger.error("Both a username and a password need to be provided")
-        valid_arguments = False
-    if args.username and args.password:
-        args.password = getpass.getpass("Password:")
-    if args.repo_url is not FAKE_URL and not (args.username and args.password):
-        logger.info("A repo url is provided without credentials, assuming the repository is public")
+    # Prompt for the password for a remote repo if username is specified
+    if args.command == "repo" and args.repository_location == "remote" and args.username:
+        if "RESC_REPO_PASSWORD" in os.environ:
+            args.password = os.environ["RESC_REPO_PASSWORD"]
+        else:
+            args.password = getpass.getpass("Password:")
 
-    if args.gitleaks_path and not os.path.isfile(args.gitleaks_path):
-        logger.error(f"Could not locate Gitleaks binary path: {args.gitleaks_path}")
-        valid_arguments = False
-    if args.gitleaks_rules_path and not os.path.isfile(args.gitleaks_rules_path):
-        logger.error(f"Could not locate Gitleaks rules path: {args.gitleaks_rules_path}")
-        valid_arguments = False
-    if not args.repo_name:
-        if args.repo_dir:
-            if not os.path.isdir(args.repo_dir):
-                logger.error(f"The directory {args.repo_dir} does not exist")
-                valid_arguments = False
-            args.repo_name = os.path.split(args.repo_dir)[1]
-        elif args.repo_url is not FAKE_URL:
-            args.repo_name = get_repository_name_from_url(args.repo_url)
+    # Derive the repository name from the directory or url if not provided
+    if args.command == "repo" and args.repository_location == "remote" and not args.repo_name:
+        args.repo_name = get_repository_name_from_url(args.repo_url)
+    elif args.command == "dir" or \
+            (args.command == "repo" and args.repository_location == "local" and not args.repo_name):
+        if not os.path.isdir(args.dir.absolute()):
+            logger.error(f"The directory {args.dir.absolute()} does not exist")
+            valid_arguments = False
+        args.repo_name = os.path.split(args.dir.absolute())[1]
 
-    if args.repo_info:
-        logger.error("The --repo-info flag is not supported yet")
-        valid_arguments = False
     if not valid_arguments:
         return False
 
@@ -111,13 +156,74 @@ def validate_cli_arguments(args: Namespace):  # pylint: disable=R0912
 
 
 def scan_repository_from_cli():
+    """
+        Startup command for the CLI, parsing arguments and starting the process
+    """
     parser: ArgumentParser = create_cli_argparser()
     args: Namespace = parser.parse_args()
     args = validate_cli_arguments(args)
-    if not args:
-        logger.error("CLI arguments validation failed")
-        sys.exit(-1)
-    logger.debug("CLI arguments validation succeeded")
+
+    if args.verbose:
+        logger_config.setLevel(logging.DEBUG)
+    else:
+        logger_config.setLevel(logging.INFO)
+
+    if args.command == "dir":
+        logger.info(f"Scanning directory {args.dir.absolute()}")
+        scan_directory(args)
+    elif args.command == "repo":
+        if args.repository_location == "local":
+            logger.info(f"Scanning repository local {args.dir.absolute()}")
+            args.repo_url = FAKE_URL
+            args.username = None
+            args.password = None
+        elif args.repository_location == "remote":
+            logger.info(f"Scanning repository remote {args.repo_url}")
+        scan_repository(args)
+
+
+def scan_directory(args: Namespace):
+    """
+        Start the process of scanning a non-git directory
+    :param args:
+        Namespace object containing the CLI arguments
+    """
+    repository = RepositoryRuntime(
+        repository_url=FAKE_URL,
+        repository_name="local",
+        repository_id="local",
+        project_key="local",
+        vcs_instance_name="vcs_instance_name",
+        branches=[]
+    )
+
+    output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
+                                 exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
+    with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
+        rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
+    if not rule_pack_version:
+        rule_pack_version = "0.0.0"
+
+    secret_scanner = SecretScanner(
+        gitleaks_binary_path=args.gitleaks_path,
+        gitleaks_rules_path=args.gitleaks_rules_path,
+        rule_pack_version=rule_pack_version,
+        output_plugin=output_plugin,
+        repository=repository.convert_to_repository(vcs_instance_id=1),
+        username="",
+        personal_access_token="",
+        local_path=f"{args.dir.absolute()}",
+    )
+
+    secret_scanner.run_directory_scan()
+
+
+def scan_repository(args: Namespace):
+    """
+        Start the process of scanning a git repository (remote or local)
+    :param args:
+        Namespace object containing the CLI arguments
+    """
     branches = []
     for i, branch in enumerate(args.branches):
         logger.info(f"Adding branch {branch} to the list of branches to be scanned")
@@ -143,9 +249,12 @@ def scan_repository_from_cli():
         rule_pack_version = output_plugin.download_rule_pack()
 
     else:
-        output_plugin = STDOUTWriter()
+        output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
+                                     exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
         with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
             rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
+    if not rule_pack_version:
+        rule_pack_version = "0.0.0"
 
     secret_scanner = SecretScanner(
         gitleaks_binary_path=args.gitleaks_path,
@@ -155,7 +264,7 @@ def scan_repository_from_cli():
         repository=repository.convert_to_repository(vcs_instance_id=1),
         username=args.username,
         personal_access_token=args.password,
-        local_path=args.repo_dir,
+        local_path=f"{args.dir.absolute()}",
         force_base_scan=args.force_base_scan
     )
 
@@ -163,7 +272,13 @@ def scan_repository_from_cli():
 
 
 def guess_vcs_provider(repo_url: str) -> VCSProviders:
-
+    """
+        Guess the vcs provider based on the url given, defaulted to bitbucket
+    :param repo_url:
+        Full url of the repository
+    :return: VCSProviders.
+        The output will contain the guessed VCSProviders enum value
+    """
     url = urlparse(repo_url)
     if "bitbucket" in url.netloc:
         return VCSProviders.BITBUCKET
@@ -174,8 +289,17 @@ def guess_vcs_provider(repo_url: str) -> VCSProviders:
 
 
 def determine_vcs_name(repo_url: str, vcs_type: VCSProviders) -> str:
+    """
+        Determine the vcs provider name based on the vcs_type given, defaulted to CLI_VCS_LOCAL_SCAN
+    :param repo_url:
+        Full url of the repository
+    :param vcs_type:
+        VCSProviders type of the repository
+    :return: str.
+        The output will contain the name of the vcs provider
+    """
     vcs_name = CLI_VCS_LOCAL_SCAN
-    if repo_url is not FAKE_URL:
+    if repo_url and repo_url is not FAKE_URL:
         if vcs_type == VCSProviders.AZURE_DEVOPS:
             vcs_name = CLI_VCS_AZURE
         elif vcs_type == VCSProviders.BITBUCKET:

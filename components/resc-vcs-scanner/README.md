@@ -161,13 +161,29 @@ To create vcs_instances_config.json file please refer to: [Structure of vcs_inst
   pip install -e .
   ```
  #### 3. Run CLI scanner:
+The CLI has 3 modes of operation, please make use of the --help argument to see all the options for the modes:
+- Scanning a non-git directory: 
   ```bash
-  secret_scanner --help
+  secret_scanner dir --help
+  secret_scanner dir --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --dir=<directory to scan>
   ```
-  Example:
+
+- Scanning an already cloned git repository: 
   ```bash
-  secret_scanner  --repo-url=<repository url> --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary>
+  secret_scanner repo local --help
+  secret_scanner repo local --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --dir=<directory of repository to scan>
   ```
+
+- Scanning a remote git repository: 
+  ```bash
+  secret_scanner repo remote --help
+  secret_scanner repo remote --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --repo-url=<url of repository to scan>
+  ```
+Most CLI arguments can also be provided by setting the corresponding environment variable. 
+Please see the --help options on the arguments that can be provided using environment variables, and the expected environment variable names.
+These will always be prefixed with RESC_
+
+Example: the argument **--gitleaks-path** can be provided using the environment variable **RESC_GITLEAKS_PATH**
 </details>
 
 ## Testing 
