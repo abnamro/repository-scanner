@@ -83,3 +83,4 @@ MANIFEST
 resc-rules/
 values-local-no-commit.yaml
 RESC-RULE.toml
+custom-values.yaml

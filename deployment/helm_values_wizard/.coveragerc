@@ -1,0 +1,8 @@
+[report]
+fail_under=30
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+omit =
+    src/helm_values.py
+show_missing=true

@@ -46,7 +46,22 @@ cd ./deployment/kubernetes/
 curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > RESC-RULE.toml
 ```
 
-#### 3. Create persistent volume and update it in example-values.yaml
+#### 3. Populate custom-values.yaml file
+
+Run the interactive CLI wizard to populate custom-values.yaml.
+
+```bash
+cd ./deployment/kubernetes/helm_values_wizard
+pip install -e .
+python src/run_wizard.py
+```
+Detailed information can be found [here](https://github.com/abnamro/repository-scanner/blob/main/deployment/helm_values_wizard/README.md)
+
+#### 4. Manual configuration for values.yaml file (Optional)
+<details>
+  <summary>Preview</summary>
+  
+  #### 1. Create persistent volume and update it in custom-values.yaml
 Create two folders in your user folder and name them _database_ and _rabbitmq_ as described below.
 
 Windows: C:\Users\<username>\resc\database and C:\Users\<username>\resc\rabbitmq  
@@ -69,7 +84,7 @@ resc-database:
     pvc_path: "/Users/<username>/var/resc/database"
 ```
 
-Update persistent volume claim path and filemountType for rabbitmq in your example-values.yaml file.
+Update persistent volume claim path and filemountType for rabbitmq in your custom-values.yaml file.
 ```
 Windows:
 --------------
@@ -86,7 +101,7 @@ resc-rabbitmq:
     pvc_path: "/Users/<username>/var/resc/rabbitmq"
 ```
 
-#### 4. Provide details of the accounts/projects to scan
+#### 2. Provide details of the accounts/projects to scan
 You need to provide at least one vcs (Version Control System) instance details to start scanning.
 Below is an example for how to scan repositories from GitHub.
 * scope: List of GitHub accounts you want to scan.
@@ -119,6 +134,11 @@ resc-vcs-instances:
       tokenValue: "<enter your github personal access token here>"
 ```
 
+</details>
+
+
+
+
 ## Testing templates
 In order to run linting and rendering locally, navigate to deployment/kubernetes folder:
 ```bash
@@ -132,7 +152,7 @@ helm lint . --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 
 Render chart templates locally and display the output.
 ```bash
-helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+helm template resc . -f ../helm_values_wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
 ## Deploying charts
@@ -149,7 +169,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
 * Deploy the helm charts.
   ```bash
-  helm install --namespace resc resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+  helm install --namespace resc resc . -f ../helm_values_wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
 
 * Optionally, set the default namespace for all kubectl commands. Now you no longer need to specify the -n resc option for all the kubectl commands.
@@ -166,7 +186,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
 * To upgrade the deployment run the following command.
   ```bash
-  helm upgrade --namespace resc resc . -f ./helm-context/example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+  helm upgrade --namespace resc resc . -f ../helm_values_wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
 * To uninstall or delete the deployment run the following command.
   ```bash
@@ -199,14 +219,14 @@ docker pull rescabnamro/resc-vcs-scanner:latest
 ```
 
 ### Trigger scanning
-By default, RESC will start to scan according to the cron expression mentioned in example-values.yaml file which is `0 6 * * 6`, which is equal to 06:00 on Saturday.
+By default, RESC will start to scan according to the cron expression mentioned in custom-values.yaml file which is `0 6 * * 6`, which is equal to 06:00 on Saturday.
 You can adjust it, or you can run the command below after the Helm deployment to start the scan immediately.
 ```bash
 kubectl create job --from=cronjob/resc-vcs-scraper-projects resc-vcs-scraper-projects -n resc
 ```
 ### Connect to database using Azure Data Studio
 With Azure Data Studio you can connect to the database running in Kubernetes cluster with following connection details.  
-Use the database password defined for dbPass in example-values.yaml file.
+Use the database password defined for dbPass in custom-values.yaml file.
 
 ![db-connection-screenshot!](images/db-connection.png)
 
