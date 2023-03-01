@@ -2,7 +2,15 @@
 import re
 
 
-def password_validator(password):
+def password_validator(password: str):
+    """
+        Password validator for database
+    :param password:
+        password which needs to be validated
+    :return: str or bool.
+        If validation fails, the output will contain a validation error message.
+        Otherwise, the output will return true if validation was successful
+    """
     if len(password) < 9:
         return "Password must be at least 8 characters"
     if re.search("[0-9]", password) is None:
@@ -15,6 +23,14 @@ def password_validator(password):
 
 
 def github_token_validator(token):
+    """
+        Personal access token validator for GitHub
+    :param token:
+        token which needs to be validated
+    :return: str or bool.
+        If validation fails, the output will contain a validation error message.
+        Otherwise, the output will return true if validation was successful
+    """
     classic_pat_regex = re.compile(r"^ghp_[a-zA-Z0-9]{36}$")
     fine_grained_pat_regex = re.compile(r"^github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}$")
 
