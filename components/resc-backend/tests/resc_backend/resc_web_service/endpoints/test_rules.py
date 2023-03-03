@@ -166,6 +166,17 @@ class TestRules(unittest.TestCase):
         assert data[1] == self.db_rules[1].rule_name
 
     @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
+    def test_get_distinct_rules_from_findings_by_rule_pack_version(self, get_distinct_rules_from_findings):
+        rule_pack_version = "rule_pack_1"
+        get_distinct_rules_from_findings.return_value = [self.db_rules[0]]
+        response = self.client.get(f"{RWS_VERSION_PREFIX}"
+                                   f"{RWS_ROUTE_DETECTED_RULES}?rule_pack_version={rule_pack_version}")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data) == 1
+        assert data[0] == self.db_rules[0].rule_name
+
+    @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
     def test_get_distinct_rules_from_findings_when_all_filters_selected(self, get_distinct_rules_from_findings):
         project_name = "Test_Project"
         repository_name = "Test_Repository"

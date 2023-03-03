@@ -51,7 +51,11 @@ const FindingsService = {
     if (filter.endDate) {
       query_string += `&end_date_time=${filter.endDate}T23:59:59`;
     }
-
+    if (filter.rulePackVersions) {
+      query_string += `&rule_pack_versions=${encodeURIComponent(
+        JSON.stringify(filter.rulePackVersions)
+      )}`;
+    }
     if (query_string) {
       query_string = query_string.substring(1);
     } else {
