@@ -1,0 +1,9 @@
+[report]
+fail_under=75
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+omit =
+    src/helm_value.py
+    src/vcs_instance.py
+show_missing=true

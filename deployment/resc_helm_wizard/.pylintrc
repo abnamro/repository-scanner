@@ -1,0 +1,17 @@
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=120
+
+
+[MASTER]
+disable=
+    C0114, # missing-module-docstring
+    R0902, # too-many-instance-attributes
+    R0903, # too-few-public-methods
+    R0913, # too-many-arguments
+    W1203, # logging-fstring-interpolation
+
+[SIMILARITIES]
+# Minimum lines number of a similarity.
+min-similarity-lines=20

@@ -66,6 +66,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+**/__pycache__/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -83,3 +84,4 @@ MANIFEST
 resc-rules/
 values-local-no-commit.yaml
 RESC-RULE.toml
+custom-values.yaml

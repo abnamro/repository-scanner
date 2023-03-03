@@ -1,0 +1,3 @@
+resc-database-invalid:
+  database:
+    pvc_path: ""

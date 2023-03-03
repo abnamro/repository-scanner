@@ -1,0 +1,2 @@
+questionary==1.10.0
+PyYAML==6.0
