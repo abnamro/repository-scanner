@@ -1,0 +1,29 @@
+resc-database:
+  hostOS: ""
+  database:
+    pvc_path: ""
+    config:
+      password: ""
+
+resc-rabbitmq:
+  rabbitMQ:
+    pvc_path: ""
+  filemountType: ""
+
+resc-database-init:
+  resc:
+    config:
+      dbPass: ""
+
+resc-web-service:
+  resc:
+    config:
+      dbPass: ""
+
+resc-web-service-no-auth:
+  resc:
+    config:
+      dbPass: ""
+
+resc-vcs-instances:
+  vcsInstances:

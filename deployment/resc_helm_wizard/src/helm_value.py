@@ -1,4 +1,11 @@
-class HelmValues():
+# Standard Library
+from typing import List
+
+# First Party
+from vcs_instance import VcsInstance
+
+
+class HelmValue:
     """
     A class to represent user provided Helm values.
     Attributes
@@ -11,10 +18,8 @@ class HelmValues():
         Database storage path
     rabbitmq_storage_path : str
         Rabbitmq storage path
-    github_username : str
-        GitHub username
-    github_token : str
-        GitHub token
+    vcs_instances : list
+        List of VCS instances
     """
 
     def __init__(self,
@@ -22,11 +27,9 @@ class HelmValues():
                  db_password: str,
                  db_storage_path: str,
                  rabbitmq_storage_path: str,
-                 github_username: str,
-                 github_token: str):
+                 vcs_instances: List[VcsInstance]):
         self.operating_system: str = operating_system
         self.db_password: str = db_password
         self.db_storage_path: str = db_storage_path
         self.rabbitmq_storage_path: str = rabbitmq_storage_path
-        self.github_username: str = github_username
-        self.github_token: str = github_token
+        self.vcs_instances: list = vcs_instances

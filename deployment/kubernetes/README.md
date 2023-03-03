@@ -49,12 +49,6 @@ curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitlea
 #### 3. Populate custom-values.yaml file
 
 Run the interactive CLI wizard to populate custom-values.yaml.
-
-```bash
-cd ./deployment/kubernetes/helm_values_wizard
-pip install -e .
-python src/run_wizard.py
-```
 Detailed information can be found [here](https://github.com/abnamro/repository-scanner/blob/main/deployment/helm_values_wizard/README.md)
 
 #### 4. Manual configuration for values.yaml file (Optional)
