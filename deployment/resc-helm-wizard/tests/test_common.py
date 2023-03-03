@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 
 # First Party
-from common import (
+from resc_helm_wizard.common import (
     create_helm_values_yaml,
     create_storage_for_db_and_rabbitmq,
     generate_pvc_path,
@@ -18,8 +18,8 @@ from common import (
     get_vcs_instance_question_answers,
     prepare_vcs_instances_for_helm_values
 )
-from helm_value import HelmValue
-from vcs_instance import VcsInstance
+from resc_helm_wizard.helm_value import HelmValue
+from resc_helm_wizard.vcs_instance import VcsInstance
 
 sys.path.insert(0, "src")
 
@@ -130,7 +130,7 @@ def test_generate_pvc_path_when_create_dir_true_and_path_not_exists(mock_info_lo
     mock_info_log.assert_called_once_with(expected_call)
 
 
-@patch("questions.ask_user_to_select_vcs_instance")
+@patch("resc_helm_wizard.questions.ask_user_to_select_vcs_instance")
 @patch("logging.Logger.error")
 def test_get_vcs_instance_question_answers_when_no_vcs_instance_is_selected(mock_error_log,
                                                                             mock_ask_user_to_select_vcs_instance):
@@ -142,8 +142,8 @@ def test_get_vcs_instance_question_answers_when_no_vcs_instance_is_selected(mock
     assert excinfo.value.code is None
 
 
-@patch("questions.ask_user_to_select_vcs_instance")
-@patch("questions.ask_vcs_instance_details")
+@patch("resc_helm_wizard.questions.ask_user_to_select_vcs_instance")
+@patch("resc_helm_wizard.questions.ask_vcs_instance_details")
 def test_get_vcs_instance_question_answers(mock_ask_vcs_instance_details,
                                            mock_ask_user_to_select_vcs_instance,
                                            ):
@@ -182,10 +182,10 @@ def test_get_vcs_instance_question_answers(mock_ask_vcs_instance_details,
     assert vcs_instances[2].username == "dummy_user"
 
 
-@patch("questions.ask_local_storage_path")
+@patch("resc_helm_wizard.questions.ask_local_storage_path")
 @patch("os.path.exists")
-@patch("common.generate_pvc_path")
-@patch("common.generate_pvc_path")
+@patch("resc_helm_wizard.common.generate_pvc_path")
+@patch("resc_helm_wizard.common.generate_pvc_path")
 def test_create_storage_for_db_and_rabbitmq_where_path_exists(mock_rabbitmq_storage_path,
                                                               mock_db_storage_path, mock_path_exists,
                                                               mock_local_storage_path):
@@ -197,11 +197,11 @@ def test_create_storage_for_db_and_rabbitmq_where_path_exists(mock_rabbitmq_stor
     assert storage_path["db_storage_path"] == mock_db_storage_path.return_value
 
 
-@patch("questions.ask_local_storage_path")
+@patch("resc_helm_wizard.questions.ask_local_storage_path")
 @patch("os.path.exists")
-@patch("questions.ask_user_confirmation")
-@patch("common.generate_pvc_path")
-@patch("common.generate_pvc_path")
+@patch("resc_helm_wizard.questions.ask_user_confirmation")
+@patch("resc_helm_wizard.common.generate_pvc_path")
+@patch("resc_helm_wizard.common.generate_pvc_path")
 def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_confirmation_true(
         mock_rabbitmq_storage_path,
         mock_db_storage_path, mock_dir_confirm,
@@ -215,11 +215,11 @@ def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_co
     assert storage_path["db_storage_path"] == mock_db_storage_path.return_value
 
 
-@patch("questions.ask_local_storage_path")
+@patch("resc_helm_wizard.questions.ask_local_storage_path")
 @patch("os.path.exists")
-@patch("questions.ask_user_confirmation")
+@patch("resc_helm_wizard.questions.ask_user_confirmation")
 @patch("logging.Logger.warning")
-@patch("questions.ask_user_confirmation")
+@patch("resc_helm_wizard.questions.ask_user_confirmation")
 @patch("logging.Logger.info")
 def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_confirm_false_and_proceed_confirm_false(
         mock_info_log,
@@ -245,9 +245,7 @@ def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_co
 
 
 @patch("os.path.exists")
-@patch("logging.Logger.info")
 def test_create_helm_values_yaml_success(
-        mock_info_log,
         mock_file_path_exists):
     vcs_instance1 = VcsInstance(
         provider_type="GITHUB_PUBLIC",
@@ -268,15 +266,10 @@ def test_create_helm_values_yaml_success(
         vcs_instances=vcs_instances
     )
     mock_file_path_exists.return_type = True
-    helm_deployment_help_link = "https://github.com/abnamro/repository-scanner/" \
-                                "blob/main/deployment/kubernetes/README.md"
     input_file_path = os.path.join(THIS_DIR.parent, "tests", "fixtures", "test-values.yaml")
     generated_file_path = os.path.join(THIS_DIR.parent, "custom-values.yaml")
-    expected_info_log = f"Helm values yaml file has been successfully generated at {generated_file_path}. " \
-                        "Please refer this link to continue with the deployment or " \
-                        f"to make any customizations: {helm_deployment_help_link}"
-    create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)
-    mock_info_log.assert_called_with(expected_info_log)
+    output_file_generated = create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)
+    assert output_file_generated is True
     if os.path.exists(generated_file_path):
         os.remove(generated_file_path)
 

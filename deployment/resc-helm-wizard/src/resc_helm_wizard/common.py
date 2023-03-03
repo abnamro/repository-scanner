@@ -9,9 +9,9 @@ from urllib.parse import urlparse
 import yaml
 
 # First Party
-import questions
-from helm_value import HelmValue
-from vcs_instance import VcsInstance
+from resc_helm_wizard import questions
+from resc_helm_wizard.helm_value import HelmValue
+from resc_helm_wizard.vcs_instance import VcsInstance
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -133,16 +133,19 @@ def prepare_vcs_instances_for_helm_values(helm_values: HelmValue) -> List[VcsIns
     return vcs_instances
 
 
-def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str):
+def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str) -> bool:
     """
         Generates values yaml file for helm deployment of resc
     :param helm_values:
         object of HelmValue
     :param input_values_yaml_file:
         input values.yaml_file path
+    :return: bool
+        Returns True if file created else returns false
     :raises FileNotFoundError: if example-values.yaml file was not found
     :raises KeyError: if any expected key was not found in the values dictionary
     """
+    output_file_generated = False
     output_values_yaml_file = "custom-values.yaml"
     helm_deployment_help_link = "https://github.com/abnamro/repository-scanner/" \
                                 "blob/main/deployment/kubernetes/README.md"
@@ -169,10 +172,10 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
             yaml.dump(values_dict, file_out)
         output_values_yaml_file_path = os.path.abspath(output_values_yaml_file)
         if os.path.exists(output_values_yaml_file_path):
-            logging.info(
-                f"Helm values yaml file has been successfully generated at {output_values_yaml_file_path}. "
-                f"Please refer this link to continue with the deployment or "
-                f"to make any customizations: {helm_deployment_help_link}")
+            logging.info(f"Helm values yaml file has been successfully generated at {output_values_yaml_file_path}")
+            logging.info(f"Please refer this link to continue with the deployment or "
+                         f"to make any customizations: {helm_deployment_help_link}")
+            output_file_generated = True
 
     except FileNotFoundError:
         logging.error(f"Aborting the program! {input_values_yaml_file} file was not found")
@@ -180,6 +183,7 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
     except KeyError as error:
         logging.error(f"Aborting the program! {error} was missing in {input_values_yaml_file}")
         sys.exit()
+    return output_file_generated
 
 
 def get_scheme_host_port_from_url(url: str):

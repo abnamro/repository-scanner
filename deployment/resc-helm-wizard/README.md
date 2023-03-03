@@ -12,7 +12,7 @@
 <!-- ABOUT THE COMPONENT -->
 ## About the component
 The helm values wizard is an interactive CLI tool to generate the values yaml file which can be used for helm deployment of RESC.
-On successful run, this CLI produces custom-values.yaml file in resc_helm_wizard directory.  
+On successful run, this CLI produces custom-values.yaml file in resc-helm-wizard directory.  
 
 <!-- GETTING STARTED -->
 ## Getting started
@@ -28,7 +28,7 @@ Run the following commands in a Git Bash or Linux terminal.
  #### Clone the repository:
   ```bash
   git clone -b <branch_name> https://github.com/abnamro/repository-scanner.git
-  cd ./deployment/kubernetes/resc_helm_wizard
+  cd ./deployment/kubernetes/resc-helm-wizard
   ```
 
   #### Create virtual environment:
@@ -38,7 +38,7 @@ Run the following commands in a Git Bash or Linux terminal.
   source venv/Scripts/activate
   ```
 
- #### Install resc_helm_wizard package:
+ #### Install resc-helm-wizard package:
   ```bash
   pip install -e .
   ```

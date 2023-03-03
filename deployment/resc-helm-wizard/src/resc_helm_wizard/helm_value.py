@@ -2,7 +2,7 @@
 from typing import List
 
 # First Party
-from vcs_instance import VcsInstance
+from resc_helm_wizard.vcs_instance import VcsInstance
 
 
 class HelmValue:
