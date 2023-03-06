@@ -3,6 +3,8 @@
     {
       "file_path": "roles/fixgate/defaults/main.yml",
       "line_number": 76,
+      "column_start": 3,
+      "column_end": 6,
       "commit_id": "0f64d1333d98fd162f84cf6717323cc48c1ced6d",
       "commit_message": "main.yml edited online with Bitbucket added maxwaitminutes, and reorganized a bit",
       "commit_timestamp": "2021-01-08T21:42:45",

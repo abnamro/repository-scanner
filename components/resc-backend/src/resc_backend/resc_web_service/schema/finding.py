@@ -15,6 +15,8 @@ from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 class FindingBase(BaseModel):
     file_path: constr(max_length=500)
     line_number: conint(gt=-1)
+    column_start: conint(gt=-1)
+    column_end: conint(gt=-1)
     commit_id: constr(max_length=120)
     commit_message: str
     commit_timestamp: datetime.datetime
@@ -60,6 +62,8 @@ class FindingRead(FindingCreate):
             id_=db_finding.id_,
             file_path=db_finding.file_path,
             line_number=db_finding.line_number,
+            column_start=db_finding.column_start,
+            column_end=db_finding.column_end,
             commit_id=db_finding.commit_id,
             commit_message=db_finding.commit_message,
             commit_timestamp=db_finding.commit_timestamp,

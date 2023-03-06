@@ -198,6 +198,8 @@ def create_scan_findings(scan_id: int,
     - **scan_id**:  Id of the scan for which findings need to be inserted
     - **file_path**: file path
     - **line_number**: Line number
+    - **column_start**: Column start
+    - **column_end**: Column end
     - **commit_id**: commit hash
     - **commit_message**: Commit message
     - **commit_timestamp**: Commit timestamp

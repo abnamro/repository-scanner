@@ -86,7 +86,9 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
             if branch_finding.commit_id == finding.commit_id and \
                     branch_finding.rule_name == finding.rule_name and \
                     branch_finding.file_path == finding.file_path and \
-                    branch_finding.line_number == finding.line_number:
+                    branch_finding.line_number == finding.line_number and \
+                    branch_finding.column_start == finding.column_start and \
+                    branch_finding.column_end == finding.column_end:
                 # Store the already known finding
                 db_findings.append(branch_finding)
                 # Remove from the db_branch_findings to increase performance for the next loop

@@ -18,6 +18,10 @@
             >{{ finding.line_number }}</b-card-text
           >
           <b-card-text
+            ><span class="font-weight-bold">Position: </span
+            >{{ finding.column_start }} - {{ finding.column_end }}</b-card-text
+          >
+          <b-card-text
             ><span class="font-weight-bold">Author: </span>{{ finding.author }}</b-card-text
           >
           <b-card-text

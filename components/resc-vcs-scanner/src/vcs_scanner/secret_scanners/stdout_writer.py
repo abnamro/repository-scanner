@@ -98,7 +98,7 @@ class STDOUTWriter(OutputModule):
         """
         # Initialize table
         output_table = PrettyTable()
-        output_table.field_names = ['Level', 'Rule', 'Line', 'File path']
+        output_table.field_names = ['Level', 'Rule', 'Line', 'Position', 'File path']
         output_table.align = 'l'
         output_table.align['Line'] = 'r'
 
@@ -114,7 +114,8 @@ class STDOUTWriter(OutputModule):
                 elif finding_action == FindingAction.BLOCK:
                     exit_code = self.exit_code_block
 
-            output_table.add_row([finding_action.value, finding.rule_name, finding.line_number, finding.file_path])
+            output_table.add_row([finding_action.value, finding.rule_name, finding.line_number,
+                                  f"{finding.column_start}-{finding.column_end}", finding.file_path])
 
         logger.info(f"\n{output_table.get_string(sortby='Rule')}")
         logger.info(f"Found {len(scan_findings)} findings {self.toml_rule_file_path}")

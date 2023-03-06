@@ -56,6 +56,8 @@ class TestFinding(unittest.TestCase):
 
         self.finding = DBfinding(file_path="/path/to/file/",
                                  line_number=1,
+                                 column_start=1,
+                                 column_end=10,
                                  commit_id="2",
                                  commit_message="Fake commit message",
                                  commit_timestamp=datetime.utcnow(),
@@ -84,6 +86,8 @@ class TestFinding(unittest.TestCase):
         expected = self.finding
         finding = FindingCreate(file_path=self.finding.file_path,
                                 line_number=self.finding.line_number,
+                                column_start=self.finding.column_start,
+                                column_end=self.finding.column_end,
                                 commit_id=self.finding.commit_id,
                                 commit_message=self.finding.commit_message,
                                 commit_timestamp=self.finding.commit_timestamp,
@@ -98,6 +102,8 @@ class TestFinding(unittest.TestCase):
         result = DBfinding.create_from_finding(finding)
         self.assertEqual(result.file_path, expected.file_path)
         self.assertEqual(result.line_number, expected.line_number)
+        self.assertEqual(result.column_start, expected.column_start)
+        self.assertEqual(result.column_end, expected.column_end)
         self.assertEqual(result.commit_id, expected.commit_id)
         self.assertEqual(result.commit_message, expected.commit_message)
         self.assertEqual(result.commit_timestamp, expected.commit_timestamp)

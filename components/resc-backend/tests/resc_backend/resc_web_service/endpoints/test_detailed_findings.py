@@ -28,6 +28,8 @@ class TestDetailedFindings(unittest.TestCase):
                 id_=i,
                 file_path=f"file_path_{i}",
                 line_number=i,
+                column_start=i,
+                column_end=i,
                 commit_id=f"commit_id_{i}",
                 commit_message=f"commit_message_{i}",
                 commit_timestamp=datetime.utcnow(),
@@ -52,6 +54,8 @@ class TestDetailedFindings(unittest.TestCase):
     def assert_detailed_finding(data, detailed_finding: DetailedFindingRead):
         assert data["file_path"] == detailed_finding.file_path
         assert data["line_number"] == detailed_finding.line_number
+        assert data["column_start"] == detailed_finding.column_start
+        assert data["column_end"] == detailed_finding.column_end
         assert data["commit_id"] == detailed_finding.commit_id
         assert data["commit_message"] == detailed_finding.commit_message
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == detailed_finding.commit_timestamp

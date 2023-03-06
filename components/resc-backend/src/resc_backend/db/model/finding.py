@@ -18,6 +18,8 @@ class DBfinding(Base):
     rule_name = Column(String(400), nullable=False)
     file_path = Column(String(500), nullable=False)
     line_number = Column(Integer, nullable=False)
+    column_start = Column(Integer, nullable=False, default=0)
+    column_end = Column(Integer, nullable=False, default=0)
     commit_id = Column(String(120))
     commit_message = Column(Text)
     commit_timestamp = Column(DateTime, default=datetime.utcnow().isoformat())
@@ -29,10 +31,10 @@ class DBfinding(Base):
     event_sent_on = Column(DateTime, nullable=True)
 
     __table_args__ = (UniqueConstraint("commit_id", "branch_id", "rule_name", "file_path", "line_number",
-                                       name="uc_finding_per_branch"),)
+                                       "column_start", "column_end", name="uc_finding_per_branch"),)
 
     def __init__(self, rule_name, file_path, line_number, commit_id, commit_message, commit_timestamp, author,
-                 email, status, comment, event_sent_on, branch_id):
+                 email, status, comment, event_sent_on, branch_id, column_start, column_end):
         self.email = email
         self.author = author
         self.commit_timestamp = commit_timestamp
@@ -45,6 +47,8 @@ class DBfinding(Base):
         self.comment = comment
         self.event_sent_on = event_sent_on
         self.branch_id = branch_id
+        self.column_start = column_start
+        self.column_end = column_end
 
     @staticmethod
     def create_from_finding(finding):
@@ -61,6 +65,8 @@ class DBfinding(Base):
             status=finding.status,
             comment=sanitized_comment,
             event_sent_on=finding.event_sent_on,
-            branch_id=finding.branch_id
+            branch_id=finding.branch_id,
+            column_start=finding.column_start,
+            column_end=finding.column_end
         )
         return db_finding

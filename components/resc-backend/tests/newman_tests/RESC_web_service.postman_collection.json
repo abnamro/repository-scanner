@@ -10804,7 +10804,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": {{branch_id}}\n  }\n\n]"
+									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": {{branch_id}}\n  }\n\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id/findings",
@@ -10938,7 +10938,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"TEST\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": \"str\"\n  }\n\n]"
+									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"TEST\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": \"str\"\n  }\n\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id/findings",
@@ -11050,6 +11050,8 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
@@ -11348,6 +11350,8 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
@@ -11659,6 +11663,8 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
@@ -11868,6 +11874,8 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
@@ -12532,7 +12540,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": {{branch_id}}\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": {{branch_id}}\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12657,7 +12665,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"test status\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": \"str\"\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"test status\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": \"str\"\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12761,6 +12769,8 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][1][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][1][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][1][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][1][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][1][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][1][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][1][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
@@ -12864,6 +12874,8 @@
 											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
@@ -13062,6 +13074,8 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
@@ -13328,6 +13342,8 @@
 											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
 											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
@@ -14417,6 +14433,8 @@
 											"        pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
@@ -14817,6 +14835,8 @@
 											"    pm.expect(responseJson).to.be.an(\"array\");",
 											"    pm.expect(responseJson[0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[0][\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[0][\"email\"]).to.eql(\"test-author@mail.com\");",
@@ -15373,6 +15393,8 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");     ",
 											"    pm.expect(responseJson[\"file_path\"]).to.eql(\"dummy_file.txt\");",
 											"    pm.expect(responseJson[\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"column_end\"]).to.eql(8);",
 											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
@@ -15987,8 +16009,8 @@
 											"console.log(responseJson)",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"array\");",
-											"    pm.expect(responseJson.length).to.eql(2);",
-											"    pm.expect(responseJson).to.eql([\"GitHub Personal Access Token\", \"Rule-1\"] );",
+											"    pm.expect(responseJson.length).to.eql(1);",
+											"    pm.expect(responseJson).to.eql([\"Rule-1\"] );",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",

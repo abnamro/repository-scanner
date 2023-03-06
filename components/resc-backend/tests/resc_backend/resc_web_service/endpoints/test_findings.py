@@ -44,6 +44,8 @@ class TestFindings(unittest.TestCase):
         for i in range(1, 6):
             finding = DBfinding(file_path=f"file_path_{i}",
                                 line_number=i,
+                                column_start=i,
+                                column_end=i,
                                 commit_id=f"commit_id_{i}",
                                 commit_message=f"commit_message_{i}",
                                 commit_timestamp=datetime.utcnow(),
@@ -68,6 +70,8 @@ class TestFindings(unittest.TestCase):
                                                       branch_id=i,
                                                       file_path=f"file_path_{i}",
                                                       line_number=i,
+                                                      column_start=i,
+                                                      column_end=i,
                                                       commit_id=f"commit_id_{i}",
                                                       commit_message=f"commit_message_{i}",
                                                       commit_timestamp=datetime.utcnow(),
@@ -82,6 +86,8 @@ class TestFindings(unittest.TestCase):
     def assert_db_finding(data, finding: DBfinding, scan_findings: List[DBscanFinding]):
         assert data["file_path"] == finding.file_path
         assert data["line_number"] == finding.line_number
+        assert data["column_start"] == finding.column_start
+        assert data["column_end"] == finding.column_end
         assert data["commit_id"] == finding.commit_id
         assert data["commit_message"] == finding.commit_message
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == finding.commit_timestamp
@@ -100,6 +106,8 @@ class TestFindings(unittest.TestCase):
     def assert_finding(data, finding: Finding):
         assert data["file_path"] == finding.file_path
         assert data["line_number"] == finding.line_number
+        assert data["column_start"] == finding.column_start
+        assert data["column_end"] == finding.column_end
         assert data["commit_id"] == finding.commit_id
         assert data["commit_message"] == finding.commit_message
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == finding.commit_timestamp
@@ -119,6 +127,8 @@ class TestFindings(unittest.TestCase):
                              branch_id=finding.branch_id,
                              file_path=finding.file_path,
                              line_number=finding.line_number,
+                             column_start=finding.column_start,
+                             column_end=finding.column_end,
                              commit_id=finding.commit_id,
                              commit_message=finding.commit_message,
                              commit_timestamp=finding.commit_timestamp,
@@ -134,6 +144,8 @@ class TestFindings(unittest.TestCase):
         return FindingBase(scan_id=[x.scan_id for x in scan_findings],
                            file_path=finding.file_path,
                            line_number=finding.line_number,
+                           column_start=finding.column_start,
+                           column_end=finding.column_end,
                            commit_id=finding.commit_id,
                            commit_message=finding.commit_message,
                            commit_timestamp=finding.commit_timestamp,
@@ -295,6 +307,8 @@ class TestFindings(unittest.TestCase):
         assert data["comment"] == expected_results.comment
         assert data["file_path"] == expected_results.file_path
         assert data["line_number"] == expected_results.line_number
+        assert data["column_start"] == expected_results.column_start
+        assert data["column_end"] == expected_results.column_end
         assert data["commit_id"] == expected_results.commit_id
         assert data["commit_message"] == expected_results.commit_message
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == \
@@ -325,6 +339,8 @@ class TestFindings(unittest.TestCase):
         assert data["comment"] == expected_results.comment
         assert data["file_path"] == expected_results.file_path
         assert data["line_number"] == expected_results.line_number
+        assert data["column_start"] == expected_results.column_start
+        assert data["column_end"] == expected_results.column_end
         assert data["commit_id"] == expected_results.commit_id
         assert data["commit_message"] == expected_results.commit_message
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == \
