@@ -2,7 +2,7 @@
 import sys
 
 # First Party
-from validator import (
+from resc_helm_wizard.validator import (
     azure_devops_token_validator,
     bitbucket_token_validator,
     github_token_validator,

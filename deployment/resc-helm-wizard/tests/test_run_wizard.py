@@ -3,16 +3,16 @@ import sys
 from unittest.mock import patch
 
 # First Party
-from run_wizard import prompt_questions
+from resc_helm_wizard.run_wizard import prompt_questions
 
 sys.path.insert(0, "src")
 
 
-@patch("questions.ask_operating_system")
-@patch("common.create_storage_for_db_and_rabbitmq")
-@patch("questions.ask_password_for_database")
-@patch("common.get_vcs_instance_question_answers")
-@patch("common.create_helm_values_yaml")
+@patch("resc_helm_wizard.questions.ask_operating_system")
+@patch("resc_helm_wizard.common.create_storage_for_db_and_rabbitmq")
+@patch("resc_helm_wizard.questions.ask_password_for_database")
+@patch("resc_helm_wizard.common.get_vcs_instance_question_answers")
+@patch("resc_helm_wizard.common.create_helm_values_yaml")
 def test_prompt_questions(create_helm_values_yaml, get_vcs_instance_question_answers,
                           ask_password_for_database, create_storage_for_db_and_rabbitmq,
                           ask_operating_system):

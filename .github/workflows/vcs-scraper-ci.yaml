@@ -52,7 +52,6 @@ jobs:
     - name: Import sorting with isort
       run: |
         cd ${{ env.RESC_VCS_SCRAPER_DIR }}
-        tox -e lint
         tox -e sort
     
     - name: Lint with flake8

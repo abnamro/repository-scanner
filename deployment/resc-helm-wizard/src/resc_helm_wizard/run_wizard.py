@@ -3,9 +3,8 @@ import logging
 import sys
 
 # First Party
-import common
-import questions
-from helm_value import HelmValue
+from resc_helm_wizard import common, questions
+from resc_helm_wizard.helm_value import HelmValue
 
 
 def prompt_questions():

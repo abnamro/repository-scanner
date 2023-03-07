@@ -1,5 +1,6 @@
 # build stage
 FROM node:16-alpine3.16 as build-stage
+RUN apk -U upgrade
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -8,7 +9,7 @@ RUN npm run build
 
 # production stage
 FROM nginx:1.23.3-alpine as production-stage
-
+RUN apk -U upgrade
 RUN mkdir /app
 COPY --from=build-stage /app/dist /app
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
