@@ -270,7 +270,7 @@ def test_create_helm_values_yaml_success(
     generated_file_path = os.path.join(THIS_DIR.parent, "custom-values.yaml")
     output_file_generated = create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)
     assert output_file_generated is True
-    if os.path.exists(generated_file_path):
+    if os.path.isfile(generated_file_path):
         os.remove(generated_file_path)
 
 

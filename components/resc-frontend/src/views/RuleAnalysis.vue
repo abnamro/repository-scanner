@@ -366,7 +366,7 @@ export default {
           for (const index of response.data.data.keys()) {
             const rulePackJson = {};
             rulePackJson['id'] = index;
-            let data = response.data.data[index];
+            const data = response.data.data[index];
             if (data.active) {
               rulePackJson['label'] = data.version + ' ' + '(active)';
               this.selectedRulePackVersions.push(data.version);
