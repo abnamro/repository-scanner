@@ -33,51 +33,13 @@ To download this GitLeaks rule you need to execute the following command.
 curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > RESC-RULE.toml
 ```
 
-#### 3. Create persistent volume and update it in example-values.yaml
-It is also important to have the example-values.yaml which specifies the values provided while installing the chart. This can be downloaded with the following command.  
+#### 3. Populate custom-values.yaml file
+Run the interactive CLI wizard to populate custom-values.yaml.
+Detailed information can be found [here](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md)
 
-```bash
-curl https://raw.githubusercontent.com/abnamro/repository-scanner/main/deployment/kubernetes/example-values.yaml > example-values.yaml
+#### 4. Ensure the *resc* namespace is created, if not then run
 ```
-
-Upon downloading the example-values.yaml file, it needs a small change to make it more functional depending on the
-system you're using. Create two folders in your user folder and name them _database_ and _raabitmq_ as described below.
-
-Windows: C:\Users\<username>\resc\database and C:\Users\<username>\resc\rabbitmq  
-Linux: /Users/<username>/var/resc/database and /Users/<username>/var/resc/rabbitmq
-
-Update persistent volume claim path and hostOS for database.
-```bash
-Windows:
---------------
-resc-database:
-  hostOS: "windows"
-  database:
-    pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/database"
-
-Linux:
---------------
-resc-database:
-  hostOS: "linux"
-  database:
-    pvc_path: "/Users/<username>/var/resc/database"
-```
-
-Update persistent volume claim path and filemountType for rabbitmq.
-```bash
-Windows:
---------------
-resc-rabbitmq:
-  filemountType: "windows"
-  rabbitMQ:
-    pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq"
-
-Linux:
---------------
-resc-rabbitmq:
-  filemountType: "linux"
-  rabbitMQ:
-    pvc_path: "/Users/<username>/var/resc/rabbitmq"
+kubectl create namespace resc
 ```
 
 ## Deploying charts 
@@ -105,7 +67,7 @@ helm search repo resc-helm-repo
 * To install with the release name, run the following command.
 
 ```bash
-helm install --namespace resc resc-release resc-helm-repo/resc -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+helm install --namespace resc resc-release resc-helm-repo/resc -f <custom-values.yaml file location> --set-file global.secretScanRulePackConfig=<RESC-RULE.toml file location>
 ```
 
 * At any point if you wish to uninstall the chart.
