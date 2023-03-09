@@ -144,6 +144,8 @@ def test_write_findings(info, post):
     for i in range(1, 6):
         findings.append(Finding(file_path=f"file_path_{i}",
                                 line_number=i,
+                                column_start=i,
+                                column_end=i,
                                 commit_id=f"commit_id_{i}",
                                 commit_message=f"commit_message_{i}",
                                 commit_timestamp=datetime.utcnow(),

@@ -16,6 +16,8 @@ from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 class DetailedFindingBase(BaseModel):
     file_path: str
     line_number: conint(gt=-1)
+    column_start: conint(gt=-1)
+    column_end: conint(gt=-1)
     commit_id: constr(max_length=120)
     commit_message: str
     commit_timestamp: datetime.datetime

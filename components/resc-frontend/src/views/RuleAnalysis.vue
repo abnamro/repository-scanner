@@ -88,9 +88,19 @@
           />
         </template>
 
-        <!-- Location Column -->
+        <!-- Path Column -->
         <template #cell(file_path)="data">
-          {{ data.item.file_path | truncate(45, '...') }} #{{ data.item.line_number }}
+          {{ data.item.file_path | truncate(45, '...') }}
+        </template>
+
+        <!-- Line Column -->
+        <template #cell(line_number)="data">
+          {{ data.item.line_number }}
+        </template>
+
+        <!-- Position Column -->
+        <template #cell(position)="data">
+          {{ data.item.column_start }} - {{ data.item.column_end }}
         </template>
 
         <!-- Status Column -->
@@ -218,7 +228,21 @@ export default {
         {
           key: 'file_path',
           sortable: true,
-          label: 'Location',
+          label: 'File Path',
+          class: 'text-left position-sticky',
+          thStyle: { borderTop: '0px' },
+        },
+        {
+          key: 'line_number',
+          sortable: false,
+          label: 'Line',
+          class: 'text-left position-sticky',
+          thStyle: { borderTop: '0px' },
+        },
+        {
+          key: 'position',
+          sortable: true,
+          label: 'Position',
           class: 'text-left position-sticky',
           thStyle: { borderTop: '0px' },
         },

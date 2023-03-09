@@ -128,6 +128,8 @@ class GitLeaksWrapper:
                 logger.debug(f"{result['date']} has an unexpected date format. Expected ISO 8601")
             finding = FindingBase(file_path=result["File"],
                                   line_number=result["StartLine"],
+                                  column_start=result["StartColumn"],
+                                  column_end=result["EndColumn"],
                                   email=result["Email"],
                                   author=result["Author"],
                                   commit_id=result["Commit"],
