@@ -6,6 +6,7 @@ ARG VERSION=${VERSION}
 ARG RUN_AS_USER="apiuser"
 
 RUN apk -U upgrade \
+&& apk add --no-cache --virtual .build-deps pcre-dev gcc musl-dev python3-dev libffi-dev openssl-dev \
 && mkdir /vcs-scraper
 
 COPY ./ /vcs-scraper
@@ -18,5 +19,11 @@ USER $RUN_AS_USER
 ENV PATH=$PATH:/home/apiuser/.local/bin
 
 RUN pip install --no-cache-dir --upgrade /vcs-scraper
+
+USER root
+
+RUN apk --purge del gnupg .build-deps
+
+USER $RUN_AS_USER
 
 WORKDIR /vcs-scraper
