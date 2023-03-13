@@ -28,14 +28,21 @@ Run the following commands in a Git Bash or Linux terminal.
  #### Clone the repository:
   ```bash
   git clone -b <branch_name> https://github.com/abnamro/repository-scanner.git
-  cd ./deployment/kubernetes/resc-helm-wizard
+  cd ./deployment/resc-helm-wizard
   ```
 
-  #### Create virtual environment:
+  #### Create virtual environment (in Linux/MacOS):
   ```bash
   pip install virtualenv
   virtualenv venv
   source venv/Scripts/activate
+  ```
+
+#### Create virtual environment (in Windows):
+  ```bash
+  pip install virtualenv
+  virtualenv venv
+  venv/Scripts/activate
   ```
 
  #### Install resc-helm-wizard package:
@@ -43,7 +50,7 @@ Run the following commands in a Git Bash or Linux terminal.
   pip install -e .
   ```
 
- #### Run the resc-helm-wizard CLI:
+ #### Run the resc-helm-wizard CLI (DOES NOT work in git-bash):
   ```bash
   resc-helm-wizard
   ```
