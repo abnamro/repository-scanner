@@ -146,7 +146,7 @@ helm lint . --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 
 Render chart templates locally and display the output.
 ```bash
-helm template resc . -f ../helm-values-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+helm template resc . -f ../resc-helm-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
 ## Deploying charts
@@ -163,7 +163,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
 * Deploy the helm charts.
   ```bash
-  helm install --namespace resc resc . -f ../helm-values-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+  helm install --namespace resc resc . -f ../resc-helm-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
 
 * Optionally, set the default namespace for all kubectl commands. Now you no longer need to specify the -n resc option for all the kubectl commands.
@@ -180,7 +180,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
 * To upgrade the deployment run the following command.
   ```bash
-  helm upgrade --namespace resc resc . -f ../helm-values-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
+  helm upgrade --namespace resc resc . -f ../resc-helm-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
   ```
 * To uninstall or delete the deployment run the following command.
   ```bash
