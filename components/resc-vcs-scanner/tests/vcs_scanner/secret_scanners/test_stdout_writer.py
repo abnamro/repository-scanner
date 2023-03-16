@@ -76,7 +76,8 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
 
     _ = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         .write_findings(1, 1, findings)
-    calls = [call('\n'
+    calls = [call("Rule file: toml_path"),
+             call('\n'
                   '+-------+--------+------+----------+-------------+\n'
                   '| Level | Rule   | Line | Position | File path   |\n'
                   '+-------+--------+------+----------+-------------+\n'
@@ -86,7 +87,8 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
                   '| Info  | rule_4 |    4 | 4-4      | file_path_4 |\n'
                   '| Info  | rule_5 |    5 | 5-5      | file_path_5 |\n'
                   '+-------+--------+------+----------+-------------+'),
-             call('Found 5 findings toml_path')]
+             call("Findings detected : Total - 5, Block - 0, Warn - 0, Info - 5"),
+             call("Findings threshold check results: PASS")]
     info_log.assert_has_calls(calls, any_order=True)
     exit_mock.assert_called_with(0)
 
