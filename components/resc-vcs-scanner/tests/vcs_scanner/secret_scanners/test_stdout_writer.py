@@ -76,8 +76,7 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
 
     _ = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         .write_findings(1, 1, findings)
-    calls = [call("Rule file: toml_path"),
-             call('\n'
+    calls = [call('\n'
                   '+-------+--------+------+----------+-------------+\n'
                   '| Level | Rule   | Line | Position | File path   |\n'
                   '+-------+--------+------+----------+-------------+\n'

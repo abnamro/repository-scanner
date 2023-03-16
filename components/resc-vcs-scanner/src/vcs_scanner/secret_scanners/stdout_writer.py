@@ -135,7 +135,6 @@ class STDOUTWriter(OutputModule):
             output_table.add_row([finding_action_value, finding.rule_name, finding.line_number,
                                   f"{finding.column_start}-{finding.column_end}", finding.file_path])
 
-        logger.info(f"Rule file: {self.toml_rule_file_path}")
         logger.info(f"\n{output_table.get_string(sortby='Level')}")
 
         logger.info(f"Findings detected : Total - {len(scan_findings)}, Block - {block_count}, "
