@@ -13,6 +13,7 @@ from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan import ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceRead
+from termcolor import colored
 
 # First Party
 from vcs_scanner.helpers.finding_action import FindingAction
@@ -102,11 +103,28 @@ class STDOUTWriter(OutputModule):
         output_table.align = 'l'
         output_table.align['Line'] = 'r'
 
+        block_count = 0
+        warn_count = 0
+        info_count = 0
+
         exit_code = self.exit_code_success
 
         rule_tags = self._get_rule_tags()
         for finding in scan_findings:
             finding_action = self._determine_finding_action(finding, rule_tags)
+
+            if finding_action == FindingAction.BLOCK:
+                finding_action_value = colored(finding_action.value, "red", attrs=["bold"])
+                block_count += 1
+            elif finding_action == FindingAction.WARN:
+                finding_action_value = colored(finding_action.value, "light_red", attrs=["bold"])
+                warn_count += 1
+            elif finding_action == FindingAction.INFO:
+                finding_action_value = colored(finding_action.value, "light_yellow", attrs=["bold"])
+                info_count += 1
+            else:
+                finding_action_value = finding_action.value
+                info_count += 1
 
             if exit_code != self.exit_code_block:
                 if exit_code == self.exit_code_success and finding_action == FindingAction.WARN:
@@ -114,11 +132,23 @@ class STDOUTWriter(OutputModule):
                 elif finding_action == FindingAction.BLOCK:
                     exit_code = self.exit_code_block
 
-            output_table.add_row([finding_action.value, finding.rule_name, finding.line_number,
+            output_table.add_row([finding_action_value, finding.rule_name, finding.line_number,
                                   f"{finding.column_start}-{finding.column_end}", finding.file_path])
 
-        logger.info(f"\n{output_table.get_string(sortby='Rule')}")
-        logger.info(f"Found {len(scan_findings)} findings {self.toml_rule_file_path}")
+        logger.info(f"\n{output_table.get_string(sortby='Level')}")
+
+        logger.info(f"Findings detected : Total - {len(scan_findings)}, Block - {block_count}, "
+                    f"Warn - {warn_count}, Info - {info_count}")
+
+        if exit_code == self.exit_code_success:
+            logger.info(f"Findings threshold check results: {colored('PASS', 'light_green', attrs=['bold'])}")
+        elif exit_code == self.exit_code_block:
+            logger.info(f"Findings threshold check results: {colored('FAIL', 'red', attrs=['bold'])}")
+            logger.info(
+                colored(f"Scan failed due to policy violations: [Block:{block_count}]", "red", attrs=["bold"]))
+        elif exit_code == self.exit_code_warn:
+            logger.info(f"Findings threshold check results: {colored('PASS', 'light_green', attrs=['bold'])}")
+            logger.info(colored(f"Warning for policy violations: [Warn:{warn_count}]", "light_red", attrs=["bold"]))
 
         sys.exit(exit_code)
 
