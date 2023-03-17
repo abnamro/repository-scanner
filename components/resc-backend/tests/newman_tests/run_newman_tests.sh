@@ -81,21 +81,40 @@ docker logs $RESC_BACKEND_CONTAINER
 RESC_API_HOST_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $RESC_BACKEND_CONTAINER)
 echo "*** IP Address Of $RESC_BACKEND_CONTAINER Container is: $RESC_API_HOST_IP ***"
 
+# Clean up
+function cleanUp() {
+  echo "*** Running Clean Up: Stopping Containers ***"
+  docker stop $RESC_NEWMAN_CONTAINER || true
+  docker stop $RESC_BACKEND_CONTAINER || true
+  docker stop $RESC_DATABASE_CONTAINER || true
+  echo "*** Running Clean Up: Removing Containers ***"
+  docker rm -f $RESC_NEWMAN_CONTAINER || true
+  docker rm -f $RESC_BACKEND_CONTAINER || true
+  docker rm -f $RESC_DATABASE_CONTAINER || true
+  echo "*** Running Clean Up: Removing test artifacts ***"
+  rm -f $PWD/gitleaks.toml
+}
+
 # Running Newman Tests
 echo "*** Downloading latest gitleaks.toml rule file ***"
 curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
+
+# Stops on Newman test failure
+set -e;
+
+function onExit {
+    if [ "$?" != "0" ]; then
+        echo "Newman Tests failed";
+        cleanUp
+        exit 1;
+    else
+        echo "Newman Tests passed";
+        cleanUp
+    fi
+}
+trap onExit EXIT;
+
 echo "*** Running Newman Tests From $RESC_NEWMAN_CONTAINER Container ***"
-docker run --name $RESC_NEWMAN_CONTAINER -v "$PWD":/etc/newman "$RESC_NEWMAN_IMAGE" \
+docker run --name $RESC_NEWMAN_CONTAINER -v "$PWD":/etc/newman -t "$RESC_NEWMAN_IMAGE" \
 run --color on ./RESC_web_service.postman_collection.json --env-var "baseUrl=http://$RESC_API_HOST_IP:$RESC_API_PORT"
 
-# Running clean up
-echo "*** Running Clean Up: Stopping Containers ***"
-docker stop $RESC_NEWMAN_CONTAINER || true
-docker stop $RESC_BACKEND_CONTAINER || true
-docker stop $RESC_DATABASE_CONTAINER || true
-echo "*** Running Clean Up: Removing Containers ***"
-docker rm -f $RESC_NEWMAN_CONTAINER || true
-docker rm -f $RESC_BACKEND_CONTAINER || true
-docker rm -f $RESC_DATABASE_CONTAINER || true
-echo "*** Running Clean Up: Removing test artifacts ***"
-rm -f $PWD/gitleaks.toml
