@@ -8,6 +8,7 @@
     - [Prerequisites](#prerequisites)
     - [Run locally](#run-locally)
     - [Run using docker](#run-using-docker)
+    - [Enable or disable Single Sign-On for local run](#enable-or-disable-single-sign-on-for-local-run)
     - [Testing](#testing)
 4. [Additional information](#additional-information)
 
@@ -68,6 +69,15 @@ docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RE
 
  Access the application using this url: http://localhost:8080/
 
+### Enable or disable Single Sign-On for local run
+To enable/disable single sign-on (SSO) set the following values in .env.development file.
+    
+Enable SSO:```VUE_APP_AUTHENTICATION_REQUIRED=true```
+    
+Disable SSO:```VUE_APP_AUTHENTICATION_REQUIRED=false```
+    
+Note: Ensure to restart the server by running npm run serve for the change to take effect.    
+    
 ### Testing
 [(Back to top)](#table-of-contents)
 
