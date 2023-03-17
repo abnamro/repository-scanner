@@ -160,7 +160,7 @@ def test_get_vcs_instance_question_answers(mock_ask_vcs_instance_details,
     assert vcs_instances[0].port == "443"
     assert vcs_instances[0].provider_type == "GITHUB_PUBLIC"
     assert vcs_instances[0].scheme == "https"
-    assert vcs_instances[0].scope == ["kubernetes", "docker"]
+    assert vcs_instances[0].scope == ["kubernetes", "docker", "dummy_user"]
     assert vcs_instances[0].username == "dummy_user"
 
     assert vcs_instances[1].host == "vcs.com"
