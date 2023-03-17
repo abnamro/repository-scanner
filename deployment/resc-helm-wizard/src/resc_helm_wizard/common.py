@@ -228,7 +228,7 @@ def get_vcs_instance_question_answers() -> List[VcsInstance]:
                 username=vcs_instance_info["username"],
                 password=vcs_instance_info["token"],
                 organization=vcs_instance_info["organization"],
-                scope=["kubernetes", "docker"]
+                scope=["kubernetes", "docker", vcs_instance_info["username"]]
             )
         if vcs == "Azure Devops":
             vcs_instance = VcsInstance(

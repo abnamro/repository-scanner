@@ -36,6 +36,8 @@ Exposing sensitive information in such a way can have severe consequences for th
 the data to compromise the organization's network. This can be prevented by scanning a repository with the RESC tool. It marks all the 
 instances of exposed sensitive information in the source code.
 
+![RESC-Demo](/images/RESC_Preview.gif)
+
 ## 📒 Table of contents
 * [Links](#links)
 * [Versions](#versions)
