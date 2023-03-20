@@ -55,7 +55,7 @@ jobs:
         helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./gitleaks.toml
 
     - name: Run IaC scan using kics
-      uses: checkmarx/kics-github-action@v1.6
+      uses: checkmarx/kics-github-action@v1.6.3
       with:
         path: '${{ env.KUBERNETES_INFRA_DIR }}'
         exclude_paths: '${{ env.KUBERNETES_INFRA_DIR }}/example-values.yaml'
