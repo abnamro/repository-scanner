@@ -152,6 +152,8 @@ helm template resc . -f ../resc-helm-wizard/custom-values.yaml --set-file global
 ## Deploying charts
 Make sure you have completed the [pre-requisite](#prerequisites) steps.
 
+![RESC-Installation](./images/RESC_Installation.gif)
+
 * Ensure the namespace is created, if not then run
   ```bash
   kubectl create namespace resc
