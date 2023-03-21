@@ -35,6 +35,7 @@ These instructions will help you to get a copy of the project up and running on 
 * [Kubernetes](https://docs.docker.com/desktop/kubernetes/) - To install Kubernetes, enable it in Docker Desktop. If you install Kubernetes using minikube, ensure the version is 1.21 or later.
 * [Helm](https://helm.sh/docs/intro/install/)
 
+ 
 #### 2. Populate RESC-RULE.toml file
 RESC uses rules from [Gitleaks](https://github.com/zricethezav/gitleaks) to detect secrets.
 Ensure you have the rule pack config file in TOML format available, which needs to be provided as deployment argument.
@@ -130,9 +131,63 @@ resc-vcs-instances:
 
 </details>
 
+#### 5. Single Sign-On Configuration (Optional) - Still in development
+The Proof Key for Code Exchange (PKCE, pronounced pixie) is the recommended OAuth 2.0 Flow to implement single sign-on for RESC. The configurations below are required if you want to use SSO in RESC and below attribute values must be updated in the custom-values.yaml file.
+
+```
+authenticationEnabled: "true"
+```
+
+```
+resc-frontend:
+    ssoConfig:
+        redirectUri: "<enter redirect uri here>"
+        idTokenIssuerUrl: "<enter ID token issuer url here>"
+        accessTokenJwksUrl: "<enter Access token url here>"
+        authorizationUrl: "<enter authorization url here>"
+        tokenEndPointUrl: "<enter token end point url here>"
+        idTokenJwksUrl: "<enter ID token JWKS url here>"
+        accessTokenJwksUrl: "<enter Access token JWKS url here"
+```
+
+```
+resc-web-service:
+    resc:
+      ssoConfig:
+        ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>"
+        ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>"
+      authRequired: "true"
+```
 
 
+<details>
+  <summary>Preview</summary>
+Examples and explanation:
 
+1. redirectUri: "http://localhost:30000/callback"
+    The Redirect URI is a URL that specifies where the authorization code should be sent by the authorization server.
+
+2. idTokenIssuerUrl: "https://example.com"
+    The ID token issuer URL refers to the URL of the authorization server where the client application can retrieve the ID token during the PKCE flow to authenticate the user and to obtain information about the user's identity.
+
+3. authorizationUrl: "https://example.com/as/authorization.oauth2"
+    The authorization URL in PKCE flow is the endpoint where the user is redirected to grant consent and authenticate with the authorization server, while also providing the PKCE code challenge.
+
+4. tokenEndPointUrl: "https://example.com/as/token.oauth2"
+    The token endpoint URL is the endpoint where the client exchanges an authorization code for an access token.
+
+5. idTokenJwksUrl: "https://example.com/pf/JWKS"
+    The ID token JWKS URL is the endpoint where the client can retrieve the JSON Web Key Set (JWKS) to verify the signature of the ID token received during OAuth 2.0 PKCE flow.
+
+
+6. accessTokenIssuerUrl / ssoAccessTokenIssuerUrl: "https://example.com"
+    The access token issuer URL is the endpoint where the Authorization Server issues access tokens in the PKCE flow.
+
+7. accessTokenJwksUrl / ssoAccessTokenJwksUrl: "https://example.com/ext/employeeoidc/jwks"
+    The access token JWKS URL is the endpoint where the server provides the public keys needed to verify the signature of an access token.
+
+ </details>
+    
 ## Testing templates
 In order to run linting and rendering locally, navigate to deployment/kubernetes folder:
 ```bash
@@ -188,6 +243,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   ```bash
   helm uninstall resc --namespace resc
   ```
+    
 
 ### GitHub as Helm Chart Repository
 It is now possible to directly download the files from the Repository Scanner (RESC) GitHub Repository since it now also
@@ -225,5 +281,3 @@ With Azure Data Studio you can connect to the database running in Kubernetes clu
 Use the database password defined for dbPass in custom-values.yaml file.
 
 ![db-connection-screenshot!](images/db-connection.png)
-
-
