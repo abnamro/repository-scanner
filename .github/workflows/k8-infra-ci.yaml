@@ -7,12 +7,18 @@ on:
       - .github/workflows/k8-infra-ci.yaml
       - deployment/kubernetes/**
       - '!**.md'
+      - '!**.png'
+      - '!**.gif'
+      - .gitignore
   pull_request:
     branches: [ "main" ]
     paths:
       - .github/workflows/k8-infra-ci.yaml
       - deployment/kubernetes/**
       - '!**.md'
+      - '!**.png'
+      - '!**.gif'
+      - .gitignore
   workflow_dispatch:
 
 env:
