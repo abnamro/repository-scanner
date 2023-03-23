@@ -13,6 +13,8 @@ on:
       - .github/workflows/k8-infra-ci.yaml
       - deployment/kubernetes/**
       - '!**.md'
+      - '!**.png'
+      - '!**.gif'
   workflow_dispatch:
 
 env:
