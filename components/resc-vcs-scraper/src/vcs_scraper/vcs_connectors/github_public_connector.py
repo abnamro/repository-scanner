@@ -3,6 +3,7 @@ import os
 from typing import List
 
 # Third Party
+import requests
 from github import Github
 from github.Branch import Branch as GithubBranch
 from github.Repository import Repository as GithubRepository
@@ -30,7 +31,11 @@ class GithubPublicConnector(VCSConnector):
         return self._api_client
 
     def get_all_projects(self) -> List[str]:
-        return [user.login for user in self.api_client.get_users()]
+        try:
+            return [user.login for user in self.api_client.get_users()]
+        except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ProxyError,
+                requests.exceptions.ReadTimeout, requests.exceptions.SSLError, requests.exceptions.HTTPError) as ex:
+            raise ConnectionError(ex) from ex
 
     def get_repos(self, project_key) -> List[dict]:
         repository_list = []

@@ -8,6 +8,7 @@ from azure.devops.connection import Connection
 from azure.devops.exceptions import AzureDevOpsServiceError
 from azure.devops.released.core.core_client import CoreClient
 from msrest.authentication import BasicAuthentication
+from msrest.exceptions import ClientRequestError
 
 # First Party
 from vcs_scraper.model import Branch, Repository
@@ -60,17 +61,21 @@ class AzureDevopsConnector(VCSConnector):
         return self._git_api_client
 
     def get_all_projects(self):
-        all_projects = []
-        call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects()
-        projects = call_results.value
-        all_projects.extend([project.name for project in projects])
-        while call_results.continuation_token:
-            call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects(
-                continuation_token=call_results.continuation_token)
+        try:
+            self._core_api_client = self.api_client.clients.get_core_client()
+            all_projects = []
+            call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects()
             projects = call_results.value
             all_projects.extend([project.name for project in projects])
+            while call_results.continuation_token:
+                call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects(
+                    continuation_token=call_results.continuation_token)
+                projects = call_results.value
+                all_projects.extend([project.name for project in projects])
 
-        return all_projects
+            return all_projects
+        except ClientRequestError as ex:
+            raise ConnectionError(ex) from ex
 
     def project_exists(self, project_key: str) -> bool:
         return bool(self.core_api_client.get_project(project_key))

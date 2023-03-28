@@ -85,5 +85,8 @@ def collect_all_projects():
     vcs_instances_map = load_vcs_instances_into_map(env_variables[VCS_INSTANCES_FILE_PATH])
 
     for vcs_instance in vcs_instances_map:
-
-        collect_projects_from_vcs_instance(vcs_instances_map[vcs_instance])
+        try:
+            collect_projects_from_vcs_instance(vcs_instances_map[vcs_instance])
+        except ConnectionError as connection_error:
+            logger.error(f"Failed to get projects for VCSInstance {vcs_instances_map[vcs_instance].name} "
+                         f"due to {connection_error}")

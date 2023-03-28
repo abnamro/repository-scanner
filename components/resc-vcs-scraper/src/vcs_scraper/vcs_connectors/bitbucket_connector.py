@@ -43,7 +43,11 @@ class BitbucketConnector(VCSConnector):
         return self._api_client
 
     def get_all_projects(self):
-        return [project["key"] for project in self.api_client.project_list()]
+        try:
+            return [project["key"] for project in self.api_client.project_list()]
+        except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ProxyError,
+                requests.exceptions.ReadTimeout, requests.exceptions.SSLError, requests.exceptions.HTTPError) as ex:
+            raise ConnectionError(ex) from ex
 
     def project_exists(self, project_key: str) -> bool:
         return bool(self.api_client.project(project_key))
