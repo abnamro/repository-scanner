@@ -66,3 +66,24 @@ def bitbucket_token_validator(token):
     if not re.fullmatch(regex, token):
         return "Validation failed for provided Bitbucket token"
     return True
+
+
+def github_account_name_validator(github_accounts):
+    """
+        GitHub account name validator
+    :param github_accounts:
+        comma separated list of GitHub accounts
+    :return: str or bool.
+        If validation fails, the output will contain a validation error message.
+        Otherwise, the output will return true if validation was successful
+    """
+    input_list = [elem.strip() for elem in github_accounts.split(",")]
+    regex = re.compile(r"^[a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38}$")
+    for account in input_list:
+        if not re.fullmatch(regex, account):
+            if account:
+                msg = f"{account} is not a valid GitHub account"
+            else:
+                msg = "Please enter a valid comma separated list of GitHub accounts you want to scan"
+            return msg
+    return True

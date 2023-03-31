@@ -62,4 +62,61 @@ jobs:
       run: |
         cd ${{ env.RESC_HELM_WIZARD_DIR }}
         tox -e lint
+
+    - name: Get Branch Name
+      id: extract_branch
+      run: |
+        if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
+            export BRANCH_NAME="${GITHUB_HEAD_REF}"
+            echo "::set-output name=branch_name::${BRANCH_NAME}"
+        elif [[ ${GITHUB_EVENT_NAME} == 'push' ]]; then
+            export BRANCH_NAME="${GITHUB_REF_NAME}"
+            echo "::set-output name=branch_name::${BRANCH_NAME}"
+        else
+            echo "Event is neither pull_request nor push"
+        fi
+    outputs:
+      branch_name: ${{ steps.extract_branch.outputs.branch_name }}
+        
+    
+  python-build-and-publish:
+    name: Python Build and Publish
+    needs: python-basic-validation
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    outputs:
+      wizard_version: ${{ steps.getversion.outputs.wizard_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Building python package
+        run: |
+          cd ${{ env.RESC_HELM_WIZARD_DIR }}
+          python -m pip install --upgrade pip
+          pip install build wheel
+          python setup.py sdist bdist_wheel
+
+      - name: Publish python package to PyPI
+        if: ${{ needs.python-basic-validation.outputs.branch_name == 'main' }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.__PYPI_TOKEN__ }}
+          packages_dir: ${{ env.RESC_HELM_WIZARD_DIR }}/dist
+          skip_existing: true
+
+      - id: getversion
+        name: Get package version
+        run: | 
+          cd ${{ env.RESC_HELM_WIZARD_DIR }}
+          wizard_version=$(python ./setup.py --version)
+          echo "wizard_version=$wizard_version" >> $GITHUB_OUTPUT
       

@@ -5,6 +5,7 @@
 1. [About the component](#about-the-component)
 2. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
+    - [Usage](#usage)
     - [Run helm-values-wizard locally from source](#run-helm-values-wizard-locally-from-source)
 3. [Testing](#testing)
     - [Run unit tests, linting and import checks locally](#run-unit-tests-linting-and-import-checks-locally)
@@ -14,6 +15,7 @@
 The helm values wizard is an interactive CLI tool to generate the values yaml file which can be used for helm deployment of RESC.
 On successful run, this CLI produces custom-values.yaml file in resc-helm-wizard directory.  
 
+
 <!-- GETTING STARTED -->
 ## Getting started
 
@@ -22,6 +24,21 @@ These instructions will help you to get a copy of the project up and running on 
 ### Prerequisites
 - [Git](https://git-scm.com/downloads)
 - [Python (v3.9.0 or higher)](https://www.python.org/downloads/release/python-390/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Kubernetes](https://kubernetes.io/)
+- [Helm](https://helm.sh/)
+
+### Usage
+Install the package:
+```bash
+pip install resc-helm-wizard
+```
+
+Run the wizard: 
+```bash
+resc-helm-wizard
+```
+![RESC-Installation](./images/RESC_Installation.gif)
 
 ### Run helm-values-wizard locally from source
 Run the following commands in a Git Bash or Linux terminal.

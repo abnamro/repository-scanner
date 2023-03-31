@@ -1,19 +1,28 @@
 # Standard Library
 import logging
 import os
+import subprocess
 import sys
 from typing import List
 from urllib.parse import urlparse
 
 # Third Party
+import requests
 import yaml
 
 # First Party
-from resc_helm_wizard import questions
+from resc_helm_wizard import constants, questions
+from resc_helm_wizard.helm_utilities import (
+    add_helm_repository,
+    install_or_upgrade_helm_release,
+    is_chart_version_already_installed,
+    update_helm_repository
+)
 from resc_helm_wizard.helm_value import HelmValue
+from resc_helm_wizard.kubernetes_utilities import create_namespace_if_not_exists
 from resc_helm_wizard.vcs_instance import VcsInstance
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def get_operating_system(user_input: str) -> str:
@@ -66,7 +75,7 @@ def create_storage_for_db_and_rabbitmq(operating_system: str) -> dict:
                                                           tool_type="rabbitmq", create_dir=False)
             else:
                 logging.info("Aborting the program!!")
-                sys.exit()
+                sys.exit(1)
     storage_path = {"db_storage_path": db_storage_path, "rabbitmq_storage_path": rabbitmq_storage_path}
     return storage_path
 
@@ -146,7 +155,7 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
     :raises KeyError: if any expected key was not found in the values dictionary
     """
     output_file_generated = False
-    output_values_yaml_file = "custom-values.yaml"
+    output_values_yaml_file = constants.VALUES_FILE
     helm_deployment_help_link = "https://github.com/abnamro/repository-scanner/" \
                                 "blob/main/deployment/kubernetes/README.md"
 
@@ -179,10 +188,10 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
 
     except FileNotFoundError:
         logging.error(f"Aborting the program! {input_values_yaml_file} file was not found")
-        sys.exit()
+        sys.exit(1)
     except KeyError as error:
         logging.error(f"Aborting the program! {error} was missing in {input_values_yaml_file}")
-        sys.exit()
+        sys.exit(1)
     return output_file_generated
 
 
@@ -212,7 +221,7 @@ def get_vcs_instance_question_answers() -> List[VcsInstance]:
 
     if not vcs_instance_answers:
         logging.error("Aborting the program! No VCS instance was selected")
-        sys.exit()
+        sys.exit(1)
 
     vcs_instances: List[VcsInstance] = []
 
@@ -220,6 +229,10 @@ def get_vcs_instance_question_answers() -> List[VcsInstance]:
         vcs_instance_info = questions.ask_vcs_instance_details(vcs_type=vcs)
         scheme, host, port = get_scheme_host_port_from_url(vcs_instance_info["url"])
         if vcs == "GitHub":
+            default_github_accounts = f"{vcs_instance_info['username']}, kubernetes, docker"
+            github_accounts = questions.ask_which_github_accounts_to_scan(
+                default_github_accounts=default_github_accounts)
+            github_account_list = [account.strip() for account in github_accounts.split(",")]
             vcs_instance = VcsInstance(
                 provider_type="GITHUB_PUBLIC",
                 scheme=scheme,
@@ -228,7 +241,7 @@ def get_vcs_instance_question_answers() -> List[VcsInstance]:
                 username=vcs_instance_info["username"],
                 password=vcs_instance_info["token"],
                 organization=vcs_instance_info["organization"],
-                scope=["kubernetes", "docker", vcs_instance_info["username"]]
+                scope=github_account_list
             )
         if vcs == "Azure Devops":
             vcs_instance = VcsInstance(
@@ -254,3 +267,72 @@ def get_vcs_instance_question_answers() -> List[VcsInstance]:
             )
         vcs_instances.append(vcs_instance)
     return vcs_instances
+
+
+def download_rule_toml_file(url: str, file: str) -> bool:
+    """
+        Download rule toml file
+    :param url:
+        url of the file to download
+    :param file:
+        path of the downloaded file
+    :return: bool
+        Returns true if rule downloaded successfully else returns false
+    """
+    downloaded = False
+    response = requests.get(url, timeout=100, verify=True)
+    with open(file, "wb") as output:
+        output.write(response.content)
+    if os.path.exists(file) and os.path.getsize(file) > 0:
+        downloaded = True
+        logging.debug(f"{file} successfully downloaded")
+    else:
+        logging.error("Unable to download the rule file")
+    return downloaded
+
+
+def run_deployment_as_per_user_confirmation():
+    """
+        Run deployment as per user confirmation
+    """
+    run_deployment_confirm_msg = "Do you want to run deployment?"
+    run_deployment_confirm = questions.ask_user_confirmation(msg=run_deployment_confirm_msg)
+    if run_deployment_confirm is True:
+        run_deployment()
+    else:
+        logging.info("Skipping deployment...")
+
+
+def run_deployment():
+    """
+        Runs a helm deployment
+    :return: bool
+        Returns true if deployment successful else returns false
+    """
+    deployment_status = False
+
+    rule_file_downloaded = download_rule_toml_file(url=constants.RULE_FILE_URL, file=constants.RULE_FILE)
+
+    add_helm_repository()
+    update_helm_repository()
+
+    if rule_file_downloaded:
+        namespace_created = create_namespace_if_not_exists(namespace_name=constants.NAMESPACE)
+
+    if namespace_created:
+        # Check if release is already installed
+        output = subprocess.run(["helm", "list", "-n", constants.NAMESPACE], capture_output=True, text=True, check=True)
+        # Check if same chart version is already installed
+        version_installed = is_chart_version_already_installed()
+        if constants.RELEASE_NAME in output.stdout and version_installed is True:
+            run_upgrade_confirm_msg = f"Release {constants.RELEASE_NAME} is already installed in " \
+                                      f"{constants.NAMESPACE} namespace. Do you want to upgrade the release?"
+            run_upgrade_confirm = questions.ask_user_confirmation(msg=run_upgrade_confirm_msg)
+            if run_upgrade_confirm is True:
+                deployment_status = install_or_upgrade_helm_release(action="upgrade")
+            else:
+                logging.info("Skipping deployment...")
+
+        else:
+            deployment_status = install_or_upgrade_helm_release(action="install")
+    return deployment_status

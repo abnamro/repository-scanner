@@ -5,6 +5,7 @@ import sys
 from resc_helm_wizard.validator import (
     azure_devops_token_validator,
     bitbucket_token_validator,
+    github_account_name_validator,
     github_token_validator,
     password_validator
 )
@@ -45,4 +46,13 @@ def test_bitbucket_token_validator():
     validate = bitbucket_token_validator(token="invalid")
     assert validate == "Validation failed for provided Bitbucket token"
     validate = bitbucket_token_validator(token="123456dummyToken123456789012345+dummytoken12")
+    assert validate is True
+
+
+def test_github_account_name_validator():
+    validate = github_account_name_validator(github_accounts="Lizard!, Liza")
+    assert validate == "Lizard! is not a valid GitHub account"
+    validate = github_account_name_validator(github_accounts="")
+    assert validate == "Please enter a valid comma separated list of GitHub accounts you want to scan"
+    validate = github_account_name_validator(github_accounts="Lizard")
     assert validate is True

@@ -8,6 +8,7 @@ import questionary
 from resc_helm_wizard.validator import (
     azure_devops_token_validator,
     bitbucket_token_validator,
+    github_account_name_validator,
     github_token_validator,
     password_validator
 )
@@ -103,3 +104,15 @@ def ask_vcs_instance_details(vcs_type: str) -> dict:
                                      validate=azure_devops_token_validator).unsafe_ask()
     vcs_instance_info = {"url": url, "organization": organization, "username": username, "token": token}
     return vcs_instance_info
+
+
+def ask_which_github_accounts_to_scan(default_github_accounts: str) -> [str]:
+    """
+        Asks user to provide GitHub account names to scan
+    :return: [str]
+        Returns array of GitHub account names
+    """
+    github_accounts = questionary.text("Enter a comma separated list of GitHub accounts you want to scan",
+                                       default=default_github_accounts,
+                                       validate=github_account_name_validator).unsafe_ask()
+    return github_accounts
