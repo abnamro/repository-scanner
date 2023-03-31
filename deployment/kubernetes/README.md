@@ -7,7 +7,7 @@
 3. [Getting started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Testing templates](#testing-templates)
-    - [Deploying charts](#deploying-charts)
+    - [Deploying charts manually](#deploying-charts-manually)
     - [Github as Helm Chart Repository](#github-as-helm-chart-repository)
 4. [Additional Information](#additional-information)
     - [Trigger scanning](#trigger-scanning)
@@ -28,6 +28,7 @@ This component contains templates and charts for deploying the Repository Scanne
 ## Getting started
 
 These instructions will help you to get a copy of the project up and running on your local machine for development and testing purposes.
+For an interactive easy deployment of RESC on Kubernetes cluster, please refer [resc-helm-wizard](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md).
 
 ### Prerequisites
 #### 1. Install Software
@@ -49,7 +50,7 @@ curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitlea
 
 #### 3. Populate custom-values.yaml file
 
-Run the interactive CLI wizard to populate custom-values.yaml.
+Run the interactive CLI wizard to populate custom-values.yaml and run the deployment.
 Detailed information can be found [here](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md)
 
 #### 4. Manual configuration for values.yaml file (Optional)
@@ -204,10 +205,11 @@ Render chart templates locally and display the output.
 helm template resc . -f ../resc-helm-wizard/custom-values.yaml --set-file global.secretScanRulePackConfig=./RESC-RULE.toml
 ```
 
-## Deploying charts
+## Deploying charts manually
+If you are using [resc-helm-wizard](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md) for deployment then you can skip this steps.
+<details>
+  <summary>Preview</summary>
 Make sure you have completed the [pre-requisite](#prerequisites) steps.
-
-![RESC-Installation](./images/RESC_Installation.gif)
 
 * Ensure the namespace is created, if not then run
   ```bash
@@ -243,7 +245,7 @@ Make sure you have completed the [pre-requisite](#prerequisites) steps.
   ```bash
   helm uninstall resc --namespace resc
   ```
-    
+ </details>  
 
 ### GitHub as Helm Chart Repository
 It is now possible to directly download the files from the Repository Scanner (RESC) GitHub Repository since it now also

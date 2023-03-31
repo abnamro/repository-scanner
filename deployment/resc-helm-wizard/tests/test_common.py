@@ -12,11 +12,13 @@ import pytest
 from resc_helm_wizard.common import (
     create_helm_values_yaml,
     create_storage_for_db_and_rabbitmq,
+    download_rule_toml_file,
     generate_pvc_path,
     get_operating_system,
     get_scheme_host_port_from_url,
     get_vcs_instance_question_answers,
-    prepare_vcs_instances_for_helm_values
+    prepare_vcs_instances_for_helm_values,
+    run_deployment_as_per_user_confirmation
 )
 from resc_helm_wizard.helm_value import HelmValue
 from resc_helm_wizard.vcs_instance import VcsInstance
@@ -139,18 +141,23 @@ def test_get_vcs_instance_question_answers_when_no_vcs_instance_is_selected(mock
         get_vcs_instance_question_answers()
     expected_call = "Aborting the program! No VCS instance was selected"
     mock_error_log.assert_called_once_with(expected_call)
-    assert excinfo.value.code is None
+    assert excinfo.value.code == 1
 
 
 @patch("resc_helm_wizard.questions.ask_user_to_select_vcs_instance")
 @patch("resc_helm_wizard.questions.ask_vcs_instance_details")
-def test_get_vcs_instance_question_answers(mock_ask_vcs_instance_details,
+@patch("resc_helm_wizard.questions.ask_which_github_accounts_to_scan")
+def test_get_vcs_instance_question_answers(mock_ask_which_github_accounts_to_scan,
+                                           mock_ask_vcs_instance_details,
                                            mock_ask_user_to_select_vcs_instance,
                                            ):
     vcs_instance_info = {"url": "https://vcs.com:443", "organization": "dummy_org", "username": "dummy_user",
                          "token": "dummy_token"}
     mock_ask_user_to_select_vcs_instance.return_value = ["GitHub", "Azure Devops", "Bitbucket"]
     mock_ask_vcs_instance_details.return_value = vcs_instance_info
+    mock_ask_which_github_accounts_to_scan.return_value = "dummy_user, kubernetes, docker"
+    github_account_list = [account.strip() for account in
+                           mock_ask_which_github_accounts_to_scan.return_value.split(",")]
 
     vcs_instances = get_vcs_instance_question_answers()
     assert len(vcs_instances) == 3
@@ -160,7 +167,7 @@ def test_get_vcs_instance_question_answers(mock_ask_vcs_instance_details,
     assert vcs_instances[0].port == "443"
     assert vcs_instances[0].provider_type == "GITHUB_PUBLIC"
     assert vcs_instances[0].scheme == "https"
-    assert vcs_instances[0].scope == ["kubernetes", "docker", "dummy_user"]
+    assert vcs_instances[0].scope == github_account_list
     assert vcs_instances[0].username == "dummy_user"
 
     assert vcs_instances[1].host == "vcs.com"
@@ -241,7 +248,7 @@ def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_co
         create_storage_for_db_and_rabbitmq(operating_system="linux")
     mock_warning_log.assert_called_once_with(expected_call_warning)
     mock_info_log.assert_called_once_with(expected_call_info)
-    assert excinfo.value.code is None
+    assert excinfo.value.code == 1
 
 
 @patch("os.path.exists")
@@ -281,7 +288,7 @@ def test_create_helm_values_sys_exit_when_file_not_exists(mock_error_log):
     with pytest.raises(SystemExit) as excinfo:
         create_helm_values_yaml(helm_values=None, input_values_yaml_file=input_file_path)
     mock_error_log.assert_called_with(expected_error_log)
-    assert excinfo.value.code is None
+    assert excinfo.value.code == 1
 
 
 @patch("logging.Logger.error")
@@ -298,4 +305,68 @@ def test_create_helm_values_sys_exit_when_key_not_exists(mock_error_log):
     with pytest.raises(SystemExit) as excinfo:
         create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)
     mock_error_log.assert_called_with(expected_error_log)
-    assert excinfo.value.code is None
+    assert excinfo.value.code == 1
+
+
+@patch("requests.get")
+@patch("logging.Logger.debug")
+def test_download_rule_toml_file_success(mock_debug_log, mock_get):
+    url = "https://example.com/rule_file.toml"
+    file = "temp_file.toml"
+    content = b'file content'
+    expected_debug_log = f"{file} successfully downloaded"
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.content = content
+    downloaded = download_rule_toml_file(url=url, file=file)
+    assert downloaded is True
+    mock_debug_log.assert_called_with(expected_debug_log)
+    with open(file, "rb") as file_output:
+        assert file_output.read() == content
+    if os.path.isfile(file):
+        os.remove(file)
+
+
+@patch("requests.get")
+@patch("os.path.exists")
+@patch("os.path.getsize")
+@patch("logging.Logger.error")
+def test_download_rule_toml_file_failure(mock_error_log, mock_os_path_getsize, mock_os_path_exists, mock_get):
+    url = "https://example.com/rule_file.toml"
+    file = "temp_file.toml"
+    content = b'file content'
+    expected_error_log = "Unable to download the rule file"
+    mock_os_path_exists.return_value = False
+    mock_os_path_getsize.return_value = -1
+    mock_get.return_value.status_code = 500
+    mock_get.return_value.content = content
+    downloaded = download_rule_toml_file(url=url, file=file)
+    assert downloaded is False
+    mock_error_log.assert_called_with(expected_error_log)
+    with open(file, "rb") as file_output:
+        assert file_output.read() == content
+    if os.path.isfile(file):
+        os.remove(file)
+
+
+@patch("resc_helm_wizard.questions.ask_user_confirmation")
+@patch("resc_helm_wizard.common.run_deployment")
+def test_run_deployment_as_per_user_confirmation_yes(mock_run_deployment, mock_ask_user_confirmation):
+    run_deployment_confirm_msg = "Do you want to run deployment?"
+    mock_ask_user_confirmation.return_value = True
+    mock_run_deployment.return_value = True
+    deployment_status = run_deployment_as_per_user_confirmation()
+    assert deployment_status is None
+    mock_run_deployment.assert_called_once_with
+    mock_ask_user_confirmation.assert_called_once_with(msg=run_deployment_confirm_msg)
+
+
+@patch("resc_helm_wizard.questions.ask_user_confirmation")
+@patch("logging.Logger.info")
+def test_run_deployment_as_per_user_confirmation_no(mock_log_info, mock_ask_user_confirmation):
+    expected_info_log = "Skipping deployment..."
+    run_deployment_confirm_msg = "Do you want to run deployment?"
+    mock_ask_user_confirmation.return_value = False
+    deployment_status = run_deployment_as_per_user_confirmation()
+    assert deployment_status is None
+    mock_ask_user_confirmation.assert_called_once_with(msg=run_deployment_confirm_msg)
+    mock_log_info.assert_called_with(expected_info_log)
