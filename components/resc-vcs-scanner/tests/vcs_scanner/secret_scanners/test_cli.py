@@ -105,3 +105,13 @@ def test_create_cli_argparser_repo_remote():
     assert args.gitleaks_path == PosixPath('/tmp')
     assert args.gitleaks_rules_path == PosixPath('/tmp')
     assert args.repo_url == "https://fake.url/repo"
+
+
+def test_create_cli_argparser_cli_tag():
+    parser = create_cli_argparser()
+    assert isinstance(parser, ArgumentParser)
+    argv = 'repo remote --gitleaks-path=/f --gitleaks-rules-path=/f --repo-url=https://url/ --filter-tag=Cli'.split()
+    args = parser.parse_args(argv)
+    args = validate_cli_arguments(args)
+    assert args is not False
+    assert args.filter_tag == "Cli"

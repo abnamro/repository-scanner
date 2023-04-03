@@ -4,7 +4,7 @@ from unittest.mock import call, patch
 
 # Third Party
 from resc_backend.resc_web_service.schema.branch import BranchBase, BranchRead
-from resc_backend.resc_web_service.schema.finding import Finding
+from resc_backend.resc_web_service.schema.finding import Finding, FindingCreate
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate, RepositoryRead
 from resc_backend.resc_web_service.schema.scan import ScanRead
@@ -126,3 +126,66 @@ def test_get_last_scanned_commit():
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         .get_last_scanned_commit(branch)
     assert result is None
+
+
+def test_finding_tag_filter_no_filter():
+    finding = FindingCreate(scan_ids=[1],
+                            file_path=f"file_path_{1}",
+                            line_number=1,
+                            column_start=1,
+                            column_end=1,
+                            commit_id=f"commit_id_{1}",
+                            commit_message=f"commit_message_{1}",
+                            commit_timestamp=datetime.utcnow(),
+                            author=f"author_{1}",
+                            email=f"email_{1}",
+                            status=FindingStatus.NOT_ANALYZED,
+                            comment=f"comment_{1}",
+                            rule_name=f"rule_{1}",
+                            branch_id=1)
+
+    result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
+        ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag=None)
+    assert result is True
+
+
+def test_finding_tag_filter_match_filter():
+    finding = FindingCreate(scan_ids=[1],
+                            file_path=f"file_path_{1}",
+                            line_number=1,
+                            column_start=1,
+                            column_end=1,
+                            commit_id=f"commit_id_{1}",
+                            commit_message=f"commit_message_{1}",
+                            commit_timestamp=datetime.utcnow(),
+                            author=f"author_{1}",
+                            email=f"email_{1}",
+                            status=FindingStatus.NOT_ANALYZED,
+                            comment=f"comment_{1}",
+                            rule_name=f"rule_{1}",
+                            branch_id=1)
+
+    result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
+        ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag="tag")
+    assert result is True
+
+
+def test_finding_tag_filter_nomatch_filter():
+    finding = FindingCreate(scan_ids=[1],
+                            file_path=f"file_path_{1}",
+                            line_number=1,
+                            column_start=1,
+                            column_end=1,
+                            commit_id=f"commit_id_{1}",
+                            commit_message=f"commit_message_{1}",
+                            commit_timestamp=datetime.utcnow(),
+                            author=f"author_{1}",
+                            email=f"email_{1}",
+                            status=FindingStatus.NOT_ANALYZED,
+                            comment=f"comment_{1}",
+                            rule_name=f"rule_{1}",
+                            branch_id=1)
+
+    result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
+        ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag="resc")
+    assert result is False
