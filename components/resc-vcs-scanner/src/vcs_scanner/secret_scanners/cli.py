@@ -56,6 +56,10 @@ def create_cli_argparser() -> ArgumentParser:
                                envvar="RESC_EXIT_CODE_BLOCK",
                                help="Exit code given if CLI encounters findings tagged with Block, default 1. "
                                     "Can also be set via the RESC_EXIT_CODE_BLOCK environment variable")
+    parser_common.add_argument("--filter-tag", required=False, action=EnvDefault, type=str,
+                               envvar="RESC_FILTER_TAG",
+                               help="Filter for findings based on specified tag. "
+                                    "Can also be set via the RESC_FILTER_TAG environment variable")
     parser_common.add_argument("-v", "--verbose", required=False, action="store_true",
                                help="Enable more verbose logging")
 
@@ -198,7 +202,8 @@ def scan_directory(args: Namespace):
     )
 
     output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
-                                 exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
+                                 exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block,
+                                 filter_tag=args.filter_tag)
     with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
         rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:
@@ -250,7 +255,8 @@ def scan_repository(args: Namespace):
 
     else:
         output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
-                                     exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block)
+                                     exit_code_warn=args.exit_code_warn, exit_code_block=args.exit_code_block,
+                                     filter_tag=args.filter_tag)
         with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
             rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
     if not rule_pack_version:

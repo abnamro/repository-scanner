@@ -25,10 +25,11 @@ logger = logging.getLogger(__name__)
 
 class STDOUTWriter(OutputModule):
 
-    def __init__(self, toml_rule_file_path: str, exit_code_warn: int, exit_code_block: int):
+    def __init__(self, toml_rule_file_path: str, exit_code_warn: int, exit_code_block: int, filter_tag: str = None):
         self.toml_rule_file_path: str = toml_rule_file_path
         self.exit_code_warn: int = exit_code_warn
         self.exit_code_block: int = exit_code_block
+        self.filter_tag: str = filter_tag
         self.exit_code_success = 0
 
     def write_vcs_instance(self, vcs_instance_runtime: VCSInstanceRuntime) -> Optional[VCSInstanceRead]:
@@ -87,6 +88,22 @@ class STDOUTWriter(OutputModule):
             rule_action = FindingAction.BLOCK
         return rule_action
 
+    def _finding_tag_filter(self, finding: FindingCreate, rule_tags: dict, filter_tag: str) -> bool:
+        """
+            Determine the action to take for the finding, based on the rule tags
+        :param finding:
+            FindingCreate instance of the finding
+        :param rule_tags:
+            Dictionary continuing all the rules and there respective tags
+        :Param: filter_tag.
+            filter_tag will check for the tag
+        :return bool:
+            The output will be boolean, based on the tag filter given
+        """
+        if filter_tag and filter_tag not in rule_tags.get(finding.rule_name, []):
+            return False
+        return True
+
     def write_findings(self, scan_id: int, branch_id: int, scan_findings: List[FindingCreate]):
         """
             Write the findings to the STDOUT in a nice table and set the exit code based on the FindingActions found
@@ -111,33 +128,34 @@ class STDOUTWriter(OutputModule):
 
         rule_tags = self._get_rule_tags()
         for finding in scan_findings:
-            finding_action = self._determine_finding_action(finding, rule_tags)
+            should_process_finding = self._finding_tag_filter(finding, rule_tags, self.filter_tag)
+            if should_process_finding:
+                finding_action = self._determine_finding_action(finding, rule_tags)
+                if finding_action == FindingAction.BLOCK:
+                    finding_action_value = colored(finding_action.value, "red", attrs=["bold"])
+                    block_count += 1
+                elif finding_action == FindingAction.WARN:
+                    finding_action_value = colored(finding_action.value, "light_red", attrs=["bold"])
+                    warn_count += 1
+                elif finding_action == FindingAction.INFO:
+                    finding_action_value = colored(finding_action.value, "light_yellow", attrs=["bold"])
+                    info_count += 1
+                else:
+                    finding_action_value = finding_action.value
+                    info_count += 1
 
-            if finding_action == FindingAction.BLOCK:
-                finding_action_value = colored(finding_action.value, "red", attrs=["bold"])
-                block_count += 1
-            elif finding_action == FindingAction.WARN:
-                finding_action_value = colored(finding_action.value, "light_red", attrs=["bold"])
-                warn_count += 1
-            elif finding_action == FindingAction.INFO:
-                finding_action_value = colored(finding_action.value, "light_yellow", attrs=["bold"])
-                info_count += 1
-            else:
-                finding_action_value = finding_action.value
-                info_count += 1
+                if exit_code != self.exit_code_block:
+                    if exit_code == self.exit_code_success and finding_action == FindingAction.WARN:
+                        exit_code = self.exit_code_warn
+                    elif finding_action == FindingAction.BLOCK:
+                        exit_code = self.exit_code_block
 
-            if exit_code != self.exit_code_block:
-                if exit_code == self.exit_code_success and finding_action == FindingAction.WARN:
-                    exit_code = self.exit_code_warn
-                elif finding_action == FindingAction.BLOCK:
-                    exit_code = self.exit_code_block
-
-            output_table.add_row([finding_action_value, finding.rule_name, finding.line_number,
-                                  f"{finding.column_start}-{finding.column_end}", finding.file_path])
+                output_table.add_row([finding_action_value, finding.rule_name, finding.line_number,
+                                     f"{finding.column_start}-{finding.column_end}", finding.file_path])
 
         logger.info(f"\n{output_table.get_string(sortby='Level')}")
 
-        logger.info(f"Findings detected : Total - {len(scan_findings)}, Block - {block_count}, "
+        logger.info(f"Findings detected : Total - {block_count+warn_count+info_count}, Block - {block_count}, "
                     f"Warn - {warn_count}, Info - {info_count}")
 
         if exit_code == self.exit_code_success:
