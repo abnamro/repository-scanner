@@ -182,8 +182,8 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
         output_values_yaml_file_path = os.path.abspath(output_values_yaml_file)
         if os.path.exists(output_values_yaml_file_path):
             logging.info(f"Helm values yaml file has been successfully generated at {output_values_yaml_file_path}")
-            logging.info(f"Please refer this link to continue with the deployment or "
-                         f"to make any customizations: {helm_deployment_help_link}")
+            logging.info(f"You can proceed with deployment or you can refer to this link "
+                         f"to make any customizations in helm values yaml file: {helm_deployment_help_link}")
             output_file_generated = True
 
     except FileNotFoundError:
