@@ -39,7 +39,7 @@ def upgrade():
                                   sa.Enum('NOT_ANALYZED', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED', 'FALSE_POSITIVE',
                                           'TRUE_POSITIVE', name='findingstatus'), server_default='NOT_ANALYZED',
                                   nullable=False),
-                        sa.Column('author', sa.String(length=200), nullable=True),
+                        sa.Column('auditor', sa.String(length=200), nullable=True),
                         sa.Column('comment', sa.String(length=255), nullable=True),
                         sa.Column('timestamp', sa.DateTime(), nullable=False),
                         sa.Column('finding_id', sa.Integer(), nullable=False),
@@ -60,8 +60,8 @@ def upgrade():
 
     # insert data in to audit table
     logger.info(f"Inserting data in to {AUDIT} table")
-    op.execute(f"INSERT INTO {AUDIT} (status, comment, author, timestamp, finding_id) "
-               f"SELECT status, comment,'Anonymous' as author, CURRENT_TIMESTAMP as timestamp, id FROM {FINDING}")
+    op.execute(f"INSERT INTO {AUDIT} (status, comment, auditor, timestamp, finding_id) "
+               f"SELECT status, comment,'Anonymous' as auditor, CURRENT_TIMESTAMP as timestamp, id FROM {FINDING}")
 
     # insert in to finding_audit table
     logger.info(f"Inserting data in to {FINDING_AUDIT} table")

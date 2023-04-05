@@ -15,21 +15,21 @@ class DBaudit(Base):
     id_ = Column("id", Integer, primary_key=True)
     status = Column(Enum(FindingStatus), default=FindingStatus.NOT_ANALYZED, server_default="NOT_ANALYZED",
                     nullable=False)
-    author = Column(String(200))
+    auditor = Column(String(200))
     comment = Column(String(255), nullable=True)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    def __init__(self, status, author, comment, timestamp):
+    def __init__(self, status, auditor, comment, timestamp):
         self.status = status
-        self.author = author
+        self.auditor = auditor
         self.comment = comment
         self.timestamp = timestamp
 
     @staticmethod
-    def create_from_metadata(status: str, author: str, comment: str, timestamp: datetime):
+    def create_from_metadata(status: str, auditor: str, comment: str, timestamp: datetime):
         sanitized_comment = html.escape(comment) if comment else comment
         db_audit = DBaudit(
-            author=author,
+            auditor=auditor,
             status=status,
             comment=sanitized_comment,
             timestamp=timestamp
