@@ -22,8 +22,6 @@ class FindingBase(BaseModel):
     commit_timestamp: datetime.datetime
     author: constr(max_length=200)
     email: constr(max_length=100)
-    status: FindingStatus = FindingStatus.NOT_ANALYZED
-    comment: Optional[constr(max_length=255)] = None
     event_sent_on: Optional[datetime.datetime]
     rule_name: constr(max_length=400)
 
@@ -69,8 +67,6 @@ class FindingRead(FindingCreate):
             commit_timestamp=db_finding.commit_timestamp,
             author=db_finding.author,
             email=db_finding.email,
-            status=db_finding.status,
-            comment=db_finding.comment,
             event_sent_on=db_finding.event_sent_on,
             rule_name=db_finding.rule_name,
             branch_id=db_finding.branch_id,

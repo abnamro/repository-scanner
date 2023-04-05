@@ -89,9 +89,6 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
     - **commit_timestamp**: Commit timestamp
     - **author**: Author name
     - **email**: Email of the author
-    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
-                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
-    - **comment**: Comment
     - **event_sent_on**: event sent timestamp
     - **rule_name**: rule name
     - **branch_id**: branch id of the finding
@@ -164,39 +161,39 @@ def patch_finding(
     )
 
 
-@router.put("/{finding_id}",
-            response_model=finding_schema.FindingRead,
-            summary="Update a finding by ID",
-            status_code=status.HTTP_200_OK,
-            responses={
-                200: {"description": "Update finding <finding_id>"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"},
-                500: {"description": ERROR_MESSAGE_500},
-                503: {"description": ERROR_MESSAGE_503}
-            })
-def update_finding(
-        finding_id: int,
-        finding: finding_schema.FindingUpdate,
-        db_connection: Session = Depends(get_db_connection)
-):
-    """
-        Update a finding by ID
-
-    - **db_connection**: Session of the database connection
-    - **finding_ids**: List of finding IDs for which details need to be updated
-    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
-                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
-    - **comment**: Comment
-    """
-    db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
-    db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
-    scan_ids = [x.scan_id for x in db_sca_findings]
-    if db_finding is None:
-        raise HTTPException(status_code=404, detail="Finding not found")
-    return FindingRead.create_from_db_entities(
-        finding_crud.update_finding(db_connection=db_connection, finding_id=finding_id, finding=finding),
-        scan_ids
-    )
+# @router.put("/{finding_id}",
+#             response_model=finding_schema.FindingRead,
+#             summary="Update a finding by ID",
+#             status_code=status.HTTP_200_OK,
+#             responses={
+#                 200: {"description": "Update finding <finding_id>"},
+#                 404: {"model": Model404, "description": "Finding <finding_id> not found"},
+#                 500: {"description": ERROR_MESSAGE_500},
+#                 503: {"description": ERROR_MESSAGE_503}
+#             })
+# def update_finding(
+#         finding_id: int,
+#         finding: finding_schema.FindingUpdate,
+#         db_connection: Session = Depends(get_db_connection)
+# ):
+#     """
+#         Update a finding by ID
+#
+#     - **db_connection**: Session of the database connection
+#     - **finding_ids**: List of finding IDs for which details need to be updated
+#     - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+#                   CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+#     - **comment**: Comment
+#     """
+#     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
+#     db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
+#     scan_ids = [x.scan_id for x in db_sca_findings]
+#     if db_finding is None:
+#         raise HTTPException(status_code=404, detail="Finding not found")
+#     return FindingRead.create_from_db_entities(
+#         finding_crud.update_finding(db_connection=db_connection, finding_id=finding_id, finding=finding),
+#         scan_ids
+#     )
 
 
 @router.delete("/{finding_id}",
@@ -272,46 +269,46 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
     return PaginationModel[finding_schema.FindingRead](data=findings, total=total_findings, limit=limit, skip=skip)
 
 
-@router.put(f"{RWS_ROUTE_AUDIT}/",
-            response_model=List[finding_schema.FindingRead],
-            summary="audit single/multiple findings",
-            status_code=status.HTTP_200_OK,
-            responses={
-                200: {"description": "Audit finding(s) to update status and comments"},
-                404: {"model": Model404, "description": "Finding <finding_id> not found"},
-                500: {"description": ERROR_MESSAGE_500},
-                503: {"description": ERROR_MESSAGE_503}
-            })
-def audit_findings(
-        audit: audit_schema.AuditMultiple,
-        db_connection: Session = Depends(get_db_connection)
-) -> List[finding_schema.FindingRead]:
-    """
-        Audit single/multiple findings, updating the status and comment
-
-    - **db_connection**: Session of the database connection
-    - **finding_ids**: List of finding IDs for which audit to be performed
-    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
-                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
-    - **comment**: Comment
-    - **return**: [FindingRead]
-        The output will contain a list of the findings that where updated
-    """
-    audited_findings = []
-    for finding_id in audit.finding_ids:
-        db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
-        db_scan_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
-        scan_ids = [x.scan_id for x in db_scan_findings]
-        if db_finding is None:
-            raise HTTPException(status_code=404, detail=f"Finding {finding_id} not found")
-
-        audited_findings.append(
-            FindingRead.create_from_db_entities(
-                finding_crud.audit_finding(db_connection=db_connection, db_finding=db_finding,
-                                           status=audit.status, comment=audit.comment),
-                scan_ids=scan_ids)
-        )
-    return audited_findings
+# @router.put(f"{RWS_ROUTE_AUDIT}/",
+#             response_model=List[finding_schema.FindingRead],
+#             summary="audit single/multiple findings",
+#             status_code=status.HTTP_200_OK,
+#             responses={
+#                 200: {"description": "Audit finding(s) to update status and comments"},
+#                 404: {"model": Model404, "description": "Finding <finding_id> not found"},
+#                 500: {"description": ERROR_MESSAGE_500},
+#                 503: {"description": ERROR_MESSAGE_503}
+#             })
+# def audit_findings(
+#         audit: audit_schema.AuditMultiple,
+#         db_connection: Session = Depends(get_db_connection)
+# ) -> List[finding_schema.FindingRead]:
+#     """
+#         Audit single/multiple findings, updating the status and comment
+# 
+#     - **db_connection**: Session of the database connection
+#     - **finding_ids**: List of finding IDs for which audit to be performed
+#     - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+#                   CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+#     - **comment**: Comment
+#     - **return**: [FindingRead]
+#         The output will contain a list of the findings that where updated
+#     """
+#     audited_findings = []
+#     for finding_id in audit.finding_ids:
+#         db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
+#         db_scan_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
+#         scan_ids = [x.scan_id for x in db_scan_findings]
+#         if db_finding is None:
+#             raise HTTPException(status_code=404, detail=f"Finding {finding_id} not found")
+# 
+#         audited_findings.append(
+#             FindingRead.create_from_db_entities(
+#                 finding_crud.audit_finding(db_connection=db_connection, db_finding=db_finding,
+#                                            status=audit.status, comment=audit.comment),
+#                 scan_ids=scan_ids)
+#         )
+#     return audited_findings
 
 
 @router.get(f"{RWS_ROUTE_SUPPORTED_STATUSES}/",

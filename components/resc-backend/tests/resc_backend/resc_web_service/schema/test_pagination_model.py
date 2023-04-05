@@ -66,8 +66,6 @@ def test_pagination_model_findings():
                             commit_timestamp=datetime.utcnow(),
                             author=f"author_{i}",
                             email=f"email_{i}",
-                            status=FindingStatus.NOT_ANALYZED,
-                            comment="",
                             rule_name=f"rule_{i}",
                             event_sent_on=datetime.utcnow(),
                             branch_id=1)
