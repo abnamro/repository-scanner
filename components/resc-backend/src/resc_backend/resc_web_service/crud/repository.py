@@ -1,5 +1,5 @@
 # Third Party
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
 # First Party
@@ -10,6 +10,7 @@ from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.schema import repository as repository_schema
+from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
@@ -49,38 +50,21 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
     if only_if_has_findings:
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query the latest Base scan object for a branch
-        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp == max_time_stmt_base)
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query all latest Base-to-date increment scans for a branch
-        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+        max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                     func.max(model.DBscan.id_).label("latest_base_scan_id"))
+        max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+        max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
-        # Query all latest Base-to-date scans for a branch
-        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
+        sub_query = db_connection.query(model.DBrepository.id_)
+        sub_query = sub_query.join(model.DBbranch, model.DBbranch.repository_id == model.DBrepository.id_)
+        sub_query = sub_query.join(max_base_scan_subquery, model.DBbranch.id_ == max_base_scan_subquery.c.branch_id)
+        sub_query = sub_query.join(model.DBscan, and_(model.DBbranch.id_ == model.DBscan.branch_id,
+                                                      model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+        sub_query = sub_query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
+        sub_query = sub_query.distinct()
 
-        # Query all scans branch_id's where the scan id in the list of latest Base-to-date scans for this branch
-        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
-            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
-            .distinct()
-        # Filter on branches that are in the above selection
-        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
-            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
         # Filter on repositories that are in the branches selection
-        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(sub_query))
 
     if vcs_providers and vcs_providers is not None:
         query = query.filter(model.DBVcsInstance.provider_type.in_(vcs_providers))
@@ -116,38 +100,21 @@ def get_repositories_count(db_connection: Session, vcs_providers: [VCSProviders]
     query = db_connection.query(func.count(model.DBrepository.id_))
 
     if only_if_has_findings:
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query the latest Base scan object for a branch
-        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp == max_time_stmt_base)
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query all latest Base-to-date increment scans for a branch
-        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+        max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                     func.max(model.DBscan.id_).label("latest_base_scan_id"))
+        max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+        max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
-        # Query all latest Base-to-date scans for a branch
-        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
+        sub_query = db_connection.query(model.DBrepository.id_)
+        sub_query = sub_query.join(model.DBbranch, model.DBbranch.repository_id == model.DBrepository.id_)
+        sub_query = sub_query.join(max_base_scan_subquery, model.DBbranch.id_ == max_base_scan_subquery.c.branch_id)
+        sub_query = sub_query.join(model.DBscan, and_(model.DBbranch.id_ == model.DBscan.branch_id,
+                                                      model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+        sub_query = sub_query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
+        sub_query = sub_query.distinct()
 
-        # Query all scans branch_id's where the scan id in the list of latest Base-to-date scans for this branch
-        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
-            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
-            .distinct()
-        # Filter on branches that are in the above selection
-        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
-            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
         # Filter on repositories that are in the branches selection
-        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
+        query = query.filter(model.DBrepository.id_.in_(sub_query))
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
@@ -229,38 +196,16 @@ def get_distinct_projects(db_connection: Session, vcs_providers: [VCSProviders] 
     query = db_connection.query(model.DBrepository.project_key)
 
     if only_if_has_findings:
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query the latest Base scan object for a branch
-        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp == max_time_stmt_base)
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query all latest Base-to-date increment scans for a branch
-        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+        max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                     func.max(model.DBscan.id_).label("latest_base_scan_id"))
+        max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+        max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
-        # Query all latest Base-to-date scans for a branch
-        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
-
-        # Query all scans branch_id's where the scan id in the list of latest Base-to-date scans for this branch
-        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
-            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
-            .distinct()
-        # Filter on branches that are in the above selection
-        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
-            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
-        # Filter on repositories that are in the branches selection
-        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
+        query = query.join(model.DBbranch, model.DBbranch.repository_id == model.DBrepository.id_)
+        query = query.join(max_base_scan_subquery, model.DBbranch.id_ == max_base_scan_subquery.c.branch_id)
+        query = query.join(model.DBscan, and_(model.DBbranch.id_ == model.DBscan.branch_id,
+                                              model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+        query = query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
@@ -292,38 +237,16 @@ def get_distinct_repositories(db_connection: Session, vcs_providers: [VCSProvide
     query = db_connection.query(model.DBrepository.repository_name)
 
     if only_if_has_findings:
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_base = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query the latest Base scan object for a branch
-        scan_id_stmt_base = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp == max_time_stmt_base)
-        # Query the latest Base scan timestamp for a branch
-        max_time_stmt_incr = db_connection.query(func.max(model.DBscan.timestamp)) \
-            .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch).scalar_subquery()
-        # Query all latest Base-to-date increment scans for a branch
-        scan_id_stmt_incr = db_connection.query(model.DBscan.id_) \
-            .filter(model.DBscan.scan_type == ScanType.INCREMENTAL) \
-            .filter(model.DBscan.branch_id == model.DBbranch.id_).correlate(model.DBbranch) \
-            .filter(model.DBscan.timestamp >= max_time_stmt_incr)
+        max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                     func.max(model.DBscan.id_).label("latest_base_scan_id"))
+        max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+        max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
-        # Query all latest Base-to-date scans for a branch
-        scan_id_stmt = scan_id_stmt_base.union(scan_id_stmt_incr)
-
-        # Query all scans branch_id's where the scan id in the list of latest Base-to-date scans for this branch
-        scan_sub_stmt = db_connection.query(model.DBscan.branch_id) \
-            .join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.id_.in_(scan_id_stmt)) \
-            .distinct()
-        # Filter on branches that are in the above selection
-        branch_sub_stmt = db_connection.query(model.DBbranch.repository_id) \
-            .filter(model.DBbranch.id_.in_(scan_sub_stmt))
-        # Filter on repositories that are in the branches selection
-        query = query.filter(model.DBrepository.id_.in_(branch_sub_stmt))
+        query = query.join(model.DBbranch, model.DBbranch.repository_id == model.DBrepository.id_)
+        query = query.join(max_base_scan_subquery, model.DBbranch.id_ == max_base_scan_subquery.c.branch_id)
+        query = query.join(model.DBscan, and_(model.DBbranch.id_ == model.DBscan.branch_id,
+                                              model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+        query = query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
 
     if vcs_providers and vcs_providers is not None:
         query = query.join(model.DBVcsInstance,
@@ -337,23 +260,43 @@ def get_distinct_repositories(db_connection: Session, vcs_providers: [VCSProvide
     return distinct_repositories
 
 
-def get_findings_metadata_by_repository_id(db_connection: Session, repository_id: int):
+def get_findings_metadata_by_repository_id(db_connection: Session, repository_ids: list[int]):
     """
         Retrieves the finding metadata for a repository id from the database with most recent scan information
     :param db_connection:
         Session of the database connection
-    :param repository_id:
-        id of the repository for which findings metadata to be retrieved
+    :param repository_ids:
+        ids of the repository for which findings metadata to be retrieved
     :return: findings_metadata
         findings_metadata containing the count for each status
     """
-    latest_scan = scan_crud.get_latest_scan_for_repository_for_master_branch(db_connection, repository_id=repository_id)
+    query = db_connection.query(model.DBrepository.id_,
+                                model.DBaudit.status,
+                                func.count(model.DBscanFinding.finding_id))
 
-    if latest_scan is not None:
-        findings_metadata = scan_crud.get_branch_findings_metadata_for_latest_scan(
-            db_connection, branch_id=latest_scan.branch_id, scan_timestamp=latest_scan.timestamp)
-    else:
-        findings_metadata = {
+    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                 func.max(model.DBscan.id_).label("latest_base_scan_id"))
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
+
+    max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                             func.max(model.DBaudit.id_).label("audit_id")) \
+        .group_by(model.DBaudit.finding_id).subquery()
+
+    query = query.join(model.DBbranch, model.DBbranch.repository_id == model.DBrepository.id_)
+    query = query.join(max_base_scan_subquery, model.DBbranch.id_ == max_base_scan_subquery.c.branch_id)
+    query = query.join(model.DBscan, and_(model.DBbranch.id_ == model.DBscan.branch_id,
+                                          model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    query = query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
+    query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.DBscanFinding.finding_id,
+                       isouter=True)
+    query = query.join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id, isouter=True)
+    query = query.filter(model.DBrepository.id_.in_(repository_ids))
+    query = query.group_by(model.DBrepository.id_, model.DBaudit.status, )
+    status_counts = query.all()
+    repo_count_dict = {}
+    for repository_id in repository_ids:
+        repo_count_dict[repository_id] = {
             "true_positive": 0,
             "false_positive": 0,
             "not_analyzed": 0,
@@ -361,8 +304,20 @@ def get_findings_metadata_by_repository_id(db_connection: Session, repository_id
             "clarification_required": 0,
             "total_findings_count": 0
         }
+    for status_count in status_counts:
+        repo_count_dict[status_count[0]]["total_findings_count"] += status_count[2]
+        if status_count[1] == FindingStatus.NOT_ANALYZED or status_count[1] is None:
+            repo_count_dict[status_count[0]]["not_analyzed"] += status_count[2]
+        elif status_count[1] == FindingStatus.FALSE_POSITIVE:
+            repo_count_dict[status_count[0]]["false_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.TRUE_POSITIVE:
+            repo_count_dict[status_count[0]]["true_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.UNDER_REVIEW:
+            repo_count_dict[status_count[0]]["under_review"] += status_count[2]
+        elif status_count[1] == FindingStatus.CLARIFICATION_REQUIRED:
+            repo_count_dict[status_count[0]]["clarification_required"] += status_count[2]
 
-    return findings_metadata
+    return repo_count_dict
 
 
 def delete_repository(db_connection: Session, repository_id: int, delete_related: bool = False):
