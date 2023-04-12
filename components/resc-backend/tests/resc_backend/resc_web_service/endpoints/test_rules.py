@@ -50,8 +50,8 @@ class TestRules(unittest.TestCase):
         counter = 1
         for finding_status in FindingStatus:
             counter = counter + 1
-            self.db_status_count.append((finding_status, counter))
-        self.db_status_count = sorted(self.db_status_count, key=lambda status_count: status_count[0])
+            self.db_status_count.append((counter, finding_status))
+        self.db_status_count = sorted(self.db_status_count, key=lambda status_count: status_count[1])
 
     @staticmethod
     def cast_db_rule_to_rule_create(rule: DBrule):
@@ -222,8 +222,8 @@ class TestRules(unittest.TestCase):
             assert data[i]["finding_count"] == 20
             assert len(data[i]["finding_statuses_count"]) == len(self.db_status_count)
             for status in range(len(self.db_status_count)):
-                assert data[i]["finding_statuses_count"][status]["status"] == self.db_status_count[status][0]
-                assert data[i]["finding_statuses_count"][status]["count"] == self.db_status_count[status][1]
+                assert data[i]["finding_statuses_count"][status]["status"] == self.db_status_count[status][1]
+                assert data[i]["finding_statuses_count"][status]["count"] == self.db_status_count[status][0]
 
     @patch("resc_backend.resc_web_service.crud.rule.create_rule")
     def test_create_rule(self, create_rule):

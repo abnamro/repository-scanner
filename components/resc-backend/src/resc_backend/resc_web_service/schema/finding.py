@@ -9,7 +9,6 @@ from pydantic import BaseModel, conint, conlist, constr
 
 # First Party
 from resc_backend.db.model import DBfinding
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
 
 class FindingBase(BaseModel):
@@ -24,11 +23,6 @@ class FindingBase(BaseModel):
     email: constr(max_length=100)
     event_sent_on: Optional[datetime.datetime]
     rule_name: constr(max_length=400)
-
-
-class FindingUpdate(BaseModel):
-    status: FindingStatus
-    comment: constr(max_length=255)
 
 
 class FindingPatch(BaseModel):

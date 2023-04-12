@@ -8,7 +8,6 @@ import pytest
 # First Party
 from resc_backend.db.model import DBfinding
 from resc_backend.resc_web_service.schema.finding import FindingRead
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.pagination_model import PaginationModel
 
 

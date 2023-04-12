@@ -1,14 +1,12 @@
 # pylint: disable=R0902
 # Standard Library
-import html
 from datetime import datetime
 
 # Third Party
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 
 # First Party
 from resc_backend.db.model import Base
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
 
 class DBfinding(Base):

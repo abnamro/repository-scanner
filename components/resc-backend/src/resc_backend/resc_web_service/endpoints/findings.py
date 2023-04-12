@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 
 # Third Party
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 
 # First Party
 from resc_backend.constants import (
@@ -20,6 +20,7 @@ from resc_backend.constants import (
     RWS_ROUTE_TOTAL_COUNT_BY_RULE
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.crud import audit as audit_crud
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
@@ -161,41 +162,6 @@ def patch_finding(
     )
 
 
-# @router.put("/{finding_id}",
-#             response_model=finding_schema.FindingRead,
-#             summary="Update a finding by ID",
-#             status_code=status.HTTP_200_OK,
-#             responses={
-#                 200: {"description": "Update finding <finding_id>"},
-#                 404: {"model": Model404, "description": "Finding <finding_id> not found"},
-#                 500: {"description": ERROR_MESSAGE_500},
-#                 503: {"description": ERROR_MESSAGE_503}
-#             })
-# def update_finding(
-#         finding_id: int,
-#         finding: finding_schema.FindingUpdate,
-#         db_connection: Session = Depends(get_db_connection)
-# ):
-#     """
-#         Update a finding by ID
-#
-#     - **db_connection**: Session of the database connection
-#     - **finding_ids**: List of finding IDs for which details need to be updated
-#     - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
-#                   CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
-#     - **comment**: Comment
-#     """
-#     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
-#     db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
-#     scan_ids = [x.scan_id for x in db_sca_findings]
-#     if db_finding is None:
-#         raise HTTPException(status_code=404, detail="Finding not found")
-#     return FindingRead.create_from_db_entities(
-#         finding_crud.update_finding(db_connection=db_connection, finding_id=finding_id, finding=finding),
-#         scan_ids
-#     )
-
-
 @router.delete("/{finding_id}",
                summary="Delete a finding",
                status_code=status.HTTP_200_OK,
@@ -269,46 +235,71 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
     return PaginationModel[finding_schema.FindingRead](data=findings, total=total_findings, limit=limit, skip=skip)
 
 
-# @router.put(f"{RWS_ROUTE_AUDIT}/",
-#             response_model=List[finding_schema.FindingRead],
-#             summary="audit single/multiple findings",
-#             status_code=status.HTTP_200_OK,
-#             responses={
-#                 200: {"description": "Audit finding(s) to update status and comments"},
-#                 404: {"model": Model404, "description": "Finding <finding_id> not found"},
-#                 500: {"description": ERROR_MESSAGE_500},
-#                 503: {"description": ERROR_MESSAGE_503}
-#             })
-# def audit_findings(
-#         audit: audit_schema.AuditMultiple,
-#         db_connection: Session = Depends(get_db_connection)
-# ) -> List[finding_schema.FindingRead]:
-#     """
-#         Audit single/multiple findings, updating the status and comment
-# 
-#     - **db_connection**: Session of the database connection
-#     - **finding_ids**: List of finding IDs for which audit to be performed
-#     - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
-#                   CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
-#     - **comment**: Comment
-#     - **return**: [FindingRead]
-#         The output will contain a list of the findings that where updated
-#     """
-#     audited_findings = []
-#     for finding_id in audit.finding_ids:
-#         db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
-#         db_scan_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
-#         scan_ids = [x.scan_id for x in db_scan_findings]
-#         if db_finding is None:
-#             raise HTTPException(status_code=404, detail=f"Finding {finding_id} not found")
-# 
-#         audited_findings.append(
-#             FindingRead.create_from_db_entities(
-#                 finding_crud.audit_finding(db_connection=db_connection, db_finding=db_finding,
-#                                            status=audit.status, comment=audit.comment),
-#                 scan_ids=scan_ids)
-#         )
-#     return audited_findings
+@router.post(f"{RWS_ROUTE_AUDIT}/",
+             response_model=int,
+             summary="audit single/multiple findings",
+             status_code=status.HTTP_201_CREATED,
+             responses={
+                 201: {"description": "Audit(s) successfully saved"},
+                 404: {"model": Model404, "description": "Finding <finding_id> not found"},
+                 500: {"description": ERROR_MESSAGE_500},
+                 503: {"description": ERROR_MESSAGE_503}
+             })
+def audit_findings(
+        request: Request,
+        audit: audit_schema.AuditMultiple,
+        db_connection: Session = Depends(get_db_connection)
+) -> int:
+    """
+        Audit single/multiple findings, updating the status and comment
+
+    - **db_connection**: Session of the database connection
+    - **finding_ids**: List of finding IDs for which audit to be performed
+    - **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,
+                  CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE
+    - **comment**: Comment
+    - **return**: int
+        The output will contain count of successful saved audits
+    """
+    audits = []
+    for finding_id in audit.finding_ids:
+        db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
+        if db_finding is None:
+            raise HTTPException(status_code=404, detail=f"Finding {finding_id} not found")
+        audits.append(
+            audit_crud.create_audit(db_connection=db_connection, finding_id=db_finding.id_,
+                                    auditor=request.user, status=audit.status, comment=audit.comment)
+        )
+    return len(audits)
+
+
+@router.get("/{finding_id}"f"{RWS_ROUTE_AUDIT}",
+            response_model=PaginationModel[audit_schema.AuditRead],
+            summary="Get audit(s) for finding",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the audit entries for a finding"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
+def get_finding_audits(finding_id: int, skip: int = Query(default=0, ge=0),
+                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
+                       db_connection: Session = Depends(get_db_connection)) \
+        -> PaginationModel[audit_schema.AuditRead]:
+    """
+        Retrieve all audit objects paginated for a finding
+
+    - **db_connection**: Session of the database connection
+    - **finding_id**: id of the finding to get the audit for
+    - **skip**: Integer amount of records to skip to support pagination
+    - **limit**: Integer amount of records to return, to support pagination
+    - **return**: [AuditRead]
+        The output will contain a PaginationModel containing the list of AuditRead type objects,
+        or an empty list if no audit info was found
+    """
+    audits = audit_crud.get_finding_audits(db_connection, skip=skip, limit=limit, finding_id=finding_id)
+    total_audits = audit_crud.get_finding_audits_count(db_connection, finding_id=finding_id)
+    return PaginationModel[audit_schema.AuditRead](data=audits, total=total_audits, limit=limit, skip=skip)
 
 
 @router.get(f"{RWS_ROUTE_SUPPORTED_STATUSES}/",

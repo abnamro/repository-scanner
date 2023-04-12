@@ -18,7 +18,6 @@ from resc_backend.constants import (
 from resc_backend.db.model import DBbranch, DBfinding, DBrepository, DBscan, DBVcsInstance
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate
 from resc_backend.resc_web_service.schema.vcs_instance import VCSProviders
 

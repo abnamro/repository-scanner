@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from resc_backend.db.model import Base, DBbranch, DBfinding, DBrepository, DBrule, DBscan, DBscanFinding, DBVcsInstance
 from resc_backend.db.model.rule_pack import DBrulePack
 from resc_backend.resc_web_service.schema.finding import FindingCreate
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
 sys.path.insert(0, "src")
 

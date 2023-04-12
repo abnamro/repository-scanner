@@ -99,7 +99,7 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
                                                                     rule_name=rule_finding_count.rule_name)
         handled_statuses = []
         for status_count in count_by_status:
-            finding_status_count = StatusCount(status=status_count[0], count=status_count[1])
+            finding_status_count = StatusCount(status=status_count[1], count=status_count[0])
             finding_count = finding_count + finding_status_count.count
             handled_statuses.append(finding_status_count.status)
             rule_finding_count.finding_statuses_count.append(finding_status_count)

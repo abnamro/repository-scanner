@@ -12,7 +12,6 @@ from resc_backend.db.model import DBfinding, DBrule, DBscan
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 from resc_backend.resc_web_service.schema.finding import FindingRead
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.scan import ScanCreate
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
