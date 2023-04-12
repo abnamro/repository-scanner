@@ -168,14 +168,14 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
         findings_count_by_status = finding_crud.get_findings_count_by_status(
             db_connection, scan_ids=scan_ids_latest_to_base, finding_statuses=FindingStatus)
         for finding in findings_count_by_status:
-            finding_status = finding[0]
-            count = finding[1]
+            finding_status = finding[1]
+            count = finding[0]
             if finding_status == FindingStatus.TRUE_POSITIVE:
                 true_positive_count = count
             if finding_status == FindingStatus.FALSE_POSITIVE:
                 false_positive_count = count
-            if finding_status == FindingStatus.NOT_ANALYZED:
-                not_analyzed_count = count
+            if finding_status == FindingStatus.NOT_ANALYZED or finding_status is None:
+                not_analyzed_count += count
             if finding_status == FindingStatus.UNDER_REVIEW:
                 under_review_count = count
             if finding_status == FindingStatus.CLARIFICATION_REQUIRED:

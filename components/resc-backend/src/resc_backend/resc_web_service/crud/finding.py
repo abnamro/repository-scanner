@@ -381,7 +381,12 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
                   model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
             .filter(model.DBscan.id_.in_(scan_ids))
     if finding_statuses:
-        query = query.filter(model.DBaudit.status.in_(finding_statuses))
+        if FindingStatus.NOT_ANALYZED in finding_statuses:
+            query = query. \
+                filter(or_(model.DBaudit.status.in_(finding_statuses),
+                           model.DBaudit.status == None))  # noqa: E711
+        else:
+            query = query.filter(model.DBaudit.status.in_(finding_statuses))
     if rule_name:
         query = query.filter(model.DBfinding.rule_name == rule_name)
 

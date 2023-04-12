@@ -98,11 +98,21 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
         count_by_status = finding_crud.get_findings_count_by_status(db_connection,
                                                                     rule_name=rule_finding_count.rule_name)
         handled_statuses = []
+        not_analyzed_count = 0
         for status_count in count_by_status:
-            finding_status_count = StatusCount(status=status_count[1], count=status_count[0])
-            finding_count = finding_count + finding_status_count.count
-            handled_statuses.append(finding_status_count.status)
-            rule_finding_count.finding_statuses_count.append(finding_status_count)
+            status_count_status = status_count[1]
+            status_count_count = status_count[0]
+            if status_count_status is None or status_count_status == FindingStatus.NOT_ANALYZED:
+                not_analyzed_count += status_count_count
+            else:
+                finding_status_count = StatusCount(status=status_count_status, count=status_count_count)
+                handled_statuses.append(finding_status_count.status)
+                rule_finding_count.finding_statuses_count.append(finding_status_count)
+            finding_count += status_count_count
+
+        finding_status_count = StatusCount(status=FindingStatus.NOT_ANALYZED, count=not_analyzed_count)
+        handled_statuses.append(finding_status_count.status)
+        rule_finding_count.finding_statuses_count.append(finding_status_count)
 
         for finding_status in FindingStatus:
             # add default values of 0 for statuses without findings
