@@ -11,7 +11,7 @@ const FindingsService = {
   async auditFindings(findingIds, findingStatus, comment) {
     const commentVal = comment == null ? '' : comment;
 
-    return axios.put(`/findings/audit/`, {
+    return axios.post(`/findings/audit/`, {
       finding_ids: findingIds,
       status: findingStatus,
       comment: commentVal,
@@ -73,6 +73,15 @@ const FindingsService = {
 
   async getFindingCountPerWeek() {
     return axios.get(`/findings/count-by-time/week`);
+  },
+
+  async getFindingAudits(findingId, perPage, skipRowCount) {
+    return axios.get(`findings/${findingId}/audit`, {
+      params: {
+        skip: skipRowCount,
+        limit: perPage,
+      },
+    });
   },
 };
 

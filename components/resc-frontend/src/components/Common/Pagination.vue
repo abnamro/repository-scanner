@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <!-- Page size -->
-      <div class="col-md-3">
+      <div class="col-md-3 small">
         <small class="mr-1">Items per page</small>
         <select
           class="mt-1 custom-select-sm"
@@ -14,7 +14,7 @@
           </option>
         </select>
       </div>
-      <div class="col-md-5">
+      <div class="col-md-5 small">
         <!-- Pagination -->
         <b-pagination
           v-model="currentPageNumber"
@@ -33,7 +33,7 @@
       </div>
 
       <!-- Total Record Count -->
-      <div class="col-md-2">
+      <div class="col-md-2 small">
         <ul class="pagination">
           <li class="page-item active">
             <a class="page-link">Total {{ totalRows }}</a>
@@ -42,7 +42,7 @@
       </div>
 
       <!-- Go to page -->
-      <div class="col-md-2 form-group mt-1">
+      <div class="col-md-2 form-group mt-1 small">
         <label class="mr-1" for="go-to-page"><small>Go to page</small></label>
         <input
           type="number"

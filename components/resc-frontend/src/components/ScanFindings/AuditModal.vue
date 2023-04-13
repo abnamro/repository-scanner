@@ -69,7 +69,6 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import FindingsService from '@/services/findings-service';
-import PushNotification from '@/utils/push-notification';
 import ScanFindingsService from '@/services/scan-findings-service';
 
 export default {
@@ -154,10 +153,9 @@ export default {
       FindingsService.auditFindings(this.selectedCheckBoxIds, this.status, this.comment)
         .then(() => {
           this.$emit('update-audit', this.status, this.comment);
-          PushNotification.success('Audit saved successfully', 'Success', 5000);
         })
         .catch((error) => {
-          PushNotification.danger(error.message, 'Error', 5000);
+          AxiosConfig.handleError(error);
         });
 
       // Hide the modal manually
