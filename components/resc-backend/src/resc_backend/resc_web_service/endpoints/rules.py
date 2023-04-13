@@ -89,40 +89,22 @@ def get_rules_finding_status_count(db_connection: Session = Depends(get_db_conne
     - **db_connection**: Session of the database connection
     - **return**: List[str] The output will contain a list of strings of unique rules with counts per status
     """
-    distinct_rules = finding_crud.get_distinct_rules_from_findings(db_connection)
-
+    rule_finding_counts = finding_crud.get_rule_findings_count_by_status(db_connection)
     rule_findings_counts = []
-    for rule in distinct_rules:
-        finding_count = 0
-        rule_finding_count = RuleFindingCountModel(rule_name=rule.rule_name)
-        count_by_status = finding_crud.get_findings_count_by_status(db_connection,
-                                                                    rule_name=rule_finding_count.rule_name)
-        handled_statuses = []
-        not_analyzed_count = 0
-        for status_count in count_by_status:
-            status_count_status = status_count[1]
-            status_count_count = status_count[0]
-            if status_count_status is None or status_count_status == FindingStatus.NOT_ANALYZED:
-                not_analyzed_count += status_count_count
-            else:
-                finding_status_count = StatusCount(status=status_count_status, count=status_count_count)
-                handled_statuses.append(finding_status_count.status)
-                rule_finding_count.finding_statuses_count.append(finding_status_count)
-            finding_count += status_count_count
 
-        finding_status_count = StatusCount(status=FindingStatus.NOT_ANALYZED, count=not_analyzed_count)
-        handled_statuses.append(finding_status_count.status)
-        rule_finding_count.finding_statuses_count.append(finding_status_count)
-
-        for finding_status in FindingStatus:
-            # add default values of 0 for statuses without findings
-            if finding_status not in handled_statuses:
-                finding_status_count = StatusCount(status=finding_status, count=0)
-                rule_finding_count.finding_statuses_count.append(finding_status_count)
-
-        rule_finding_count.finding_count = finding_count
-        rule_finding_count.finding_statuses_count = sorted(rule_finding_count.finding_statuses_count,
-                                                           key=lambda status_counter: status_counter.status)
+    for rule_name, rule_counts in rule_finding_counts.items():
+        rule_finding_count = RuleFindingCountModel(rule_name=rule_name,
+                                                   finding_count=rule_counts["total_findings_count"])
+        rule_finding_count.finding_statuses_count.append(
+            StatusCount(status=FindingStatus.TRUE_POSITIVE, count=rule_counts["true_positive"]))
+        rule_finding_count.finding_statuses_count.append(
+            StatusCount(status=FindingStatus.FALSE_POSITIVE, count=rule_counts["false_positive"]))
+        rule_finding_count.finding_statuses_count.append(
+            StatusCount(status=FindingStatus.NOT_ANALYZED, count=rule_counts["not_analyzed"]))
+        rule_finding_count.finding_statuses_count.append(
+            StatusCount(status=FindingStatus.UNDER_REVIEW, count=rule_counts["under_review"]))
+        rule_finding_count.finding_statuses_count.append(
+            StatusCount(status=FindingStatus.CLARIFICATION_REQUIRED, count=rule_counts["clarification_required"]))
         rule_findings_counts.append(rule_finding_count)
 
     return rule_findings_counts

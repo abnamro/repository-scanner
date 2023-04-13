@@ -16,6 +16,7 @@ from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.schema import finding as finding_schema
 from resc_backend.resc_web_service.schema.date_filter import DateFilter
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 logger = logging.getLogger(__name__)
@@ -222,7 +223,7 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
             total_count_query = total_count_query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
         if findings_filter.finding_statuses:
             if FindingStatus.NOT_ANALYZED in findings_filter.finding_statuses:
-                total_count_query = total_count_query.\
+                total_count_query = total_count_query. \
                     filter(or_(model.DBaudit.status.in_(findings_filter.finding_statuses),
                                model.DBaudit.status == None))  # noqa: E711
             else:
@@ -393,6 +394,64 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     findings_count_by_status = query.group_by(model.DBaudit.status).all()
 
     return findings_count_by_status
+
+
+def get_rule_findings_count_by_status(db_connection: Session):
+    """
+        Retrieve count of findings based on rulename and status
+    :param db_connection:
+        Session of the database connection
+    :return: findings_count
+        per rulename and status the count of findings
+    """
+    query = db_connection.query(model.DBfinding.rule_name,
+                                model.DBaudit.status,
+                                func.count(model.DBfinding.id_))
+
+    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                 func.max(model.DBscan.id_).label("latest_base_scan_id"))
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
+
+    max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                             func.max(model.DBaudit.id_).label("audit_id")) \
+        .group_by(model.DBaudit.finding_id).subquery()
+
+    query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
+    query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
+    query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                          model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.DBscanFinding.finding_id,
+                       isouter=True)
+    query = query.join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id, isouter=True)
+    query = query.group_by(model.DBfinding.rule_name, model.DBaudit.status)
+    query = query.order_by(model.DBfinding.rule_name, model.DBaudit.status)
+    status_counts = query.all()
+
+    rule_count_dict = {}
+    for status_count in status_counts:
+        rule_count_dict[status_count[0]] = {
+            "true_positive": 0,
+            "false_positive": 0,
+            "not_analyzed": 0,
+            "under_review": 0,
+            "clarification_required": 0,
+            "total_findings_count": 0
+        }
+    for status_count in status_counts:
+        rule_count_dict[status_count[0]]["total_findings_count"] += status_count[2]
+        if status_count[1] == FindingStatus.NOT_ANALYZED or status_count[1] is None:
+            rule_count_dict[status_count[0]]["not_analyzed"] += status_count[2]
+        elif status_count[1] == FindingStatus.FALSE_POSITIVE:
+            rule_count_dict[status_count[0]]["false_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.TRUE_POSITIVE:
+            rule_count_dict[status_count[0]]["true_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.UNDER_REVIEW:
+            rule_count_dict[status_count[0]]["under_review"] += status_count[2]
+        elif status_count[1] == FindingStatus.CLARIFICATION_REQUIRED:
+            rule_count_dict[status_count[0]]["clarification_required"] += status_count[2]
+
+    return rule_count_dict
 
 
 def get_findings_count_by_time(db_connection: Session,

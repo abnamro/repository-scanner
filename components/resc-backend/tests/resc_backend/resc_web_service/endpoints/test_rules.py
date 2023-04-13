@@ -207,23 +207,27 @@ class TestRules(unittest.TestCase):
         assert data[0] == self.db_rules[0].rule_name
         assert data[1] == self.db_rules[1].rule_name
 
-    @patch("resc_backend.resc_web_service.crud.finding.get_findings_count_by_status")
-    @patch("resc_backend.resc_web_service.crud.finding.get_distinct_rules_from_findings")
-    def test_get_get_rules_finding_status_count(self, get_distinct_rules_from_findings, get_findings_count_by_status):
-        get_distinct_rules_from_findings.return_value = self.db_rules
-        get_findings_count_by_status.return_value = self.db_status_count
+    @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
+    def test_get_get_rules_finding_status_count(self, get_rule_findings_count_by_status):
+        rule_statuses = {self.db_rules[0].rule_name: {
+            "true_positive": 2,
+            "false_positive": 2,
+            "not_analyzed": 2,
+            "under_review": 2,
+            "clarification_required": 2,
+            "total_findings_count": 10
+        }}
+        get_rule_findings_count_by_status.return_value = rule_statuses
         response = self.client.get(f"{RWS_VERSION_PREFIX}"
                                    f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}")
         assert response.status_code == 200, response.text
         data = response.json()
-        assert len(data) == len(self.db_rules)
-        for i in range(len(self.db_rules)):
-            assert data[i]["rule_name"] == self.db_rules[i].rule_name
-            assert data[i]["finding_count"] == 20
-            assert len(data[i]["finding_statuses_count"]) == len(self.db_status_count)
-            for status in range(len(self.db_status_count)):
-                assert data[i]["finding_statuses_count"][status]["status"] == self.db_status_count[status][1]
-                assert data[i]["finding_statuses_count"][status]["count"] == self.db_status_count[status][0]
+        assert len(data) == 1
+        assert data[0]["rule_name"] == self.db_rules[0].rule_name
+        assert data[0]["finding_count"] == 10
+        assert len(data[0]["finding_statuses_count"]) == len(self.db_status_count)
+        for status in range(len(self.db_status_count)):
+            assert data[0]["finding_statuses_count"][status]["count"] == 2
 
     @patch("resc_backend.resc_web_service.crud.rule.create_rule")
     def test_create_rule(self, create_rule):
