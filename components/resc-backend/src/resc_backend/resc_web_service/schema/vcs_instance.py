@@ -11,7 +11,6 @@ from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
 class VCSInstanceBase(BaseModel):
-
     name: constr(max_length=200)
     provider_type: VCSProviders
     hostname: constr(max_length=200)
@@ -32,24 +31,17 @@ class VCSInstanceBase(BaseModel):
     @validator("organization", pre=True)
     @classmethod
     def check_organization(cls, value, values):
-        try:
-            if not value:
-                if values["provider_type"] == AZURE_DEVOPS:
-                    raise ValueError("The organization field needs to be specified for Azure devops vcs instances")
-            return value
-        except KeyError:
-            return value
+        if not value and values.get("provider_type", None) == AZURE_DEVOPS:
+            raise ValueError("The organization field needs to be specified for Azure devops vcs instances")
+        return value
 
     @validator("scope", pre=True)
     @classmethod
     def check_scope_and_exceptions(cls, value, values):
-        try:
-            if value and values["exceptions"]:
-                raise ValueError("You cannot specify bot the scope and exceptions to the scan, only one setting"
-                                 " is supported.")
-            return value
-        except KeyError:
-            return value
+        if value and values.get("exceptions", None):
+            raise ValueError("You cannot specify bot the scope and exceptions to the scan, only one setting"
+                             " is supported.")
+        return value
 
 
 class VCSInstanceCreate(VCSInstanceBase):
