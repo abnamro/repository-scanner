@@ -1,12 +1,11 @@
-# pylint: disable=R0916,R0912
+# pylint: disable=R0916,R0912,C0121
 # Standard Library
-import html
 import logging
 from datetime import datetime
 from typing import List
 
 # Third Party
-from sqlalchemy import and_, extract, func
+from sqlalchemy import and_, extract, func, or_
 from sqlalchemy.orm import Session
 
 # First Party
@@ -17,19 +16,10 @@ from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.schema import finding as finding_schema
 from resc_backend.resc_web_service.schema.date_filter import DateFilter
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 logger = logging.getLogger(__name__)
-
-
-def update_finding(db_connection: Session, finding_id: int, finding: finding_schema.FindingUpdate):
-    sanitized_comment = html.escape(finding.comment) if finding.comment else finding.comment
-    db_finding = db_connection.query(model.DBfinding).filter_by(id_=finding_id).first()
-    db_finding.status = finding.status
-    db_finding.comment = sanitized_comment
-    db_connection.commit()
-    db_connection.refresh(db_finding)
-    return db_finding
 
 
 def patch_finding(db_connection: Session, finding_id: int, finding_update: finding_schema.FindingPatch):
@@ -38,30 +28,6 @@ def patch_finding(db_connection: Session, finding_id: int, finding_update: findi
     finding_update_dict = finding_update.dict(exclude_unset=True)
     for key in finding_update_dict:
         setattr(db_finding, key, finding_update_dict[key])
-
-    db_connection.commit()
-    db_connection.refresh(db_finding)
-    return db_finding
-
-
-def audit_finding(db_connection: Session, db_finding: finding_schema.FindingRead,
-                  status: FindingStatus, comment: str = "") -> model.DBfinding:
-    """
-        Audit finding, updating the status and comment
-    :param db_connection:
-        Session of the database connection
-    :param db_finding:
-        database finding object to update
-    :param status:
-        audit status to set, type FindingStatus
-    :param comment:
-        audit comment to set
-    :return: FindingRead
-        The output will contain the findings that was updated
-    """
-    sanitized_comment = html.escape(comment) if comment else comment
-    db_finding.status = status
-    db_finding.comment = sanitized_comment
 
     db_connection.commit()
     db_connection.refresh(db_finding)
@@ -156,13 +122,27 @@ def get_scans_findings(db_connection, scan_ids: [int], skip: int = 0, limit: int
     query = query.join(model.DBscanFinding,
                        model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
 
+    if statuses_filter:
+        # subquery to select latest audit ids findings
+        max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                                 func.max(model.DBaudit.id_).label("audit_id")) \
+            .group_by(model.DBaudit.finding_id).subquery()
+
+        query = query \
+            .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                  isouter=True) \
+            .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+                  isouter=True)
+        if FindingStatus.NOT_ANALYZED in statuses_filter:
+            query = query.filter(or_(model.DBaudit.status.in_(statuses_filter),
+                                     model.DBaudit.status == None))  # noqa: E711
+        else:
+            query = query.filter(model.DBaudit.status.in_(statuses_filter))
+
     query = query.filter(model.DBscanFinding.scan_id.in_(scan_ids))
 
     if rules_filter:
         query = query.filter(model.DBfinding.rule_name.in_(rules_filter))
-
-    if statuses_filter:
-        query = query.filter(model.DBfinding.status.in_(statuses_filter))
 
     findings = query.order_by(model.finding.DBfinding.id_).offset(skip).limit(limit_val).all()
     return findings
@@ -180,6 +160,17 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
 
     total_count_query = db_connection.query(func.count(model.DBfinding.id_))
     if findings_filter:
+        if findings_filter.finding_statuses:
+            # subquery to select latest audit ids findings
+            max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                                     func.max(model.DBaudit.id_).label("audit_id")) \
+                .group_by(model.DBaudit.finding_id).subquery()
+
+            total_count_query = total_count_query \
+                .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                      isouter=True) \
+                .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+                      isouter=True)
         if (findings_filter.vcs_providers and findings_filter.vcs_providers is not None) \
                 or findings_filter.project_name or findings_filter.branch_name \
                 or findings_filter.repository_name or findings_filter.start_date_time \
@@ -200,7 +191,7 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                                                     func.max(model.DBscanFinding.scan_id).label("scan_id"))
             max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
             total_count_query = total_count_query.join(max_scan_subquery,
-                                                       model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id)\
+                                                       model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id) \
                 .join(model.DBscan, model.scan.DBscan.id_ == max_scan_subquery.c.scan_id)
 
         if findings_filter.rule_tags:
@@ -231,8 +222,12 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
         if findings_filter.rule_names:
             total_count_query = total_count_query.filter(model.DBfinding.rule_name.in_(findings_filter.rule_names))
         if findings_filter.finding_statuses:
-            total_count_query = total_count_query.filter(
-                model.finding.DBfinding.status.in_(findings_filter.finding_statuses))
+            if FindingStatus.NOT_ANALYZED in findings_filter.finding_statuses:
+                total_count_query = total_count_query. \
+                    filter(or_(model.DBaudit.status.in_(findings_filter.finding_statuses),
+                               model.DBaudit.status == None))  # noqa: E711
+            else:
+                total_count_query = total_count_query.filter(model.DBaudit.status.in_(findings_filter.finding_statuses))
         if findings_filter.scan_ids and len(findings_filter.scan_ids) == 1:
             total_count_query = total_count_query.join(
                 model.DBscanFinding, model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
@@ -305,14 +300,29 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
                   model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
             .join(model.DBVcsInstance,
                   model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+    if finding_statuses:
+        # subquery to select latest audit ids findings
+        max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                                 func.max(model.DBaudit.id_).label("audit_id")) \
+            .group_by(model.DBaudit.finding_id).subquery()
 
+        query = query \
+            .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                  isouter=True) \
+            .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+                  isouter=True)
     if scan_id > 0:
         query = query.join(model.DBscanFinding,
                            model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_)
         query = query.filter(model.DBscanFinding.scan_id == scan_id)
     else:
         if finding_statuses:
-            query = query.filter(model.DBfinding.status.in_(finding_statuses))
+            if FindingStatus.NOT_ANALYZED in finding_statuses:
+                query = query. \
+                    filter(or_(model.DBaudit.status.in_(finding_statuses),
+                               model.DBaudit.status == None))  # noqa: E711
+            else:
+                query = query.filter(model.DBaudit.status.in_(finding_statuses))
 
         if vcs_providers:
             query = query.filter(model.DBVcsInstance.provider_type.in_(vcs_providers))
@@ -351,7 +361,18 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     :return: findings_count
         count of findings
     """
-    query = db_connection.query(model.DBfinding.status, func.count(model.DBfinding.status).label('status_count'))
+    # subquery to select latest audit ids findings
+    max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                             func.max(model.DBaudit.id_).label("audit_id")) \
+        .group_by(model.DBaudit.finding_id).subquery()
+
+    query = db_connection.query(func.count(model.DBfinding.id_).label('status_count'), model.DBaudit.status)
+
+    query = query \
+        .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+              isouter=True) \
+        .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+              isouter=True)
 
     if scan_ids and len(scan_ids) > 0:
         query = query \
@@ -361,13 +382,76 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
                   model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
             .filter(model.DBscan.id_.in_(scan_ids))
     if finding_statuses:
-        query = query.filter(model.DBfinding.status.in_(finding_statuses))
+        if FindingStatus.NOT_ANALYZED in finding_statuses:
+            query = query. \
+                filter(or_(model.DBaudit.status.in_(finding_statuses),
+                           model.DBaudit.status == None))  # noqa: E711
+        else:
+            query = query.filter(model.DBaudit.status.in_(finding_statuses))
     if rule_name:
         query = query.filter(model.DBfinding.rule_name == rule_name)
 
-    findings_count_by_status = query.group_by(model.DBfinding.status).all()
+    findings_count_by_status = query.group_by(model.DBaudit.status).all()
 
     return findings_count_by_status
+
+
+def get_rule_findings_count_by_status(db_connection: Session):
+    """
+        Retrieve count of findings based on rulename and status
+    :param db_connection:
+        Session of the database connection
+    :return: findings_count
+        per rulename and status the count of findings
+    """
+    query = db_connection.query(model.DBfinding.rule_name,
+                                model.DBaudit.status,
+                                func.count(model.DBfinding.id_))
+
+    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                 func.max(model.DBscan.id_).label("latest_base_scan_id"))
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
+
+    max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                             func.max(model.DBaudit.id_).label("audit_id")) \
+        .group_by(model.DBaudit.finding_id).subquery()
+
+    query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
+    query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
+    query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                          model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.DBscanFinding.finding_id,
+                       isouter=True)
+    query = query.join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id, isouter=True)
+    query = query.group_by(model.DBfinding.rule_name, model.DBaudit.status)
+    query = query.order_by(model.DBfinding.rule_name, model.DBaudit.status)
+    status_counts = query.all()
+
+    rule_count_dict = {}
+    for status_count in status_counts:
+        rule_count_dict[status_count[0]] = {
+            "true_positive": 0,
+            "false_positive": 0,
+            "not_analyzed": 0,
+            "under_review": 0,
+            "clarification_required": 0,
+            "total_findings_count": 0
+        }
+    for status_count in status_counts:
+        rule_count_dict[status_count[0]]["total_findings_count"] += status_count[2]
+        if status_count[1] == FindingStatus.NOT_ANALYZED or status_count[1] is None:
+            rule_count_dict[status_count[0]]["not_analyzed"] += status_count[2]
+        elif status_count[1] == FindingStatus.FALSE_POSITIVE:
+            rule_count_dict[status_count[0]]["false_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.TRUE_POSITIVE:
+            rule_count_dict[status_count[0]]["true_positive"] += status_count[2]
+        elif status_count[1] == FindingStatus.UNDER_REVIEW:
+            rule_count_dict[status_count[0]]["under_review"] += status_count[2]
+        elif status_count[1] == FindingStatus.CLARIFICATION_REQUIRED:
+            rule_count_dict[status_count[0]]["clarification_required"] += status_count[2]
+
+    return rule_count_dict
 
 
 def get_findings_count_by_time(db_connection: Session,

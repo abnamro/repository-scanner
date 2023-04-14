@@ -114,31 +114,6 @@ def create_scan(db_connection: Session, scan: scan_schema.ScanCreate) -> model.D
     return db_scan
 
 
-def get_latest_scan_for_repository_for_master_branch(db_connection: Session, repository_id: int) -> model.DBscan:
-    """
-        Retrieve the most recent scan of a given repository object
-    :param db_connection:
-        Session of the database connection
-    :param repository_id:
-        id of the repository object for which to retrieve the most recent scan
-    :return: scan
-        scan object having the most recent timestamp for a given repository object
-    """
-    master_branch = ['master', 'main']
-    subquery = (db_connection.query(func.max(model.DBscan.timestamp).label("max_time"))
-                .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_)
-                .filter(model.branch.DBbranch.repository_id == repository_id)
-                .filter(func.lower(model.branch.DBbranch.branch_name).in_(master_branch))
-                ).subquery()
-
-    scan = db_connection.query(model.DBscan) \
-        .join(subquery,
-              and_(model.DBscan.timestamp == subquery.c.max_time)) \
-        .first()
-
-    return scan
-
-
 def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_id: int,
                                                  scan_timestamp: datetime):
     """
@@ -168,14 +143,14 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
         findings_count_by_status = finding_crud.get_findings_count_by_status(
             db_connection, scan_ids=scan_ids_latest_to_base, finding_statuses=FindingStatus)
         for finding in findings_count_by_status:
-            finding_status = finding[0]
-            count = finding[1]
+            finding_status = finding[1]
+            count = finding[0]
             if finding_status == FindingStatus.TRUE_POSITIVE:
                 true_positive_count = count
             if finding_status == FindingStatus.FALSE_POSITIVE:
                 false_positive_count = count
-            if finding_status == FindingStatus.NOT_ANALYZED:
-                not_analyzed_count = count
+            if finding_status == FindingStatus.NOT_ANALYZED or finding_status is None:
+                not_analyzed_count += count
             if finding_status == FindingStatus.UNDER_REVIEW:
                 under_review_count = count
             if finding_status == FindingStatus.CLARIFICATION_REQUIRED:

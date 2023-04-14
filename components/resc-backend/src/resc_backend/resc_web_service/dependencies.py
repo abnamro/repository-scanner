@@ -7,7 +7,7 @@ import urllib.error
 # Third Party
 import jwt
 import sqlalchemy.orm
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBasicCredentials, HTTPBearer
 from jwt import PyJWKClient
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -21,7 +21,7 @@ security = HTTPBearer()
 logger = logging.getLogger(__name__)
 
 
-async def requires_auth(credentials: HTTPBasicCredentials = Depends(security)):
+async def requires_auth(request: Request, credentials: HTTPBasicCredentials = Depends(security)):
     """
         Function that is used to validate the JWT access token
     """
@@ -50,7 +50,7 @@ async def requires_auth(credentials: HTTPBasicCredentials = Depends(security)):
             logger.error(f"Invalid login attempt for user {claims['email']}")
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="You don't have permission to access this resource.")
-
+        request.scope["user"] = claims['email']
     except urllib.error.URLError as error:
         logger.error(f"Unable to contact server for token validation {jwks_url} Message: {error}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -91,11 +91,11 @@ def user_has_resc_operator_role(claims: dict) -> bool:
     return bool("roles" in claims and claims["roles"] == RESC_OPERATOR_ROLE)
 
 
-def requires_no_auth():
+def requires_no_auth(request: Request):
     """
         Function that is used for unauthenticated access
     """
-    return None
+    request.scope["user"] = "Anonymous"
 
 
 def get_db_connection():

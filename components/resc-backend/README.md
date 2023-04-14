@@ -169,7 +169,7 @@ If you can override the images by providing below arguments to the script.
 cd tests/newman_tests
 ./run_newman_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -n <newman image:tag> 
 
-Example: ./run_integration_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
 ```
 
 

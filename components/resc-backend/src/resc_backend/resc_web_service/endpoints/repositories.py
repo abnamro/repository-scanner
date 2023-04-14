@@ -350,16 +350,16 @@ def get_findings_metadata_for_repository(repository_id: int,
         raise HTTPException(status_code=404, detail="Repository not found")
 
     findings_meta_data = repository_crud.get_findings_metadata_by_repository_id(
-        db_connection, repository_id=repository_id)
+        db_connection, repository_ids=[repository_id])
 
     return FindingCountModel[repository_schema.RepositoryRead](
         data=repository,
-        true_positive=findings_meta_data["true_positive"],
-        false_positive=findings_meta_data["false_positive"],
-        not_analyzed=findings_meta_data["not_analyzed"],
-        under_review=findings_meta_data["under_review"],
-        clarification_required=findings_meta_data["clarification_required"],
-        total_findings_count=findings_meta_data["total_findings_count"])
+        true_positive=findings_meta_data[repository_id]["true_positive"],
+        false_positive=findings_meta_data[repository_id]["false_positive"],
+        not_analyzed=findings_meta_data[repository_id]["not_analyzed"],
+        under_review=findings_meta_data[repository_id]["under_review"],
+        clarification_required=findings_meta_data[repository_id]["clarification_required"],
+        total_findings_count=findings_meta_data[repository_id]["total_findings_count"])
 
 
 @router.get(f"{RWS_ROUTE_FINDINGS_METADATA}/",
@@ -409,9 +409,10 @@ def get_all_repositories_with_findings_metadata(
                                                                 repository_filter=repositoryfilter,
                                                                 only_if_has_findings=onlyifhasfindings)
     repository_list = []
+    repo_ids = [repo.id_ for repo in repositories]
+    repo_findings_meta_data = repository_crud.get_findings_metadata_by_repository_id(
+        db_connection, repository_ids=repo_ids)
     for repo in repositories:
-        findings_meta_data = repository_crud.get_findings_metadata_by_repository_id(
-            db_connection, repository_id=repo.id_)
         enriched_repository = repository_enriched_schema.RepositoryEnrichedRead(
             id_=repo.id_,
             project_key=repo.project_key,
@@ -419,12 +420,12 @@ def get_all_repositories_with_findings_metadata(
             repository_name=repo.repository_name,
             repository_url=repo.repository_url,
             vcs_provider=repo.provider_type,
-            true_positive=findings_meta_data["true_positive"],
-            false_positive=findings_meta_data["false_positive"],
-            not_analyzed=findings_meta_data["not_analyzed"],
-            under_review=findings_meta_data["under_review"],
-            clarification_required=findings_meta_data["clarification_required"],
-            total_findings_count=findings_meta_data["total_findings_count"]
+            true_positive=repo_findings_meta_data[repo.id_]["true_positive"],
+            false_positive=repo_findings_meta_data[repo.id_]["false_positive"],
+            not_analyzed=repo_findings_meta_data[repo.id_]["not_analyzed"],
+            under_review=repo_findings_meta_data[repo.id_]["under_review"],
+            clarification_required=repo_findings_meta_data[repo.id_]["clarification_required"],
+            total_findings_count=repo_findings_meta_data[repo.id_]["total_findings_count"]
         )
         repository_list.append(enriched_repository)
 

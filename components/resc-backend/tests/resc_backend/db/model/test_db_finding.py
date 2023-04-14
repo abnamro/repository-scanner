@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from resc_backend.db.model import Base, DBbranch, DBfinding, DBrepository, DBrule, DBscan, DBscanFinding, DBVcsInstance
 from resc_backend.db.model.rule_pack import DBrulePack
 from resc_backend.resc_web_service.schema.finding import FindingCreate
-from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
 sys.path.insert(0, "src")
 
@@ -63,8 +62,6 @@ class TestFinding(unittest.TestCase):
                                  commit_timestamp=datetime.utcnow(),
                                  author="fake author",
                                  email="fake.author@fake-domain.com",
-                                 status=FindingStatus.NOT_ANALYZED,
-                                 comment="fake comment",
                                  rule_name="rule_1",
                                  event_sent_on=datetime.utcnow(),
                                  branch_id=1)
@@ -93,8 +90,6 @@ class TestFinding(unittest.TestCase):
                                 commit_timestamp=self.finding.commit_timestamp,
                                 author=self.finding.author,
                                 email=self.finding.email,
-                                status=self.finding.status,
-                                comment=self.finding.comment,
                                 rule_name=self.finding.rule_name,
                                 event_sent_on=self.finding.event_sent_on,
                                 scan_ids=[self.scan_finding.scan_id],

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5f67f934-9848-401e-afa3-4149bbe5cd08",
+		"_postman_id": "481f2991-1890-40aa-b1d8-9ee6ad788cba",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -10913,10 +10913,8 @@
 											"const responseJson = pm.response.json();",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.enum\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid enumeration member; permitted: 'NOT_ANALYZED', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED', 'FALSE_POSITIVE', 'TRUE_POSITIVE'\");",
-											"    pm.expect(responseJson[\"detail\"][1][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][1][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
 											"",
 											"});",
 											"",
@@ -10938,7 +10936,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"TEST\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": \"str\"\n  }\n\n]"
+									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": \"str\"\n  }\n\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id/findings",
@@ -11057,8 +11055,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
 											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -11357,8 +11353,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
 											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -11670,8 +11664,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
 											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -11881,8 +11873,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.eql(\"2023-01-30T23:18:24.547000\");",
 											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -12540,7 +12530,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": {{branch_id}}\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": {{branch_id}}\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12641,10 +12631,8 @@
 											"const responseJson = pm.response.json();",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.enum\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid enumeration member; permitted: 'NOT_ANALYZED', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED', 'FALSE_POSITIVE', 'TRUE_POSITIVE'\");",
-											"    pm.expect(responseJson[\"detail\"][1][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][1][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",
@@ -12665,7 +12653,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"test status\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": \"str\"\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": \"str\"\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12776,8 +12764,6 @@
 											"    pm.expect(responseJson[\"data\"][1][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
 											"    pm.expect(responseJson[\"data\"][1][\"author\"]).to.eql(\"test-author\");",
 											"    pm.expect(responseJson[\"data\"][1][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][1][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][1][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][1][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][1][\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
 											"    pm.expect(responseJson[\"data\"][1][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -12903,7 +12889,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&rule_pack_versions=[\"1.0.0\"]",
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&rule_pack_versions",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -13079,8 +13065,6 @@
 											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
 											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -13347,8 +13331,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -14414,440 +14396,23 @@
 							]
 						},
 						{
-							"name": "Update a finding",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"        pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"file_path\"]).to.eql(\"dummy_file.txt\");",
-											"    pm.expect(responseJson[\"line_number\"]).to.eql(10);",
-											"    pm.expect(responseJson[\"column_start\"]).to.eql(1);",
-											"    pm.expect(responseJson[\"column_end\"]).to.eql(8);",
-											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
-											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"comment\"]).to.eql(\"\");",
-											"    pm.expect(responseJson[\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
-											"    pm.expect(responseJson[\"id_\"]).to.eql(pm.environment.get(\"finding_id\"));",
-											"    pm.expect(responseJson[\"scan_ids\"]).to.be.an(\"array\");",
-											"    pm.expect(responseJson[\"scan_ids\"].length).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"status\": \"NOT_ANALYZED\",\n  \"comment\": \"\"\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"findings",
-										":finding_id"
-									],
-									"variable": [
-										{
-											"key": "finding_id",
-											"value": "{{finding_id}}"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Update a finding with non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});",
-											"",
-											"pm.test(\"Status is Not Found\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" Not Found\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Finding not found\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"status\": \"NOT_ANALYZED\",\n  \"comment\": \"\"\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"findings",
-										":finding_id"
-									],
-									"variable": [
-										{
-											"key": "finding_id",
-											"value": "999"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Update a finding with invalid body",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.enum\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid enumeration member; permitted: 'NOT_ANALYZED', 'UNDER_REVIEW', 'CLARIFICATION_REQUIRED', 'FALSE_POSITIVE', 'TRUE_POSITIVE'\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"status\": \"test status\",\n  \"comment\": \"\"\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"findings",
-										":finding_id"
-									],
-									"variable": [
-										{
-											"key": "finding_id",
-											"value": "1"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
 							"name": "Audit single/multiple findings",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
 											"});",
 											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"pm.test(\"Status is Created\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" Created\")",
 											"}",
 											"",
-											"const responseJson = pm.response.json();",
 											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"array\");",
-											"    pm.expect(responseJson[0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
-											"    pm.expect(responseJson[0][\"line_number\"]).to.eql(10);",
-											"    pm.expect(responseJson[0][\"column_start\"]).to.eql(1);",
-											"    pm.expect(responseJson[0][\"column_end\"]).to.eql(8);",
-											"    pm.expect(responseJson[0][\"commit_id\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[0][\"commit_message\"]).to.eql(\"test commit message\");",
-											"    pm.expect(responseJson[0][\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[0][\"comment\"]).to.eql(\"Audited\");",
-											"    pm.expect(responseJson[0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[0][\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
-											"    pm.expect(responseJson[0][\"id_\"]).to.eql(pm.environment.get(\"finding_id\"));",
-											"    pm.expect(responseJson[0][\"scan_ids\"]).to.be.an(\"array\");",
-											"    pm.expect(responseJson[0][\"scan_ids\"].length).to.eql(0);",
+											"    pm.response.to.have.body(\"1\");",
+											"    pm.expect(pm.response.text()).to.include(\"1\");",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",
@@ -14859,7 +14424,7 @@
 								}
 							],
 							"request": {
-								"method": "PUT",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -14983,7 +14548,7 @@
 								}
 							],
 							"request": {
-								"method": "PUT",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -15110,7 +14675,7 @@
 								}
 							],
 							"request": {
-								"method": "PUT",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -15398,8 +14963,6 @@
 											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
-											"    pm.expect(responseJson[\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(responseJson[\"comment\"]).to.eql(\"Audited\");",
 											"    pm.expect(responseJson[\"event_sent_on\"]).to.include(\"2023-01-31T13\");",
 											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
 											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -15904,6 +15467,1767 @@
 									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
 								}
 							]
+						},
+						{
+							"name": "Get audit(s) for finding",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    let today = new Date().toISOString().slice(0, 10)",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"auditor\"]).to.eql(\"Anonymous\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"Audited\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.include(today);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id/audit?skip=0&limit=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"findings",
+										":finding_id",
+										"audit"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										}
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "{{finding_id}}"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get audit(s) for finding by non existent ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.eql([]);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id/audit?skip=0&limit=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"findings",
+										":finding_id",
+										"audit"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										}
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "999"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get audit(s) for finding by invalid ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});",
+											"",
+											"pm.test(\"Status is Unprocessable Entity\"), function (){",
+											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/findings/:finding_id/audit?skip=0&limit=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"findings",
+										":finding_id",
+										"audit"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										}
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "invalid"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with rule filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=rule_names=[\"Rule-1\"]",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "rule_names=[\"Rule-1\"]"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with status filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=finding_statuses=[\"NOT_ANALYZED\"]",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "finding_statuses=[\"NOT_ANALYZED\"]"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with rule pack filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=rule_pack_versions=[\"1.0.0\"]",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "rule_pack_versions=[\"1.0.0\"]"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with vcs provider filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=vcs_providers=[\"AZURE_DEVOPS\"]",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "vcs_providers=[\"AZURE_DEVOPS\"]"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with project name filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=project_name=test-project",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "project_name=test-project"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with repository name filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=repository_name=test-repository",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "repository_name=test-repository"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with scan  start date filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=start_date_time=2020-04-13T00:00:00",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "start_date_time=2020-04-13T00:00:00"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with scan  start date and end date filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "start_date_time=2020-04-13T00:00:00&end_date_time=2023-01-31T23:59:59"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get all detailed findings with all filters",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"][0][\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"data\"][0][\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"data\"][0][\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"data\"][0][\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"data\"][0][\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"data\"][0][\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"data\"][0][\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59%26rule_pack_versions=[\"1.0.0\"]",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings"
+									],
+									"query": [
+										{
+											"key": "skip",
+											"value": "0"
+										},
+										{
+											"key": "limit",
+											"value": "100"
+										},
+										{
+											"key": "query_string",
+											"value": "rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59%26rule_pack_versions=[\"1.0.0\"]"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detailed finding by its ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"file_path\"]).to.eql(\"dummy_file.txt\");",
+											"    pm.expect(responseJson[\"line_number\"]).to.eql(10);",
+											"    pm.expect(responseJson[\"column_start\"]).to.eql(1);",
+											"    pm.expect(responseJson[\"column_end\"]).to.eql(8);",
+											"    pm.expect(responseJson[\"commit_id\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"commit_message\"]).to.eql(\"test commit message\");",
+											"    pm.expect(responseJson[\"commit_timestamp\"]).to.include(\"2023-01-30T23\");",
+											"    pm.expect(responseJson[\"author\"]).to.eql(\"test-author\");",
+											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
+											"    pm.expect(responseJson[\"status\"]).to.eql(\"NOT_ANALYZED\");",
+											"    pm.expect(responseJson[\"comment\"]).to.eql(\"\");",
+											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"Rule-1\");",
+											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
+											"    pm.expect(responseJson[\"project_key\"]).to.eql(\"test-project\");",
+											"    pm.expect(responseJson[\"repository_name\"]).to.eql(\"test-repository\");",
+											"    pm.expect(responseJson[\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
+											"    pm.expect(responseJson[\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
+											"    pm.expect(responseJson[\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
+											"    pm.expect(responseJson[\"event_sent_on\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
+											"    pm.expect(responseJson[\"commit_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository/commit/testcommit12345?refName=refs/heads/test-branch1&path=/dummy_file.txt\");",
+											"    pm.expect(responseJson[\"id_\"]).to.be.greaterThan(0);",
+											"    pm.expect(responseJson[\"id_\"]).to.eql(1);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings/:finding_id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings",
+										":finding_id"
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detailed finding by non existent ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Status is Not Found\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" Not Found\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Finding not found\");",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings/:finding_id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings",
+										":finding_id"
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "999"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detailed finding by invalid ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});",
+											"",
+											"pm.test(\"Status is Unprocessable Entity\"), function (){",
+											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings/:finding_id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"detailed-findings",
+										":finding_id"
+									],
+									"variable": [
+										{
+											"key": "finding_id",
+											"value": "invalid"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
 						}
 					]
 				},
@@ -16093,35 +17417,63 @@
 											"const responseJson = pm.response.json();",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"array\");",
-											"    pm.expect(responseJson.length).to.eql(2);",
 											"",
-											"    const rule1 = responseJson[0];",
-											"    pm.expect(rule1[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(rule1[\"finding_count\"]).to.eql(1);",
-											"    pm.expect(rule1[\"finding_statuses_count\"][0][\"status\"]).to.eql(\"CLARIFICATION_REQUIRED\");",
-											"    pm.expect(rule1[\"finding_statuses_count\"][0][\"count\"]).to.eql(0);",
-											"    pm.expect(rule1[\"finding_statuses_count\"][1][\"status\"]).to.eql(\"FALSE_POSITIVE\");",
-											"    pm.expect(rule1[\"finding_statuses_count\"][1][\"count\"]).to.eql(0);",
-											"    pm.expect(rule1[\"finding_statuses_count\"][2][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(rule1[\"finding_statuses_count\"][2][\"count\"]).to.eql(1);",
-											"    pm.expect(rule1[\"finding_statuses_count\"][3][\"status\"]).to.eql(\"TRUE_POSITIVE\");",
-											"    pm.expect(rule1[\"finding_statuses_count\"][3][\"count\"]).to.eql(0);",
-											"    pm.expect(rule1[\"finding_statuses_count\"][4][\"status\"]).to.eql(\"UNDER_REVIEW\");",
-											"    pm.expect(rule1[\"finding_statuses_count\"][4][\"count\"]).to.eql(0);",
+											"    responseJson.forEach((obj) => {",
+											"    \tif (obj.rule_name === \"Rule-1\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"Rule-1\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
 											"",
-											"    const rule2 = responseJson[1];",
-											"    pm.expect(rule2[\"rule_name\"]).to.eql(\"Rule-1\");",
-											"    pm.expect(rule2[\"finding_count\"]).to.eql(1);",
-											"    pm.expect(rule2[\"finding_statuses_count\"][0][\"status\"]).to.eql(\"CLARIFICATION_REQUIRED\");",
-											"    pm.expect(rule2[\"finding_statuses_count\"][0][\"count\"]).to.eql(0);",
-											"    pm.expect(rule2[\"finding_statuses_count\"][1][\"status\"]).to.eql(\"FALSE_POSITIVE\");",
-											"    pm.expect(rule2[\"finding_statuses_count\"][1][\"count\"]).to.eql(0);",
-											"    pm.expect(rule2[\"finding_statuses_count\"][2][\"status\"]).to.eql(\"NOT_ANALYZED\");",
-											"    pm.expect(rule2[\"finding_statuses_count\"][2][\"count\"]).to.eql(1);",
-											"    pm.expect(rule2[\"finding_statuses_count\"][3][\"status\"]).to.eql(\"TRUE_POSITIVE\");",
-											"    pm.expect(rule2[\"finding_statuses_count\"][3][\"count\"]).to.eql(0);",
-											"    pm.expect(rule2[\"finding_statuses_count\"][4][\"status\"]).to.eql(\"UNDER_REVIEW\");",
-											"    pm.expect(rule2[\"finding_statuses_count\"][4][\"count\"]).to.eql(0);",
+											"        if (obj.rule_name === \"GitHub Personal Access Token\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"GitHub Personal Access Token\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
+											"",
+											"    });",
 											"",
 											"});",
 											"",
@@ -16633,10 +17985,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "detailed-findings",
-					"item": []
 				}
 			]
 		}

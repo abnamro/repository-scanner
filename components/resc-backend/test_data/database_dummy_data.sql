@@ -31,14 +31,14 @@ INSERT INTO scan (branch_id, [timestamp], scan_type, last_scanned_commit, increm
     (3, '2022-02-24 17:00:00.000', 'BASE', 'qwerty1', 0, '0.0.0'),
     (3, '2022-03-24 17:00:00.000', 'BASE', 'qwerty1', 0, '0.0.0');
 
-INSERT INTO finding (branch_id, file_path, line_number, commit_id, commit_message, commit_timestamp, author, email, rule_name, status, comment, column_start, column_end) VALUES
-    (1, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 'NOT_ANALYZED', NULL, 1, 100),
-    (1, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 'NOT_ANALYZED', NULL, 0, 0),
-    (2, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 'NOT_ANALYZED', NULL, 1, 50),
-    (2, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 'NOT_ANALYZED', NULL, 42, 43),
-    (3, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 'NOT_ANALYZED', NULL, 12, 34),
-    (3, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 'NOT_ANALYZED', NULL, 21, 34),
-    (3, '/path/to/file', 123, 'qwerty2', 'this is commit 2', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 'NOT_ANALYZED', NULL, 12, 34);
+INSERT INTO finding (branch_id, file_path, line_number, commit_id, commit_message, commit_timestamp, author, email, rule_name, column_start, column_end) VALUES
+    (1, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 1, 100),
+    (1, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 0, 0),
+    (2, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 1, 50),
+    (2, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 42, 43),
+    (3, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 12, 34),
+    (3, '/path/to/file', 123, 'qwerty1', 'this is commit 1', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#2', 21, 34),
+    (3, '/path/to/file', 123, 'qwerty2', 'this is commit 2', '2021-01-01 00:00:00.000', 'developer', 'developer@abn.com', 'rule#1', 12, 34);
 
 INSERT INTO scan_finding(scan_id, finding_id) VALUES
     (1, 1),
@@ -49,3 +49,7 @@ INSERT INTO scan_finding(scan_id, finding_id) VALUES
     (3, 6),
     (4, 6),
     (4, 7);
+
+INSERT INTO audit(finding_id, status, auditor, comment, [timestamp]) VALUES
+    (1, 'NOT_ANALYZED', 'Anonymous', NULL, '2023-01-01 00:00:00.000'),
+    (1, 'TRUE_POSITIVE', 'Anonymous', 'It is a true positive issue', '2023-01-02 00:00:00.000')

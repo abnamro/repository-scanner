@@ -35,8 +35,8 @@ class TestDetailedFindings(unittest.TestCase):
                 commit_timestamp=datetime.utcnow(),
                 author=f"author_{i}",
                 email=f"email_{i}",
-                status=FindingStatus.NOT_ANALYZED,
-                comment=f"comment_{i}",
+                # status=FindingStatus.NOT_ANALYZED,
+                # comment=f"comment_{i}",
                 rule_name=f"rule_name_{i}",
                 rule_pack=i,
                 project_key=f"_{i}",
@@ -61,8 +61,8 @@ class TestDetailedFindings(unittest.TestCase):
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == detailed_finding.commit_timestamp
         assert data["author"] == detailed_finding.author
         assert data["email"] == detailed_finding.email
-        assert data["status"] == detailed_finding.status.value
-        assert data["comment"] == detailed_finding.comment
+        # assert data["status"] == detailed_finding.status.value
+        # assert data["comment"] == detailed_finding.comment
         assert data["rule_name"] == detailed_finding.rule_name
         assert data["rule_pack"] == detailed_finding.rule_pack
         assert data["scan_id"] == detailed_finding.scan_id

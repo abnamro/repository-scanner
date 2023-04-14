@@ -23,7 +23,7 @@ class DetailedFindingBase(BaseModel):
     commit_timestamp: datetime.datetime
     author: constr(max_length=200)
     email: constr(max_length=100)
-    status: FindingStatus = FindingStatus.NOT_ANALYZED
+    status: Optional[FindingStatus] = FindingStatus.NOT_ANALYZED
     comment: Optional[constr(max_length=255)] = None
     rule_name: constr(max_length=200)
     rule_pack: constr(max_length=100)
@@ -83,6 +83,10 @@ class DetailedFindingRead(DetailedFinding):
 
     @root_validator
     def build_commit_url(cls, values) -> Dict:
+        if values["status"] is None:
+            values["status"] = FindingStatus.NOT_ANALYZED
+        if values["comment"] is None:
+            values["comment"] = ""
         if values["vcs_provider"] == VCSProviders.BITBUCKET:
             values["commit_url"] = cls.build_bitbucket_commit_url(repository_url=values["repository_url"],
                                                                   repository_name=values["repository_name"],

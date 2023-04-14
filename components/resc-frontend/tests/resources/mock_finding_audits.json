@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "id_": 5,
+      "status": "FALSE_POSITIVE",
+      "auditor": "Anonymous",
+      "comment": "Its is a false positive",
+      "timestamp": "2023-04-10T09:06:28.512Z"
+    },
+    {
+      "id_": 4,
+      "status": "TRUE_POSITIVE",
+      "auditor": "Anonymous",
+      "comment": "Its is a true positive",
+      "timestamp": "2023-04-09T09:02:12.512Z"
+    },
+    {
+      "id_": 3,
+      "status": "CLARIFICATION_REQUIRED",
+      "auditor": "Anonymous",
+      "comment": "Need some clarification",
+      "timestamp": "2023-04-08T12:05:07.512Z"
+    },
+    {
+      "id_": 2,
+      "status": "UNDER_REVIEW",
+      "auditor": "Anonymous",
+      "comment": "review started",
+      "timestamp": "2023-04-08T10:01:28.512Z"
+    },
+    {
+      "id_": 1,
+      "status": "NOT_ANALYZED",
+      "auditor": "Anonymous",
+      "comment": "",
+      "timestamp": "2023-04-08T09:05:18.512Z"
+    }
+  ],
+  "total": 5,
+  "limit": 100,
+  "skip": 0
+}

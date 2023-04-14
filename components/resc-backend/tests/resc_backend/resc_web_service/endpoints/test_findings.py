@@ -18,20 +18,13 @@ from resc_backend.constants import (
     RWS_ROUTE_TOTAL_COUNT_BY_RULE,
     RWS_VERSION_PREFIX
 )
-from resc_backend.db.model import DBfinding, DBscanFinding
+from resc_backend.db.model import DBaudit, DBfinding, DBscanFinding
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.schema.audit import AuditMultiple
 from resc_backend.resc_web_service.schema.date_filter import DateFilter
-from resc_backend.resc_web_service.schema.finding import (
-    Finding,
-    FindingBase,
-    FindingCreate,
-    FindingPatch,
-    FindingRead,
-    FindingUpdate
-)
+from resc_backend.resc_web_service.schema.finding import Finding, FindingBase, FindingCreate, FindingPatch, FindingRead
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 
 
@@ -51,8 +44,6 @@ class TestFindings(unittest.TestCase):
                                 commit_timestamp=datetime.utcnow(),
                                 author=f"author_{i}",
                                 email=f"email_{i}",
-                                status=FindingStatus.NOT_ANALYZED,
-                                comment=f"comment_{i}",
                                 rule_name=f"rule_{i}",
                                 event_sent_on=datetime.utcnow(),
                                 branch_id=1)
@@ -62,6 +53,18 @@ class TestFindings(unittest.TestCase):
                 scan_id=i,
                 finding_id=i
             ))
+
+        self.db_audits = []
+        for i in range(1, 6):
+            audit = DBaudit(
+                finding_id=i,
+                auditor=f"auditor {i}",
+                status=FindingStatus.TRUE_POSITIVE,
+                comment=f"comment {i}",
+                timestamp=datetime.utcnow()
+            )
+            self.db_audits.append(audit)
+            self.db_audits[i - 1].id_ = i
 
         self.enriched_findings = []
         for i in range(1, 6):
@@ -77,8 +80,6 @@ class TestFindings(unittest.TestCase):
                                                       commit_timestamp=datetime.utcnow(),
                                                       author=f"author_{i}",
                                                       email=f"email_{i}",
-                                                      status=FindingStatus.NOT_ANALYZED,
-                                                      comment=f"comment_{i}",
                                                       rule_name=f"rule_{i}",
                                                       event_sent_on=datetime.utcnow()))
 
@@ -93,8 +94,6 @@ class TestFindings(unittest.TestCase):
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == finding.commit_timestamp
         assert data["author"] == finding.author
         assert data["email"] == finding.email
-        assert data["status"] == finding.status.value
-        assert data["comment"] == finding.comment
         assert data["rule_name"] == finding.rule_name
         assert data["scan_ids"] == [x.scan_id for x in scan_findings]
         assert data["branch_id"] == finding.branch_id
@@ -113,8 +112,6 @@ class TestFindings(unittest.TestCase):
         assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == finding.commit_timestamp
         assert data["author"] == finding.author
         assert data["email"] == finding.email
-        assert data["status"] == finding.status.value
-        assert data["comment"] == finding.comment
         assert data["rule_name"] == finding.rule_name
         assert data["scan_ids"] == finding.scan_ids
         assert data["branch_id"] == finding.branch_id
@@ -134,8 +131,6 @@ class TestFindings(unittest.TestCase):
                              commit_timestamp=finding.commit_timestamp,
                              author=finding.author,
                              email=finding.email,
-                             status=finding.status,
-                             comment=finding.comment,
                              rule_name=finding.rule_name,
                              event_sent_on=finding.event_sent_on)
 
@@ -151,14 +146,8 @@ class TestFindings(unittest.TestCase):
                            commit_timestamp=finding.commit_timestamp,
                            author=finding.author,
                            email=finding.email,
-                           status=finding.status,
-                           comment=finding.comment,
                            rule_name=finding.rule_name,
                            event_sent_on=finding.event_sent_on)
-
-    @staticmethod
-    def cast_db_finding_to_finding_update(finding: DBfinding):
-        return FindingUpdate(status=finding.status, comment=finding.comment)
 
     @staticmethod
     def cast_db_finding_to_finding_patch(finding: DBfinding):
@@ -249,28 +238,6 @@ class TestFindings(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
-    @patch("resc_backend.resc_web_service.crud.finding.update_finding")
-    def test_put_findings(self, update_finding, get_scan_findings, get_finding):
-        finding_id = 1
-        db_finding = self.db_findings[0]
-        db_scan_findings = [self.db_scan_findings[0]]
-        get_scan_findings.return_value = db_scan_findings
-        update_finding.return_value = db_finding
-        get_finding.return_value = db_finding
-        get_finding.return_value.id_ = finding_id
-
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}",
-                                   json=self.create_json_body(db_finding, db_scan_findings))
-
-        assert response.status_code == 200, response.text
-        self.assert_db_finding(response.json(), db_finding, db_scan_findings)
-        update_finding.assert_called_once_with(
-            db_connection=ANY, finding_id=db_finding.id_,
-            finding=self.cast_db_finding_to_finding_update(db_finding))
-        get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
     @patch("resc_backend.resc_web_service.crud.finding.patch_finding")
     def test_patch_findings(self, patch_finding, get_scan_findings, get_finding):
         finding_id = 1
@@ -291,37 +258,6 @@ class TestFindings(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.patch_finding")
-    def test_patch_comment_property_findings(self, patch_finding, get_finding):
-        finding_id = 1
-        db_finding = self.db_findings[1]
-        get_finding.return_value = db_finding
-        get_finding.return_value.id_ = finding_id
-        db_scan_findings = [self.db_scan_findings[0]]
-        expected_results = self.db_findings[1]
-        expected_results.comment = "Test_comments"
-        patch_finding.return_value = db_finding
-        response = self.client.patch(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}",
-                                     json=self.create_json_body(expected_results, db_scan_findings))
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["comment"] == expected_results.comment
-        assert data["file_path"] == expected_results.file_path
-        assert data["line_number"] == expected_results.line_number
-        assert data["column_start"] == expected_results.column_start
-        assert data["column_end"] == expected_results.column_end
-        assert data["commit_id"] == expected_results.commit_id
-        assert data["commit_message"] == expected_results.commit_message
-        assert datetime.strptime(data["commit_timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == \
-               expected_results.commit_timestamp
-        assert data["author"] == expected_results.author
-        assert data["email"] == expected_results.email
-        assert data["status"] == expected_results.status
-        assert data["rule_name"] == expected_results.rule_name
-        assert datetime.strptime(data["event_sent_on"], "%Y-%m-%dT%H:%M:%S.%f") == \
-               expected_results.event_sent_on
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.patch_finding")
     def test_patch_event_sent_property_findings(self, patch_finding, get_finding):
         finding_id = 1
         db_finding = self.db_findings[1]
@@ -336,7 +272,6 @@ class TestFindings(unittest.TestCase):
         assert response.status_code == 200, response.text
         data = response.json()
         assert data["event_sent_on"] == expected_results.event_sent_on
-        assert data["comment"] == expected_results.comment
         assert data["file_path"] == expected_results.file_path
         assert data["line_number"] == expected_results.line_number
         assert data["column_start"] == expected_results.column_start
@@ -347,80 +282,7 @@ class TestFindings(unittest.TestCase):
                expected_results.commit_timestamp
         assert data["author"] == expected_results.author
         assert data["email"] == expected_results.email
-        assert data["status"] == expected_results.status
         assert data["rule_name"] == expected_results.rule_name
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
-    @patch("resc_backend.resc_web_service.crud.finding.update_finding")
-    def test_put_findings_set_status(self, update_finding, get_scan_findings, get_finding):
-        finding_id = 1
-        db_finding = self.db_findings[0]
-        db_scan_findings = [self.db_scan_findings[0]]
-        get_scan_findings.return_value = db_scan_findings
-        db_finding.status = FindingStatus.FALSE_POSITIVE
-        update_finding.return_value = db_finding
-        get_finding.return_value = db_finding
-        get_finding.return_value.id_ = finding_id
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}",
-                                   json=self.create_json_body(db_finding, db_scan_findings))
-        assert response.status_code == 200, response.text
-        self.assert_db_finding(response.json(), db_finding, db_scan_findings)
-        update_finding.assert_called_once_with(
-            db_connection=ANY, finding_id=db_finding.id_,
-            finding=self.cast_db_finding_to_finding_update(db_finding))
-        get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
-    @patch("resc_backend.resc_web_service.crud.finding.update_finding")
-    def test_put_findings_set_comment(self, update_finding, get_scan_findings, get_finding):
-        finding_id = 1
-        db_finding = self.db_findings[0]
-        db_scan_findings = [self.db_scan_findings[0]]
-        get_scan_findings.return_value = db_scan_findings
-        db_finding.comment = "my 2-cents comment"
-        db_finding.event_sent_on = datetime.utcnow()
-
-        update_finding.return_value = db_finding
-        get_finding.return_value = db_finding
-        get_finding.return_value.id_ = finding_id
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}",
-                                   json=self.create_json_body(db_finding, db_scan_findings))
-        assert response.status_code == 200, response.text
-        self.assert_db_finding(response.json(), db_finding, db_scan_findings)
-        update_finding.assert_called_once_with(
-            db_connection=ANY, finding_id=db_finding.id_,
-            finding=self.cast_db_finding_to_finding_update(db_finding))
-        get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.update_finding")
-    def test_put_findings_empty_body(self, update_finding, get_finding):
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/9999999999",
-                                   json={}, )
-        assert response.status_code == 422, response.text
-        data = response.json()
-        assert data["detail"][0]["loc"] == ['body', 'status']
-        assert data["detail"][0]["msg"] == "field required"
-        assert data["detail"][1]["loc"] == ['body', 'comment']
-        assert data["detail"][1]["msg"] == "field required"
-        get_finding.assert_not_called()
-        update_finding.assert_not_called()
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.update_finding")
-    def test_put_findings_non_existing(self, update_finding, get_finding):
-        db_finding = self.db_findings[0]
-        db_scan_finding = []
-        get_finding.return_value = None
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{db_finding.id_}",
-                                   json=self.create_json_body(db_finding, db_scan_finding))
-        assert response.status_code == 404, response.text
-        data = response.json()
-        assert data["detail"] == "Finding not found"
-        get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
-        update_finding.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
     @patch("resc_backend.resc_web_service.crud.finding.get_findings")
@@ -558,29 +420,31 @@ class TestFindings(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
-    @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
+    @patch("resc_backend.resc_web_service.crud.audit.create_audit")
     def test_audit_findings(self, audit_findings, get_scan_findings, get_finding):
         audit_multiple = AuditMultiple(finding_ids=[1, 2], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
         get_scan_findings.return_value = [self.db_scan_findings[1]]
         get_finding.return_value = self.db_findings[1]
-        audit_findings.return_value = self.db_findings[2]
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
-                                   json=self.create_json_body_multiple_audit(audit_multiple))
-        assert response.status_code == 200, response.text
+        audit_findings.return_value = 1
+        response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
+                                    json=self.create_json_body_multiple_audit(audit_multiple))
+        assert response.status_code == 201, response.text
         get_finding.assert_has_calls([call(ANY, finding_id=1), call(ANY, finding_id=2)], any_order=False)
-        audit_findings.assert_has_calls([call(db_connection=ANY, db_finding=get_finding.return_value,
+        audit_findings.assert_has_calls([call(db_connection=ANY, finding_id=get_finding.return_value.id_,
+                                              auditor='Anonymous',
                                               status=audit_multiple.status, comment=audit_multiple.comment),
-                                         call(db_connection=ANY, db_finding=get_finding.return_value,
+                                         call(db_connection=ANY, finding_id=get_finding.return_value.id_,
+                                              auditor='Anonymous',
                                               status=audit_multiple.status, comment=audit_multiple.comment)],
                                         any_order=False)
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
-    @patch("resc_backend.resc_web_service.crud.finding.audit_finding")
+    @patch("resc_backend.resc_web_service.crud.audit.create_audit")
     def test_audit_findings_non_existing(self, audit_findings, get_finding):
         audit_multiple = AuditMultiple(finding_ids=[1, 2], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
         get_finding.return_value = None
-        response = self.client.put(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
-                                   json=self.create_json_body_multiple_audit(audit_multiple))
+        response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
+                                    json=self.create_json_body_multiple_audit(audit_multiple))
         assert response.status_code == 404, response.text
         get_finding.assert_called_once_with(ANY, finding_id=1)
         audit_findings.assert_not_called()
@@ -650,3 +514,22 @@ class TestFindings(unittest.TestCase):
         assert data["total"] == 2
         assert data["limit"] == 100
         assert data["skip"] == 0
+
+    @patch("resc_backend.resc_web_service.crud.audit.get_finding_audits_count")
+    @patch("resc_backend.resc_web_service.crud.audit.get_finding_audits")
+    def test_get_finding_audits(self, get_finding_audits, get_finding_audits_count):
+        get_finding_audits.return_value = self.db_audits[:1]
+        get_finding_audits_count.return_value = len(self.db_audits[:1])
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/1{RWS_ROUTE_AUDIT}",
+                                   params={"skip": 0, "limit": 5})
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data["data"]) == 1
+        assert data["data"][0]["id_"] == self.db_audits[0].id_
+        assert data["data"][0]["comment"] == self.db_audits[0].comment
+        assert data["data"][0]["auditor"] == self.db_audits[0].auditor
+        assert datetime.strptime(data["data"][0]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f") == self.db_audits[0].timestamp
+        assert data["total"] == 1
+        assert data["limit"] == 5
+        assert data["skip"] == 0
+        get_finding_audits.assert_called_once_with(ANY, skip=0, limit=5, finding_id=1)

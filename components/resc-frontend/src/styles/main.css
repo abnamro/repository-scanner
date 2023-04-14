@@ -101,6 +101,9 @@
 #rule-analysis-table .tabs, #scan-findings-table .tabs {
   cursor: default !important;
 }
+#audit-history-table tr {
+  cursor: auto !important;
+}
 
 .b-table-details {
   border-left: 2px solid #b3daeb !important;
@@ -120,9 +123,23 @@
 }
 
 /* Tabs */
+.tab-content {
+  height: 250px;
+  overflow: hidden;
+}
+.card-body {
+  flex: 1 1 auto;
+  min-height: 1px;
+  padding-left: 0.5rem;
+  padding-right: 0.75rem;
+  padding-top: 0.5rem;
+}
 .card-header {
-  background-color: #e4f9f5;
-  display: none;
+  font-size: small;
+  height: 38px;
+}
+.card-header-pills {
+  margin-top: -0.3rem;
 }
 .nav-pills .tab-pills .nav-link:not(.active) {
   background-color: transparent !important;
@@ -136,6 +153,10 @@
 .card-text {
   margin: 10px;
   font-size: small;
+}
+.nav-pills .nav-link {
+  padding: 0.2rem 0.7rem !important;
+  font-size: smaller !important;
 }
 
 /* Pagination */

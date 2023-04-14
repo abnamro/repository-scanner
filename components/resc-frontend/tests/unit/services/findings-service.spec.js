@@ -4,6 +4,7 @@ import findings from '@/../tests/resources/mock_findings.json';
 import detailed_findings from '@/../tests/resources/mock_detailed_findings.json';
 import detailed_findings_with_rule_pack_version from '@/../tests/resources/mock_detailed_findings_with_rule_pack_version.json';
 import finding_count_per_week from '@/../tests/resources/mock_findings_count_per_week.json';
+import audits from '@/../tests/resources/mock_finding_audits.json';
 
 jest.mock('axios');
 
@@ -26,10 +27,7 @@ describe('function auditFindings', () => {
     axios.put.mockResolvedValueOnce(findings.data.slice(-2));
 
     const response = await FindingsService.auditFindings([1, 2], 'FALSE_POSITIVE', 'test');
-
-    expect(response).toBeDefined();
-    expect(response).not.toBeNull();
-    expect(response).toEqual(findings.data.slice(-2));
+    expect(response).not.toBeDefined();
   });
 });
 
@@ -128,6 +126,40 @@ describe('function getDetailedFindings', () => {
         axios.get.mockResolvedValueOnce([]);
 
         await FindingsService.getFindingCountPerWeek('not_valid')
+          .then((response) => {
+            expect(response).toEqual([]);
+            expect(response).not.toBeNull();
+          })
+          .catch((error) => {
+            expect(error).toBeDefined();
+            expect(error).not.toBeNull();
+          });
+      });
+    });
+  });
+
+  describe('function getFindingAudits', () => {
+    describe('when getFindingAudits API call is successful', () => {
+      it('should return finding count per week', async () => {
+        axios.get.mockResolvedValueOnce(audits);
+
+        const response = await FindingsService.getFindingAudits(1, 100, 0);
+
+        expect(response).toEqual(audits);
+        expect(response).toBeDefined();
+        expect(response).not.toBeNull();
+        expect(response.data.length).toBe(5);
+        expect(response.total).toBe(5);
+        expect(response.limit).toBe(100);
+        expect(response.skip).toBe(0);
+      });
+    });
+
+    describe('when getFindingAudits API call fails', () => {
+      it('getFindingAudits should return error', async () => {
+        axios.get.mockResolvedValueOnce([]);
+
+        await FindingsService.getFindingAudits('not_valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
