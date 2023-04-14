@@ -78,7 +78,7 @@ def downgrade():
     # Populate the status and comment from audit table to finding table
     op.execute(f"UPDATE {FINDING} "
                "SET status = status_comments.status, comment = status_comments.comment "
-               f"FROM (select a.id, a.status, a.comment, a.finding_id from audit1 a ) "
+               f"FROM (select a.id, a.status, a.comment, a.finding_id from audit a ) "
                f"as status_comments WHERE finding.id = status_comments.finding_id")
 
     drop_if_exist(inspector, AUDIT)

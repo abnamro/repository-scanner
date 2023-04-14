@@ -13,7 +13,7 @@
       <div class="pr-1" v-if="hasRecords">
         <b-table
           id="audit-history-table"
-          sticky-header="25vh"
+          sticky-header="230px"
           :items="auditList"
           :fields="fields"
           :current-page="currentPage"
@@ -164,9 +164,7 @@ export default {
         });
     },
   },
-  created() {
-    // this.fetchAuditsForFinding();
-  },
+  created() {},
   components: {
     Spinner,
   },
