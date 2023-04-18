@@ -47,8 +47,14 @@ const RuleService = {
     return axios.get(`/detected-rules?${queryParams}`);
   },
 
-  async getRulesWithFindingStatusCount() {
-    return axios.get(`/rules/finding-status-count`);
+  async getRulesWithFindingStatusCount(rulePackVersions) {
+    let queryParams = '';
+    if (rulePackVersions) {
+      rulePackVersions.forEach((version) => {
+        queryParams += `&rule_pack_version=${version}`;
+      });
+    }
+    return axios.get(`/rules/finding-status-count?${queryParams}`);
   },
 
   async getRulePacks(perPage, skipRowCount) {

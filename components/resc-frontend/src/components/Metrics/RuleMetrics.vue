@@ -8,6 +8,16 @@
     <!-- Spinner -->
     <Spinner :active="spinnerActive" />
 
+    <div class="mt-4">
+      <div class="col-md-4">
+        <RulePackFilter
+          :selectedRulePackVersionsList="selectedRulePackVersionsList"
+          :rulePackVersions="allRulePackVersions"
+          @on-rule-pack-version-change="onRulePackVersionChange"
+        />
+      </div>
+    </div>
+
     <!--Rule Metrics Table -->
     <div v-if="!hasRecords" class="text-center cursor-default">
       <br />
@@ -119,6 +129,8 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import HealthBar from '@/components/Common/HealthBar.vue';
+import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
+import RulePackService from '@/services/rule-pack-service';
 import RuleService from '@/services/rule-service';
 import Spinner from '@/components/Common/Spinner.vue';
 import spinnerMixin from '@/mixins/spinner.js';
@@ -127,6 +139,18 @@ import Store from '@/store/index.js';
 export default {
   name: 'RuleMetrics',
   mixins: [spinnerMixin],
+  props: {
+    selectedRulePackVersionsList: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    rulePackVersions: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+  },
   data() {
     return {
       ruleList: [],
@@ -138,6 +162,8 @@ export default {
       totalFindingsCountForAllRules: 0,
       truePositiveRateList: [],
       avgTruePosiitveRate: 0,
+      allRulePackVersions: [],
+      selectedRulePackVersions: [],
       ruleTotalRowClass: ['text-left', 'font-weight-bold'],
       fields: [
         {
@@ -212,9 +238,33 @@ export default {
     },
   },
   methods: {
+    fetchRulePackVersions() {
+      RulePackService.getRulePackVersions(10000, 0)
+        .then((response) => {
+          this.allRulePackVersions = [];
+          this.selectedRulePackVersions = [];
+          for (const index of response.data.data.keys()) {
+            const rulePackJson = {};
+            rulePackJson['id'] = index;
+            const data = response.data.data[index];
+            if (data.active) {
+              rulePackJson['label'] = data.version + ' ' + '(active)';
+              this.selectedRulePackVersions.push(data.version);
+              this.selectedRulePackVersionsList.push(rulePackJson);
+            } else {
+              rulePackJson['label'] = data.version;
+            }
+            this.allRulePackVersions.push(rulePackJson);
+          }
+          this.fetchRulesWithFindingStatusCount();
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
     fetchRulesWithFindingStatusCount() {
       this.showSpinner();
-      RuleService.getRulesWithFindingStatusCount()
+      RuleService.getRulesWithFindingStatusCount(this.selectedRulePackVersions)
         .then((response) => {
           this.ruleList = response.data;
           this.getTotalCountRowValuesForRuleMetricsTable();
@@ -288,12 +338,17 @@ export default {
       });
       this.$router.push({ name: 'RuleAnalysis' });
     },
+    onRulePackVersionChange(rulePackVersions) {
+      this.selectedRulePackVersions = rulePackVersions;
+      this.fetchRulesWithFindingStatusCount();
+    },
   },
   created() {
-    this.fetchRulesWithFindingStatusCount();
+    this.fetchRulePackVersions();
   },
   components: {
     HealthBar,
+    RulePackFilter,
     Spinner,
   },
 };
