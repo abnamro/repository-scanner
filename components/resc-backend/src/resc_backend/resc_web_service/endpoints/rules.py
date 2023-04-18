@@ -82,30 +82,35 @@ def get_distinct_rules_from_findings(
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-def get_rules_finding_status_count(db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
+def get_rules_finding_status_count(
+        rule_pack_versions: Optional[List[str]] = Query(None, alias="rule_pack_version", title="RulePackVersion"),
+        db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """
         Retrieve all detected rules with finding counts per supported status
 
+    - **rule_pack_version**: Optional, filter on rule pack version
     - **db_connection**: Session of the database connection
     - **return**: List[str] The output will contain a list of strings of unique rules with counts per status
     """
-    rule_finding_counts = finding_crud.get_rule_findings_count_by_status(db_connection)
+    rule_finding_counts = finding_crud.get_rule_findings_count_by_status(db_connection,
+                                                                         rule_pack_versions=rule_pack_versions)
     rule_findings_counts = []
 
-    for rule_name, rule_counts in rule_finding_counts.items():
-        rule_finding_count = RuleFindingCountModel(rule_name=rule_name,
-                                                   finding_count=rule_counts["total_findings_count"])
-        rule_finding_count.finding_statuses_count.append(
-            StatusCount(status=FindingStatus.TRUE_POSITIVE, count=rule_counts["true_positive"]))
-        rule_finding_count.finding_statuses_count.append(
-            StatusCount(status=FindingStatus.FALSE_POSITIVE, count=rule_counts["false_positive"]))
-        rule_finding_count.finding_statuses_count.append(
-            StatusCount(status=FindingStatus.NOT_ANALYZED, count=rule_counts["not_analyzed"]))
-        rule_finding_count.finding_statuses_count.append(
-            StatusCount(status=FindingStatus.UNDER_REVIEW, count=rule_counts["under_review"]))
-        rule_finding_count.finding_statuses_count.append(
-            StatusCount(status=FindingStatus.CLARIFICATION_REQUIRED, count=rule_counts["clarification_required"]))
-        rule_findings_counts.append(rule_finding_count)
+    if rule_finding_counts:
+        for rule_name, rule_counts in rule_finding_counts.items():
+            rule_finding_count = RuleFindingCountModel(rule_name=rule_name,
+                                                       finding_count=rule_counts["total_findings_count"])
+            rule_finding_count.finding_statuses_count.append(
+                StatusCount(status=FindingStatus.TRUE_POSITIVE, count=rule_counts["true_positive"]))
+            rule_finding_count.finding_statuses_count.append(
+                StatusCount(status=FindingStatus.FALSE_POSITIVE, count=rule_counts["false_positive"]))
+            rule_finding_count.finding_statuses_count.append(
+                StatusCount(status=FindingStatus.NOT_ANALYZED, count=rule_counts["not_analyzed"]))
+            rule_finding_count.finding_statuses_count.append(
+                StatusCount(status=FindingStatus.UNDER_REVIEW, count=rule_counts["under_review"]))
+            rule_finding_count.finding_statuses_count.append(
+                StatusCount(status=FindingStatus.CLARIFICATION_REQUIRED, count=rule_counts["clarification_required"]))
+            rule_findings_counts.append(rule_finding_count)
 
     return rule_findings_counts
 

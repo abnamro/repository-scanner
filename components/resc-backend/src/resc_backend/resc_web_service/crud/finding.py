@@ -396,11 +396,13 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     return findings_count_by_status
 
 
-def get_rule_findings_count_by_status(db_connection: Session):
+def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions: [str] = None):
     """
         Retrieve count of findings based on rulename and status
     :param db_connection:
         Session of the database connection
+    :param rule_pack_versions:
+        optional, filter on rule pack version
     :return: findings_count
         per rulename and status the count of findings
     """
@@ -411,6 +413,8 @@ def get_rule_findings_count_by_status(db_connection: Session):
     max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
                                                  func.max(model.DBscan.id_).label("latest_base_scan_id"))
     max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    if rule_pack_versions:
+        max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
     max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
     max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
@@ -421,6 +425,9 @@ def get_rule_findings_count_by_status(db_connection: Session):
     query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
     query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
                                           model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    if rule_pack_versions:
+        query = query.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
+
     query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.DBscanFinding.finding_id,
                        isouter=True)
     query = query.join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id, isouter=True)

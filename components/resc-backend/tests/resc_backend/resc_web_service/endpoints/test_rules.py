@@ -208,7 +208,7 @@ class TestRules(unittest.TestCase):
         assert data[1] == self.db_rules[1].rule_name
 
     @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
-    def test_get_get_rules_finding_status_count(self, get_rule_findings_count_by_status):
+    def test_get_rules_finding_status_count(self, get_rule_findings_count_by_status):
         rule_statuses = {self.db_rules[0].rule_name: {
             "true_positive": 2,
             "false_positive": 2,
@@ -228,6 +228,68 @@ class TestRules(unittest.TestCase):
         assert len(data[0]["finding_statuses_count"]) == len(self.db_status_count)
         for status in range(len(self.db_status_count)):
             assert data[0]["finding_statuses_count"][status]["count"] == 2
+
+    @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
+    def test_get_rules_finding_status_count_with_valid_rule_pack_filter(self, get_rule_findings_count_by_status):
+        rule_pack_version = "1.0.1"
+        rule_statuses = {self.db_rules[0].rule_name: {
+            "true_positive": 2,
+            "false_positive": 2,
+            "not_analyzed": 2,
+            "under_review": 2,
+            "clarification_required": 2,
+            "total_findings_count": 10
+        }}
+        get_rule_findings_count_by_status.return_value = rule_statuses
+        response = self.client.get(f"{RWS_VERSION_PREFIX}"
+                                   f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}"
+                                   f"?rule_pack_version={rule_pack_version}")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["rule_name"] == self.db_rules[0].rule_name
+        assert data[0]["finding_count"] == 10
+        assert len(data[0]["finding_statuses_count"]) == len(self.db_status_count)
+        for status in range(len(self.db_status_count)):
+            assert data[0]["finding_statuses_count"][status]["count"] == 2
+
+    @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
+    def test_get_rules_finding_status_count_with_multiple_rule_pack_filter(self, get_rule_findings_count_by_status):
+        version1 = "1.0.1"
+        version2 = "1.0.2"
+        rule_statuses = {self.db_rules[0].rule_name: {
+            "true_positive": 2,
+            "false_positive": 2,
+            "not_analyzed": 2,
+            "under_review": 2,
+            "clarification_required": 2,
+            "total_findings_count": 10
+        }}
+        get_rule_findings_count_by_status.return_value = rule_statuses
+        response = self.client.get(f"{RWS_VERSION_PREFIX}"
+                                   f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}"
+                                   f"?rule_pack_version={version1}&rule_pack_version={version2}")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["rule_name"] == self.db_rules[0].rule_name
+        assert data[0]["finding_count"] == 10
+        assert len(data[0]["finding_statuses_count"]) == len(self.db_status_count)
+        for status in range(len(self.db_status_count)):
+            assert data[0]["finding_statuses_count"][status]["count"] == 2
+
+    @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
+    def test_get_rules_finding_status_count_with_invalid_rule_pack_filter(self, get_rule_findings_count_by_status):
+        rule_pack_version = "invalid"
+        rule_statuses = []
+        get_rule_findings_count_by_status.return_value = rule_statuses
+        response = self.client.get(f"{RWS_VERSION_PREFIX}"
+                                   f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}"
+                                   f"?rule_pack_version={rule_pack_version}")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data) == 0
+        assert data == []
 
     @patch("resc_backend.resc_web_service.crud.rule.create_rule")
     def test_create_rule(self, create_rule):
