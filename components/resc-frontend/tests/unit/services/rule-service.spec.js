@@ -6,11 +6,12 @@ import rules_with_findings_status_count from '@/../tests/resources/mock_rules_wi
 jest.mock('axios');
 
 describe('function getRulesWithFindingStatusCount', () => {
-  describe('when getRulesWithFindingStatusCount API call is successful', () => {
+  describe('when getRulesWithFindingStatusCount API call is successful with valid rule pack versions filter', () => {
     it('should return all distinct rules with their finding status count', async () => {
+      let rulePackVersions = ['1.0.0', '1.0.1'];
       axios.get.mockResolvedValueOnce(rules_with_findings_status_count);
 
-      const response = await RuleService.getRulesWithFindingStatusCount();
+      const response = await RuleService.getRulesWithFindingStatusCount(rulePackVersions);
 
       expect(response).toEqual(rules_with_findings_status_count);
       expect(response).toBeDefined();
@@ -31,11 +32,12 @@ describe('function getRulesWithFindingStatusCount', () => {
     });
   });
 
-  describe('when getRulesWithFindingStatusCount API call fails', () => {
+  describe('when getRulesWithFindingStatusCount API call fails with invalid rule pack versions filter', () => {
     it('getRulesWithFindingStatusCount should return error', async () => {
+      let rulePackVersions = ['not_valid'];
       axios.get.mockResolvedValueOnce([]);
 
-      await RuleService.getRulesWithFindingStatusCount('not_valid')
+      await RuleService.getRulesWithFindingStatusCount(rulePackVersions)
         .then((response) => {
           expect(response).toEqual([]);
           expect(response).not.toBeNull();
