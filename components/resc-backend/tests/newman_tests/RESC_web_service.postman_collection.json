@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "481f2991-1890-40aa-b1d8-9ee6ad788cba",
+		"_postman_id": "dae3a703-7ca2-4ab9-ac37-d872f5944e46",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -17498,6 +17498,377 @@
 										"v1",
 										"rules",
 										"finding-status-count"
+									]
+								},
+								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/detected-rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"detected-rules"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detected rules with counts per status with single rule pack in filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"",
+											"    responseJson.forEach((obj) => {",
+											"    \tif (obj.rule_name === \"Rule-1\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"Rule-1\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
+											"",
+											"        if (obj.rule_name === \"GitHub Personal Access Token\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"GitHub Personal Access Token\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
+											"",
+											"    });",
+											"",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rules/finding-status-count?rule_pack_version=1.0.0",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rules",
+										"finding-status-count"
+									],
+									"query": [
+										{
+											"key": "rule_pack_version",
+											"value": "1.0.0"
+										}
+									]
+								},
+								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/detected-rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"detected-rules"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detected rules with counts per status with multiple rule packs in filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"",
+											"    responseJson.forEach((obj) => {",
+											"    \tif (obj.rule_name === \"Rule-1\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"Rule-1\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
+											"",
+											"        if (obj.rule_name === \"GitHub Personal Access Token\"){",
+											"            pm.expect(obj.rule_name).to.eql(\"GitHub Personal Access Token\");",
+											"            pm.expect(obj.finding_count).to.eql(1);",
+											"            obj.finding_statuses_count.forEach((statusObj) => {",
+											"                if(statusObj.status === \"TRUE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"TRUE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"FALSE_POSITIVE\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"FALSE_POSITIVE\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"NOT_ANALYZED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"NOT_ANALYZED\");",
+											"                    pm.expect(statusObj.count).to.eql(1);",
+											"                }",
+											"                if(statusObj.status === \"UNDER_REVIEW\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"UNDER_REVIEW\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"                if(statusObj.status === \"CLARIFICATION_REQUIRED\"){",
+											"                    pm.expect(statusObj.status).to.eql(\"CLARIFICATION_REQUIRED\");",
+											"                    pm.expect(statusObj.count).to.eql(0);",
+											"                }",
+											"            });",
+											"        }",
+											"",
+											"    });",
+											"",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rules/finding-status-count?rule_pack_version=1.0.0&rule_pack_version=1.0.1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rules",
+										"finding-status-count"
+									],
+									"query": [
+										{
+											"key": "rule_pack_version",
+											"value": "1.0.0"
+										},
+										{
+											"key": "rule_pack_version",
+											"value": "1.0.1"
+										}
+									]
+								},
+								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/detected-rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"detected-rules"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get detected rules with counts per status with invalid rule pack in filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(0);",
+											"",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rules/finding-status-count?rule_pack_version=invalid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rules",
+										"finding-status-count"
+									],
+									"query": [
+										{
+											"key": "rule_pack_version",
+											"value": "invalid"
+										}
 									]
 								},
 								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"

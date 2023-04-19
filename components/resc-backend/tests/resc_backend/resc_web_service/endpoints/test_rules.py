@@ -281,7 +281,7 @@ class TestRules(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.finding.get_rule_findings_count_by_status")
     def test_get_rules_finding_status_count_with_invalid_rule_pack_filter(self, get_rule_findings_count_by_status):
         rule_pack_version = "invalid"
-        rule_statuses = []
+        rule_statuses = {}
         get_rule_findings_count_by_status.return_value = rule_statuses
         response = self.client.get(f"{RWS_VERSION_PREFIX}"
                                    f"{RWS_ROUTE_RULES}{RWS_ROUTE_FINDING_STATUS_COUNT}"
