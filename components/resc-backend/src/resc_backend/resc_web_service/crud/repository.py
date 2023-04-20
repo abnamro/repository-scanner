@@ -290,7 +290,8 @@ def get_findings_metadata_by_repository_id(db_connection: Session, repository_id
     query = query.join(model.DBscanFinding, model.DBscan.id_ == model.DBscanFinding.scan_id)
     query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.DBscanFinding.finding_id,
                        isouter=True)
-    query = query.join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id, isouter=True)
+    query = query.join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.DBscanFinding.finding_id,
+                                           model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id), isouter=True)
     query = query.filter(model.DBrepository.id_.in_(repository_ids))
     query = query.group_by(model.DBrepository.id_, model.DBaudit.status, )
     status_counts = query.all()
