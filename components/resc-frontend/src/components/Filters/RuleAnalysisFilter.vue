@@ -80,6 +80,7 @@
               :selectedRulePackVersionsList="selectedRulePackVersionsList"
               :rulePackVersions="rulePackVersions"
               @on-rule-pack-version-change="onRulePackVersionChange"
+              @on-latest-rule-pack-version-selection="onLatestRulePackVersionSelection"
             />
           </div>
         </div>
@@ -199,6 +200,18 @@ export default {
       this.handleFilterChange();
     },
 
+    onLatestRulePackVersionSelection(rulePackVersions) {
+      const rulePackVersionValues = [];
+      for (const rulePackVersion of rulePackVersions) {
+        const version = rulePackVersion.label.split(' ');
+        rulePackVersionValues.push(version.length > 0 ? version[0] : rulePackVersion.label);
+      }
+      this.selectedRulePackVersions = rulePackVersionValues;
+
+      // Fetch detected rules for latest rule pack selection
+      this.fetchAllDetectedRules();
+    },
+
     handleFilterChange() {
       // Refresh table data in Rule Analysis page
       const filterObj = {};
@@ -266,7 +279,6 @@ export default {
     },
   },
   created() {
-    this.fetchAllDetectedRules();
     this.applyRuleFilterInRuleAnalysisPage();
   },
   components: {

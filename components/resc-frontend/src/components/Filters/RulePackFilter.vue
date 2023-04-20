@@ -71,6 +71,7 @@ export default {
     ) {
       this.initialized = true;
       this.selectedVersions = this.selectedRulePackVersionsList;
+      this.$emit('on-rule-pack-version-init', this.selectedVersions);
     }
   },
 };
