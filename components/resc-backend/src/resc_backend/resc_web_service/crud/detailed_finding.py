@@ -86,7 +86,8 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
         .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
               isouter=True) \
-        .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+        .join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                  model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
               isouter=True)
 
     if findings_filter.rule_tags:
@@ -169,7 +170,8 @@ def get_detailed_findings_count(db_connection: Session, findings_filter: Finding
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
         .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
               isouter=True) \
-        .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+        .join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                  model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
               isouter=True)
 
     if findings_filter.rule_tags:
@@ -265,7 +267,8 @@ def get_detailed_finding(db_connection: Session, finding_id: int) -> detailed_fi
               model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
         .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
               isouter=True) \
-        .join(model.DBaudit, model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id,
+        .join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                  model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
               isouter=True) \
         .filter(model.finding.DBfinding.id_ == finding_id)
     finding = query.first()
