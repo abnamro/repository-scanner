@@ -12,6 +12,7 @@ from resc_backend.db import model
 from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.schema import detailed_finding as detailed_finding_schema
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
+from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 
 def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilter, skip: int = 0,
@@ -32,17 +33,13 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         The output will contain a list of DetailedFindingRead objects,
         or an empty list if no finding was found for the given findings_filter
     """
-    max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
-                                            func.max(model.DBscanFinding.scan_id).label("scan_id"))
-
+    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                 func.max(model.DBscan.id_).label("latest_base_scan_id"))
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
     if findings_filter.rule_pack_versions:
-        max_scan_subquery = max_scan_subquery.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
-
-    if findings_filter.scan_ids:
-        max_scan_subquery = max_scan_subquery.filter(model.DBscanFinding.scan_id.in_(findings_filter.scan_ids))
-
-    max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
+        max_base_scan_subquery = max_base_scan_subquery.filter(
+            model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
     # subquery to select latest audit ids of findings
     max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
@@ -50,7 +47,7 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         .group_by(model.DBaudit.finding_id).subquery()
 
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
-    scan_id = model.DBscan.id_.label("scan_id")
+
     query = db_connection.query(
         model.DBfinding.id_,
         model.DBfinding.file_path,
@@ -68,34 +65,41 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
         model.DBscan.rule_pack,
         model.DBfinding.event_sent_on,
         model.DBscan.timestamp,
-        scan_id,
+        model.DBscan.id_.label("scan_id"),
         model.DBbranch.branch_name,
         model.DBscan.last_scanned_commit,
         model.DBVcsInstance.provider_type.label("vcs_provider"),
         model.DBrepository.project_key,
         model.DBrepository.repository_name,
         model.DBrepository.repository_url,
-    ).join(max_scan_subquery, model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id) \
-        .join(model.DBscan,
-              model.scan.DBscan.id_ == max_scan_subquery.c.scan_id) \
-        .join(model.DBbranch,
-              model.branch.DBbranch.id_ == model.finding.DBfinding.branch_id) \
+    )
+    query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
+    if findings_filter.scan_ids:
+        query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                              model.DBscan.id_.in_(findings_filter.scan_ids)))
+    else:
+        query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
+        query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                              model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    query = query.join(model.DBbranch,
+                       model.branch.DBbranch.id_ == model.finding.DBfinding.branch_id) \
         .join(model.DBrepository,
               model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
         .join(model.DBVcsInstance,
-              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
-        .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
-              isouter=True) \
-        .join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
-                                  model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
-              isouter=True)
+              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+    query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                       isouter=True)
+    query = query.join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                           model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
+                       isouter=True)
 
     if findings_filter.rule_tags:
         query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
                                               model.DBrule.rule_pack == model.DBscan.rule_pack))
         for tag in findings_filter.rule_tags:
             query = query.filter(model.DBrule.tags.like(f"%{tag}%"))
-
+    if findings_filter.rule_pack_versions:
+        query = query.filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
     if findings_filter.start_date_time:
         query = query.filter(model.scan.DBscan.timestamp >= findings_filter.start_date_time)
     if findings_filter.end_date_time:
@@ -141,38 +145,41 @@ def get_detailed_findings_count(db_connection: Session, findings_filter: Finding
     :return: total_count
         count of findings
     """
-    max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
-                                            func.max(model.DBscanFinding.scan_id).label("scan_id"))
-
     # subquery to select latest audit ids of findings
     max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
                                              func.max(model.DBaudit.id_).label("audit_id")) \
         .group_by(model.DBaudit.finding_id).subquery()
 
+    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+                                                 func.max(model.DBscan.id_).label("latest_base_scan_id"))
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
     if findings_filter.rule_pack_versions:
-        max_scan_subquery = max_scan_subquery.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id) \
-            .filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
+        max_base_scan_subquery = max_base_scan_subquery.filter(
+            model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
+    query = db_connection.query(func.count(model.DBfinding.id_))
+
+    query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
     if findings_filter.scan_ids:
-        max_scan_subquery = max_scan_subquery.filter(model.DBscanFinding.scan_id.in_(findings_filter.scan_ids))
+        query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                              model.DBscan.id_.in_(findings_filter.scan_ids)))
+    else:
+        query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
+        query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
+                                              model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
 
-    max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
-
-    query = db_connection.query(func.count(model.DBfinding.id_)) \
-        .join(max_scan_subquery, model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id) \
-        .join(model.DBscan,
-              model.scan.DBscan.id_ == max_scan_subquery.c.scan_id) \
-        .join(model.DBbranch,
-              model.branch.DBbranch.id_ == model.finding.DBfinding.branch_id) \
+    query = query.join(model.DBbranch,
+                       model.branch.DBbranch.id_ == model.finding.DBfinding.branch_id) \
         .join(model.DBrepository,
               model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
         .join(model.DBVcsInstance,
-              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
-        .join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
-              isouter=True) \
-        .join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
-                                  model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
-              isouter=True)
+              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+    query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                       isouter=True)
+    query = query.join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                           model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
+                       isouter=True)
 
     if findings_filter.rule_tags:
         query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
@@ -180,6 +187,8 @@ def get_detailed_findings_count(db_connection: Session, findings_filter: Finding
         for tag in findings_filter.rule_tags:
             query = query.filter(model.DBrule.tags.like(f"%{tag}%"))
 
+    if findings_filter.rule_pack_versions:
+        query = query.filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
     if findings_filter.start_date_time:
         query = query.filter(model.scan.DBscan.timestamp >= findings_filter.start_date_time)
     if findings_filter.end_date_time:
