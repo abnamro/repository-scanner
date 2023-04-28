@@ -247,6 +247,7 @@ export default {
       const selectedRules = [];
       if (Store.getters.previousRouteState) {
         selectedRules.push(Store.getters.previousRouteState.ruleName);
+        this.selectedRulePackVersions = Store.getters.previousRouteState.rulePackVersions;
       }
       const sourceRoute = Store.getters.sourceRoute;
       const destinationRoute = Store.getters.destinationRoute;

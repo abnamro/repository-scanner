@@ -268,6 +268,13 @@ export default {
     },
   },
   methods: {
+    isRedirectedFromRuleMetricsPage() {
+      const sourceRoute = Store.getters.sourceRoute;
+      const destinationRoute = Store.getters.destinationRoute;
+      return sourceRoute === '/metrics/rule-metrics' && destinationRoute === '/rule-analysis'
+        ? true
+        : false;
+    },
     selectSingleCheckbox() {
       this.allSelected = false;
     },
@@ -400,8 +407,8 @@ export default {
             }
             this.rulePackVersions.push(rulePackJson);
           }
-          //load findings when no filter values are provided from previous route
-          if (!Store.getters.previousRouteState) {
+          // only call when not redirected from rule metrics page
+          if (!this.isRedirectedFromRuleMetricsPage()) {
             this.fetchPaginatedDetailedFindings();
           }
         })
@@ -422,8 +429,11 @@ export default {
 
   created() {
     this.fetchRulePackVersions();
-    this.fetchDistinctProjects();
-    this.fetchDistinctRepositories();
+    // only call when not redirected from rule metrics page
+    if (!this.isRedirectedFromRuleMetricsPage()) {
+      this.fetchDistinctProjects();
+      this.fetchDistinctRepositories();
+    }
   },
   components: {
     AuditModal,

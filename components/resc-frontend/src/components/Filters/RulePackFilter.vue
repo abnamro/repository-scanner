@@ -25,6 +25,7 @@
 </template>
 <script>
 import Multiselect from 'vue-multiselect';
+import Store from '@/store/index.js';
 
 export default {
   name: 'RulePackFilter',
@@ -47,6 +48,13 @@ export default {
     };
   },
   methods: {
+    isRedirectedFromRuleMetricsPage() {
+      const sourceRoute = Store.getters.sourceRoute;
+      const destinationRoute = Store.getters.destinationRoute;
+      return sourceRoute === '/metrics/rule-metrics' && destinationRoute === '/rule-analysis'
+        ? true
+        : false;
+    },
     onRulePackVersionFilterChange() {
       if (this.selectedVersions.length > 0) {
         const rulePackVersionValues = [];
@@ -70,7 +78,13 @@ export default {
       this.selectedVersions.length < 1
     ) {
       this.initialized = true;
-      this.selectedVersions = this.selectedRulePackVersionsList;
+      if (this.isRedirectedFromRuleMetricsPage()) {
+        // Get selected rule pack version from rule metrics screen
+        this.selectedVersions = this.selectedRulePackVersionsList; // To be fixed
+      } else {
+        // Select the latest version of rule pack by default
+        this.selectedVersions = this.selectedRulePackVersionsList;
+      }
       this.$emit('on-latest-rule-pack-version-selection', this.selectedVersions);
     }
   },

@@ -335,6 +335,7 @@ export default {
     goToRuleAnalysisPage(record) {
       Store.commit('update_previous_route_state', {
         ruleName: record.rule_name,
+        rulePackVersions: this.selectedRulePackVersions,
       });
       this.$router.push({ name: 'RuleAnalysis' });
     },
