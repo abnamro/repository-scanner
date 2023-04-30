@@ -243,11 +243,13 @@ export default {
     fetchRulePackVersions() {
       RulePackService.getRulePackVersions(10000, 0)
         .then((response) => {
+          this.selectedVersions = [];
           this.allRulePackVersions = [];
           this.selectedRulePackVersions = [];
           for (const index of response.data.data.keys()) {
             const data = response.data.data[index];
             if (data.active) {
+              this.selectedVersions.push(data.version);
               this.selectedRulePackVersions.push(data.version);
               this.selectedVersionsList.push(data);
             }
