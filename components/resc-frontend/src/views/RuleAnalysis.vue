@@ -271,7 +271,9 @@ export default {
     isRedirectedFromRuleMetricsPage() {
       const sourceRoute = Store.getters.sourceRoute;
       const destinationRoute = Store.getters.destinationRoute;
-      return sourceRoute === '/metrics/rule-metrics' && destinationRoute === '/rule-analysis'
+      return sourceRoute === '/metrics/rule-metrics' &&
+        destinationRoute === '/rule-analysis' &&
+        Store.getters.previousRouteState
         ? true
         : false;
     },
@@ -389,28 +391,42 @@ export default {
           AxiosConfig.handleError(error);
         });
     },
-    fetchRulePackVersions() {
+    fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage() {
       RulePackService.getRulePackVersions(10000, 0)
         .then((response) => {
           this.rulePackVersions = [];
           this.selectedRulePackVersions = [];
           for (const index of response.data.data.keys()) {
-            const rulePackJson = {};
-            rulePackJson['id'] = index;
+            const data = response.data.data[index];
+            if (Store.getters.previousRouteState) {
+              for (const obj of Store.getters.previousRouteState.rulePackVersions) {
+                this.selectedRulePackVersions.push(obj.version);
+                this.selectedRulePackVersionsList.push(obj);
+              }
+              Store.commit('update_previous_route_state', null);
+            }
+            this.rulePackVersions.push(data);
+          }
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
+    fetchRulePackVersions() {
+      RulePackService.getRulePackVersions(10000, 0)
+        .then((response) => {
+          this.rulePackVersions = [];
+          this.selectedRulePackVersions = [];
+          this.selectedRulePackVersionsList = [];
+          for (const index of response.data.data.keys()) {
             const data = response.data.data[index];
             if (data.active) {
-              rulePackJson['label'] = data.version + ' ' + '(active)';
               this.selectedRulePackVersions.push(data.version);
-              this.selectedRulePackVersionsList.push(rulePackJson);
-            } else {
-              rulePackJson['label'] = data.version;
+              this.selectedRulePackVersionsList.push(data);
             }
-            this.rulePackVersions.push(rulePackJson);
+            this.rulePackVersions.push(data);
           }
-          // only call when not redirected from rule metrics page
-          if (!this.isRedirectedFromRuleMetricsPage()) {
-            this.fetchPaginatedDetailedFindings();
-          }
+          this.fetchPaginatedDetailedFindings();
         })
         .catch((error) => {
           AxiosConfig.handleError(error);
@@ -428,9 +444,11 @@ export default {
   },
 
   created() {
-    this.fetchRulePackVersions();
-    // only call when not redirected from rule metrics page
-    if (!this.isRedirectedFromRuleMetricsPage()) {
+    if (this.isRedirectedFromRuleMetricsPage()) {
+      this.fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage();
+    } else {
+      Store.commit('update_previous_route_state', null);
+      this.fetchRulePackVersions();
       this.fetchDistinctProjects();
       this.fetchDistinctRepositories();
     }
