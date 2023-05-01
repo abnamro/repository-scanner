@@ -4,8 +4,9 @@
       <multiselect
         v-model="selectedVersions"
         :options="rulePackVersions"
+        :custom-label="customLabelForVersions"
         :multiple="true"
-        :show-labels="true"
+        :show-labels="false"
         :close-on-select="true"
         :clear-on-select="false"
         :searchable="true"
@@ -13,11 +14,17 @@
         :select-label="'Select'"
         :deselect-label="'Remove'"
         placeholder="Select RulePack"
-        label="label"
-        track-by="id"
+        label="version"
+        track-by="version"
         :preselect-first="false"
         @input="onRulePackVersionFilterChange"
       >
+        <template slot="option" slot-scope="props">
+          <div>
+            <span>{{ props.option.version }}</span
+            ><span v-if="props.option.active"> (active)</span>
+          </div>
+        </template>
         <span slot="noResult">No RulePack found</span>
       </multiselect>
     </b-form-group>
@@ -25,6 +32,7 @@
 </template>
 <script>
 import Multiselect from 'vue-multiselect';
+import Store from '@/store/index.js';
 
 export default {
   name: 'RulePackFilter',
@@ -47,14 +55,21 @@ export default {
     };
   },
   methods: {
+    customLabelForVersions({ version, active }) {
+      return active ? `${version} (active)` : version;
+    },
+    isRedirectedFromRuleMetricsPage() {
+      const sourceRoute = Store.getters.sourceRoute;
+      const destinationRoute = Store.getters.destinationRoute;
+      return sourceRoute === '/metrics/rule-metrics' &&
+        destinationRoute === '/rule-analysis' &&
+        Store.getters.previousRouteState
+        ? true
+        : false;
+    },
     onRulePackVersionFilterChange() {
       if (this.selectedVersions.length > 0) {
-        const rulePackVersionValues = [];
-        for (const rulePackVersion of this.selectedVersions) {
-          const version = rulePackVersion.label.split(' ');
-          rulePackVersionValues.push(version.length > 0 ? version[0] : rulePackVersion.label);
-        }
-        this.$emit('on-rule-pack-version-change', rulePackVersionValues);
+        this.$emit('on-rule-pack-version-change', this.selectedVersions);
       } else {
         this.$emit('on-rule-pack-version-change', null);
       }
@@ -70,8 +85,16 @@ export default {
       this.selectedVersions.length < 1
     ) {
       this.initialized = true;
-      this.selectedVersions = this.selectedRulePackVersionsList;
-      this.$emit('on-latest-rule-pack-version-selection', this.selectedVersions);
+      if (this.isRedirectedFromRuleMetricsPage()) {
+        // Get selected rule pack versions from Rule metrics screen and set it on Rule analyis page
+        for (const obj of this.selectedRulePackVersionsList) {
+          this.selectedVersions.push(obj);
+        }
+      } else {
+        // Select the latest version of rule pack version on Rule analysis page filter
+        this.selectedVersions = this.selectedRulePackVersionsList;
+      }
+      this.$emit('set-rule-pack-versions-on-rule-pack-filter', this.selectedVersions);
     }
   },
 };

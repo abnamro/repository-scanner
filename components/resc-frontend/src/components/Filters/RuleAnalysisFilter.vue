@@ -80,7 +80,7 @@
               :selectedRulePackVersionsList="selectedRulePackVersionsList"
               :rulePackVersions="rulePackVersions"
               @on-rule-pack-version-change="onRulePackVersionChange"
-              @on-latest-rule-pack-version-selection="onLatestRulePackVersionSelection"
+              @set-rule-pack-versions-on-rule-pack-filter="setRulePackVersionsOnRulePackFilter"
             />
           </div>
         </div>
@@ -200,21 +200,21 @@ export default {
       this.handleFilterChange();
     },
 
-    onLatestRulePackVersionSelection(rulePackVersions) {
-      const rulePackVersionValues = [];
-      for (const rulePackVersion of rulePackVersions) {
-        const version = rulePackVersion.label.split(' ');
-        rulePackVersionValues.push(version.length > 0 ? version[0] : rulePackVersion.label);
-      }
-      this.selectedRulePackVersions = rulePackVersionValues;
-
-      // Fetch detected rules for latest rule pack selection
+    setRulePackVersionsOnRulePackFilter(rulePackVersions) {
+      this.selectedRulePackVersions = rulePackVersions;
       this.fetchAllDetectedRules();
     },
 
     handleFilterChange() {
       // Refresh table data in Rule Analysis page
       const filterObj = {};
+      const rulePackVersions = [];
+      if (this.selectedRulePackVersions) {
+        for (const obj of this.selectedRulePackVersions) {
+          rulePackVersions.push(obj.version);
+        }
+      }
+
       filterObj.startDate = this.startDate;
       filterObj.endDate = this.endDate;
       filterObj.vcsProvider = this.selectedVcsProvider;
@@ -223,10 +223,16 @@ export default {
       filterObj.repository = this.selectedRepository;
       filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
-      filterObj.rulePackVersions = this.selectedRulePackVersions;
+      filterObj.rulePackVersions = rulePackVersions;
       this.$emit('on-filter-change', filterObj);
     },
     fetchAllDetectedRules() {
+      const rulePackVersions = [];
+      if (this.selectedRulePackVersions) {
+        for (const obj of this.selectedRulePackVersions) {
+          rulePackVersions.push(obj.version);
+        }
+      }
       RuleService.getAllDetectedRules(
         this.selectedStatus,
         this.selectedVcsProvider,
@@ -234,7 +240,7 @@ export default {
         this.selectedRepository,
         this.startDate,
         this.endDate,
-        this.selectedRulePackVersions
+        rulePackVersions
       )
         .then((response) => {
           this.rules = response.data;
@@ -245,8 +251,14 @@ export default {
     },
     applyRuleFilterInRuleAnalysisPage() {
       const selectedRules = [];
+      const selectedVersions = [];
       if (Store.getters.previousRouteState) {
         selectedRules.push(Store.getters.previousRouteState.ruleName);
+        if (Store.getters.previousRouteState.rulePackVersions) {
+          for (const obj of Store.getters.previousRouteState.rulePackVersions) {
+            selectedVersions.push(obj.version);
+          }
+        }
       }
       const sourceRoute = Store.getters.sourceRoute;
       const destinationRoute = Store.getters.destinationRoute;
@@ -265,7 +277,7 @@ export default {
         filterObj.repository = this.selectedRepository;
         filterObj.branch = this.selectedBranch;
         filterObj.rule = selectedRules;
-        filterObj.rulePackVersions = this.selectedRulePackVersions;
+        filterObj.rulePackVersions = selectedVersions;
 
         //Populate rule analysis list based on rule filter
         this.$emit('on-filter-change', filterObj);
@@ -275,7 +287,6 @@ export default {
       } else {
         this.selectedRule = [];
       }
-      Store.commit('update_previous_route_state', null);
     },
   },
   created() {

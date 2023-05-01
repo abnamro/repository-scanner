@@ -11,7 +11,7 @@
     <div class="mt-4">
       <div class="col-md-4">
         <RulePackFilter
-          :selectedRulePackVersionsList="selectedRulePackVersionsList"
+          :selectedRulePackVersionsList="selectedVersionsList"
           :rulePackVersions="allRulePackVersions"
           @on-rule-pack-version-change="onRulePackVersionChange"
         />
@@ -164,6 +164,8 @@ export default {
       avgTruePosiitveRate: 0,
       allRulePackVersions: [],
       selectedRulePackVersions: [],
+      selectedVersionsList: [],
+      selectedVersions: [],
       ruleTotalRowClass: ['text-left', 'font-weight-bold'],
       fields: [
         {
@@ -241,20 +243,17 @@ export default {
     fetchRulePackVersions() {
       RulePackService.getRulePackVersions(10000, 0)
         .then((response) => {
+          this.selectedVersions = [];
           this.allRulePackVersions = [];
           this.selectedRulePackVersions = [];
           for (const index of response.data.data.keys()) {
-            const rulePackJson = {};
-            rulePackJson['id'] = index;
             const data = response.data.data[index];
             if (data.active) {
-              rulePackJson['label'] = data.version + ' ' + '(active)';
+              this.selectedVersions.push(data.version);
               this.selectedRulePackVersions.push(data.version);
-              this.selectedRulePackVersionsList.push(rulePackJson);
-            } else {
-              rulePackJson['label'] = data.version;
+              this.selectedVersionsList.push(data);
             }
-            this.allRulePackVersions.push(rulePackJson);
+            this.allRulePackVersions.push(data);
           }
           this.fetchRulesWithFindingStatusCount();
         })
@@ -264,7 +263,7 @@ export default {
     },
     fetchRulesWithFindingStatusCount() {
       this.showSpinner();
-      RuleService.getRulesWithFindingStatusCount(this.selectedRulePackVersions)
+      RuleService.getRulesWithFindingStatusCount(this.selectedVersions)
         .then((response) => {
           this.ruleList = response.data;
           this.getTotalCountRowValuesForRuleMetricsTable();
@@ -292,6 +291,14 @@ export default {
       return `${true_positive_rate}%`;
     },
     getTotalCountRowValuesForRuleMetricsTable() {
+      this.totalFindingsCountForAllRules = 0;
+      this.truePositiveTotalCount = 0;
+      this.falsePositiveTotalCount = 0;
+      this.clarificationRequiredTotalCount = 0;
+      this.underReviewTotalCount = 0;
+      this.notAnalyzedTotalCount = 0;
+      this.notAnalyzedTotalCount = 0;
+      this.truePositiveRateList = [];
       this.ruleList.forEach((rule) => {
         let tpCount = 0;
         let fpCount = 0;
@@ -335,11 +342,20 @@ export default {
     goToRuleAnalysisPage(record) {
       Store.commit('update_previous_route_state', {
         ruleName: record.rule_name,
+        rulePackVersions: this.selectedVersionsList,
       });
       this.$router.push({ name: 'RuleAnalysis' });
     },
     onRulePackVersionChange(rulePackVersions) {
       this.selectedRulePackVersions = rulePackVersions;
+      this.selectedVersions = [];
+      this.selectedVersionsList = [];
+      if (rulePackVersions) {
+        for (const obj of rulePackVersions) {
+          this.selectedVersionsList.push(obj);
+          this.selectedVersions.push(obj.version);
+        }
+      }
       this.fetchRulesWithFindingStatusCount();
     },
   },
