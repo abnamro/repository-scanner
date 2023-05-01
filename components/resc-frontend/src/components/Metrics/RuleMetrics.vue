@@ -291,6 +291,14 @@ export default {
       return `${true_positive_rate}%`;
     },
     getTotalCountRowValuesForRuleMetricsTable() {
+      this.totalFindingsCountForAllRules = 0;
+      this.truePositiveTotalCount = 0;
+      this.falsePositiveTotalCount = 0;
+      this.clarificationRequiredTotalCount = 0;
+      this.underReviewTotalCount = 0;
+      this.notAnalyzedTotalCount = 0;
+      this.notAnalyzedTotalCount = 0;
+      this.truePositiveRateList = [];
       this.ruleList.forEach((rule) => {
         let tpCount = 0;
         let fpCount = 0;
