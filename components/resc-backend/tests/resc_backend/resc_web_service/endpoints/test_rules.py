@@ -1,7 +1,7 @@
 # Standard Library
 import json
 import unittest
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 # Third Party
 from fastapi.testclient import TestClient
@@ -33,7 +33,6 @@ class TestRules(unittest.TestCase):
                 allow_list=i,
                 rule_name=f"rule_name_{i}",
                 description=f"description_{i}",
-                tags=f"tags_{i}",
                 entropy=1.0,
                 secret_group=i,
                 regex=f"regex_{i}",
@@ -59,7 +58,6 @@ class TestRules(unittest.TestCase):
                           allow_list=rule.allow_list,
                           rule_name=rule.rule_name,
                           description=rule.description,
-                          tags=rule.tags,
                           entropy=rule.entropy,
                           secret_group=rule.secret_group,
                           regex=rule.regex,
@@ -290,22 +288,3 @@ class TestRules(unittest.TestCase):
         data = response.json()
         assert len(data) == 0
         assert data == []
-
-    @patch("resc_backend.resc_web_service.crud.rule.create_rule")
-    def test_create_rule(self, create_rule):
-        db_rule = self.db_rule_list[0]
-        create_rule.return_value = db_rule
-
-        rule = create_rule(db_connection=ANY, rule=db_rule)
-
-        assert rule.allow_list == db_rule.allow_list
-        assert rule.description == db_rule.description
-        assert rule.entropy == db_rule.entropy
-        assert rule.id_ == db_rule.id_
-        assert rule.path == db_rule.path
-        assert rule.regex == db_rule.regex
-        assert rule.rule_name == db_rule.rule_name
-        assert rule.rule_pack == db_rule.rule_pack
-        assert rule.secret_group == db_rule.secret_group
-        assert rule.tags == db_rule.tags
-        create_rule.assert_called_once_with(db_connection=ANY, rule=db_rule)

@@ -8,12 +8,20 @@
     <!-- Spinner -->
     <Spinner :active="spinnerActive" />
 
-    <div class="mt-4">
+    <div class="row pl-3 mt-4">
       <div class="col-md-4">
         <RulePackFilter
           :selectedRulePackVersionsList="selectedVersionsList"
           :rulePackVersions="allRulePackVersions"
           @on-rule-pack-version-change="onRulePackVersionChange"
+        />
+      </div>
+      <div class="col-md-4">
+        <RuleTagsFilter
+          ref="ruleTagsFilterChildComponent"
+          :options="ruleTagsList"
+          :requestedRuleTagsFilterValue="selectedRuleTags"
+          @on-rule-tags-change="onRuleTagsFilterChange"
         />
       </div>
     </div>
@@ -132,6 +140,7 @@ import HealthBar from '@/components/Common/HealthBar.vue';
 import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
 import RuleService from '@/services/rule-service';
+import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
 import Spinner from '@/components/Common/Spinner.vue';
 import spinnerMixin from '@/mixins/spinner.js';
 import Store from '@/store/index.js';
@@ -154,6 +163,7 @@ export default {
   data() {
     return {
       ruleList: [],
+      ruleTagsList: [],
       truePositiveTotalCount: 0,
       falsePositiveTotalCount: 0,
       clarificationRequiredTotalCount: 0,
@@ -164,6 +174,7 @@ export default {
       avgTruePosiitveRate: 0,
       allRulePackVersions: [],
       selectedRulePackVersions: [],
+      selectedRuleTags: [],
       selectedVersionsList: [],
       selectedVersions: [],
       ruleTotalRowClass: ['text-left', 'font-weight-bold'],
@@ -240,6 +251,20 @@ export default {
     },
   },
   methods: {
+    onRuleTagsFilterChange(ruleTags) {
+      this.selectedRuleTags = ruleTags;
+      this.fetchRulesWithFindingStatusCount();
+    },
+    fetchRuleTags() {
+      RulePackService.getRuleTagsByRulePackVersions(this.selectedVersions)
+        .then((response) => {
+          this.selectedRuleTags = [];
+          this.ruleTagsList = response.data;
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
     fetchRulePackVersions() {
       RulePackService.getRulePackVersions(10000, 0)
         .then((response) => {
@@ -255,6 +280,7 @@ export default {
             }
             this.allRulePackVersions.push(data);
           }
+          this.fetchRuleTags();
           this.fetchRulesWithFindingStatusCount();
         })
         .catch((error) => {
@@ -263,7 +289,7 @@ export default {
     },
     fetchRulesWithFindingStatusCount() {
       this.showSpinner();
-      RuleService.getRulesWithFindingStatusCount(this.selectedVersions)
+      RuleService.getRulesWithFindingStatusCount(this.selectedVersions, this.selectedRuleTags)
         .then((response) => {
           this.ruleList = response.data;
           this.getTotalCountRowValuesForRuleMetricsTable();
@@ -343,6 +369,7 @@ export default {
       Store.commit('update_previous_route_state', {
         ruleName: record.rule_name,
         rulePackVersions: this.selectedVersionsList,
+        ruleTags: this.selectedRuleTags,
       });
       this.$router.push({ name: 'RuleAnalysis' });
     },
@@ -355,6 +382,9 @@ export default {
           this.selectedVersionsList.push(obj);
           this.selectedVersions.push(obj.version);
         }
+        // Referesh rule tags dropdown options and reset selected value
+        this.selectedRuleTags = null;
+        this.fetchRuleTags(this.selectedVersions);
       }
       this.fetchRulesWithFindingStatusCount();
     },
@@ -365,6 +395,7 @@ export default {
   components: {
     HealthBar,
     RulePackFilter,
+    RuleTagsFilter,
     Spinner,
   },
 };

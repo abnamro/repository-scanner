@@ -188,6 +188,7 @@ export default {
       currentItems: [],
       selectedScanID: null,
       ruleFilter: null,
+      ruleTagsFilter: null,
       statusFilter: null,
       totalRows: 0,
       currentPage: 1,
@@ -366,6 +367,7 @@ export default {
       filterObj.scanIds = [this.selectedScanID];
       filterObj.findingStatus = this.statusFilter;
       filterObj.rule = this.ruleFilter;
+      filterObj.ruleTags = this.ruleTagsFilter;
 
       FindingsService.getDetailedFindings(filterObj)
         .then((response) => {
@@ -400,19 +402,21 @@ export default {
       this.fetchPaginatedFindingsByScanId();
       this.allSelected = false;
     },
-    handleFilterChange(scanId, rule, status) {
+    handleFilterChange(scanId, rule, status, ruleTags) {
       this.selectedScanID = scanId;
       this.ruleFilter = rule;
+      this.ruleTagsFilter = ruleTags;
       this.statusFilter = status;
       this.currentPage = 1;
       this.allSelected = false;
       this.fetchPaginatedFindingsByScanId();
     },
-    displayPreviousScans(rule, status, previousScanList) {
+    displayPreviousScans(rule, ruleTags, status, previousScanList) {
       this.currentPage = 1;
       this.allSelected = false;
       this.previousScanList = previousScanList;
       this.ruleFilter = rule;
+      this.ruleTagsFilter = ruleTags;
       this.statusFilter = status;
       this.fetchPreviousScanFindings();
     },
@@ -430,6 +434,7 @@ export default {
       filterObj.scanIds = previousScanIds;
       filterObj.findingStatus = this.statusFilter;
       filterObj.rule = this.ruleFilter;
+      filterObj.ruleTags = this.ruleTagsFilter;
 
       FindingsService.getDetailedFindings(filterObj)
         .then((response) => {

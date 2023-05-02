@@ -3,6 +3,12 @@
     <table class="table table-sm table-borderless">
       <tbody>
         <tr>
+          <th>VCS Instance</th>
+          <td>
+            <span class="badge badge-color">{{ repository.vcs_instance_name }}</span>
+          </td>
+        </tr>
+        <tr>
           <th>Project</th>
           <td>
             <span class="badge badge-color">{{ repository.project_key }}</span>
@@ -12,12 +18,6 @@
           <th>Repository</th>
           <td>
             <span class="badge badge-color">{{ repository.repository_name }}</span>
-          </td>
-        </tr>
-        <tr>
-          <th>VCS Instance</th>
-          <td>
-            <span class="badge badge-color">{{ repository.vcs_instance_name }}</span>
           </td>
         </tr>
       </tbody>

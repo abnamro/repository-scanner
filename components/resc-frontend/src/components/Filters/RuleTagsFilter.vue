@@ -1,8 +1,8 @@
 <template>
   <div>
-    <b-form-group class="label-title text-left" label="Rule" label-for="rule-filter">
+    <b-form-group class="label-title text-left" label="Tags" label-for="rule-tags-filter">
       <multiselect
-        v-model="selectedRules"
+        v-model="selectedRuleTags"
         :options="options"
         :multiple="true"
         :show-labels="true"
@@ -12,11 +12,11 @@
         :preserve-search="true"
         :select-label="'Select'"
         :deselect-label="'Remove'"
-        placeholder="Select Rule"
+        placeholder="Select Tag"
         :preselect-first="false"
-        @input="onRuleFilterChange"
+        @input="onRuleTagFilterChange"
       >
-        <span slot="noResult">No rule found</span>
+        <span slot="noResult">No tag found</span>
       </multiselect>
     </b-form-group>
   </div>
@@ -25,13 +25,13 @@
 import Multiselect from 'vue-multiselect';
 
 export default {
-  name: 'RuleFilter',
+  name: 'RuleTagsFilter',
   props: {
     options: {
       type: Array,
       required: true,
     },
-    requestedRuleFilterValue: {
+    requestedRuleTagsFilterValue: {
       type: Array,
       required: false,
       default: () => [],
@@ -39,24 +39,24 @@ export default {
   },
   data() {
     return {
-      selectedRules: this.requestedRuleFilterValue,
+      selectedRuleTags: this.requestedRuleTagsFilterValue,
     };
   },
   methods: {
-    onRuleFilterChange() {
-      if (this.selectedRules.length > 0) {
-        this.$emit('on-rule-change', this.selectedRules);
+    onRuleTagFilterChange() {
+      if (this.selectedRuleTags.length > 0) {
+        this.$emit('on-rule-tags-change', this.selectedRuleTags);
       } else {
-        this.$emit('on-rule-change', null);
+        this.$emit('on-rule-tags-change', null);
       }
     },
-    resetRuleFilterSelection() {
-      this.selectedRules = this.requestedRuleFilterValue;
+    resetRuleTagsFilterSelection() {
+      this.selectedRuleTags = this.requestedRuleTagsFilterValue;
     },
   },
   watch: {
-    requestedRuleFilterValue(newValue) {
-      this.selectedRules = newValue;
+    requestedRuleTagsFilterValue(newValue) {
+      this.selectedRuleTags = newValue;
     },
   },
   components: {

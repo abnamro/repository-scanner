@@ -44,13 +44,15 @@ def create_allow_list_dictionary(allow_list: RuleAllowList) -> dict:
     return allow_list_dict
 
 
-def create_rule_dictionary(rule: Rule, allow_list_dict: dict) -> dict:
+def create_rule_dictionary(rule: Rule, allow_list_dict: dict, tags: str) -> dict:
     """
         Create a dictionary for rule when Rule object and RuleAllowList dict are supplied
     :param rule:
         Rule object
     :param allow_list_dict:
         Allow list dictionary
+    :param tags:
+        String of tags of the rule
     :return: Rule dictionary
         The output will contain a dictionary of Rule
     """
@@ -58,8 +60,8 @@ def create_rule_dictionary(rule: Rule, allow_list_dict: dict) -> dict:
     if rule.rule_name:
         rule_dict["id"] = rule.rule_name
         rule_dict["description"] = rule.rule_name
-    if rule.tags:
-        rule_dict["tags"] = rule.tags
+    if tags:
+        rule_dict["tags"] = tags
     if rule.entropy:
         rule_dict["entropy"] = rule.entropy
     if rule.secret_group:
@@ -75,7 +77,8 @@ def create_rule_dictionary(rule: Rule, allow_list_dict: dict) -> dict:
     return rule_dict
 
 
-def create_toml_dictionary(rule_pack_version: str, rules: List[str], global_allow_list: List[str]) -> dict:
+def create_toml_dictionary(rule_pack_version: str, rules: List[str], global_allow_list: List[str], rule_tag_names) \
+        -> dict:
     """
         Create a dictionary for gitleaks toml rule for specified rule pack version, rules and global allow list
     :param rule_pack_version:
@@ -84,13 +87,19 @@ def create_toml_dictionary(rule_pack_version: str, rules: List[str], global_allo
         Rule list
     :param global_allow_list:
         Global Allow list
+    :param rule_tag_names:
+        List of rule names and tags
     :return: toml dictionary
         The output will contain a dictionary for gitleaks toml rule
     """
     rule_list = []
     for rule in rules:
         allow_list_dict = create_allow_list_dictionary(rule)
-        rule_dict = create_rule_dictionary(rule, allow_list_dict)
+        tags_list = [x.name for x in rule_tag_names if x.rule_name == rule.rule_name]
+        tags = None
+        if len(tags_list) >= 1:
+            tags = ','.join(tags_list)
+        rule_dict = create_rule_dictionary(rule, allow_list_dict, tags)
         rule_list.append(rule_dict)
 
     global_allow_list_dict = create_allow_list_dictionary(global_allow_list)

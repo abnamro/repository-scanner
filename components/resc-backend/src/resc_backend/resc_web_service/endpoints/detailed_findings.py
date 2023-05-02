@@ -60,7 +60,8 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
 
             - rule_names of type [String]
 
-            - rule_tags of type [String]
+            - rule_tags of type [String] findings in the result will have at least one of the specified tags
+              for the rules
 
             - project_name of type String
 

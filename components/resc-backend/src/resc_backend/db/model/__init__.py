@@ -19,6 +19,8 @@ from resc_backend.db.model.repository import DBrepository
 from resc_backend.db.model.rule import DBrule
 from resc_backend.db.model.rule_allow_list import DBruleAllowList
 from resc_backend.db.model.rule_pack import DBrulePack
+from resc_backend.db.model.rule_tag import DBruleTag
 from resc_backend.db.model.scan import DBscan
 from resc_backend.db.model.scan_finding import DBscanFinding
+from resc_backend.db.model.tag import DBtag
 from resc_backend.db.model.vcs_instance import DBVcsInstance

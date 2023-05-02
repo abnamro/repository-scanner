@@ -189,20 +189,6 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                       model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
                 .join(model.DBVcsInstance,
                       model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
-        elif findings_filter.rule_tags:
-            max_scan_subquery = db_connection.query(model.DBscanFinding.finding_id,
-                                                    func.max(model.DBscanFinding.scan_id).label("scan_id"))
-            max_scan_subquery = max_scan_subquery.group_by(model.DBscanFinding.finding_id).subquery()
-            total_count_query = total_count_query.join(max_scan_subquery,
-                                                       model.finding.DBfinding.id_ == max_scan_subquery.c.finding_id) \
-                .join(model.DBscan, model.scan.DBscan.id_ == max_scan_subquery.c.scan_id)
-
-        if findings_filter.rule_tags:
-            total_count_query = total_count_query.join(model.DBrule,
-                                                       and_(model.DBrule.rule_name == model.DBfinding.rule_name,
-                                                            model.DBrule.rule_pack == model.DBscan.rule_pack))
-            for tag in findings_filter.rule_tags:
-                total_count_query = total_count_query.filter(model.DBrule.tags.like(f"%{tag}%"))
 
         if findings_filter.start_date_time:
             total_count_query = total_count_query.filter(
@@ -401,13 +387,16 @@ def get_findings_count_by_status(db_connection: Session, scan_ids: List[int] = N
     return findings_count_by_status
 
 
-def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions: [str] = None):
+def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions: [str] = None,
+                                      rule_tags: [str] = None):
     """
         Retrieve count of findings based on rulename and status
     :param db_connection:
         Session of the database connection
     :param rule_pack_versions:
         optional, filter on rule pack version
+    :param rule_tags:
+        optional, filter on rule tag
     :return: findings_count
         per rulename and status the count of findings
     """
@@ -430,6 +419,20 @@ def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions
     query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
     query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
                                           model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
+    if rule_tags:
+        rule_tag_subquery = db_connection.query(model.DBruleTag.rule_id) \
+            .join(model.DBtag, model.DBruleTag.tag_id == model.DBtag.id_)
+        if rule_pack_versions:
+            rule_tag_subquery = rule_tag_subquery.join(model.DBrule, model.DBrule.id_ == model.DBruleTag.rule_id)
+            rule_tag_subquery = rule_tag_subquery.filter(model.DBrule.rule_pack.in_(rule_pack_versions))
+
+        rule_tag_subquery = rule_tag_subquery.filter(model.DBtag.name.in_(rule_tags))
+        rule_tag_subquery = rule_tag_subquery.group_by(model.DBruleTag.rule_id).subquery()
+
+        query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
+                                              model.DBrule.rule_pack == model.DBscan.rule_pack))
+        query = query.join(rule_tag_subquery, model.DBrule.id_ == rule_tag_subquery.c.rule_id)
+
     if rule_pack_versions:
         query = query.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
 

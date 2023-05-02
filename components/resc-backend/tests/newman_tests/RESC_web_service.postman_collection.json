@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dfc5e7c6-839e-49f6-a271-b717a29b2248",
+		"_postman_id": "3d5d6abf-2f53-4200-b744-d3965c492658",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -1595,6 +1595,139 @@
 									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
 								}
 							]
+						},
+						{
+							"name": "Get rule packs tags no version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rule-packs/tags",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rule-packs",
+										"tags"
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": []
+						},
+						{
+							"name": "Get rule packs tags with multiple versions",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rule-packs/tags?version=0.0.0&version=0.0.2",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rule-packs",
+										"tags"
+									],
+									"query": [
+										{
+											"key": "version",
+											"value": "0.0.0"
+										},
+										{
+											"key": "version",
+											"value": "0.0.2"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": []
+						},
+						{
+							"name": "Get rule packs tags with one version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/rule-packs/tags?version=0.0.0",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"rule-packs",
+										"tags"
+									],
+									"query": [
+										{
+											"key": "version",
+											"value": "0.0.0"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": []
 						}
 					]
 				},

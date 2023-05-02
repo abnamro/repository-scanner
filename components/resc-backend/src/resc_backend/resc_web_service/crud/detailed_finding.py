@@ -1,4 +1,4 @@
-# pylint: disable=R0912,C0121
+# pylint: disable=R0912,C0121,R0915
 # Standard Library
 from typing import List
 
@@ -45,6 +45,18 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
     max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
                                              func.max(model.DBaudit.id_).label("audit_id")) \
         .group_by(model.DBaudit.finding_id).subquery()
+
+    rule_tag_subquery = db_connection.query(model.DBruleTag.rule_id) \
+        .join(model.DBtag, model.DBruleTag.tag_id == model.DBtag.id_)
+    if findings_filter.rule_tags:
+        rule_tag_subquery = rule_tag_subquery.filter(model.DBtag.name.in_(findings_filter.rule_tags))
+    if findings_filter.rule_pack_versions or findings_filter.rule_names:
+        rule_tag_subquery = rule_tag_subquery.join(model.DBrule, model.DBrule.id_ == model.DBruleTag.rule_id)
+        if findings_filter.rule_pack_versions:
+            rule_tag_subquery = rule_tag_subquery.filter(model.DBrule.rule_pack.in_(findings_filter.rule_pack_versions))
+        if findings_filter.rule_names:
+            rule_tag_subquery = rule_tag_subquery.filter(model.DBrule.rule_name.in_(findings_filter.rule_names))
+    rule_tag_subquery = rule_tag_subquery.group_by(model.DBruleTag.rule_id).subquery()
 
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
 
@@ -96,8 +108,8 @@ def get_detailed_findings(db_connection: Session, findings_filter: FindingsFilte
     if findings_filter.rule_tags:
         query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
                                               model.DBrule.rule_pack == model.DBscan.rule_pack))
-        for tag in findings_filter.rule_tags:
-            query = query.filter(model.DBrule.tags.like(f"%{tag}%"))
+        query = query.join(rule_tag_subquery, model.DBrule.id_ == rule_tag_subquery.c.rule_id)
+
     if findings_filter.rule_pack_versions:
         query = query.filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
     if findings_filter.start_date_time:
@@ -158,6 +170,18 @@ def get_detailed_findings_count(db_connection: Session, findings_filter: Finding
             model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))
     max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
 
+    rule_tag_subquery = db_connection.query(model.DBruleTag.rule_id) \
+        .join(model.DBtag, model.DBruleTag.tag_id == model.DBtag.id_)
+    if findings_filter.rule_tags:
+        rule_tag_subquery = rule_tag_subquery.filter(model.DBtag.name.in_(findings_filter.rule_tags))
+    if findings_filter.rule_pack_versions or findings_filter.rule_names:
+        rule_tag_subquery = rule_tag_subquery.join(model.DBrule, model.DBrule.id_ == model.DBruleTag.rule_id)
+        if findings_filter.rule_pack_versions:
+            rule_tag_subquery = rule_tag_subquery.filter(model.DBrule.rule_pack.in_(findings_filter.rule_pack_versions))
+        if findings_filter.rule_names:
+            rule_tag_subquery = rule_tag_subquery.filter(model.DBrule.rule_name.in_(findings_filter.rule_names))
+    rule_tag_subquery = rule_tag_subquery.group_by(model.DBruleTag.rule_id).subquery()
+
     query = db_connection.query(func.count(model.DBfinding.id_))
 
     query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
@@ -184,8 +208,7 @@ def get_detailed_findings_count(db_connection: Session, findings_filter: Finding
     if findings_filter.rule_tags:
         query = query.join(model.DBrule, and_(model.DBrule.rule_name == model.DBfinding.rule_name,
                                               model.DBrule.rule_pack == model.DBscan.rule_pack))
-        for tag in findings_filter.rule_tags:
-            query = query.filter(model.DBrule.tags.like(f"%{tag}%"))
+        query = query.join(rule_tag_subquery, model.DBrule.id_ == rule_tag_subquery.c.rule_id)
 
     if findings_filter.rule_pack_versions:
         query = query.filter(model.DBscan.rule_pack.in_(findings_filter.rule_pack_versions))

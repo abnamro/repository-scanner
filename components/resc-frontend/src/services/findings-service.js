@@ -56,6 +56,9 @@ const FindingsService = {
         JSON.stringify(filter.rulePackVersions)
       )}`;
     }
+    if (filter.ruleTags) {
+      query_string += `&rule_tags=${encodeURIComponent(JSON.stringify(filter.ruleTags))}`;
+    }
     if (query_string) {
       query_string = query_string.substring(1);
     } else {
