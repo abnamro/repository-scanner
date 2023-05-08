@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Config from '@/configuration/config';
+import FindingMetrics from '@/components/Metrics/FindingMetrics';
 import Store from '@/store/index.js';
 import Analytics from '@/views/Analytics';
 import Repositories from '@/views/Repositories';
@@ -42,6 +43,11 @@ const routes = [
     path: '/metrics/rule-metrics',
     name: 'RuleMetrics',
     component: RuleMetrics,
+  },
+  {
+    path: '/metrics/finding-metrics',
+    name: 'FindingMetrics',
+    component: FindingMetrics,
   },
   {
     path: '/rulepacks',

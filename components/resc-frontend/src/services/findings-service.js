@@ -75,6 +75,16 @@ const FindingsService = {
     return axios.get(`/findings/count-by-time/week`);
   },
 
+  async getMetricsFindingsCountPerVcsProviderPerWeek() {
+    return axios.get(`/metrics/count-per-vcs-provider-by-week`);
+  },
+  async getUnTriagedCountPerVcsProviderPerWeek() {
+    return axios.get(`/metrics/un-triaged-count-over-time`);
+  },
+  async getTruePositiveCountPerVcsProviderPerWeek() {
+    return axios.get(`/metrics/audited-count-over-time`);
+  },
+
   async getFindingAudits(findingId, perPage, skipRowCount) {
     return axios.get(`findings/${findingId}/audit`, {
       params: {
