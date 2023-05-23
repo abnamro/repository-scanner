@@ -26,6 +26,16 @@ export default {
             },
           },
         },
+        {
+          href: '/metrics/finding-metrics',
+          title: 'Finding Metrics',
+          icon: {
+            element: 'font-awesome-icon',
+            attributes: {
+              icon: 'chart-bar',
+            },
+          },
+        },
       ],
     },
     {

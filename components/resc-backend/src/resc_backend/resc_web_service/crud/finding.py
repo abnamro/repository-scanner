@@ -1,11 +1,12 @@
 # pylint: disable=R0916,R0912,C0121
 # Standard Library
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 
 # Third Party
-from sqlalchemy import and_, extract, func, or_
+from sqlalchemy import and_, extract, func, or_, union
+from sqlalchemy.engine import Row
 from sqlalchemy.orm import Session
 
 # First Party
@@ -450,6 +451,7 @@ def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions
             "clarification_required": 0,
             "total_findings_count": 0
         }
+
     for status_count in status_counts:
         rule_count_dict[status_count[0]]["total_findings_count"] += status_count[2]
         if status_count[1] == FindingStatus.NOT_ANALYZED or status_count[1] is None:
@@ -640,3 +642,160 @@ def delete_findings_by_vcs_instance_id(db_connection: Session, vcs_instance_id: 
                 model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
+
+
+def get_finding_audit_status_count_over_time(db_connection: Session, status: FindingStatus, weeks: int = 13) -> dict:
+    """
+        Retrieve count of true positive findings over time for given weeks
+    :param db_connection:
+        Session of the database connection
+    :param status:
+        mandatory, status for which to get the audit counts over time
+    :param weeks:
+        optional, filter on last n weeks, default 13
+    :return: true_positive_count_over_time
+        list of rows containing finding statuses count over time per week
+    """
+    all_tables = []
+    for week in range(0, weeks):
+        last_nth_week_date_time = datetime.utcnow() - timedelta(weeks=week)
+        query = db_connection.query(extract('year', last_nth_week_date_time).label("year"),
+                                    extract('week', last_nth_week_date_time).label("week"),
+                                    model.DBVcsInstance.provider_type.label("provider_type"),
+                                    func.count(model.DBaudit.id_).label("finding_count")
+                                    )
+        max_audit_subquery = db_connection.query(func.max(model.DBaudit.id_).label("audit_id")) \
+            .filter(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time)) \
+            .filter(extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .group_by(model.DBaudit.finding_id).subquery()
+        query = query.join(max_audit_subquery, max_audit_subquery.c.audit_id == model.DBaudit.id_)
+        query = query.join(model.DBfinding, model.DBfinding.id_ == model.DBaudit.finding_id)
+        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBfinding.branch_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
+        query = query.filter(model.DBaudit.status == status)
+        query = query.group_by(model.DBVcsInstance.provider_type)
+
+        all_tables.append(query)
+
+    # union
+    unioned_query = union(*all_tables)
+    status_count_over_time = db_connection.execute(unioned_query).all()
+    return status_count_over_time
+
+
+def get_finding_count_by_vcs_provider_over_time(db_connection: Session, weeks: int = 13) -> list[Row]:
+    """
+        Retrieve count findings over time for given weeks
+    :param db_connection:
+        Session of the database connection
+    :param weeks:
+        optional, filter on last n weeks, default 13
+    :return: count_over_time
+        list of rows containing finding count over time per week
+    """
+    all_tables = []
+    for week in range(0, weeks):
+        last_nth_week_date_time = datetime.utcnow() - timedelta(weeks=week)
+        query = db_connection.query(extract('year', last_nth_week_date_time).label("year"),
+                                    extract('week', last_nth_week_date_time).label("week"),
+                                    model.DBVcsInstance.provider_type.label("provider_type"),
+                                    func.count(model.DBfinding.id_).label("finding_count")
+                                    )
+        max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
+                                            model.DBscan.branch_id) \
+            .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
+            .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .group_by(model.DBscan.branch_id).subquery()
+
+        query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
+        query = query.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id)
+        query = query.join(max_base_scan, and_(max_base_scan.c.branch_id == model.DBscan.branch_id,
+                                               or_(model.DBscan.id_ == max_base_scan.c.scan_id,
+                                                   (and_(model.DBscan.id_ > max_base_scan.c.scan_id,
+                                                         model.DBscan.scan_type == ScanType.INCREMENTAL,
+                                                         extract('week', model.DBscan.timestamp) <=
+                                                         extract('week', last_nth_week_date_time),
+                                                         extract('year', model.DBscan.timestamp) ==
+                                                         extract('year', last_nth_week_date_time)))
+                                                   )
+                                               )
+                           )
+        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBscan.branch_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
+        query = query.group_by(model.DBVcsInstance.provider_type)
+
+        all_tables.append(query)
+
+    # union
+    unioned_query = union(*all_tables)
+    count_over_time = db_connection.execute(unioned_query).all()
+    return count_over_time
+
+
+def get_un_triaged_finding_count_by_vcs_provider_over_time(db_connection: Session, weeks: int = 13) -> list[Row]:
+    """
+        Retrieve count of un triaged findings over time for given weeks
+    :param db_connection:
+        Session of the database connection
+    :param weeks:
+        optional, filter on last n weeks, default 13
+    :return: count_over_time
+        list of rows containing un triaged findings count over time per week
+    """
+    all_tables = []
+    for week in range(0, weeks):
+        last_nth_week_date_time = datetime.utcnow() - timedelta(weeks=week)
+        query = db_connection.query(extract('year', last_nth_week_date_time).label("year"),
+                                    extract('week', last_nth_week_date_time).label("week"),
+                                    model.DBVcsInstance.provider_type.label("provider_type"),
+                                    func.count(model.DBfinding.id_).label("finding_count")
+                                    )
+        max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
+                                            model.DBscan.branch_id) \
+            .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
+            .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(model.DBscan.scan_type == ScanType.BASE) \
+            .group_by(model.DBscan.branch_id).subquery()
+
+        max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
+                                                 func.max(model.DBaudit.id_).label("audit_id")) \
+            .filter(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time)) \
+            .filter(extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .group_by(model.DBaudit.finding_id).subquery()
+
+        query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
+        query = query.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id)
+        query = query.join(max_base_scan, and_(max_base_scan.c.branch_id == model.DBscan.branch_id,
+                                               or_(model.DBscan.id_ == max_base_scan.c.scan_id,
+                                                   (and_(model.DBscan.id_ > max_base_scan.c.scan_id,
+                                                         model.DBscan.scan_type == ScanType.INCREMENTAL,
+                                                         extract('week', model.DBscan.timestamp) <=
+                                                         extract('week', last_nth_week_date_time),
+                                                         extract('year', model.DBscan.timestamp) ==
+                                                         extract('year', last_nth_week_date_time)))
+                                                   )
+                                               )
+                           )
+        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBscan.branch_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
+
+        query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
+                           isouter=True)
+        query = query.join(model.DBaudit, and_(model.audit.DBaudit.finding_id == model.finding.DBfinding.id_,
+                                               model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
+                           isouter=True)
+        query = query.filter(
+            or_(model.DBaudit.id_ == None, model.DBaudit.status == FindingStatus.NOT_ANALYZED))  # noqa: E711
+
+        query = query.group_by(model.DBVcsInstance.provider_type)
+
+        all_tables.append(query)
+
+    # union
+    unioned_query = union(*all_tables)
+    count_over_time = db_connection.execute(unioned_query).all()
+    return count_over_time

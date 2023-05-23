@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dae3a703-7ca2-4ab9-ac37-d872f5944e46",
+		"_postman_id": "dfc5e7c6-839e-49f6-a271-b717a29b2248",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -8988,7 +8988,7 @@
 											"    pm.environment.set(\"scan_id\", responseJson[\"id_\"]);",
 											"    pm.expect(responseJson[\"scan_type\"]).to.eql(\"BASE\");",
 											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
 											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -8997,6 +8997,16 @@
 											"pm.test(\"Response time is less than 300ms\", function () {",
 											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const now = new Date().toISOString();",
+											"pm.environment.set('currentdate', now);"
 										],
 										"type": "text/javascript"
 									}
@@ -9012,7 +9022,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
+									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans",
@@ -9244,7 +9254,7 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"scan_type\"]).to.eql(\"BASE\");",
 											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
 											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -9504,7 +9514,7 @@
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_type\"]).to.eql(\"BASE\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -9514,6 +9524,15 @@
 											"pm.test(\"Response time is less than 300ms\", function () {",
 											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -9690,7 +9709,7 @@
 											"    pm.environment.set(\"scan_id\", responseJson[\"id_\"]);",
 											"    pm.expect(responseJson[\"scan_type\"]).to.eql(\"BASE\");",
 											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
 											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
@@ -9714,7 +9733,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
+									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id",
@@ -13851,7 +13870,7 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
-											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(\"2023-1\");",
+											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(pm.environment.get(\"currentdate\").substring(0, 3));",
 											"    pm.expect(responseJson[\"data\"][0][\"finding_count\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
@@ -14039,7 +14058,7 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
-											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(\"2023-W5\");",
+											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(pm.environment.get(\"currentdate\").substring(0, 4));",
 											"    pm.expect(responseJson[\"data\"][0][\"finding_count\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
@@ -14227,7 +14246,7 @@
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
-											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(\"2023-1-30\");",
+											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(pm.environment.get(\"currentdate\").substring(0, 3));",
 											"    pm.expect(responseJson[\"data\"][0][\"finding_count\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
@@ -15800,7 +15819,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -15817,6 +15836,15 @@
 											"pm.test(\"Response time is less than 300ms\", function () {",
 											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
 										],
 										"type": "text/javascript"
 									}
@@ -15915,7 +15943,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16034,7 +16062,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16153,7 +16181,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16272,7 +16300,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16391,7 +16419,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16510,7 +16538,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16629,7 +16657,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16748,7 +16776,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16768,13 +16796,25 @@
 										],
 										"type": "text/javascript"
 									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let today = new Date();",
+											"today.setDate(today.getDate() + 1);",
+											"end_date_time = today.toISOString().split('T')[0]+'T00:00:00';",
+											"pm.environment.set('end_date_time', end_date_time);"
+										],
+										"type": "text/javascript"
+									}
 								}
 							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59",
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=start_date_time=2020-04-13T00:00:00%26end_date_time={{end_date_time}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -16794,7 +16834,7 @@
 										},
 										{
 											"key": "query_string",
-											"value": "start_date_time=2020-04-13T00:00:00&end_date_time=2023-01-31T23:59:59"
+											"value": "start_date_time=2020-04-13T00:00:00%26end_date_time={{end_date_time}}"
 										}
 									]
 								},
@@ -16867,7 +16907,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -16887,13 +16927,25 @@
 										],
 										"type": "text/javascript"
 									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let today = new Date();",
+											"today.setDate(today.getDate() + 1);",
+											"end_date_time = today.toISOString().split('T')[0]+'T00:00:00';",
+											"pm.environment.set('end_date_time', end_date_time);"
+										],
+										"type": "text/javascript"
+									}
 								}
 							],
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59%26rule_pack_versions=[\"1.0.0\"]",
+									"raw": "{{baseUrl}}/resc/v1/detailed-findings?skip=0&limit=100&query_string=rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time={{end_date_time}}%26rule_pack_versions=[\"1.0.0\"]",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -16913,7 +16965,7 @@
 										},
 										{
 											"key": "query_string",
-											"value": "rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time=2023-01-31T23:59:59%26rule_pack_versions=[\"1.0.0\"]"
+											"value": "rule_names=[\"Rule-1\"]%26finding_statuses=[\"NOT_ANALYZED\"]%26vcs_providers=[\"AZURE_DEVOPS\"]%26project_name=test-project%26repository_name=test-repository%26start_date_time=2020-04-13T00:00:00%26end_date_time={{end_date_time}}%26rule_pack_versions=[\"1.0.0\"]"
 										}
 									]
 								},
@@ -16985,7 +17037,7 @@
 											"    pm.expect(responseJson[\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
-											"    pm.expect(responseJson[\"timestamp\"]).to.eql(\"2023-01-30T22:51:31.487000\");",
+											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
 											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
@@ -18023,6 +18075,10 @@
 											"pm.test(\"Scan id doesn't exist\", function() {",
 											"    pm.environment.unset(\"scan_id\");",
 											"    pm.expect(pm.environment.get(\"scan_id\")).to.eql(undefined);",
+											"    pm.environment.unset(\"currentdate\");",
+											"    pm.expect(pm.environment.get(\"currentdate\")).to.eql(undefined);",
+											"    pm.environment.unset(\"end_date_time\");",
+											"    pm.expect(pm.environment.get(\"end_date_time\")).to.eql(undefined);",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",
@@ -18356,8 +18412,300 @@
 							]
 						}
 					]
+				},
+				{
+					"name": "metrics",
+					"item": [
+						{
+							"name": "Get count of audit status over time for given weeks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(13);",
+											"    responseJson.forEach((obj) => {",
+											"        pm.expect(obj).to.have.property('time_period');",
+											"        pm.expect(obj).to.have.property('vcs_provider_finding_count');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('AZURE_DEVOPS');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('BITBUCKET');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('GITHUB_PUBLIC');",
+											"        pm.expect(obj).to.have.property('total');",
+											"    });",
+											"    ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/metrics/audited-count-over-time",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"metrics",
+										"audited-count-over-time"
+									]
+								},
+								"description": "    Retrieve count of audited findings over time for given weeks\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects"
+							},
+							"response": [
+								{
+									"name": "Retrieve count of audit status over time for given weeks",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/resc/v1/metrics/audited-count-over-time",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"resc",
+												"v1",
+												"metrics",
+												"audited-count-over-time"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"time_period\": \"pariatur culpa sint\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  },\n  {\n    \"time_period\": \"sit\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Get count of findings over time for given weeks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(13);",
+											"    responseJson.forEach((obj) => {",
+											"        pm.expect(obj).to.have.property('time_period');",
+											"        pm.expect(obj).to.have.property('vcs_provider_finding_count');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('AZURE_DEVOPS');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('BITBUCKET');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('GITHUB_PUBLIC');",
+											"        pm.expect(obj).to.have.property('total');",
+											"    });",
+											"    ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/metrics/count-per-vcs-provider-by-week",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"metrics",
+										"count-per-vcs-provider-by-week"
+									]
+								},
+								"description": "    Retrieve count of findings over time for given weeks\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects"
+							},
+							"response": [
+								{
+									"name": "Retrieve count of findings over time for given weeks",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/resc/v1/metrics/count-per-vcs-provider-by-week",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"resc",
+												"v1",
+												"metrics",
+												"count-per-vcs-provider-by-week"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"time_period\": \"fugiat do\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  },\n  {\n    \"time_period\": \"ullamco reprehenderit esse\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  }\n]"
+								}
+							]
+						},
+						{
+							"name": "Get count of findings over time for given weeks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(13);",
+											"    responseJson.forEach((obj) => {",
+											"        pm.expect(obj).to.have.property('time_period');",
+											"        pm.expect(obj).to.have.property('vcs_provider_finding_count');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('AZURE_DEVOPS');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('BITBUCKET');",
+											"        pm.expect(obj.vcs_provider_finding_count).to.have.property('GITHUB_PUBLIC');",
+											"        pm.expect(obj).to.have.property('total');",
+											"    });",
+											"    ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/metrics/un-triaged-count-over-time",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"metrics",
+										"un-triaged-count-over-time"
+									]
+								},
+								"description": "    Retrieve count of findings over time for given weeks\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects"
+							},
+							"response": [
+								{
+									"name": "Retrieve count of findings over time for given weeks",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/resc/v1/metrics/un-triaged-count-over-time",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"resc",
+												"v1",
+												"metrics",
+												"un-triaged-count-over-time"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n  {\n    \"time_period\": \"sed cupidatat dolore commodo\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  },\n  {\n    \"time_period\": \"veniam\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  }\n]"
+								}
+							]
+						}
+					]
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"variable": [

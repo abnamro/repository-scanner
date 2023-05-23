@@ -25,6 +25,7 @@ from resc_backend.resc_web_service.endpoints import (
     detailed_findings,
     findings,
     health,
+    metrics,
     repositories,
     rules,
     rule_packs,
@@ -95,6 +96,7 @@ tags_metadata = [
     {"name": "resc-scans", "description": "Manage scan information"},
     {"name": "resc-findings", "description": "Manage findings information"},
     {"name": "resc-vcs-instances", "description": "Manage vcs instance information"},
+    {"name": "resc-metrics", "description": "Retrieve metrics"},
 ]
 
 # Check if authentication is required for api endpoints
@@ -126,6 +128,7 @@ app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
+app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX)
 
 # Add exception handlers
 add_exception_handlers(app=app)

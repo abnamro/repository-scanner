@@ -5,6 +5,7 @@ import detailed_findings from '@/../tests/resources/mock_detailed_findings.json'
 import detailed_findings_with_rule_pack_version from '@/../tests/resources/mock_detailed_findings_with_rule_pack_version.json';
 import finding_count_per_week from '@/../tests/resources/mock_findings_count_per_week.json';
 import audits from '@/../tests/resources/mock_finding_audits.json';
+import findings_status_counts_per_vcs_provider_per_week from '@/../tests/resources/mock_findings_status_count_by_vcs_provider_per_week.json';
 
 jest.mock('axios');
 
@@ -126,6 +127,108 @@ describe('function getDetailedFindings', () => {
         axios.get.mockResolvedValueOnce([]);
 
         await FindingsService.getFindingCountPerWeek('not_valid')
+          .then((response) => {
+            expect(response).toEqual([]);
+            expect(response).not.toBeNull();
+          })
+          .catch((error) => {
+            expect(error).toBeDefined();
+            expect(error).not.toBeNull();
+          });
+      });
+    });
+  });
+
+  describe('function getMetricsFindingsCountPerVcsProviderPerWeek', () => {
+    describe('when getMetricsFindingsCountPerVcsProviderPerWeek API call is successful', () => {
+      it('should return finding statuses count per vcs provider per week', async () => {
+        axios.get.mockResolvedValueOnce(findings_status_counts_per_vcs_provider_per_week);
+
+        const response = await FindingsService.getMetricsFindingsCountPerVcsProviderPerWeek();
+
+        expect(response).toEqual(findings_status_counts_per_vcs_provider_per_week);
+        expect(response).toBeDefined();
+        expect(response).not.toBeNull();
+        expect(response.length).toBe(13);
+        expect(response[0].time_period).toBe('2023 W09');
+        expect(response[0].total).toBe(0);
+        expect(response[0].vcs_provider_finding_count.AZURE_DEVOPS).toBe(0);
+      });
+    });
+
+    describe('when getMetricsFindingsCountPerVcsProviderPerWeek API call fails', () => {
+      it('getMetricsFindingsCountPerVcsProviderPerWeek should return error', async () => {
+        axios.get.mockResolvedValueOnce([]);
+
+        await FindingsService.getMetricsFindingsCountPerVcsProviderPerWeek('not_valid')
+          .then((response) => {
+            expect(response).toEqual([]);
+            expect(response).not.toBeNull();
+          })
+          .catch((error) => {
+            expect(error).toBeDefined();
+            expect(error).not.toBeNull();
+          });
+      });
+    });
+  });
+
+  describe('function getUnTriagedCountPerVcsProviderPerWeek', () => {
+    describe('when getUnTriagedCountPerVcsProviderPerWeek API call is successful', () => {
+      it('should return finding statuses count per vcs provider per week', async () => {
+        axios.get.mockResolvedValueOnce(findings_status_counts_per_vcs_provider_per_week);
+
+        const response = await FindingsService.getUnTriagedCountPerVcsProviderPerWeek();
+
+        expect(response).toEqual(findings_status_counts_per_vcs_provider_per_week);
+        expect(response).toBeDefined();
+        expect(response).not.toBeNull();
+        expect(response.length).toBe(13);
+        expect(response[0].time_period).toBe('2023 W09');
+        expect(response[0].total).toBe(0);
+        expect(response[0].vcs_provider_finding_count.AZURE_DEVOPS).toBe(0);
+      });
+    });
+
+    describe('when getUnTriagedCountPerVcsProviderPerWeek API call fails', () => {
+      it('getUnTriagedCountPerVcsProviderPerWeek should return error', async () => {
+        axios.get.mockResolvedValueOnce([]);
+
+        await FindingsService.getUnTriagedCountPerVcsProviderPerWeek('not_valid')
+          .then((response) => {
+            expect(response).toEqual([]);
+            expect(response).not.toBeNull();
+          })
+          .catch((error) => {
+            expect(error).toBeDefined();
+            expect(error).not.toBeNull();
+          });
+      });
+    });
+  });
+
+  describe('function getTruePositiveCountPerVcsProviderPerWeek', () => {
+    describe('when getTruePositiveCountPerVcsProviderPerWeek API call is successful', () => {
+      it('should return finding statuses count per vcs provider per week', async () => {
+        axios.get.mockResolvedValueOnce(findings_status_counts_per_vcs_provider_per_week);
+
+        const response = await FindingsService.getTruePositiveCountPerVcsProviderPerWeek();
+
+        expect(response).toEqual(findings_status_counts_per_vcs_provider_per_week);
+        expect(response).toBeDefined();
+        expect(response).not.toBeNull();
+        expect(response.length).toBe(13);
+        expect(response[0].time_period).toBe('2023 W09');
+        expect(response[0].total).toBe(0);
+        expect(response[0].vcs_provider_finding_count.AZURE_DEVOPS).toBe(0);
+      });
+    });
+
+    describe('when getTruePositiveCountPerVcsProviderPerWeek API call fails', () => {
+      it('getTruePositiveCountPerVcsProviderPerWeek should return error', async () => {
+        axios.get.mockResolvedValueOnce([]);
+
+        await FindingsService.getTruePositiveCountPerVcsProviderPerWeek('not_valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
