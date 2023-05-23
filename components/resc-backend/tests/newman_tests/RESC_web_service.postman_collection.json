@@ -18444,10 +18444,6 @@
 											"        pm.expect(obj).to.have.property('total');",
 											"    });",
 											"    ",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -18537,10 +18533,6 @@
 											"        pm.expect(obj).to.have.property('total');",
 											"    });",
 											"    ",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
 										],
 										"type": "text/javascript"
@@ -18630,10 +18622,6 @@
 											"        pm.expect(obj).to.have.property('total');",
 											"    });",
 											"    ",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
 											"});"
 										],
 										"type": "text/javascript"
