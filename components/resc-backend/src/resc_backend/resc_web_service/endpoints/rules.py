@@ -17,10 +17,8 @@ from resc_backend.constants import (
 )
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import finding as finding_crud
-from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
-from resc_backend.resc_web_service.schema.rule import RuleCreate
 from resc_backend.resc_web_service.schema.rule_count_model import RuleFindingCountModel
 from resc_backend.resc_web_service.schema.status_count import StatusCount
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
@@ -84,16 +82,19 @@ def get_distinct_rules_from_findings(
             })
 def get_rules_finding_status_count(
         rule_pack_versions: Optional[List[str]] = Query(None, alias="rule_pack_version", title="RulePackVersion"),
+        rule_tags: Optional[List[str]] = Query(None, alias="rule_tag", title="RuleTag"),
         db_connection: Session = Depends(get_db_connection)) -> List[RuleFindingCountModel]:
     """
         Retrieve all detected rules with finding counts per supported status
 
     - **rule_pack_version**: Optional, filter on rule pack version
+    - **rule_tag**: Optional, filter on rule tag
     - **db_connection**: Session of the database connection
     - **return**: List[str] The output will contain a list of strings of unique rules with counts per status
     """
     rule_finding_counts = finding_crud.get_rule_findings_count_by_status(db_connection,
-                                                                         rule_pack_versions=rule_pack_versions)
+                                                                         rule_pack_versions=rule_pack_versions,
+                                                                         rule_tags=rule_tags)
     rule_findings_counts = []
 
     for rule_name, rule_counts in rule_finding_counts.items():
@@ -112,17 +113,3 @@ def get_rules_finding_status_count(
         rule_findings_counts.append(rule_finding_count)
 
     return rule_findings_counts
-
-
-def create_rule(
-        rule: RuleCreate,
-        db_connection: Session = Depends(get_db_connection)):
-    """
-        Create rule in database
-    :param rule:
-        RuleCreate object to be created
-    :param db_connection:
-        Session of the database connection
-    """
-    return rule_crud.create_rule(db_connection=db_connection,
-                                 rule=rule)

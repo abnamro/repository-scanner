@@ -1,7 +1,7 @@
 # Standard Library
 import logging
 import re
-from typing import Optional
+from typing import List, Optional
 
 # Third Party
 import tomlkit
@@ -21,6 +21,7 @@ from resc_backend.constants import (
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.crud import rule_pack as rule_pack_crud
+from resc_backend.resc_web_service.crud import rule_tag as rule_tag_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.helpers.resc_swagger_models import Model400, Model404, Model409, Model422
 from resc_backend.resc_web_service.helpers.rule import (
@@ -97,11 +98,12 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
     rule_pack_from_db = read_rule_pack(version=version, db_connection=db_connection)
     if rule_pack_from_db:
         version = rule_pack_from_db.version
-        rules = rule_crud.get_rules_by_rule_pack_version(db_connection=db_connection,
-                                                         rule_pack_version=version)
+        rules = rule_crud.get_rules_by_rule_pack_version(db_connection=db_connection, rule_pack_version=version)
+        rule_tag_names = rule_tag_crud.get_rule_tag_names_by_rule_pack_version(db_connection=db_connection,
+                                                                               rule_pack_version=version)
         global_allow_list = rule_crud.get_global_allow_list_by_rule_pack_version(db_connection=db_connection,
                                                                                  rule_pack_version=version)
-        generated_toml_dict = create_toml_dictionary(version, rules, global_allow_list)
+        generated_toml_dict = create_toml_dictionary(version, rules, global_allow_list, rule_tag_names)
     else:
         raise HTTPException(status_code=404, detail=f"No rule pack found with version {version}")
 
@@ -236,7 +238,6 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
     if "rules" in toml_rule_dictionary:
         rule_list = toml_rule_dictionary.get("rules")
         for rule in rule_list:
-            tags = None
             keywords = None
             rule_name = rule["id"] if "id" in rule else None
             description = rule["description"] if "description" in rule else None
@@ -244,10 +245,6 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
             entropy = rule["entropy"] if "entropy" in rule else None
             secret_group = rule["secretGroup"] if "secretGroup" in rule else None
             path = rule["path"] if "path" in rule else None
-
-            if "tags" in rule:
-                tag_array = rule["tags"]
-                tags = ",".join(tag_array)
 
             if "keywords" in rule:
                 keyword_array = rule["keywords"]
@@ -268,11 +265,42 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
                 created_allow_list_id = None
             rule_obj = RuleCreate(rule_pack=version,
                                   allow_list=created_allow_list_id,
-                                  rule_name=rule_name, description=description, tags=tags, entropy=entropy,
+                                  rule_name=rule_name, description=description, entropy=entropy,
                                   secret_group=secret_group, regex=regex, path=path, keywords=keywords)
             created_rule = rule_crud.create_rule(rule=rule_obj, db_connection=db_connection)
             if not created_rule.id_:
                 logger.warning(f"Creating rule failed for Rule: {rule_name}")
+            if "tags" in rule:
+                _ = rule_tag_crud.create_rule_tag(db_connection=db_connection, rule_id=created_rule.id_,
+                                                  tags=rule["tags"])
+
+
+@router.get("/tags",
+            response_model=List[str],
+            summary="Get rule packs' tags",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve all the tags related to a rule-pack[s]"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
+def get_rule_packs_tags(versions: Optional[List[str]] = Query(None, alias="version", title="version"),
+                        db_connection: Session = Depends(get_db_connection)) -> List[str]:
+    """
+        Retrieve rule pack related tags
+
+    :param db_connection: Session of the database connection
+    :param versions: Optional, filter on rule pack version, if not provided filter on active.
+    :return: List[str]
+        The output will contain a list of tags related to one or more rule-packs.
+    """
+    if not versions:
+        active_rule_pack = rule_pack_crud.get_current_active_rule_pack(db_connection=db_connection)
+        if not active_rule_pack:
+            raise HTTPException(status_code=500, detail="No currently active rule pack.")
+        versions = [active_rule_pack.version]
+    rule_packs_tags = rule_pack_crud.get_rule_packs_tags(db_connection=db_connection, versions=versions)
+    return rule_packs_tags
 
 
 def determine_uploaded_rule_pack_activation(requested_rule_pack_version: str,

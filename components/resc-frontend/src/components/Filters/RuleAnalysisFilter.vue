@@ -84,6 +84,16 @@
             />
           </div>
         </div>
+        <div class="row">
+          <!-- Rule Tags Filter -->
+          <div class="col-md-3">
+            <RuleTagsFilter
+              :options="ruleTags"
+              :requestedRuleTagsFilterValue="selectedRuleTags"
+              @on-rule-tags-change="onRuleTagsChange"
+            />
+          </div>
+        </div>
       </b-collapse>
     </div>
   </div>
@@ -95,10 +105,12 @@ import FindingStatusFilter from '@/components/Filters/FindingStatusFilter.vue';
 import ProjectFilter from '@/components/Filters/ProjectFilter.vue';
 import RepositoryFilter from '@/components/Filters/RepositoryFilter.vue';
 import RuleFilter from '@/components/Filters/RuleFilter.vue';
+import RulePackService from '@/services/rule-pack-service';
 import RuleService from '@/services/rule-service';
 import Store from '@/store/index.js';
 import VcsProviderFilter from '@/components/Filters/VcsProviderFilter.vue';
 import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
+import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
 
 export default {
   name: 'RuleAnalysisFilter',
@@ -127,6 +139,7 @@ export default {
   data() {
     return {
       rules: [],
+      ruleTags: [],
       startDate: '',
       endDate: '',
       selectedVcsProvider: null,
@@ -135,6 +148,7 @@ export default {
       selectedRepository: null,
       selectedBranch: null,
       selectedRule: null,
+      selectedRuleTags: null,
       selectedRulePackVersions: [],
     };
   },
@@ -194,15 +208,22 @@ export default {
       this.handleFilterChange();
     },
 
+    onRuleTagsChange(ruleTags) {
+      this.selectedRuleTags = ruleTags;
+      this.handleFilterChange();
+    },
+
     onRulePackVersionChange(rulePackVersions) {
       this.selectedRulePackVersions = rulePackVersions;
       this.fetchAllDetectedRules();
+      this.fetchRuleTags();
       this.handleFilterChange();
     },
 
     setRulePackVersionsOnRulePackFilter(rulePackVersions) {
       this.selectedRulePackVersions = rulePackVersions;
       this.fetchAllDetectedRules();
+      this.fetchRuleTags();
     },
 
     handleFilterChange() {
@@ -224,6 +245,7 @@ export default {
       filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
       filterObj.rulePackVersions = rulePackVersions;
+      filterObj.ruleTags = this.selectedRuleTags;
       this.$emit('on-filter-change', filterObj);
     },
     fetchAllDetectedRules() {
@@ -249,6 +271,21 @@ export default {
           AxiosConfig.handleError(error);
         });
     },
+    fetchRuleTags() {
+      const rulePackVersions = [];
+      if (this.selectedRulePackVersions) {
+        for (const obj of this.selectedRulePackVersions) {
+          rulePackVersions.push(obj.version);
+        }
+      }
+      RulePackService.getRuleTagsByRulePackVersions(rulePackVersions)
+        .then((response) => {
+          this.ruleTags = response.data;
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
     applyRuleFilterInRuleAnalysisPage() {
       const selectedRules = [];
       const selectedVersions = [];
@@ -258,6 +295,9 @@ export default {
           for (const obj of Store.getters.previousRouteState.rulePackVersions) {
             selectedVersions.push(obj.version);
           }
+        }
+        if (Store.getters.previousRouteState.ruleTags) {
+          this.selectedRuleTags = Store.getters.previousRouteState.ruleTags;
         }
       }
       const sourceRoute = Store.getters.sourceRoute;
@@ -277,6 +317,7 @@ export default {
         filterObj.repository = this.selectedRepository;
         filterObj.branch = this.selectedBranch;
         filterObj.rule = selectedRules;
+        filterObj.ruleTags = this.selectedRuleTags;
         filterObj.rulePackVersions = selectedVersions;
 
         //Populate rule analysis list based on rule filter
@@ -299,6 +340,7 @@ export default {
     RuleFilter,
     VcsProviderFilter,
     RulePackFilter,
+    RuleTagsFilter,
   },
 };
 </script>

@@ -9,7 +9,6 @@ from pydantic import BaseModel, conint, constr
 class RuleBase(BaseModel):
     rule_name: constr(min_length=1, max_length=400)
     description: Optional[constr(max_length=2000)] = None
-    tags: Optional[constr(max_length=2000)] = None
     entropy: Optional[float] = None
     secret_group: Optional[int] = None
     regex: Optional[str] = None

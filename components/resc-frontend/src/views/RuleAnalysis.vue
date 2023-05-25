@@ -170,6 +170,7 @@ export default {
       pageSizes: [20, 50, 100],
       requestedPageNumber: 1,
       rulePackVersions: [],
+      ruleTagsList: [],
       projectNames: [],
       repositoryNames: [],
       selectedStartDate: '',
@@ -180,6 +181,7 @@ export default {
       selectedRepository: null,
       selectedBranch: null,
       selectedRule: null,
+      selectedRuleTags: null,
       selectedRulePackVersions: [],
       selectedRulePackVersionsList: [],
       selectedCheckBoxIds: [],
@@ -326,6 +328,7 @@ export default {
       filterObj.repository = this.selectedRepository;
       filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
+      filterObj.ruleTags = this.selectedRuleTags;
       filterObj.rulePackVersions = this.selectedRulePackVersions;
 
       FindingsService.getDetailedFindings(filterObj)
@@ -360,6 +363,7 @@ export default {
       this.selectedRepository = filterObj.repository;
       this.selectedBranch = filterObj.branch;
       this.selectedRule = filterObj.rule;
+      this.selectedRuleTags = filterObj.ruleTags;
       this.selectedRulePackVersions = filterObj.rulePackVersions;
       this.currentPage = 1;
       this.allSelected = false;
@@ -396,16 +400,17 @@ export default {
         .then((response) => {
           this.rulePackVersions = [];
           this.selectedRulePackVersions = [];
-          for (const index of response.data.data.keys()) {
-            const data = response.data.data[index];
-            if (Store.getters.previousRouteState) {
-              for (const obj of Store.getters.previousRouteState.rulePackVersions) {
-                this.selectedRulePackVersions.push(obj.version);
-                this.selectedRulePackVersionsList.push(obj);
-              }
-              Store.commit('update_previous_route_state', null);
+          response.data.data.forEach((rulePack) => {
+            this.rulePackVersions.push(rulePack);
+          });
+          //Select rule pack versions passed from rule analysis scrren
+          if (Store.getters.previousRouteState) {
+            for (const obj of Store.getters.previousRouteState.rulePackVersions) {
+              this.selectedRulePackVersions.push(obj.version);
+              this.selectedRulePackVersionsList.push(obj);
             }
-            this.rulePackVersions.push(data);
+            this.fetchRuleTags();
+            Store.commit('update_previous_route_state', null);
           }
         })
         .catch((error) => {
@@ -427,6 +432,16 @@ export default {
             this.rulePackVersions.push(data);
           }
           this.fetchPaginatedDetailedFindings();
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
+    fetchRuleTags() {
+      RulePackService.getRuleTagsByRulePackVersions(this.selectedRulePackVersions)
+        .then((response) => {
+          this.selectedRuleTags = [];
+          this.ruleTagsList = response.data;
         })
         .catch((error) => {
           AxiosConfig.handleError(error);

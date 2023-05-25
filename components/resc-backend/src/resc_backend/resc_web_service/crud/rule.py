@@ -62,7 +62,6 @@ def create_rule(db_connection: Session, rule: RuleCreate):
     db_rule = model.rule.DBrule(
         rule_name=rule.rule_name,
         description=rule.description,
-        tags=rule.tags,
         entropy=rule.entropy,
         secret_group=rule.secret_group,
         regex=rule.regex,
@@ -92,7 +91,6 @@ def get_rules_by_rule_pack_version(db_connection: Session, rule_pack_version: st
         model.DBrule.id_,
         model.DBrule.rule_pack,
         model.DBrule.rule_name,
-        model.DBrule.tags,
         model.DBrule.entropy,
         model.DBrule.secret_group,
         model.DBrule.regex,

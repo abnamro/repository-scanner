@@ -44,7 +44,11 @@
 
       <!-- Rule Filter -->
       <div class="col-md-3">
-        <RuleFilter :options="ruleList" @on-rule-change="handleRuleFilterChange" />
+        <RuleFilter
+          ref="ruleFilterChildComponent"
+          :options="ruleList"
+          @on-rule-change="handleRuleFilterChange"
+        />
       </div>
 
       <!-- Status Filter -->
@@ -55,16 +59,28 @@
 
     <!-- Include previous scan findings -->
     <div class="row">
-      <div class="col-md-2 ml-3">
+      <!-- Rule Tags Filter -->
+      <div class="col-md-1 ml-3"></div>
+      <div class="col-md-3 ml-2">
+        <RuleTagsFilter
+          ref="ruleTagsFilterChildComponent"
+          :options="ruleTagsList"
+          :requestedRuleTagsFilterValue="selectedRuleTags"
+          @on-rule-tags-change="handleRuleTagsFilterChange"
+        />
+      </div>
+      <div class="col-md-2 ml-3 mt-4 pt-3">
         <b-form-checkbox
           v-model="includePreviousScans"
           name="check-button"
           switch
           @change="togglePreviousScans"
+          @click.native="handleToggleButtonClick"
         >
           <small class="text-nowrap">Include previous scan findings</small>
         </b-form-checkbox>
       </div>
+      <div class="col-md-1"></div>
     </div>
   </div>
 </template>
@@ -75,6 +91,8 @@ import DateUtils from '@/utils/date-utils';
 import FindingStatusFilter from '@/components/Filters/FindingStatusFilter.vue';
 import Multiselect from 'vue-multiselect';
 import RuleFilter from '@/components/Filters/RuleFilter.vue';
+import RulePackService from '@/services/rule-pack-service';
+import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
 import RepositoryService from '@/services/repository-service';
 import ScanFindingsService from '@/services/scan-findings-service';
 
@@ -93,10 +111,12 @@ export default {
       scanList: [],
       scanDateList: [],
       ruleList: [],
+      ruleTagsList: [],
       statusList: [],
       selectedBranch: null,
       selectedScan: null,
       selectedRule: null,
+      selectedRuleTags: null,
       selectedStatus: null,
       includePreviousScans: false,
     };
@@ -112,6 +132,9 @@ export default {
         }
       }
     },
+    handleToggleButtonClick() {
+      this.refreshRuleTagsOnToggleOfPreviousScansButton();
+    },
     togglePreviousScans() {
       if (this.includePreviousScans) {
         this.previousScans = [];
@@ -120,6 +143,7 @@ export default {
         this.$emit(
           'include-previous-scans',
           this.selectedRule,
+          this.selectedRuleTags,
           this.selectedStatus,
           this.previousScans
         );
@@ -139,10 +163,21 @@ export default {
       this.fetchScanDates();
     },
     handleScanDateFilterChange() {
+      // On scan date reset the Rule tags filter selection
+      this.selectedRuleTags = null;
+      this.$refs.ruleTagsFilterChildComponent.resetRuleTagsFilterSelection();
+
+      // On scan date reset the Rule filter selection
+      this.selectedRule = null;
+      this.$refs.ruleFilterChildComponent.resetRuleFilterSelection();
       this.fetchRules();
     },
     handleRuleFilterChange(rule) {
       this.selectedRule = rule;
+      this.handleFilterChange();
+    },
+    handleRuleTagsFilterChange(ruleTags) {
+      this.selectedRuleTags = ruleTags;
       this.handleFilterChange();
     },
     onStatusFilterChange(status) {
@@ -156,7 +191,8 @@ export default {
           'on-filter-change',
           this.selectedScan.scanId,
           this.selectedRule,
-          this.selectedStatus
+          this.selectedStatus,
+          this.selectedRuleTags
         );
       } else {
         this.togglePreviousScans();
@@ -169,6 +205,16 @@ export default {
       }
       const scanIds = this.includePreviousScans ? previousScanIds : [this.selectedScan.scanId];
       return scanIds;
+    },
+    getSelectedRulePacks() {
+      const rulePacksForPreviousScanIds = [];
+      for (const scan of this.previousScans) {
+        rulePacksForPreviousScanIds.push(scan.rule_pack);
+      }
+      const rulePacks = this.includePreviousScans
+        ? rulePacksForPreviousScanIds
+        : [this.selectedScan.rulePackVersion];
+      return rulePacks;
     },
     refreshRuleFilter() {
       const scanIds = this.getPreviousScanIds();
@@ -191,21 +237,47 @@ export default {
             this.selectedRule = null;
             this.ruleList = response.data;
 
-            // Refresh findings
-            this.handleFilterChange();
-
-            // if scanId gets changed, update it in route parameter
-            if (Number(this.$route.params.scanId) !== Number(this.selectedScan.scanId)) {
-              this.$router.replace({
-                name: 'ScanFindings',
-                params: { scanId: this.selectedScan.scanId },
-              });
-            }
+            // Fetch Rule Tags
+            this.fetchRuleTags();
           })
           .catch((error) => {
             AxiosConfig.handleError(error);
           });
       }
+    },
+    fetchRuleTags() {
+      const rulePackVersions = this.getSelectedRulePacks();
+      RulePackService.getRuleTagsByRulePackVersions(rulePackVersions)
+        .then((response) => {
+          this.selectedRuleTags = null;
+          this.ruleTagsList = response.data;
+
+          // Refresh findings
+          this.handleFilterChange();
+
+          // if scanId gets changed, update it in route parameter
+          if (Number(this.$route.params.scanId) !== Number(this.selectedScan.scanId)) {
+            this.$router.replace({
+              name: 'ScanFindings',
+              params: { scanId: this.selectedScan.scanId },
+            });
+          }
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
+    },
+    refreshRuleTagsOnToggleOfPreviousScansButton() {
+      const rulePackVersions = this.getSelectedRulePacks();
+      RulePackService.getRuleTagsByRulePackVersions(rulePackVersions)
+        .then((response) => {
+          this.ruleTagsList = response.data;
+          this.selectedRuleTags = null;
+          this.$refs.ruleTagsFilterChildComponent.resetRuleTagsFilterSelection();
+        })
+        .catch((error) => {
+          AxiosConfig.handleError(error);
+        });
     },
     fetchScanDates() {
       if (this.selectedBranch.id_) {
@@ -222,6 +294,7 @@ export default {
               scanJson['scanId'] = scan.id_;
               scanJson['scanDate'] = DateUtils.formatDate(scan.timestamp);
               scanJson['scanType'] = scan.scan_type === 'INCREMENTAL' ? 'Incremental' : 'Base';
+              scanJson['rulePackVersion'] = scan.rule_pack;
 
               // Set scan date value in select option when user clicks branch scan findings record from Repositories page
               if (this.$route.params.scanId === scan.id_) {
@@ -279,6 +352,7 @@ export default {
     FindingStatusFilter,
     Multiselect,
     RuleFilter,
+    RuleTagsFilter,
   },
 };
 </script>

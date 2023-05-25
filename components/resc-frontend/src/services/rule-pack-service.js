@@ -31,6 +31,16 @@ const RulePackService = {
       responseType: 'arraybuffer',
     });
   },
+
+  async getRuleTagsByRulePackVersions(rulePackVersions) {
+    let queryParams = '';
+    if (rulePackVersions) {
+      rulePackVersions.forEach((version) => {
+        queryParams += `&version=${version}`;
+      });
+    }
+    return axios.get(`/rule-packs/tags?${queryParams}`);
+  },
 };
 
 export default RulePackService;

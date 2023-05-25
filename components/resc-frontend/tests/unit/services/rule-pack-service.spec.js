@@ -1,6 +1,7 @@
 import axios from 'axios';
 import RulePackService from '@/services/rule-pack-service';
 import rule_packs from '@/../tests/resources/mock_rule_packs.json';
+import rule_tags from '@/../tests/resources/mock_rule_tags.json';
 
 jest.mock('axios');
 
@@ -102,6 +103,42 @@ describe('function uploadRulePack', () => {
           expect(response).toBeDefined();
           expect(response).not.toBeNull();
           expect(response.status).toEqual(500);
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).not.toBeNull();
+        });
+    });
+  });
+});
+
+describe('function getRuleTagsByRulePackVersions', () => {
+  describe('when getRuleTagsByRulePackVersions API call is successful', () => {
+    it('should return all tags for provided rule pack versions', async () => {
+      axios.get.mockResolvedValueOnce(rule_tags);
+      const rulePackVersions = ['1.0.0', '1.0.1'];
+      const response = await RulePackService.getRuleTagsByRulePackVersions(rulePackVersions);
+
+      expect(response).toBeDefined();
+      expect(response).not.toBeNull();
+      expect(response).toEqual(rule_tags);
+      expect(response.data.length).toBe(4);
+      expect(response.data[0]).toBe('Cli');
+      expect(response.data[1]).toBe('Info');
+      expect(response.data[2]).toBe('Warn');
+      expect(response.data[3]).toBe('Sentinel');
+    });
+  });
+
+  describe('when getRuleTagsByRulePackVersions API call fails', () => {
+    it('getRuleTagsByRulePackVersions should return error', async () => {
+      axios.get.mockResolvedValueOnce([]);
+
+      await RulePackService.getRuleTagsByRulePackVersions('not_valid')
+        .then((response) => {
+          expect(response).toEqual([]);
+          expect(response).not.toBeNull();
+          expect(response.length).toBe(0);
         })
         .catch((error) => {
           expect(error).toBeDefined();
