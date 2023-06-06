@@ -1,2 +1,4 @@
 exclude README.md
 exclude MANIFEST.in
+include resources/*
+include images/*
