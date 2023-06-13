@@ -117,16 +117,13 @@ class RESTAPIWriter(OutputModule):
 
         return created_scan
 
-    def get_last_scanned_commit(self, branch: BranchRead):
-        last_scanned_commit = None
+    def get_last_scan_for_branch(self, branch: BranchRead) -> ScanRead:
         response = get_last_scan_for_branch(self.rws_url,
                                             branch.id_)
         if response.status_code == 200:
-            json_body = json.loads(response.text)
-            last_scanned_commit = json_body['last_scanned_commit'] if json_body else None
-        else:
-            logger.warning(f"Retrieving last scan details failed with error: {response.status_code}->{response.text}")
-        return last_scanned_commit
+            return ScanRead(**json.loads(response.text))
+        logger.warning(f"Retrieving last scan details failed with error: {response.status_code}->{response.text}")
+        return None
 
     @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(100))
     def write_vcs_instances(self, vcs_instances_dict: Dict[str, VCSInstanceRuntime]) \

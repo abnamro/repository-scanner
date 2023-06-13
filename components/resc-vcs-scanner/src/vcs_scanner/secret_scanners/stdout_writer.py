@@ -179,5 +179,5 @@ class STDOUTWriter(OutputModule):
                         id_=1,
                         rule_pack=rule_pack)
 
-    def get_last_scanned_commit(self, branch: Branch):
+    def get_last_scan_for_branch(self, branch: Branch) -> ScanRead:
         return None

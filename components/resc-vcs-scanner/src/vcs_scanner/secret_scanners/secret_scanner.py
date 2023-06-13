@@ -88,16 +88,11 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                 return
 
             # Get last scanned commit for the branch
-            last_scanned_commit = self._output_module.get_last_scanned_commit(branch=created_branch)
+            last_scan_for_branch = self._output_module.get_last_scan_for_branch(branch=created_branch)
+            last_scanned_commit = last_scan_for_branch.last_scanned_commit if last_scan_for_branch else None
+            scan_type_to_run = self.determine_scan_type(branch, last_scan_for_branch)
 
-            # Decide which type of scan to run
-            if self.force_base_scan:
-                scan_type_to_run = ScanType.BASE
-            else:
-                scan_type_to_run = ScanType.INCREMENTAL if last_scanned_commit else ScanType.BASE
-
-            # Only insert in to scan and finding table if its BASE Scan or there is new commit, else skip
-            if scan_type_to_run == ScanType.BASE or last_scanned_commit != branch.latest_commit:
+            if scan_type_to_run:
                 # Insert in to scan table
                 scan_timestamp_start = datetime.utcnow()
                 created_scan = self._output_module.write_scan(
@@ -250,4 +245,22 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
             logger.debug(f"Cleaning up the temporary report: {report_filepath}")
             if os.path.exists(report_filepath):
                 os.remove(report_filepath)
+        return None
+
+    # Decide which type of scan to run
+    def determine_scan_type(self, branch, last_scan_for_branch):
+        # Force base scan, or has no previous scan
+        if self.force_base_scan or last_scan_for_branch is None:
+            return ScanType.BASE
+        # Has previous scan
+        if last_scan_for_branch:
+            last_used_rule_pack = last_scan_for_branch.rule_pack
+            # Rule-pack is different from previous scan
+            if last_used_rule_pack != self.rule_pack_version:
+                return ScanType.BASE
+            last_scanned_commit = last_scan_for_branch.last_scanned_commit
+            # Last commit is different from previous scan
+            if branch and branch.latest_commit != last_scanned_commit:
+                return ScanType.INCREMENTAL
+        # Skip scanning, no conditions match
         return None

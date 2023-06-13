@@ -236,7 +236,7 @@ def test_write_scan_unsuccessful(warning, post):
 
 
 @patch("requests.get")
-def test_get_last_scanned_commit(get):
+def test_get_last_scan_for_branch(get):
     url = "https://nonexistingwebsite.com"
     branch = BranchRead(id_=1,
                         branch_id="branch.branch_id",
@@ -255,8 +255,8 @@ def test_get_last_scanned_commit(get):
     get.return_value.status_code = 200
     get.return_value.text = expected_json
 
-    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch)
-    assert result == expected_result.last_scanned_commit
+    result = RESTAPIWriter(rws_url=url).get_last_scan_for_branch(branch)
+    assert result == expected_result
 
 
 @patch("requests.get")
@@ -272,7 +272,7 @@ def test_get_last_scanned_commit_invalid_id(warning, get):
     get.return_value.status_code = 404
     get.return_value.text = error_text
 
-    result = RESTAPIWriter(rws_url=url).get_last_scanned_commit(branch)
+    result = RESTAPIWriter(rws_url=url).get_last_scan_for_branch(branch)
     assert result is None
     warning.assert_called_once()
     warning.assert_called_with(f"Retrieving last scan details failed with error: 404->{error_text}")

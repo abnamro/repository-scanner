@@ -6,7 +6,7 @@ from typing import List
 from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.finding import FindingCreate
 from resc_backend.resc_web_service.schema.repository import Repository
-from resc_backend.resc_web_service.schema.scan import Scan
+from resc_backend.resc_web_service.schema.scan import Scan, ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 
 # First Party
@@ -39,5 +39,5 @@ class OutputModule(metaclass=abc.ABCMeta):
             rule_pack: str) -> Scan:
         pass
 
-    def get_last_scanned_commit(self, branch: Branch):
+    def get_last_scan_for_branch(self, branch: Branch) -> ScanRead:
         pass
