@@ -31,29 +31,28 @@ def install_or_upgrade_helm_release(action: str) -> bool:
         return False
 
 
-def is_chart_version_already_installed() -> bool:
+def get_deployment_status_from_installed_chart() -> str:
+    """
+        Get status of the installed chart
+    :return: str
+        Returns status of the installed chart
+    """
+    cmd = f"helm list -f {constants.CHART_NAME} -n {constants.NAMESPACE} -o json"
+    output = subprocess.check_output(cmd, shell=True)
+    chart_info = json.loads(output.decode("utf-8"))
+    if chart_info and "status" in chart_info[0]:
+        return chart_info[0]["status"]
+    return None
+
+
+def is_chart_already_installed() -> bool:
     """
         Checks if chart installed or not
     :return: bool
         Returns true if chart already installed else returns false
     """
-    downloaded_version = get_version_from_downloaded_chart()
-    installed_version = get_version_from_installed_chart()
-    return downloaded_version == installed_version
-
-
-def get_version_from_installed_chart() -> str:
-    """
-        Get version of the installed chart
-    :return: str
-        Returns version of the installed chart
-    """
-    cmd = f"helm list -f {constants.CHART_NAME} -n {constants.NAMESPACE} -o json"
-    output = subprocess.check_output(cmd, shell=True)
-    chart_info = json.loads(output.decode("utf-8"))
-    if chart_info and "chart" in chart_info[0]:
-        return chart_info[0]["chart"].split("-")[1]
-    return None
+    status = get_deployment_status_from_installed_chart()
+    return bool(status == "deployed")
 
 
 def get_version_from_downloaded_chart() -> str:
@@ -92,4 +91,19 @@ def update_helm_repository():
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
         logging.error("An error occurred while updating the helm repository")
+        sys.exit(1)
+
+
+def validate_helm_deployment_status():
+    """
+        Validate the status of the helm deployment
+    """
+    try:
+        result = subprocess.run(['helm', 'status', constants.RELEASE_NAME, "-n", constants.NAMESPACE],
+                                capture_output=True, check=True, text=True)
+        output = result.stdout.strip()
+        if "STATUS: deployed" in output:
+            logging.info("The deployment was successful. Visit http://127.0.0.1:30000 to get started with RESC!")
+    except subprocess.CalledProcessError:
+        logging.error("An error occurred during deployment.")
         sys.exit(1)
