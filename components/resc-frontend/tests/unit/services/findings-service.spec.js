@@ -6,6 +6,7 @@ import detailed_findings_with_rule_pack_version from '@/../tests/resources/mock_
 import finding_count_per_week from '@/../tests/resources/mock_findings_count_per_week.json';
 import audits from '@/../tests/resources/mock_finding_audits.json';
 import findings_status_counts_per_vcs_provider_per_week from '@/../tests/resources/mock_findings_status_count_by_vcs_provider_per_week.json';
+import audit_count_by_auditor_per_week from '@/../tests/resources/mock_audit_count_by_auditor_per_week.json';
 
 jest.mock('axios');
 
@@ -271,6 +272,40 @@ describe('function getDetailedFindings', () => {
             expect(error).toBeDefined();
             expect(error).not.toBeNull();
           });
+      });
+    });
+
+    describe('function getAuditsByAuditorPerWeek', () => {
+      describe('when getAuditsByAuditorPerWeek API call is successful', () => {
+        it('should return audit counts per auditor per week', async () => {
+          axios.get.mockResolvedValueOnce(audit_count_by_auditor_per_week);
+
+          const response = await FindingsService.getAuditsByAuditorPerWeek();
+
+          expect(response).toEqual(audit_count_by_auditor_per_week);
+          expect(response).toBeDefined();
+          expect(response).not.toBeNull();
+          expect(response.length).toBe(13);
+          expect(response[0].time_period).toBe('2023 W12');
+          expect(response[0].total).toBe(0);
+          expect(response[0].audit_by_auditor_count.Anonymous).toBe(0);
+        });
+      });
+
+      describe('when getAuditsByAuditorPerWeek API call fails', () => {
+        it('getAuditsByAuditorPerWeek should return error', async () => {
+          axios.get.mockResolvedValueOnce([]);
+
+          await FindingsService.getAuditsByAuditorPerWeek('not_valid')
+            .then((response) => {
+              expect(response).toEqual([]);
+              expect(response).not.toBeNull();
+            })
+            .catch((error) => {
+              expect(error).toBeDefined();
+              expect(error).not.toBeNull();
+            });
+        });
       });
     });
   });

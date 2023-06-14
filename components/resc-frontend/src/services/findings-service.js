@@ -87,6 +87,9 @@ const FindingsService = {
   async getTruePositiveCountPerVcsProviderPerWeek() {
     return axios.get(`/metrics/audited-count-over-time`);
   },
+  async getAuditsByAuditorPerWeek() {
+    return axios.get(`/metrics/audit-count-by-auditor-over-time`);
+  },
 
   async getFindingAudits(findingId, perPage, skipRowCount) {
     return axios.get(`findings/${findingId}/audit`, {
