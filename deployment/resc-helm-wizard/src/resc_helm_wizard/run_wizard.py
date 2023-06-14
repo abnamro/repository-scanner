@@ -37,7 +37,7 @@ def prompt_questions():
                 )
 
                 common.create_helm_values_yaml(helm_values=helm_values,
-                                               input_values_yaml_file="resources/example-values.yaml")
+                                               input_values_yaml_file="config/example-values.yaml")
                 common.run_deployment_as_per_user_confirmation()
     except KeyboardInterrupt:
         logging.error("Aborting the program! operation cancelled by user")
