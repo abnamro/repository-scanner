@@ -19,8 +19,7 @@ def install_or_upgrade_helm_release(action: str) -> bool:
         Returns true if install or upgrade succeeded else returns false
     """
     logging.info(f"Running {action}. Please wait for a moment...")
-    helm_command = ["helm", action, "--timeout", constants.HELM_DEPLOY_TIMEOUT, "-n",
-                    constants.NAMESPACE, constants.RELEASE_NAME, constants.CHART_NAME, "-f",
+    helm_command = ["helm", action, "-n", constants.NAMESPACE, constants.RELEASE_NAME, constants.CHART_NAME, "-f",
                     constants.VALUES_FILE, "--set-file", "global.secretScanRulePackConfig=" + constants.RULE_FILE]
     try:
         output = subprocess.check_output(helm_command)
@@ -31,15 +30,28 @@ def install_or_upgrade_helm_release(action: str) -> bool:
         return False
 
 
-def check_helm_release_exists() -> bool:
+def get_deployment_status_from_installed_chart() -> str:
     """
-        Checks if helm release exists or not
+        Get status of the installed chart
+    :return: str
+        Returns status of the installed chart
+    """
+    cmd = f"helm list -f {constants.CHART_NAME} -n {constants.NAMESPACE} -o json"
+    output = subprocess.check_output(cmd, shell=True)
+    chart_info = json.loads(output.decode("utf-8"))
+    if chart_info and "status" in chart_info[0]:
+        return chart_info[0]["status"]
+    return None
+
+
+def is_chart_already_installed() -> bool:
+    """
+        Checks if chart installed or not
     :return: bool
-        Returns true if helm release exists else returns false
+        Returns true if chart already installed else returns false
     """
-    output = subprocess.run(["helm", "list", "-f", constants.RELEASE_NAME, "-n", constants.NAMESPACE],
-                            capture_output=True, text=True, check=True)
-    return bool(constants.RELEASE_NAME in output.stdout.strip())
+    status = get_deployment_status_from_installed_chart()
+    return bool(status == "deployed")
 
 
 def get_version_from_downloaded_chart() -> str:
@@ -91,10 +103,6 @@ def validate_helm_deployment_status():
         output = result.stdout.strip()
         if "STATUS: deployed" in output:
             logging.info("The deployment was successful. Visit http://127.0.0.1:30000 to get started with RESC!")
-            logging.info("Refer this link for more information on how to trigger the scan: "
-                         "https://github.com/abnamro/repository-scanner/tree/main/"
-                         "deployment/kubernetes#trigger-scanning")
     except subprocess.CalledProcessError:
-        logging.error("An error occurred during deployment. Please run this command to debug any issue: "
-                      "kubectl get pods -n resc")
+        logging.error("An error occurred during deployment.")
         sys.exit(1)
