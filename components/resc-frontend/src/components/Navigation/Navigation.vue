@@ -17,8 +17,8 @@ export default {
       },
       child: [
         {
-          href: '/metrics/rule-metrics',
-          title: 'Rule Metrics',
+          href: '/metrics/audit-metrics',
+          title: 'Audit Metrics',
           icon: {
             element: 'font-awesome-icon',
             attributes: {
@@ -29,6 +29,16 @@ export default {
         {
           href: '/metrics/finding-metrics',
           title: 'Finding Metrics',
+          icon: {
+            element: 'font-awesome-icon',
+            attributes: {
+              icon: 'chart-bar',
+            },
+          },
+        },
+        {
+          href: '/metrics/rule-metrics',
+          title: 'Rule Metrics',
           icon: {
             element: 'font-awesome-icon',
             attributes: {

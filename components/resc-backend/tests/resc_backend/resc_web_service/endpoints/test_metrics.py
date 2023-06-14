@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 # First Party
 from resc_backend.constants import (
+    RWS_ROUTE_AUDIT_COUNT_BY_AUDITOR_OVER_TIME,
     RWS_ROUTE_AUDITED_COUNT_OVER_TIME,
     RWS_ROUTE_COUNT_PER_VCS_PROVIDER_BY_WEEK,
     RWS_ROUTE_METRICS,
@@ -90,3 +91,18 @@ class TestFindings(unittest.TestCase):
         assert data[1].total == data2["finding_count"]+data3["finding_count"]
         assert data[0].time_period == f"{third_week.isocalendar().year} W{third_week.isocalendar().week:02d}"
         assert data[0].total == 0
+
+    @patch("resc_backend.resc_web_service.crud.audit.get_audit_count_by_auditor_over_time")
+    def test_get_audit_count_by_auditor_over_time(self, get_audit_count_by_auditor_over_time):
+        get_audit_count_by_auditor_over_time.return_value = {}
+        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_METRICS}"
+                                   f"{RWS_ROUTE_AUDIT_COUNT_BY_AUDITOR_OVER_TIME}")
+
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert len(data) == 13
+        first_week = datetime.utcnow() - timedelta(weeks=0)
+        nth_week = datetime.utcnow() - timedelta(weeks=len(data)-1)
+        assert data[len(data)-1]["time_period"] == f"{first_week.isocalendar().year} " \
+                                                   f"W{first_week.isocalendar().week:02d}"
+        assert data[0]["time_period"] == f"{nth_week.isocalendar().year} W{nth_week.isocalendar().week:02d}"
