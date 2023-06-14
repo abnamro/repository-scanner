@@ -74,7 +74,7 @@ def add_helm_repository():
     """
         Adds a helm repository
     """
-    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL]
+    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL, "-n", constants.NAMESPACE]
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
@@ -86,7 +86,7 @@ def update_helm_repository():
     """
         Updates a helm repository
     """
-    cmd = ["helm", "repo", "update", constants.HELM_REPO_NAME]
+    cmd = ["helm", "repo", "update", "-n", constants.NAMESPACE]
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:

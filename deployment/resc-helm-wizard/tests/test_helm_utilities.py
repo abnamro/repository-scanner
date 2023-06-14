@@ -94,7 +94,7 @@ def test_get_version_from_downloaded_chart_failure(mock_check_output):
 
 @patch("subprocess.run")
 def test_add_helm_repository_success(mock_check_output):
-    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL]
+    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL, "-n", constants.NAMESPACE]
     add_helm_repository()
     assert mock_check_output.called
     mock_check_output.assert_called_once_with(cmd, check=True)
@@ -102,7 +102,7 @@ def test_add_helm_repository_success(mock_check_output):
 
 @patch("logging.Logger.error")
 def test_add_helm_repository_failure(mock_error_log):
-    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL]
+    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL, "-n", constants.NAMESPACE]
     expected_error_log = "An error occurred while adding the helm repository"
     with mock.patch("subprocess.run") as mock_check_output, \
             mock.patch("sys.exit") as mock_sys_exit:
@@ -116,7 +116,7 @@ def test_add_helm_repository_failure(mock_error_log):
 
 @patch("subprocess.run")
 def test_update_helm_repository_success(mock_check_output):
-    cmd = ["helm", "repo", "update", constants.HELM_REPO_NAME]
+    cmd = ["helm", "repo", "update", "-n", constants.NAMESPACE]
     update_helm_repository()
     assert mock_check_output.called
     mock_check_output.assert_called_once_with(cmd, check=True)
@@ -124,7 +124,7 @@ def test_update_helm_repository_success(mock_check_output):
 
 @patch("logging.Logger.error")
 def test_update_helm_repository_failure(mock_error_log):
-    cmd = ["helm", "repo", "update", constants.HELM_REPO_NAME]
+    cmd = ["helm", "repo", "update", "-n", constants.NAMESPACE]
     expected_error_log = "An error occurred while updating the helm repository"
     with mock.patch("subprocess.run") as mock_check_output, \
             mock.patch("sys.exit") as mock_sys_exit:
