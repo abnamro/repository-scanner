@@ -20,8 +20,7 @@ def install_or_upgrade_helm_release(action: str) -> bool:
     """
     logging.info(f"Running {action}. Please wait for a moment...")
     helm_command = ["helm", action, "-n", constants.NAMESPACE, constants.RELEASE_NAME, constants.CHART_NAME, "-f",
-                    constants.VALUES_FILE, "--set-file", "global.secretScanRulePackConfig=" + constants.RULE_FILE,
-                    "--repo", constants.RESC_HELM_REPO_URL]
+                    constants.VALUES_FILE, "--set-file", "global.secretScanRulePackConfig=" + constants.RULE_FILE]
     try:
         output = subprocess.check_output(helm_command)
         logging.info(output.decode("utf-8"))
