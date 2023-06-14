@@ -1,4 +1,4 @@
-# Helm Values YAML Wizard
+# Repository Scanner Helm Wizard (resc-helm-wizard)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents

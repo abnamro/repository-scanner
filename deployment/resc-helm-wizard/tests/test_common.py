@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 # Third Party
 import pytest
+import yaml
 
 # First Party
 from resc_helm_wizard.common import (
@@ -251,9 +252,10 @@ def test_create_storage_for_db_and_rabbitmq_where_path_does_not_exist_and_dir_co
     assert excinfo.value.code == 1
 
 
+@patch("resc_helm_wizard.common.read_yaml_file")
 @patch("os.path.exists")
 def test_create_helm_values_yaml_success(
-        mock_file_path_exists):
+        mock_file_path_exists, mock_read_yaml_file):
     vcs_instance1 = VcsInstance(
         provider_type="GITHUB_PUBLIC",
         scheme="https",
@@ -272,8 +274,12 @@ def test_create_helm_values_yaml_success(
         rabbitmq_storage_path="/temp/rabbitmq",
         vcs_instances=vcs_instances
     )
+
     mock_file_path_exists.return_type = True
     input_file_path = os.path.join(THIS_DIR.parent, "tests", "fixtures", "test-values.yaml")
+    with open(input_file_path, "r", encoding="utf-8") as file_in:
+        values_dict = yaml.safe_load(file_in)
+    mock_read_yaml_file.return_value = values_dict
     generated_file_path = os.path.join(THIS_DIR.parent, "custom-values.yaml")
     output_file_generated = create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)
     assert output_file_generated is True
@@ -291,8 +297,9 @@ def test_create_helm_values_sys_exit_when_file_not_exists(mock_error_log):
     assert excinfo.value.code == 1
 
 
+@patch("resc_helm_wizard.common.read_yaml_file")
 @patch("logging.Logger.error")
-def test_create_helm_values_sys_exit_when_key_not_exists(mock_error_log):
+def test_create_helm_values_sys_exit_when_key_not_exists(mock_error_log, mock_read_yaml_file):
     helm_values = HelmValue(
         operating_system="linux",
         db_password="dummy_pass",
@@ -301,6 +308,9 @@ def test_create_helm_values_sys_exit_when_key_not_exists(mock_error_log):
         vcs_instances=[]
     )
     input_file_path = os.path.join(THIS_DIR.parent, "tests", "fixtures", "test-invalid-values.yaml")
+    with open(input_file_path, "r", encoding="utf-8") as file_in:
+        values_dict = yaml.safe_load(file_in)
+    mock_read_yaml_file.return_value = values_dict
     expected_error_log = f"Aborting the program! 'resc-database' was missing in {input_file_path}"
     with pytest.raises(SystemExit) as excinfo:
         create_helm_values_yaml(helm_values=helm_values, input_values_yaml_file=input_file_path)

@@ -7,6 +7,7 @@ from typing import List
 from urllib.parse import urlparse
 
 # Third Party
+import pkg_resources
 import requests
 import yaml
 
@@ -161,8 +162,7 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
                                 "blob/main/deployment/kubernetes/README.md"
 
     try:
-        with open(input_values_yaml_file, "r", encoding="utf-8") as file_in:
-            values_dict = yaml.safe_load(file_in)
+        values_dict = read_yaml_file(input_values_yaml_file)
 
         values_dict["resc-database"]["hostOS"] = helm_values.operating_system
         values_dict["resc-database"]["database"]["pvc_path"] = helm_values.db_storage_path
@@ -194,6 +194,19 @@ def create_helm_values_yaml(helm_values: HelmValue, input_values_yaml_file: str)
         logging.error(f"Aborting the program! {error} was missing in {input_values_yaml_file}")
         sys.exit(1)
     return output_file_generated
+
+
+def read_yaml_file(file_path):
+    """
+        Read content of yaml file
+    :param file_path:
+        path of yaml file
+    :return: stream
+        Returns yaml content
+    """
+    with pkg_resources.resource_stream(__name__, file_path) as file_in:
+        data = yaml.safe_load(file_in)
+    return data
 
 
 def get_scheme_host_port_from_url(url: str):
