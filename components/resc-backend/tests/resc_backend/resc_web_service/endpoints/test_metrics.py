@@ -12,16 +12,12 @@ from resc_backend.constants import (
     RWS_ROUTE_AUDITED_COUNT_OVER_TIME,
     RWS_ROUTE_COUNT_PER_VCS_PROVIDER_BY_WEEK,
     RWS_ROUTE_METRICS,
-    RWS_ROUTE_PERSONAL_AUDITS,
     RWS_ROUTE_UN_TRIAGED_COUNT_OVER_TIME,
     RWS_VERSION_PREFIX
 )
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
-from resc_backend.resc_web_service.endpoints.metrics import (
-    convert_rows_to_finding_count_over_time,
-    determine_audit_rank_current_week
-)
+from resc_backend.resc_web_service.endpoints.metrics import convert_rows_to_finding_count_over_time
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 
@@ -110,39 +106,3 @@ class TestFindings(unittest.TestCase):
         assert data[len(data)-1]["time_period"] == f"{first_week.isocalendar().year} " \
                                                    f"W{first_week.isocalendar().week:02d}"
         assert data[0]["time_period"] == f"{nth_week.isocalendar().year} W{nth_week.isocalendar().week:02d}"
-
-    @patch("resc_backend.resc_web_service.crud.audit.get_audit_count_by_auditor_over_time")
-    @patch("resc_backend.resc_web_service.crud.audit.get_personal_audit_count")
-    def test_get_personal_audit_metrics(self, get_personal_audit_count, get_audit_count_by_auditor_over_time):
-        get_personal_audit_count.return_value = 2
-        get_audit_count_by_auditor_over_time.return_value = {}
-        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_METRICS}{RWS_ROUTE_PERSONAL_AUDITS}")
-
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == 7
-        assert data["today"] == 2
-        assert data["current_week"] == 2
-        assert data["last_week"] == 2
-        assert data["current_month"] == 2
-        assert data["current_year"] == 2
-        assert data["forever"] == 2
-        assert data["rank_current_week"] == 0
-
-    @patch("resc_backend.resc_web_service.crud.audit.get_audit_count_by_auditor_over_time")
-    def test_determine_audit_rank_current_week(self, get_audit_count_by_auditor_over_time):
-        get_audit_count_by_auditor_over_time.return_value = [{
-            "auditor": 'Anonymous',
-            "audit_count": 2
-        }, {
-            "auditor": 'Me',
-            "audit_count": 4
-        }]
-        rank = determine_audit_rank_current_week(auditor='Anonymous', db_connection=None)
-        assert rank == 2
-
-    @patch("resc_backend.resc_web_service.crud.audit.get_audit_count_by_auditor_over_time")
-    def test_determine_audit_rank_current_week_zero_audits(self, get_audit_count_by_auditor_over_time):
-        get_audit_count_by_auditor_over_time.return_value = {}
-        rank = determine_audit_rank_current_week(auditor='Anonymous', db_connection=None)
-        assert rank == 0

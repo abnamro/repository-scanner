@@ -8,6 +8,7 @@ GITHUB_PUBLIC = "GITHUB_PUBLIC"
 # RWS: RESC Web Service
 RWS_VERSION_PREFIX = "/resc/v1"
 RWS_ROUTE_REPOSITORIES = "/repositories"
+RWS_ROUTE_BRANCHES = "/branches"
 RWS_ROUTE_SCANS = "/scans"
 RWS_ROUTE_LAST_SCAN = "/last-scan"
 RWS_ROUTE_FINDINGS = "/findings"
@@ -23,7 +24,6 @@ RWS_ROUTE_RULE_PACKS = "/rule-packs"
 RWS_ROUTE_VCS = "/vcs-instances"
 
 
-RWS_ROUTE_PERSONAL_AUDITS = "/personal-audits"
 RWS_ROUTE_AUDIT_COUNT_BY_AUDITOR_OVER_TIME = "/audit-count-by-auditor-over-time"
 RWS_ROUTE_AUDITED_COUNT_OVER_TIME = "/audited-count-over-time"
 RWS_ROUTE_UN_TRIAGED_COUNT_OVER_TIME = "/un-triaged-count-over-time"
@@ -42,6 +42,7 @@ RWS_ROUTE_AUTH_CHECK = "/auth-check"
 RWS_ROUTE_HEALTH = "/health"
 
 REPOSITORIES_TAG = "resc-repositories"
+BRANCHES_TAG = "resc-branches"
 SCANS_TAG = "resc-scans"
 FINDINGS_TAG = "resc-findings"
 RULES_TAG = "resc-rules"
@@ -64,9 +65,6 @@ TOML_CUSTOM_DELIMITER = "#custom-delimiter#"
 TEMP_RULE_FILE = "/tmp/temp_resc_rule.toml"
 ALLOWED_EXTENSION = ".toml"
 
-# Logging for dummy-data-generator
-LOG_FILE_DUMMY_DATA_GENENERATOR = "dummy-data-gen.log"
-
 # Logging
 LOG_FILE_PATH_RABBITMQ = "rabbitmq_initialization.log"
 LOGGING_FILE = "logging.ini"
@@ -74,20 +72,3 @@ LOGGING_FILE = "logging.ini"
 # Error message
 ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
 ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"
-
-# Redis Cache
-REDIS_CACHE_EXPIRE = 60*60*24  # set to 24 hours
-
-# HTTP Security Response Headers
-STRICT_TRANSPORT_SECURITY = "max-age=31536000; includeSubDomains; preload"
-CACHE_CONTROL = "no-cache, no-store"
-CROSS_ORIGIN_RESOURCE_POLICY = "same-site"
-REFERRER_POLICY = "same-origin"
-X_PERMITTED_CROSS_DOMAIN_POLICIES = "none"
-X_CONTENT_TYPE_OPTIONS = "nosniff"
-X_FRAME_OPTIONS = "DENY"
-X_XSS_PROTECTION = "1; mode=block"
-CONTENT_SECURITY_POLICY = "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; " \
-                          "connect-src 'self'; img-src 'self' https://fastapi.tiangolo.com data:;style-src " \
-                          "'self' https://fonts.googleapis.com https://cdn.jsdelivr.net 'unsafe-inline';" \
-                          "frame-ancestors 'self'; form-action 'self';"
