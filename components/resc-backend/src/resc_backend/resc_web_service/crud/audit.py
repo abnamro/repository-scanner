@@ -1,10 +1,11 @@
 # pylint: disable=R0916,R0912,C0121
 # Standard Library
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Third Party
-from sqlalchemy import func
+from sqlalchemy import extract, func
+from sqlalchemy.engine import Row
 from sqlalchemy.orm import Session
 
 # First Party
@@ -78,6 +79,34 @@ def get_finding_audits_count(db_connection: Session, finding_id: int) -> int:
     :return: total_count
         count of audit entries
     """
-    total_count = db_connection.query(func.count(model.DBaudit.id_))\
+    total_count = db_connection.query(func.count(model.DBaudit.id_)) \
         .filter(model.DBaudit.finding_id == finding_id).scalar()
     return total_count
+
+
+def get_audit_count_by_auditor_over_time(db_connection: Session, weeks: int = 13) -> list[Row]:
+    """
+        Retrieve count audits by auditor over time for given weeks
+    :param db_connection:
+        Session of the database connection
+    :param weeks:
+        optional, filter on last n weeks, default 13
+    :return: count_over_time
+        list of rows containing audit count over time per week
+    """
+    last_nth_week_date_time = datetime.utcnow() - timedelta(weeks=weeks)
+
+    query = db_connection.query(extract('year', model.DBaudit.timestamp).label("year"),
+                                extract('week', model.DBaudit.timestamp).label("week"),
+                                model.DBaudit.auditor,
+                                func.count(model.DBaudit.id_).label("audit_count")) \
+        .filter(model.DBaudit.timestamp >= last_nth_week_date_time) \
+        .group_by(extract('year', model.DBaudit.timestamp).label("year"),
+                  extract('week', model.DBaudit.timestamp).label("week"),
+                  model.DBaudit.auditor) \
+        .order_by(extract('year', model.DBaudit.timestamp).label("year"),
+                  extract('week', model.DBaudit.timestamp).label("week"),
+                  model.DBaudit.auditor)
+    finding_audits = query.all()
+
+    return finding_audits

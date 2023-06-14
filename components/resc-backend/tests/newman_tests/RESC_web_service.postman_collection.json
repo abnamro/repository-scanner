@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3d5d6abf-2f53-4200-b744-d3965c492658",
+		"_postman_id": "6db9b02e-2513-4d4e-a31d-c90f3a766832",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -18815,6 +18815,55 @@
 									"body": "[\n  {\n    \"time_period\": \"sed cupidatat dolore commodo\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  },\n  {\n    \"time_period\": \"veniam\",\n    \"vcs_provider_finding_count\": {\n      \"AZURE_DEVOPS\": 0,\n      \"BITBUCKET\": 0,\n      \"GITHUB_PUBLIC\": 0\n    },\n    \"total\": 0\n  }\n]"
 								}
 							]
+						},
+						{
+							"name": "Get count of auditds by auditer over time for given weeks",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"array\");",
+											"    pm.expect(responseJson.length).to.eql(13);",
+											"    responseJson.forEach((obj) => {",
+											"        pm.expect(obj).to.have.property('time_period');",
+											"        pm.expect(obj).to.have.property('audit_by_auditor_count');",
+											"        pm.expect(obj).to.have.property('total');",
+											"    });",
+											"    ",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/metrics/audit-count-by-auditor-over-time",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"metrics",
+										"audit-count-by-auditor-over-time"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				}
