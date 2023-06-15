@@ -8,10 +8,9 @@ from unittest.mock import patch
 from resc_helm_wizard import constants
 from resc_helm_wizard.helm_utilities import (
     add_helm_repository,
-    get_deployment_status_from_installed_chart,
+    check_helm_release_exists,
     get_version_from_downloaded_chart,
     install_or_upgrade_helm_release,
-    is_chart_already_installed,
     update_helm_repository,
     validate_helm_deployment_status
 )
@@ -39,40 +38,6 @@ def test_install_or_upgrade_helm_release_failure(mock_error_log):
         assert mock_check_output.called
         assert actual_output is False
         mock_error_log.assert_called_with(expected_error_log)
-
-
-@patch("resc_helm_wizard.helm_utilities.get_deployment_status_from_installed_chart")
-def test_is_chart_already_installed_is_true(get_deployment_status_from_installed_chart):
-    get_deployment_status_from_installed_chart.return_value = "deployed"
-    already_installed = is_chart_already_installed()
-    get_deployment_status_from_installed_chart.assert_called_once_with()
-    assert already_installed is True
-
-
-@patch("resc_helm_wizard.helm_utilities.get_deployment_status_from_installed_chart")
-def test_is_chart_already_installed_is_false(get_deployment_status_from_installed_chart):
-    get_deployment_status_from_installed_chart.return_value = None
-    already_installed = is_chart_already_installed()
-    get_deployment_status_from_installed_chart.assert_called_once_with()
-    assert already_installed is False
-
-
-@patch("subprocess.check_output")
-def test_get_deployment_status_from_installed_chart_success(mock_check_output):
-    expected_output = b'[{"name":"resc","namespace":"resc","revision":"1",' \
-                      b'"updated":"2023-03-30 10:16:56.211749 +0200 CEST","status":"deployed",' \
-                      b'"chart":"resc-1.1.0","app_version":"1.1.0"}]\n'
-    mock_check_output.return_value = expected_output
-    actual_output = get_deployment_status_from_installed_chart()
-    assert actual_output == "deployed"
-
-
-@patch("subprocess.check_output")
-def test_get_deployment_status_from_installed_chart_failure(mock_check_output):
-    expected_output = b'{}'
-    mock_check_output.return_value = expected_output
-    actual_output = get_deployment_status_from_installed_chart()
-    assert actual_output is None
 
 
 @patch("subprocess.check_output")
@@ -141,7 +106,8 @@ def test_update_helm_repository_failure(mock_error_log):
 def test_validate_helm_deployment_status_success(mock_info_log, mock_check_output):
     cmd = ['helm', 'status', constants.RELEASE_NAME, "-n", constants.NAMESPACE]
     expected_output = "RELEASE STATUS: deployed"
-    expected_info_log = "The deployment was successful. Visit http://127.0.0.1:30000 to get started with RESC!"
+    expected_info_log = "Refer this link for more information on how to trigger the scan: " \
+                        "https://github.com/abnamro/repository-scanner/tree/main/deployment/kubernetes#trigger-scanning"
     mock_check_output.return_value.stdout = expected_output
     validate_helm_deployment_status()
     assert mock_check_output.called
@@ -152,7 +118,8 @@ def test_validate_helm_deployment_status_success(mock_info_log, mock_check_outpu
 @patch("logging.Logger.error")
 def test_validate_helm_deployment_status_failure(mock_error_log):
     cmd = ['helm', 'status', constants.RELEASE_NAME, "-n", constants.NAMESPACE]
-    expected_error_log = "An error occurred during deployment."
+    expected_error_log = "An error occurred during deployment. Please run this command to debug any issue: " \
+                         "kubectl get pods -n resc"
     with mock.patch("subprocess.run") as mock_check_output, \
             mock.patch("sys.exit") as mock_sys_exit:
         mock_check_output.side_effect = subprocess.CalledProcessError(returncode=1, cmd=cmd)
@@ -161,3 +128,25 @@ def test_validate_helm_deployment_status_failure(mock_error_log):
         mock_error_log.assert_called_with(expected_error_log)
         mock_check_output.assert_called_once_with(cmd, capture_output=True, check=True, text=True)
         mock_sys_exit.assert_called_once_with(1)
+
+
+@patch("subprocess.run")
+def test_check_helm_release_exists_true(mock_check_output):
+    cmd = ["helm", "list", "-f", constants.RELEASE_NAME, "-n", constants.NAMESPACE]
+    expected_output = f"NAME: {constants.RELEASE_NAME}"
+    mock_check_output.return_value.stdout = expected_output
+    release_exists = check_helm_release_exists()
+    assert mock_check_output.called
+    mock_check_output.assert_called_once_with(cmd, capture_output=True, text=True, check=True)
+    assert release_exists is True
+
+
+@patch("subprocess.run")
+def test_check_helm_release_exists_false(mock_check_output):
+    cmd = ["helm", "list", "-f", constants.RELEASE_NAME, "-n", constants.NAMESPACE]
+    expected_output = "NAME NAMESPACE REVISION UPDATED STATUS CHART APP VERSION"
+    mock_check_output.return_value.stdout = expected_output
+    release_exists = check_helm_release_exists()
+    assert mock_check_output.called
+    mock_check_output.assert_called_once_with(cmd, capture_output=True, text=True, check=True)
+    assert release_exists is False
