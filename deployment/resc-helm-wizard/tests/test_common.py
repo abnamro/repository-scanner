@@ -318,13 +318,15 @@ def test_create_helm_values_sys_exit_when_key_not_exists(mock_error_log, mock_re
     assert excinfo.value.code == 1
 
 
+@patch("resc_helm_wizard.questions.ask_ssl_verification")
 @patch("requests.get")
 @patch("logging.Logger.debug")
-def test_download_rule_toml_file_success(mock_debug_log, mock_get):
+def test_download_rule_toml_file_success(mock_debug_log, mock_get, mock_ask_ssl_verification_confirm):
     url = "https://example.com/rule_file.toml"
     file = "temp_file.toml"
     content = b'file content'
     expected_debug_log = f"{file} successfully downloaded"
+    mock_ask_ssl_verification_confirm.return_value = True
     mock_get.return_value.status_code = 200
     mock_get.return_value.content = content
     downloaded = download_rule_toml_file(url=url, file=file)
@@ -336,15 +338,18 @@ def test_download_rule_toml_file_success(mock_debug_log, mock_get):
         os.remove(file)
 
 
+@patch("resc_helm_wizard.questions.ask_ssl_verification")
 @patch("requests.get")
 @patch("os.path.exists")
 @patch("os.path.getsize")
 @patch("logging.Logger.error")
-def test_download_rule_toml_file_failure(mock_error_log, mock_os_path_getsize, mock_os_path_exists, mock_get):
+def test_download_rule_toml_file_failure(mock_error_log, mock_os_path_getsize, mock_os_path_exists, mock_get,
+                                         mock_ask_ssl_verification_confirm):
     url = "https://example.com/rule_file.toml"
     file = "temp_file.toml"
     content = b'file content'
     expected_error_log = "Unable to download the rule file"
+    mock_ask_ssl_verification_confirm.return_value = True
     mock_os_path_exists.return_value = False
     mock_os_path_getsize.return_value = -1
     mock_get.return_value.status_code = 500
