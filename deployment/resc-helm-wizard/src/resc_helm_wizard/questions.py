@@ -5,12 +5,15 @@ import os
 import questionary
 
 # First Party
+from resc_helm_wizard import constants
 from resc_helm_wizard.validator import (
     azure_devops_token_validator,
     bitbucket_token_validator,
     github_account_name_validator,
     github_token_validator,
-    password_validator
+    github_username_validator,
+    password_validator,
+    vcs_url_validator
 )
 
 
@@ -86,19 +89,27 @@ def ask_vcs_instance_details(vcs_type: str) -> dict:
     """
     username = "NA"
     organization = ""
-    url = questionary.text(f"Please enter {vcs_type} url").unsafe_ask()
 
     if vcs_type == "GitHub":
-        username = questionary.text(f"What's your {vcs_type} username").unsafe_ask()
+        url = questionary.text(f"Please enter {vcs_type} url",
+                               default=constants.DEFAULT_GITHUB_URL,
+                               validate=vcs_url_validator).unsafe_ask()
+        username = questionary.text(f"What's your {vcs_type} username",
+                                    validate=github_username_validator).unsafe_ask()
         token = questionary.password(f"Please enter your {vcs_type} personal access token",
                                      validate=github_token_validator).unsafe_ask()
 
     if vcs_type == "Bitbucket":
+        url = questionary.text(f"Please enter {vcs_type} url",
+                               validate=vcs_url_validator).unsafe_ask()
         username = questionary.text(f"What's your {vcs_type} username").unsafe_ask()
         token = questionary.password(f"Please enter your {vcs_type} personal access token",
                                      validate=bitbucket_token_validator).unsafe_ask()
 
     if vcs_type == "Azure Devops":
+        url = questionary.text(f"Please enter {vcs_type} url",
+                               default=constants.DEFAULT_AZURE_DEVOPS_URL,
+                               validate=vcs_url_validator).unsafe_ask()
         organization = questionary.text(f"What's your organization name in {vcs_type}").unsafe_ask()
         token = questionary.password(f"Please enter your {vcs_type} personal access token",
                                      validate=azure_devops_token_validator).unsafe_ask()
@@ -116,3 +127,15 @@ def ask_which_github_accounts_to_scan(default_github_accounts: str) -> [str]:
                                        default=default_github_accounts,
                                        validate=github_account_name_validator).unsafe_ask()
     return github_accounts
+
+
+def ask_ssl_verification(msg: str) -> bool:
+    """
+        Asks for ssl verification
+    :param msg:
+        confirmation message
+    :return: bool
+        Returns True or False based on user's confirmation
+    """
+    answer = questionary.confirm(msg, default=True).unsafe_ask()
+    return answer
