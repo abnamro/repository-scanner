@@ -124,7 +124,7 @@ def test_get_last_scanned_commit():
                         repository_id=1)
 
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
-        .get_last_scanned_commit(branch)
+        .get_last_scan_for_branch(branch)
     assert result is None
 
 
