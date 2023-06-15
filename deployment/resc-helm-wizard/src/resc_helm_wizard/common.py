@@ -1,7 +1,6 @@
 # Standard Library
 import logging
 import os
-import subprocess
 import sys
 from typing import List
 from urllib.parse import urlparse
@@ -15,8 +14,8 @@ import yaml
 from resc_helm_wizard import constants, questions
 from resc_helm_wizard.helm_utilities import (
     add_helm_repository,
+    check_helm_release_exists,
     install_or_upgrade_helm_release,
-    is_chart_already_installed,
     update_helm_repository,
     validate_helm_deployment_status
 )
@@ -294,7 +293,8 @@ def download_rule_toml_file(url: str, file: str) -> bool:
         Returns true if rule downloaded successfully else returns false
     """
     downloaded = False
-    response = requests.get(url, timeout=100, verify=True)
+    verify_ssl = questions.ask_ssl_verification(msg="Do you want to verify SSL certificates for HTTPS requests?")
+    response = requests.get(url, timeout=100, verify=verify_ssl)
     with open(file, "wb") as output:
         output.write(response.content)
     if os.path.exists(file) and os.path.getsize(file) > 0:
@@ -334,11 +334,9 @@ def run_deployment():
         namespace_created = create_namespace_if_not_exists(namespace_name=constants.NAMESPACE)
 
     if namespace_created:
-        # Check if release is already installed
-        output = subprocess.run(["helm", "list", "-n", constants.NAMESPACE], capture_output=True, text=True, check=True)
-        # Check if deployment is already running
-        chart_installed = is_chart_already_installed()
-        if constants.RELEASE_NAME in output.stdout and chart_installed:
+        # Check if release already exists
+        helm_release_exists = check_helm_release_exists()
+        if helm_release_exists:
             run_upgrade_confirm_msg = f"Release {constants.RELEASE_NAME} is already installed in " \
                                       f"{constants.NAMESPACE} namespace. Do you want to upgrade the release?"
             run_upgrade_confirm = questions.ask_user_confirmation(msg=run_upgrade_confirm_msg)
