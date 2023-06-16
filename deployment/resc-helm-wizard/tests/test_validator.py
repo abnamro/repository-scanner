@@ -7,7 +7,9 @@ from resc_helm_wizard.validator import (
     bitbucket_token_validator,
     github_account_name_validator,
     github_token_validator,
-    password_validator
+    github_username_validator,
+    password_validator,
+    vcs_url_validator
 )
 
 sys.path.insert(0, "src")
@@ -51,8 +53,34 @@ def test_bitbucket_token_validator():
 
 def test_github_account_name_validator():
     validate = github_account_name_validator(github_accounts="Lizard!, Liza")
-    assert validate == "Lizard! is not a valid GitHub account"
+    assert validate == "Lizard! is not a valid GitHub account. GitHub account " \
+                       "must contain alphanumeric characters or single hyphens, " \
+                       "can't begin or end with a hyphen and maximum 39 characters allowed."
     validate = github_account_name_validator(github_accounts="")
     assert validate == "Please enter a valid comma separated list of GitHub accounts you want to scan"
     validate = github_account_name_validator(github_accounts="Lizard")
     assert validate is True
+
+
+def test_github_username_validator():
+    validate = github_username_validator(username="Lizard!")
+    assert validate == "Lizard! is not a valid GitHub username. GitHub username " \
+                       "must contain alphanumeric characters or single hyphens, " \
+                       "can't begin or end with a hyphen and maximum 39 characters allowed."
+    validate = github_username_validator(username="Lizard")
+    assert validate is True
+
+
+def test_vcs_url_validator():
+    validate = vcs_url_validator(url="https://github.com")
+    assert validate is True
+    validate = vcs_url_validator(url="http://github.com")
+    assert validate is True
+    validate = vcs_url_validator(url="http://github.com:443")
+    assert validate is True
+    validate = vcs_url_validator(url="http://github.com:-443")
+    assert validate == "Please provide a valid URL"
+    validate = vcs_url_validator(url="http:github")
+    assert validate == "Please provide a valid URL"
+    validate = vcs_url_validator(url="ftp://github")
+    assert validate == "Please provide a valid URL"
