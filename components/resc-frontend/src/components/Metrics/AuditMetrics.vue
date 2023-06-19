@@ -10,6 +10,7 @@
         v-if="loadedAuditCounts"
         :chart-data="chartDataForAuditCountsGraph"
         :chart-options="chartOptions"
+        :height="600"
       />
     </div>
   </div>
