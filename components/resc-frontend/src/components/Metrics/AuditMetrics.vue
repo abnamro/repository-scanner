@@ -4,17 +4,14 @@
       <h3><small class="text-nowrap">Audit Metrics</small></h3>
     </div>
     <div class="pl-2">
-      <div class="row">
-        <div class="col-md-5 pt-2">
-          <h5><small class="text-nowrap">Audits by Auditor per week</small></h5>
-          <Spinner :active="!loadedAuditCounts" />
-          <MultiLineChart
-            v-if="loadedAuditCounts"
-            :chart-data="chartDataForAuditCountsGraph"
-            :chart-options="chartOptions"
-          />
-        </div>
-      </div>
+      <h5><small class="text-nowrap">Audits by Auditor per week</small></h5>
+      <Spinner :active="!loadedAuditCounts" />
+      <MultiLineChart
+        v-if="loadedAuditCounts"
+        :chart-data="chartDataForAuditCountsGraph"
+        :chart-options="chartOptions"
+        :height="600"
+      />
     </div>
   </div>
 </template>
