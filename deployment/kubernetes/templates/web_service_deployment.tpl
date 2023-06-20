@@ -14,6 +14,7 @@ spec:
     metadata:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
+        container.apparmor.security.beta.kubernetes.io/resc-api: unconfined
       labels:
         {{ if .Values.additionalLabels }}
         {{- range $key, $val := .Values.additionalLabels }}    
@@ -22,6 +23,8 @@ spec:
         {{ end }}
         app: {{ .Values.global.appName }}
         tier: api{{ .Values.nameSuffix }}
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
     spec:
       {{ if .Values.global.serviceAccountName }}
       serviceAccountName: {{ .Values.global.serviceAccountName }}
@@ -53,6 +56,25 @@ spec:
             - name: config-volume
               mountPath: /tmp/odbc.ini
               subPath: odbc.ini
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+            runAsUser: 10001
+          {{ if eq .Values.resc.authRequired "false"  }}
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 300
+            httpGet:
+              path: /resc/v1/health
+              port: {{ .Values.port }}
+          {{ end }}
       volumes:
         - name: config-volume
           configMap:
@@ -60,5 +82,10 @@ spec:
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
       - name: {{ .Values.global.imagePullSecret }}
+      {{ end }}
+      {{ if .Values.global.serviceAccountName }}
+      automountServiceAccountToken: true
+      {{ else }}
+      automountServiceAccountToken: false
       {{ end }}
 {{- end }}

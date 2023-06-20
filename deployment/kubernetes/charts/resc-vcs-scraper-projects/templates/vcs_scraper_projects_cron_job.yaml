@@ -14,6 +14,8 @@ spec:
       template:
         metadata:
           labels:
+            kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+            kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
           annotations:
             {{- with include "resc.vcsScraperProjectsAnnotations" .}}
               {{- nindent 12 .}}
@@ -53,6 +55,17 @@ spec:
             env:
               - name: GET_HOSTS_FROM
                 value: dns
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              privileged: false
+              capabilities:
+                drop:
+                  - ALL
+              seccompProfile:
+                  type: RuntimeDefault
+              runAsNonRoot: true
+              runAsUser: 10001
           volumes:
             - name: config-volume
               configMap:
