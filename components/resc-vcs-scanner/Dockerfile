@@ -4,6 +4,9 @@ ARG NAME="resc-vcs-scanner"
 ARG DESCRIPTION="RESC Version Control System Scanner"
 ARG VERSION=${VERSION}
 ARG RUN_AS_USER="apiuser"
+ARG RUN_AS_GROUP="apiuser"
+ARG UID=10001
+ARG GID=10002
 
 RUN apk -U upgrade \
 && apk add --no-cache git \
@@ -13,12 +16,13 @@ RUN mkdir /resc_backend && mkdir /vcs_scanner
 
 COPY ./resc-backend /resc_backend
 
-RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER" \
-&& chown -R $RUN_AS_USER:$RUN_AS_USER ./resc_backend
+RUN addgroup -g $GID $RUN_AS_GROUP \
+&& adduser -D -u $UID -G $RUN_AS_GROUP $RUN_AS_USER \
+&& chown -R $RUN_AS_USER:$RUN_AS_GROUP ./resc_backend
 
 COPY ./resc-vcs-scanner /vcs_scanner
 
-RUN chown -R $RUN_AS_USER:$RUN_AS_USER ./vcs_scanner \
+RUN chown -R $RUN_AS_USER:$RUN_AS_GROUP ./vcs_scanner \
 && chmod +x ./vcs_scanner/gitleaks_config/seco-gitleaks-linux-amd64
 
 USER $RUN_AS_USER

@@ -9,9 +9,13 @@ spec:
   ttlSecondsAfterFinished: 600
   template:
     metadata:
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/resc-rules-init: unconfined
       labels:
         app: {{ .Values.global.appName }}
         tier: database
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
     spec:
       {{ if .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.global.serviceAccountName }}
@@ -35,6 +39,17 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /tmp/
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+            runAsUser: 10001
       volumes:
         - name: config-volume
           configMap:
@@ -43,5 +58,10 @@ spec:
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
+      {{ end }}
+      {{ if .Values.global.serviceAccountName }}
+      automountServiceAccountToken: true
+      {{ else }}
+      automountServiceAccountToken: false
       {{ end }}
   backoffLimit: {{ .Values.backoffLimit }}

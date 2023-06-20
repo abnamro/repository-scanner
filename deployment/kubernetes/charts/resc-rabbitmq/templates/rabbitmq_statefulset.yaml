@@ -15,11 +15,16 @@ spec:
       labels:
         app: {{ .Values.global.appName }}
         tier: rabbitmq
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
+        kubeaudit.io/allow-capability-setgid: "required-by-raabitmq-to-set-group-identitys"
+        kubeaudit.io/allow-capability-setuid: "required-by-raabitmq-to-set-user-identity"
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
         {{- with include "resc.mqAnnotations" .}}
           {{- nindent 8 .}}
         {{- end }}
+        container.apparmor.security.beta.kubernetes.io/resc-mq: unconfined
     spec:
       {{ if .Values.global.serviceAccountName }}
       serviceAccountName: {{ .Values.global.serviceAccountName }}
@@ -63,7 +68,37 @@ spec:
             - mountPath: "/var/lib/rabbitmq/mnesia"
               subPath: "var/lib/rabbitmq/mnesia"
               name: {{ .Values.global.appName }}-mq-pv-storage
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+              - SETGID
+              - SETUID
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+            runAsUser: 10001
+          {{ if eq .Values.useKubernetesSecret "true"}}
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 300
+            httpGet:
+              path: /api/health/checks/alarms
+              port: {{ .Values.rabbitMQ.config.mgmtPort}}
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.rabbitMQ.config.admin_username .Values.rabbitMQ.config.admin_password | b64enc }}
+          {{ end }}
       {{ if .Values.global.imagePullSecret_proxy }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret_proxy }}
+      {{ end }}
+      {{ if .Values.global.serviceAccountName }}
+      automountServiceAccountToken: true
+      {{ else }}
+      automountServiceAccountToken: false
       {{ end }}
