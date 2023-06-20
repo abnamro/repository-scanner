@@ -11,5 +11,8 @@ database:
     requests:
       cpu: 200m
       memory: 500M
+    limits:
+      cpu: "2"
+      memory: 2G
   pvc_path: "/var/resc/mssql/data"
   pvc_size: 10Gi

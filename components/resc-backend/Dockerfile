@@ -4,6 +4,9 @@ ARG NAME="resc_backend"
 ARG DESCRIPTION="Repository Scanner Backend"
 ARG VERSION=${VERSION}
 ARG RUN_AS_USER="apiuser"
+ARG RUN_AS_GROUP="apiuser"
+ARG UID=10001
+ARG GID=10002
 
 RUN apk -U upgrade \
 && apk add --no-cache curl git nginx build-base linux-headers \
@@ -24,8 +27,9 @@ RUN mkdir /resc_backend
 
 COPY ./ /resc_backend
 
-RUN addgroup -S $RUN_AS_USER && adduser -S $RUN_AS_USER -g "$RUN_AS_USER" \
-&& chown -R $RUN_AS_USER:$RUN_AS_USER ./resc_backend
+RUN addgroup -g $GID $RUN_AS_GROUP \
+&& adduser -D -u $UID -G $RUN_AS_GROUP $RUN_AS_USER \
+&& chown -R $RUN_AS_USER:$RUN_AS_GROUP ./resc_backend
 
 USER $RUN_AS_USER
 ENV PATH=$PATH:/home/apiuser/.local/bin
