@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.appName }}-redis
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+    tier: redis
+spec:
+  {{ if and (eq .Values.global.enableInClusterRedis "true") (.Values.redis.exposeToHostPort)}}
+  type: NodePort
+  {{ end }}
+  ports:
+    - port: {{ .Values.redis.config.port}}
+      targetPort: {{ .Values.redis.config.port}}
+      name: redis
+      {{ if and (eq .Values.global.enableInClusterRedis "true") (.Values.redis.exposeToHostPort) }}
+      nodePort: {{ .Values.redis.exposeToHostPort}}
+      {{ end }}
+  selector:
+    app: {{ .Values.global.appName }}
+    tier: redis

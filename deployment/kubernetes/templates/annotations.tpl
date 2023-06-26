@@ -8,3 +8,5 @@
 {{ end -}}
 {{- define "resc.mqAnnotations" -}}
 {{ end -}}
+{{- define "resc.redisAnnotations" -}}
+{{ end -}}
