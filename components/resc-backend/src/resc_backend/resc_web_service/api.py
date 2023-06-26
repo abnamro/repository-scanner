@@ -5,8 +5,10 @@ import os
 from redis import asyncio as aioredis
 
 # Third Party
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from tenacity import RetryError
@@ -20,10 +22,10 @@ from resc_backend.db.connection import Session, engine
 from resc_backend.helpers.environment_wrapper import validate_environment
 from resc_backend.resc_web_service.configuration import (
     REQUIRED_ENV_VARS,
+    RESC_REDIS_CACHE_ENABLE,
     RESC_REDIS_SERVICE_HOST,
-    RESC_REDIS_SERVICE_PORT,
-    REDIS_PASSWORD
-)
+    RESC_REDIS_PORT,
+    REDIS_PASSWORD,)
 from resc_backend.resc_web_service.dependencies import (
     check_db_initialized,
     requires_auth,
@@ -44,11 +46,7 @@ from resc_backend.resc_web_service.endpoints import (
 )
 from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
 
-# Check if cache is enabled
-cache_enabled = os.getenv('RESC_REDIS_CACHE_ENABLE', 'false')
-cache_enabled = cache_enabled.lower() in ["true", 1]
-if cache_enabled:
-    env_variables = validate_environment(REQUIRED_ENV_VARS)
+env_variables = validate_environment(REQUIRED_ENV_VARS)
 
 
 def generate_logger_config(log_file_path, debug=True):
@@ -144,8 +142,10 @@ app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX)
 
+
 # Apply the security headers to the app in the form of middleware
 app.middleware("http")(add_security_headers)
+
 
 # Add exception handlers
 add_exception_handlers(app=app)
@@ -162,9 +162,10 @@ def cache_key_builder(func, namespace: str = "", *, request=None, response=None,
 
 @app.on_event("startup")
 def app_startup():
-    if cache_enabled:
+    cache_enabled = f"{env_variables[RESC_REDIS_CACHE_ENABLE]}"
+    if cache_enabled is True:
         host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
-        port = f"{env_variables[RESC_REDIS_SERVICE_PORT]}"
+        port = f"{env_variables[RESC_REDIS_PORT]}"
         password = f"{env_variables[REDIS_PASSWORD]}"
         redis_cache = aioredis.from_url(f"redis://{host}:{port}", password=password)
         FastAPICache.init(RedisBackend(redis_cache),
@@ -172,9 +173,6 @@ def app_startup():
                           key_builder=cache_key_builder,
                           enable=cache_enabled,
                           )
-    else:
-        FastAPICache.init(backend=None, enable=cache_enabled)
-
     try:
         _ = Session(bind=engine)
         check_db_initialized()

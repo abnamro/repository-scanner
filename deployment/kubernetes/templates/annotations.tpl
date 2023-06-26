@@ -8,7 +8,5 @@
 {{ end -}}
 {{- define "resc.mqAnnotations" -}}
 {{ end -}}
-{{- define "resc.rescWebserviceAnnotations" -}}
-{{ end -}}
 {{- define "resc.redisAnnotations" -}}
 {{ end -}}
