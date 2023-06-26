@@ -15,12 +15,6 @@ echo "*** Checking python installation ***"
 
 python_installation=$(which python3)
 
-echo "*** Creating virtual environment ***"
-$python_installation -m venv .venv
-
-echo "*** Activating virtual environment ***"
-source .venv/bin/activate
-
 echo "*** Installing pyntcli ***"
 $python_installation -m pip install pyntcli
 
