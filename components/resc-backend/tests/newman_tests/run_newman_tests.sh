@@ -11,7 +11,20 @@
 #Author       : Repository Scanner
 #Email        : resc@nl.abnamro.com
 ################################################################################################
-echo "*** Running Newman Tests ***"
+echo "*** Checking python installation ***"
+
+python_installation=$(which python3)
+
+echo "*** Creating virtual environment ***"
+$python_installation -m venv .venv
+
+echo "*** Activating virtual environment ***"
+source .venv/bin/activate
+
+echo "*** Installing pyntcli ***"
+$python_installation -m pip install pyntcli
+
+echo "*** Setting up the test environment ***"
 
 # Fetch arguments provided to script
 while getopts b:d:n: flag
@@ -114,7 +127,16 @@ function onExit {
 }
 trap onExit EXIT;
 
-echo "*** Running Newman Tests From $RESC_NEWMAN_CONTAINER Container ***"
-docker run --name $RESC_NEWMAN_CONTAINER -v "$PWD":/etc/newman -t "$RESC_NEWMAN_IMAGE" \
-run --color on ./RESC_web_service.postman_collection.json --env-var "baseUrl=http://$RESC_API_HOST_IP:$RESC_API_PORT"
+echo "*** Generating environment file ***"
+echo "{\"id\": \"bb6154d5-15d4-4c83-ab65-639feb4198c1\",\"name\": \"resc-functional-test-env\",\"values\": [{\"key\": \"baseUrl\",\"value\": \"http://${RESC_API_HOST_IP}:${RESC_API_PORT}\",\"type\": \"default\",\"enabled\": true}],\"_postman_variable_scope\": \"environment\",\"_postman_exported_at\": \"2023-06-21T14:42:58.583Z\",\"_postman_exported_using\": \"Postman/10.15.1\"}" > resc-functional-test-env.json
+echo "*** Setup test environment ***"
+
+echo "*** Running Newman Tests ***"
+
+pynt newman --collection ./RESC_web_service.postman_collection.json --environment ./resc-functional-test-env.json --host-ca /Users/ajai/Downloads/cacert.pem
+echo "*** Done ***"
+
+
+
+
 
