@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.appName }}-redis
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.global.appName }}
+      tier: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.appName }}
+        tier: redis
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- with include "resc.redisAnnotations" .}}
+          {{- nindent 8 .}}
+        {{- end }}
+    spec:
+      {{ if .Values.global.serviceAccountName }}
+      serviceAccountName: {{ .Values.global.serviceAccountName }}
+      {{ end }}
+      containers:
+      - name: {{ .Values.global.appName }}-redis
+        image: {{ .Values.redis.image.name }}:{{ .Values.redis.image.tag }}
+        imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+        command: ["sh", "-c"]
+        args: ["{{ .Values.preStartUpCommand }} redis-server /redis-master/redis.conf --requirepass \"$REDIS_PASSWORD\""]
+        env:
+          - name: MASTER
+            value: "true"
+          {{ if eq .Values.useKubernetesSecret "true"}}
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.global.appName }}-redis-secret
+                key: REDIS_PASSWORD
+          {{ end }}
+        ports:
+        - containerPort: {{ .Values.redis.config.port}}
+        resources:
+          limits:
+            cpu: {{ .Values.redis.resources.limits.cpu }}
+            memory: {{ .Values.redis.resources.limits.memory }}
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+        - mountPath: /redis-master
+          name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ .Values.global.appName }}-redis-config
+            items:
+            - key: redis-config
+              path: redis.conf
+
+          
