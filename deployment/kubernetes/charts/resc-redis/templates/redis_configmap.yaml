@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.appName }}-redis-config
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.global.appName }}
+data:
+  redis-config: |
+    maxmemory 6gb
+    maxmemory-policy allkeys-lru 
+    protected-mode yes

@@ -4,6 +4,8 @@ global:
   authenticationEnabled: "true"
   enableInClusterDatabase: "true"
   enableInClusterRabbitMqMgmt: "false"
+  enableInClusterRedis: "false"
+  enableRedisCache: "true"
   namespace: resc
   appName: resc
   host:

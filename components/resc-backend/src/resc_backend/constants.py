@@ -71,3 +71,6 @@ LOGGING_FILE = "logging.ini"
 # Error message
 ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
 ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"
+
+# Redis Cache
+REDIS_CACHE_EXPIRE = 60*60*24

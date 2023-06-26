@@ -7,6 +7,9 @@ metadata:
   labels:
     app: {{ .Values.global.appName }}
 data:
+  {{ if .Values.global.enableRedisCache }}
+  RESC_REDIS_CACHE_ENABLE: {{ .Values.global.enableRedisCache | quote}}
+  {{ end }}
   {{ if .Values.resc.authRequired }}
   AUTHENTICATION_REQUIRED: {{ .Values.resc.authRequired | quote }}
   {{ else }}
