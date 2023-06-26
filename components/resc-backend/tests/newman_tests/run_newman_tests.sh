@@ -133,7 +133,7 @@ echo "*** Setup test environment ***"
 
 echo "*** Running Newman Tests ***"
 
-pynt newman --collection ./RESC_web_service.postman_collection.json --environment ./resc-functional-test-env.json --host-ca /Users/ajai/Downloads/cacert.pem
+pynt newman --collection ./RESC_web_service.postman_collection.json --environment ./resc-functional-test-env.json
 echo "*** Done ***"
 
 
