@@ -26,6 +26,15 @@ logger = logging.getLogger()
 def upgrade():
     inspector = Inspector.from_engine(op.get_bind())
 
+    # add latest_commit from branch to repository
+    op.add_column('repository', sa.Column('latest_commit', sa.String(length=100), nullable=True))
+    # fill it based on the branch
+    op.execute("update repository "
+               "set latest_commit = branch_commit.latest_commit "
+               "from (select max(latest_commit) as latest_commit, repository_id from branch group by repository_id) "
+               "as branch_commit "
+               "where branch_commit.repository_id = repository.id")
+
     # add column repository_id to scan and finding
     op.add_column('finding', sa.Column('repository_id', sa.Integer(), nullable=True))
     op.add_column('scan', sa.Column('repository_id', sa.Integer(), nullable=True))
@@ -38,7 +47,7 @@ def upgrade():
                "set scan.repository_id = branch.repository_id "
                "from branch "
                "where branch.id = scan.branch_id")
-    # make repository_id not nullable
+    # make latest_commit not nullable
     op.alter_column('finding', 'repository_id', existing_type=sa.Integer(), nullable=False)
     op.alter_column('scan', 'repository_id', existing_type=sa.Integer(), nullable=False)
     # Add foreign key constraint from scan and finding to repository
