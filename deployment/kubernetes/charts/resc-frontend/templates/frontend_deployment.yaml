@@ -13,9 +13,12 @@ spec:
     metadata:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
+        container.apparmor.security.beta.kubernetes.io/resc-frontend: unconfined
       labels:
         app: {{ .Values.global.appName }}
         tier: frontend
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
     spec:
       containers:
         - name: {{ .Values.global.appName }}-frontend
@@ -36,7 +39,19 @@ spec:
                 name: {{ .Values.global.appName }}-frontend-config
           ports:
             - containerPort: {{ .Values.port }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+            runAsUser: 101
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
       {{ end }}
+      automountServiceAccountToken: false

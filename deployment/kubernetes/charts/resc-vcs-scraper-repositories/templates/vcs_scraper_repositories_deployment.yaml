@@ -14,11 +14,14 @@ spec:
       labels:
         app: {{ .Values.global.appName }}
         tier: vcs-scraper-repositories
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
         {{- with include "resc.vcsScraperRepositoriesAnnotations" .}}
           {{- nindent 8 .}}
         {{- end }}
+        container.apparmor.security.beta.kubernetes.io/resc--vcs-scraper-repositories: unconfined
     spec:
       {{ if .Values.global.serviceAccountName }}
       serviceAccountName: {{ .Values.global.serviceAccountName }}
@@ -54,6 +57,21 @@ spec:
         env:
           - name: GET_HOSTS_FROM
             value: dns
+        securityContext:
+          {{ if eq .Values.useKubernetesSecret "true" }}
+          allowPrivilegeEscalation: false
+          {{ else }}
+          allowPrivilegeEscalation: true
+          {{ end }}
+          readOnlyRootFilesystem: false
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+              type: RuntimeDefault
+          runAsNonRoot: true
+          runAsUser: 10001
       volumes:
         - name: config-volume
           configMap:
@@ -62,4 +80,9 @@ spec:
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
+      {{ end }}
+      {{ if .Values.global.serviceAccountName }}
+      automountServiceAccountToken: true
+      {{ else }}
+      automountServiceAccountToken: false
       {{ end }}

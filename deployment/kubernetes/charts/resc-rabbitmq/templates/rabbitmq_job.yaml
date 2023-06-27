@@ -11,6 +11,10 @@ spec:
         {{- with include "resc.mqInitAnnotations" .}}
           {{- nindent 8 .}}
         {{- end }}
+        container.apparmor.security.beta.kubernetes.io/resc-mq-init: unconfined
+      labels:
+        kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
     spec:
       {{ if .Values.global.serviceAccountName }}
       serviceAccountName: {{ .Values.global.serviceAccountName }}
@@ -37,9 +41,25 @@ spec:
             - secretRef:
                 name: {{ .Values.global.appName }}-rabbitmq-admin-secret
             {{ end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+            runAsUser: 10001
       restartPolicy: {{ .Values.mqInit.restartPolicy }}
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
+      {{ end }}
+      {{ if .Values.global.serviceAccountName }}
+      automountServiceAccountToken: true
+      {{ else }}
+      automountServiceAccountToken: false
       {{ end }}
   backoffLimit: {{ .Values.mqInit.backoffLimit }}
