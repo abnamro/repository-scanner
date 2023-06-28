@@ -67,8 +67,6 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
 
             - repository_names of type [String]
 
-            - branch_name of type String
-
             - scan_ids of type list Integer
 
             - start_date_time of type datetime with the following format: 1970-01-31T00:00:00

@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 # First Party
-from resc_backend.db.model import Base, DBbranch, DBfinding, DBrepository, DBrule, DBscan, DBscanFinding, DBVcsInstance
+from resc_backend.db.model import Base, DBfinding, DBrepository, DBrule, DBscan, DBscanFinding, DBVcsInstance
 from resc_backend.db.model.rule_pack import DBrulePack
 from resc_backend.resc_web_service.schema.finding import FindingCreate
 
@@ -37,17 +37,11 @@ class TestFinding(unittest.TestCase):
                                        vcs_instance=1)
         self.session.add(self.repository)
 
-        self.branch = DBbranch(repository_id=1,
-                               branch_name="test_temp",
-                               branch_id='master',
-                               latest_commit="FAKE_HASH")
-        self.session.add(self.branch)
-
         self.rule_pack = DBrulePack(version="1.2")
 
         self.rule = DBrule(rule_pack="1.2", rule_name="fake rule", description="fake1, fake2, fake3")
 
-        self.scan = DBscan(branch_id=1, scan_type="BASE",
+        self.scan = DBscan(repository_id=1, scan_type="BASE",
                            last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(), rule_pack="1.2",
                            increment_number=1)
 
@@ -64,7 +58,7 @@ class TestFinding(unittest.TestCase):
                                  email="fake.author@fake-domain.com",
                                  rule_name="rule_1",
                                  event_sent_on=datetime.utcnow(),
-                                 branch_id=1)
+                                 repository_id=1)
         self.scan_finding = DBscanFinding(finding_id=1, scan_id=1)
         self.session.add(self.finding)
 
@@ -93,7 +87,7 @@ class TestFinding(unittest.TestCase):
                                 rule_name=self.finding.rule_name,
                                 event_sent_on=self.finding.event_sent_on,
                                 scan_ids=[self.scan_finding.scan_id],
-                                branch_id=self.finding.branch_id)
+                                repository_id=self.finding.repository_id)
         result = DBfinding.create_from_finding(finding)
         self.assertEqual(result.file_path, expected.file_path)
         self.assertEqual(result.line_number, expected.line_number)

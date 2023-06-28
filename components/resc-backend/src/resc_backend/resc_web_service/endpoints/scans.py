@@ -82,11 +82,11 @@ def create_scan(scan: scan_schema.ScanCreate, db_connection: Session = Depends(g
     - **timestamp**: creation timestamp
     - **increment_number**: scan increment number
     - **rule_pack**: rule pack version
-    - **branch_id**: branch id
+    - **repository_id**: repository id
     """
     # Determine the increment number if needed and not supplied
     if scan.scan_type == ScanType.INCREMENTAL and (not scan.increment_number or scan.increment_number <= 0):
-        last_scan = scan_crud.get_latest_scan_for_branch(db_connection, branch_id=scan.branch_id)
+        last_scan = scan_crud.get_latest_scan_for_repository(db_connection, repository_id=scan.repository_id)
         new_increment = last_scan.increment_number + 1
         scan.increment_number = new_increment
 
@@ -145,7 +145,7 @@ def update_scan(
     - **timestamp**: scan timestamp
     - **increment_number**: scan increment number
     - **rule_pack**: rule pack version
-    - **branch_id**: branch id
+    - **repository_id**: repository id
 
     """
     db_scan = scan_crud.get_scan(db_connection, scan_id=scan_id)
@@ -174,7 +174,7 @@ def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection
     db_scan = scan_crud.get_scan(db_connection, scan_id=scan_id)
     if db_scan is None:
         raise HTTPException(status_code=404, detail="Scan not found")
-    scan_crud.delete_scan(db_connection, branch_id=db_scan.branch_id, scan_id=scan_id, delete_related=True)
+    scan_crud.delete_scan(db_connection, repository_id=db_scan.repository_id, scan_id=scan_id, delete_related=True)
     return {"ok": True}
 
 
@@ -210,7 +210,7 @@ def create_scan_findings(scan_id: int,
     - **comment**: Comment
     - **event_sent_on**: event sent timestamp
     - **rule_name**: rule name
-    - **branch_id**: branch id of the finding
+    - **repository_id**: repository id of the finding
     - **return**: [FindingRead]
         The output will contain a PaginationModel containing the list of FindingRead type objects,
         or an empty list if no scan was found

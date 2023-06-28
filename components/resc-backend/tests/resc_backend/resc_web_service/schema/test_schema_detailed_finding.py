@@ -32,7 +32,6 @@ class TestDetailedFindings(unittest.TestCase):
                 repository_url=f"http://fake.repo.com/{i}",
                 timestamp=datetime.utcnow(),
                 vcs_provider="AZURE_DEVOPS",
-                branch_name=f"branch_name_{i}",
                 last_scanned_commit=f"last_scanned_commit_{i}",
                 commit_url=f"commit_url_{i}",
                 scan_id=i),
@@ -59,7 +58,6 @@ class TestDetailedFindings(unittest.TestCase):
                 repository_url=f"https://dummy-bitbucket-instance.com/projects/project_key_{index}",
                 timestamp=datetime.utcnow(),
                 vcs_provider="BITBUCKET",
-                branch_name=f"branch_name_{index}",
                 last_scanned_commit=f"last_scanned_commit_{index}",
                 commit_url=f"commit_url_{index}",
                 scan_id=index),
@@ -70,8 +68,7 @@ class TestDetailedFindings(unittest.TestCase):
         for index, finding in enumerate(detailed_findings):
             assert detailed_findings[
                        index].commit_url == f"http://fake.repo.com/{index + 1}/commit/commit_id_{index + 1}" \
-                                            f"?refName=refs/heads/branch_name_{index + 1}" \
-                                            f"&path=/file_path_{index + 1}"
+                                            f"?path=/file_path_{index + 1}"
 
     def test_get_commit_url_by_vcs_provider_bitbucket(self):
         detailed_findings = self.detailed_findings_bitbucket

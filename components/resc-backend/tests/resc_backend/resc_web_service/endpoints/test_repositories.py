@@ -9,13 +9,12 @@ from fastapi.testclient import TestClient
 
 # First Party
 from resc_backend.constants import (
-    RWS_ROUTE_BRANCHES,
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_REPOSITORIES,
     RWS_VERSION_PREFIX
 )
-from resc_backend.db.model import DBbranch, DBfinding, DBrepository, DBscan, DBVcsInstance
+from resc_backend.db.model import DBfinding, DBrepository, DBscan, DBVcsInstance
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate
@@ -47,16 +46,9 @@ class TestRepositories(unittest.TestCase):
                                                      vcs_instance=i))
             self.db_repositories[i - 1].id_ = i
 
-        self.db_branches = []
-        for i in range(1, 6):
-            self.db_branches.append(
-                DBbranch(repository_id=i, branch_id=f"branch_id_{i}", branch_name=f"branch_name_{i}",
-                         latest_commit=f"latest_commit_{i}"))
-            self.db_branches[i - 1].id_ = i
-
         self.db_scans = []
         for i in range(1, 6):
-            self.db_scans.append(DBscan(branch_id=i, scan_type="BASE",
+            self.db_scans.append(DBscan(repository_id=i, scan_type="BASE",
                                         last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(), rule_pack="1.2",
                                         increment_number=1))
             self.db_scans[i - 1].id_ = i
@@ -74,7 +66,7 @@ class TestRepositories(unittest.TestCase):
                                               email=f"email_{i}",
                                               rule_name=f"rule_{i}",
                                               event_sent_on=datetime.utcnow(),
-                                              branch_id=1))
+                                              repository_id=1))
             self.db_findings[i - 1].id_ = i
 
     @staticmethod
@@ -275,54 +267,6 @@ class TestRepositories(unittest.TestCase):
         assert data["detail"][0]["loc"] == ["query", "limit"]
         assert data["detail"][0]["msg"] == "ensure this value is greater than or equal to 1"
         get_repositories.assert_not_called()
-
-    @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
-    @patch("resc_backend.resc_web_service.crud.scan.get_latest_scan_for_branch")
-    @patch("resc_backend.resc_web_service.crud.branch.get_branches_for_repository")
-    @patch("resc_backend.resc_web_service.crud.branch.get_branches_count_for_repository")
-    @patch("resc_backend.resc_web_service.crud.scan.get_scans")
-    def test_get_repository_branches(self, get_scans, get_branches_count_for_repository,
-                                     get_branches_for_repository, get_latest_scan_for_branch,
-                                     get_total_findings_count):
-        get_branches_for_repository.return_value = self.db_branches
-        get_branches_count_for_repository.return_value = len(self.db_branches)
-        get_latest_scan_for_branch.return_value = self.db_scans[1]
-        get_scans.return_value = self.db_scans
-        get_total_findings_count.return_value = len(self.db_findings)
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}/1{RWS_ROUTE_BRANCHES}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["data"][0]["id_"] == self.db_branches[0].id_
-        assert datetime.strptime(data["data"][0]["last_scan_datetime"], "%Y-%m-%dT%H:%M:%S.%f") == \
-               self.db_scans[3].timestamp
-        assert data["total"] == 5
-        assert data["limit"] == 100
-        assert data["skip"] == 0
-
-    @patch("resc_backend.resc_web_service.crud.branch.get_branches_for_repository")
-    @patch("resc_backend.resc_web_service.crud.branch.get_branches_count_for_repository")
-    def test_get_repository_branches_non_existing(self, get_branches_count_for_repository,
-                                                  get_branches_for_repository):
-        get_branches_for_repository.return_value = []
-        get_branches_count_for_repository.return_value = 0
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}/9999{RWS_ROUTE_BRANCHES}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert data["data"] == []
-        assert data["total"] == 0
-        assert data["limit"] == 100
-        assert data["skip"] == 0
-
-    def test_get_repository_branches_invalid_id(self):
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}/invalid{RWS_ROUTE_BRANCHES}")
-        assert response.status_code == 422, response.text
-        data = response.json()
-        assert data["detail"][0]["loc"] == ['path', 'repository_id']
-        assert data["detail"][0]["msg"] == "value is not a valid integer"
-        assert data["detail"][0]["type"] == "type_error.integer"
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_when_single_vcs_instance_selected(self, get_distinct_projects):

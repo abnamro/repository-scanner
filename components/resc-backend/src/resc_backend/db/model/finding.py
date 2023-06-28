@@ -12,7 +12,7 @@ from resc_backend.db.model import Base
 class DBfinding(Base):
     __tablename__ = "finding"
     id_ = Column("id", Integer, primary_key=True)
-    branch_id = Column(Integer, ForeignKey("branch.id"), nullable=False)
+    repository_id = Column(Integer, ForeignKey("repository.id"), nullable=False)
     rule_name = Column(String(400), nullable=False)
     file_path = Column(String(500), nullable=False)
     line_number = Column(Integer, nullable=False)
@@ -25,11 +25,11 @@ class DBfinding(Base):
     email = Column(String(100))
     event_sent_on = Column(DateTime, nullable=True)
 
-    __table_args__ = (UniqueConstraint("commit_id", "branch_id", "rule_name", "file_path", "line_number",
-                                       "column_start", "column_end", name="uc_finding_per_branch"),)
+    __table_args__ = (UniqueConstraint("commit_id", "repository_id", "rule_name", "file_path", "line_number",
+                                       "column_start", "column_end", name="uc_finding_per_repository"),)
 
     def __init__(self, rule_name, file_path, line_number, commit_id, commit_message, commit_timestamp, author,
-                 email, event_sent_on, branch_id, column_start, column_end):
+                 email, event_sent_on, repository_id, column_start, column_end):
         self.email = email
         self.author = author
         self.commit_timestamp = commit_timestamp
@@ -39,7 +39,7 @@ class DBfinding(Base):
         self.file_path = file_path
         self.rule_name = rule_name
         self.event_sent_on = event_sent_on
-        self.branch_id = branch_id
+        self.repository_id = repository_id
         self.column_start = column_start
         self.column_end = column_end
 
@@ -55,7 +55,7 @@ class DBfinding(Base):
             commit_timestamp=finding.commit_timestamp,
             author=finding.author,
             event_sent_on=finding.event_sent_on,
-            branch_id=finding.branch_id,
+            repository_id=finding.repository_id,
             column_start=finding.column_start,
             column_end=finding.column_end
         )

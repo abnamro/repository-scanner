@@ -51,23 +51,6 @@ def delete_scan_finding(db_connection: Session, finding_id: int = None, scan_id:
         db_connection.commit()
 
 
-def delete_scan_finding_by_branch_id(db_connection: Session, branch_id: int):
-    """
-        Delete scan findings for a given branch
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the branch
-    """
-    db_connection.query(model.DBscanFinding) \
-        .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
-                model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
-                model.scan.DBscan.branch_id == model.finding.DBfinding.branch_id,
-                model.scan.DBscan.branch_id == branch_id) \
-        .delete(synchronize_session=False)
-    db_connection.commit()
-
-
 def delete_scan_finding_by_repository_id(db_connection: Session, repository_id: int):
     """
         Delete scan findings for a given repository
@@ -79,9 +62,8 @@ def delete_scan_finding_by_repository_id(db_connection: Session, repository_id: 
     db_connection.query(model.DBscanFinding) \
         .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
                 model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
-                model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
-                model.repository.DBrepository.id_ == repository_id) \
+                model.scan.DBscan.repository_id == model.finding.DBfinding.repository_id,
+                model.scan.DBscan.repository_id == repository_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
 
@@ -97,8 +79,7 @@ def delete_scan_finding_by_vcs_instance_id(db_connection: Session, vcs_instance_
     db_connection.query(model.DBscanFinding) \
         .filter(model.scan_finding.DBscanFinding.scan_id == model.scan.DBscan.id_,
                 model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_,
-                model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+                model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
                 model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
                 model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
         .delete(synchronize_session=False)
