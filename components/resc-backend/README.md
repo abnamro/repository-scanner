@@ -11,6 +11,7 @@
 3. [Testing](#testing)
     - [Run unit tests, linting and import checks locally](#run-unit-tests-linting-and-import-checks-locally)
     - [Run Newman tests locally](#run-newman-tests-locally)
+    - [Run OWASP ZAP API Security tests locally](#run-owasp-zap-api-security-tests-locally)
 4. [Create a migration for database changes](#create-a-migration-for-database-changes)
     - [Use Alembic to create a new migration script](#use-alembic-to-create-a-new-migration-script)
     - [Use the --autogenerate parameter](#use-the---autogenerate-parameter)
@@ -172,6 +173,20 @@ cd tests/newman_tests
 Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
 ```
 
+### Run OWASP ZAP API Security tests locally:
+If you don't provide any argument to the script, then the default image value will be used
+```bash
+cd tests/zap_tests
+./run_run_zap_api_tests.sh
+```
+
+If you can override the images by providing below arguments to the script.
+```bash
+cd tests/zap_tests
+./run_run_zap_api_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -z <zap image:tag>
+
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'owasp/zap2docker-weekly'
+```
 
 
 ## Create a migration for database changes
