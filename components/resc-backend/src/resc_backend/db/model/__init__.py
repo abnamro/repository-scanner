@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 # First Party
 from resc_backend.db.model.audit import DBaudit
-from resc_backend.db.model.branch import DBbranch
 from resc_backend.db.model.finding import DBfinding
 from resc_backend.db.model.repository import DBrepository
 from resc_backend.db.model.rule import DBrule

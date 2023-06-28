@@ -14,6 +14,7 @@ class DBrepository(Base):
     repository_id = Column(String(100), nullable=False)
     repository_name = Column(String(100), nullable=False)
     repository_url = Column(String(200), nullable=False)
+    latest_commit = Column(String(100), nullable=True)
     __table_args__ = (UniqueConstraint("project_key", "repository_id", "vcs_instance",
                                        name="unique_repository_id_per_project"),)
 

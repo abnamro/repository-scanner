@@ -12,7 +12,7 @@ Model = TypeVar("Model", bound=BaseModel)
 class FindingCountModel(GenericModel, Generic[Model]):
     """
         Generic encapsulation class for findings count end points to standardize output of the API
-        example creation, FindingCountModel[BranchRead](data=db_findings, true_positive=true_positive,
+        example creation, FindingCountModel[FindingRead](data=db_findings, true_positive=true_positive,
         false_positive=false_positive, not_analyzed=not_analyzed, under_review=under_review,
         clarification_required=clarification_required, total_findings_count=total_findings_count)
     :param Generic[Model]:

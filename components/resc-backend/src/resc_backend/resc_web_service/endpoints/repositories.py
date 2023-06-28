@@ -1,5 +1,4 @@
 # Standard Library
-import datetime
 from typing import List, Optional
 
 # Third Party
@@ -11,27 +10,21 @@ from resc_backend.constants import (
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
     REPOSITORIES_TAG,
-    RWS_ROUTE_BRANCHES,
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_FINDINGS_METADATA,
-    RWS_ROUTE_REPOSITORIES
+    RWS_ROUTE_REPOSITORIES, RWS_ROUTE_LAST_SCAN
 )
 from resc_backend.db.connection import Session
-from resc_backend.db.model import DBbranch
-from resc_backend.resc_web_service.crud import branch as branch_crud
-from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import repository as repository_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
-from resc_backend.resc_web_service.filters import FindingsFilter
 from resc_backend.resc_web_service.helpers.resc_swagger_models import Model404
-from resc_backend.resc_web_service.schema import branch as branch_schema
 from resc_backend.resc_web_service.schema import repository as repository_schema
 from resc_backend.resc_web_service.schema import repository_enriched as repository_enriched_schema
+from resc_backend.resc_web_service.schema import scan as scan_schema
 from resc_backend.resc_web_service.schema.finding_count_model import FindingCountModel
 from resc_backend.resc_web_service.schema.pagination_model import PaginationModel
-from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 router = APIRouter(prefix=f"{RWS_ROUTE_REPOSITORIES}", tags=[REPOSITORIES_TAG])
@@ -183,80 +176,6 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
         raise HTTPException(status_code=404, detail="Repository not found")
     repository_crud.delete_repository(db_connection, repository_id=repository_id, delete_related=True)
     return {"ok": True}
-
-
-@router.get("/{repository_id}"f"{RWS_ROUTE_BRANCHES}",
-            response_model=PaginationModel[branch_schema.ViewableBranch],
-            summary="Get branches for a repository",
-            status_code=status.HTTP_200_OK,
-            responses={
-                200: {"description": "Retrieve all the branches of a repository, enriched with the recent scan "
-                                     "information"},
-                500: {"description": ERROR_MESSAGE_500},
-                503: {"description": ERROR_MESSAGE_503}
-            })
-def get_branches_for_repository(repository_id: int, skip: int = Query(default=0, ge=0),
-                                limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                                db_connection: Session = Depends(get_db_connection)) \
-        -> PaginationModel[branch_schema.ViewableBranch]:
-    """
-        Retrieve all branches enriched with most recent scan information for a repository
-
-    - **db_connection**: Session of the database connection
-    - **repository_id**: ID of the parent repository object for which branch objects need to be retrieved
-    - **skip**: Integer amount of records to skip to support pagination
-    - **limit**: Integer amount of records to return, to support pagination
-    - **return**: [ViewableBranch]
-        The output will contain a PaginationModel containing the list of ViewableBranch type objects,
-        or an empty list if no branch was found for the given repository_id
-    """
-    branches = branch_crud.get_branches_for_repository(db_connection, skip=skip, limit=limit,
-                                                       repository_id=repository_id)
-    for branch in branches:
-        branch = enrich_branch_with_latest_scan_data(db_connection, branch)
-
-    total_branches = branch_crud.get_branches_count_for_repository(db_connection,
-                                                                   repository_id=repository_id)
-    return PaginationModel[branch_schema.ViewableBranch](data=branches, total=total_branches,
-                                                         limit=limit, skip=skip)
-
-
-def enrich_branch_with_latest_scan_data(db_connection: Session, branch: DBbranch):
-    """
-        Enriches a branch object retrieved from the database with most recent scan information
-    :param db_connection:
-        Session of the database connection
-    :param branch:
-        DBbranch object to enrich with scan information
-    :return: branch
-        DBbranch object enriched with latest scan information as type ViewableBranch
-    """
-
-    branch.last_scan_datetime = datetime.datetime.min
-    branch.last_scan_id = None
-    branch.last_scan_finding_count = 0
-    branch.scan_finding_count = 0
-
-    latest_scan = scan_crud.get_latest_scan_for_branch(db_connection, branch_id=branch.id_)
-    if latest_scan is not None:
-        branch.last_scan_datetime = latest_scan.timestamp
-        branch.last_scan_id = latest_scan.id_
-        branch.last_scan_finding_count = finding_crud.get_total_findings_count(
-            db_connection, FindingsFilter(scan_ids=[latest_scan.id_]))
-
-        scan_ids_latest_to_base = []
-        scans = scan_crud.get_scans(db_connection=db_connection, branch_id=branch.id_, limit=1000000)
-        scans.sort(key=lambda x: x.timestamp, reverse=True)
-        for scan in scans:
-            if scan.timestamp <= latest_scan.timestamp:
-                scan_ids_latest_to_base.append(scan.id_)
-                if scan.scan_type == ScanType.BASE:
-                    break
-
-        branch.scan_finding_count = finding_crud.get_total_findings_count(
-            db_connection, FindingsFilter(scan_ids=scan_ids_latest_to_base))
-
-    return branch
 
 
 @router.get(f"{RWS_ROUTE_DISTINCT_PROJECTS}/",
@@ -432,3 +351,28 @@ def get_all_repositories_with_findings_metadata(
     return PaginationModel[repository_enriched_schema.RepositoryEnrichedRead](data=repository_list,
                                                                               total=total_repositories,
                                                                               limit=limit, skip=skip)
+
+
+@router.get("/{repository_id}"f"{RWS_ROUTE_LAST_SCAN}",
+            response_model=scan_schema.ScanRead,
+            summary="Get latest scan for repository",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Retrieve the latest scan related to a repository"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
+def get_last_scan_for_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)) \
+        -> scan_schema.ScanRead:
+    """
+        Retrieve the latest scan object related to a branch
+
+    - **db_connection**: Session of the database connection
+    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
+    - **return**: ScanRead
+        The output will contain a ScanRead type object,
+        or empty if no scan was found
+    """
+    last_scan = scan_crud.get_latest_scan_for_repository(db_connection, repository_id=repository_id)
+
+    return last_scan

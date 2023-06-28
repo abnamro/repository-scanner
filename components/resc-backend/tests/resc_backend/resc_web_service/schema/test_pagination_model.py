@@ -67,7 +67,7 @@ def test_pagination_model_findings():
                             email=f"email_{i}",
                             rule_name=f"rule_{i}",
                             event_sent_on=datetime.utcnow(),
-                            branch_id=1)
+                            repository_id=1)
         finding.id_ = i
         findings.append(FindingRead.create_from_db_entities(finding, scan_ids=[]))
 

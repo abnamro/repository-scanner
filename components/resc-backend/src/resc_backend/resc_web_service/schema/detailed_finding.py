@@ -32,7 +32,6 @@ class DetailedFindingBase(BaseModel):
     repository_url: HttpUrl
     timestamp: datetime.datetime
     vcs_provider: VCSProviders
-    branch_name: constr(min_length=1, max_length=200)
     last_scanned_commit: constr(min_length=1, max_length=100)
     scan_id: conint(gt=0)
     event_sent_on: Optional[datetime.datetime]
@@ -65,20 +64,16 @@ class DetailedFindingRead(DetailedFinding):
 
     @staticmethod
     def build_ado_commit_url(repository_url: str,
-                             branch_name: str,
                              file_path: str,
                              commit_id: str) -> str:
-        ado_commit_url = f"{repository_url}/commit/{commit_id}?" \
-                         f"refName=refs/heads/{branch_name}&path=/{file_path}"
+        ado_commit_url = f"{repository_url}/commit/{commit_id}?path=/{file_path}"
         return ado_commit_url
 
     @staticmethod
     def build_github_commit_url(repository_url: str,
-                                branch_name: str,
                                 file_path: str,
                                 commit_id: str) -> str:
-        github_commit_url = f"{repository_url}/commit/{commit_id}?" \
-                            f"refName=refs/heads/{branch_name}&path=/{file_path}"
+        github_commit_url = f"{repository_url}/commit/{commit_id}?path=/{file_path}"
         return github_commit_url
 
     @root_validator
@@ -95,13 +90,11 @@ class DetailedFindingRead(DetailedFinding):
                                                                   commit_id=values["commit_id"])
         elif values["vcs_provider"] == VCSProviders.AZURE_DEVOPS:
             values["commit_url"] = cls.build_ado_commit_url(repository_url=values["repository_url"],
-                                                            branch_name=values["branch_name"],
                                                             file_path=values["file_path"],
                                                             commit_id=values["commit_id"])
 
         elif values["vcs_provider"] == VCSProviders.GITHUB_PUBLIC:
             values["commit_url"] = cls.build_github_commit_url(repository_url=values["repository_url"],
-                                                               branch_name=values["branch_name"],
                                                                file_path=values["file_path"],
                                                                commit_id=values["commit_id"])
         else:

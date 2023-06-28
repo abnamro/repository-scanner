@@ -14,11 +14,13 @@ from resc_backend.constants import (
     RWS_VERSION_PREFIX
 )
 from resc_backend.resc_web_service.api import app
+from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 
 
 class TestFindings(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
+        app.dependency_overrides[requires_auth] = requires_no_auth
 
     def test_get_supported_vcs_providers(self):
         response = self.client.get(f"{RWS_VERSION_PREFIX}"

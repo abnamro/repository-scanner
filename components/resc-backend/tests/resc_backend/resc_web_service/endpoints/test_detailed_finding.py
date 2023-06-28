@@ -42,7 +42,6 @@ class TestDetailedFindings(unittest.TestCase):
                 repository_url=f"http://fake.repo.com/_{i}",
                 timestamp=datetime(year=1970, month=1, day=i),
                 vcs_provider="AZURE_DEVOPS",
-                branch_name=f"_{i}",
                 last_scanned_commit=f"_{i}",
                 commit_url=f"_{i}",
                 scan_id=i),
@@ -68,7 +67,6 @@ class TestDetailedFindings(unittest.TestCase):
         assert data["repository_url"] == detailed_finding.repository_url
         assert datetime.strptime(data["timestamp"], "%Y-%m-%dT%H:%M:%S") == detailed_finding.timestamp
         assert data["vcs_provider"] == detailed_finding.vcs_provider
-        assert data["branch_name"] == detailed_finding.branch_name
         assert data["last_scanned_commit"] == detailed_finding.last_scanned_commit
         assert data["commit_url"] == detailed_finding.commit_url
 
@@ -229,7 +227,6 @@ class TestDetailedFindings(unittest.TestCase):
                       "finding_statuses": finding_statuses,
                       "start_date_time": "1970-11-11T00:00:00",
                       "end_date_time": "1970-11-11T00:00:01",
-                      "branch_name": "branch_name",
                       "project_name": "project_name",
                       "scan_ids": scan_ids,
                       "repository_name": "repository_name",
