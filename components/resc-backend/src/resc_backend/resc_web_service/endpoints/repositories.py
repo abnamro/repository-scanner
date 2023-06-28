@@ -13,9 +13,7 @@ from resc_backend.constants import (
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_FINDINGS_METADATA,
-    RWS_ROUTE_LAST_SCAN,
-    RWS_ROUTE_REPOSITORIES,
-    RWS_ROUTE_SCANS
+    RWS_ROUTE_REPOSITORIES, RWS_ROUTE_LAST_SCAN
 )
 from resc_backend.db.connection import Session
 from resc_backend.resc_web_service.crud import repository as repository_crud
@@ -341,8 +339,6 @@ def get_all_repositories_with_findings_metadata(
             repository_name=repo.repository_name,
             repository_url=repo.repository_url,
             vcs_provider=repo.provider_type,
-            last_scan_id=repo.last_scan_id,
-            last_scan_timestamp=repo.last_scan_timestamp,
             true_positive=repo_findings_meta_data[repo.id_]["true_positive"],
             false_positive=repo_findings_meta_data[repo.id_]["false_positive"],
             not_analyzed=repo_findings_meta_data[repo.id_]["not_analyzed"],
@@ -369,10 +365,10 @@ def get_all_repositories_with_findings_metadata(
 def get_last_scan_for_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> scan_schema.ScanRead:
     """
-        Retrieve the latest scan object related to a repository
+        Retrieve the latest scan object related to a branch
 
     - **db_connection**: Session of the database connection
-    - **repository_id**: ID of the parent repository object for which scan objects to be retrieved
+    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
     - **return**: ScanRead
         The output will contain a ScanRead type object,
         or empty if no scan was found
@@ -380,34 +376,3 @@ def get_last_scan_for_repository(repository_id: int, db_connection: Session = De
     last_scan = scan_crud.get_latest_scan_for_repository(db_connection, repository_id=repository_id)
 
     return last_scan
-
-
-@router.get("/{repository_id}"f"{RWS_ROUTE_SCANS}",
-            summary="Get scans for repository",
-            response_model=PaginationModel[scan_schema.ScanRead],
-            status_code=status.HTTP_200_OK,
-            responses={
-                200: {"description": "Retrieve all the scans related to a repository"},
-                500: {"description": ERROR_MESSAGE_500},
-                503: {"description": ERROR_MESSAGE_503}
-            })
-def get_scans_for_repository(repository_id: int, skip: int = Query(default=0, ge=0),
-                             limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                             db_connection: Session = Depends(get_db_connection)) \
-        -> PaginationModel[scan_schema.ScanRead]:
-    """
-        Retrieve all scan objects related to a repository paginated
-
-    - **db_connection**: Session of the database connection
-    - **repository_id**: ID of the parent repository object for which scan objects to be retrieved
-    - **skip**: Integer amount of records to skip to support pagination
-    - **limit**: Integer amount of records to return, to support pagination
-    - **return**: [ScanRead]
-        The output will contain a PaginationModel containing the list of ScanRead type objects,
-        or an empty list if no scan was found
-    """
-    scans = scan_crud.get_scans(db_connection, skip=skip, limit=limit, repository_id=repository_id)
-
-    total_scans = scan_crud.get_scans_count(db_connection, repository_id=repository_id)
-
-    return PaginationModel[scan_schema.ScanRead](data=scans, total=total_scans, limit=limit, skip=skip)

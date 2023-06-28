@@ -401,7 +401,7 @@ def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions
 
     max_base_scan_subquery = db_connection.query(model.DBscan.repository_id,
                                                  func.max(model.DBscan.id_).label("latest_base_scan_id"))
-    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.repository_id == ScanType.BASE)
     if rule_pack_versions:
         max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
     max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.repository_id).subquery()
