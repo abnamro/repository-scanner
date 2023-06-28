@@ -1,7 +1,6 @@
 # Standard Library
 import logging
-import os
-from typing import Dict, List
+from typing import Dict
 
 # Third Party
 from azure.devops.connection import Connection
@@ -11,8 +10,8 @@ from msrest.authentication import BasicAuthentication
 from msrest.exceptions import ClientRequestError
 
 # First Party
-from vcs_scraper.model import Branch, Repository
-from vcs_scraper.vcs_connectors.azure_devops_data_mapper import map_azure_devops_branch, map_azure_devops_repository
+from vcs_scraper.model import Repository
+from vcs_scraper.vcs_connectors.azure_devops_data_mapper import map_azure_devops_repository
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -83,14 +82,17 @@ class AzureDevopsConnector(VCSConnector):
     def get_repos(self, project_key):
         return list(repo.as_dict() for repo in self.git_api_client.get_repositories(project_key))
 
-    def get_branches(self, project_key, repository_id):
-        all_branches = []
+    def get_latest_commit(self, project_key, repository_id):
+        latest_commit = None
         try:
-            all_branches = list(self.git_api_client.get_branches(project=project_key, repository_id=repository_id))
-            all_branches = [branch.as_dict() for branch in all_branches]
+            latest_commits = list(self.git_api_client.get_commits(project=project_key, repository_id=repository_id,
+                                                                  top=1, search_criteria=None))
+            if latest_commits:
+                latest_commit = latest_commits[0].commit_id
         except AzureDevOpsServiceError as azure_exception:
-            logger.error(f"Failed to list branches for repository: {project_key}/{repository_id} --> {azure_exception}")
-        return all_branches
+            logger.error(f"Failed to get latest commit for repository: {project_key}/{repository_id} --> "
+                         f"{azure_exception}")
+        return latest_commit
 
     @staticmethod
     def get_clone_url(clone_urls, name):
@@ -100,32 +102,16 @@ class AzureDevopsConnector(VCSConnector):
         return ""
 
     @staticmethod
-    def export_repository(repository_information: Dict, branches_information: List[Dict],
-                          vcs_instance_name: str) \
-            -> Repository:
+    def export_repository(repository_information: Dict, latest_commit: str, vcs_instance_name: str) -> Repository:
         """
         A method which generate a repositoryInfo object about a single bitbucket repository.
 
         :param vcs_instance_name: Name of the VCS instance to which the repository belongs
         :param repository_information: Azure Devops repository information as returned by the Azure API.
-        :param branches_information: Azure Devops branches information for a single repo as returned by the Azure API.
+        :param latest_commit: Azure Devops latest_commit for a single repo as returned by the Azure API.
         :return Repository object
         """
-
-        branches: List[Branch] = []
-        for branch_information in branches_information:
-            if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
-                if branch_information["name"].lower() in ["main", "master"]:
-                    branch = Branch(repository_id=repository_information["id"],
-                                    **map_azure_devops_branch(branch_information))
-                    branches.append(branch)
-                    break
-            else:
-                branch = Branch(repository_id=repository_information["id"],
-                                **map_azure_devops_branch(branch_information))
-                branches.append(branch)
-
-        repository = Repository(branches=branches,
+        repository = Repository(latest_commit=latest_commit,
                                 vcs_instance_name=vcs_instance_name,
                                 **map_azure_devops_repository(repository_information))
 

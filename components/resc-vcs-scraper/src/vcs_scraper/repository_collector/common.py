@@ -39,17 +39,16 @@ def extract_project_information(project_key, vcs_client, vcs_instance_name):
     project_tasks = []
     for repository in project_repositories:
         try:
-            logger.info(f"Fetching branches for repository: '{project_key}/{repository['name']}'")
-            repository_branches = vcs_client.get_branches(project_key=project_key, repository_id=repository["name"])
-            task_parameters = vcs_client.export_repository(repository, repository_branches, vcs_instance_name)
+            logger.info(f"Fetching latest commit for repository: '{project_key}/{repository['name']}'")
+            latest_commit = vcs_client.get_latest_commit(project_key=project_key, repository_id=repository["name"])
+            task_parameters = vcs_client.export_repository(repository, latest_commit, vcs_instance_name)
             project_tasks.append(task_parameters)
 
-            logger.info(f"{len(task_parameters.branches)} branch(es) for repository: "
-                        f"'{project_key}/{repository['name']}' were fetched successfully")
+            logger.info(f"Information for repository: '{project_key}/{repository['name']}' was fetched successfully")
         except requests.exceptions.HTTPError as http_exception:
             logger.error(
                 f"Error while processing repository '{project_key}/{repository['name']}':"
-                f" Unable to obtain the repository's branches: {http_exception}")
+                f" Unable to obtain the repository's latest commit: {http_exception}")
     return project_tasks
 
 
@@ -61,8 +60,7 @@ def send_tasks_to_celery_queue(task_name: str, queue_name: str, project_tasks: L
 @celery_client.task(Queue=PROJECT_QUEUE)
 def collect_repositories(project_key, vcs_instance_name):
     """
-    Celery worker which takes as input a project ID and collects the required information about all of its repos and
-    their respective branches.
+    Celery worker which takes as input a project ID and collects the required information about all of its repos.
     """
     vcs_instances_map = load_vcs_instances_into_map(env_variables[VCS_INSTANCES_FILE_PATH])
 

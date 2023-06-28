@@ -15,18 +15,6 @@ from vcs_scraper.constants import AZURE_DEVOPS, BITBUCKET, GITHUB_PUBLIC
 
 
 @dataclasses.dataclass
-class Branch:
-    repository_id: int
-    branch_name: str
-    branch_id: str
-    latest_commit: str
-
-    def json(self):
-        json_branch = json.dumps(dataclasses.asdict(self))
-        return json_branch
-
-
-@dataclasses.dataclass
 class Repository:
 
     repository_name: str
@@ -34,7 +22,7 @@ class Repository:
     repository_url: str
     project_key: str
     vcs_instance_name: str
-    branches: List[Branch]
+    latest_commit: str
 
     def json(self):
         json_repo = json.dumps(dataclasses.asdict(self))

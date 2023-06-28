@@ -1,6 +1,6 @@
 # Standard Library
 import abc
-from typing import Dict, List
+from typing import Dict
 
 # First Party
 from vcs_scraper.model import Repository, VCSInstance
@@ -22,14 +22,12 @@ class VCSConnector(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get_branches(self, project_key, repository_id):
+    def get_latest_commit(self, project_key, repository_id):
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def export_repository(repository_information: Dict, branches_information: List[Dict],
-                          vcs_instance_name: str) \
-            -> Repository:
+    def export_repository(repository_information: Dict, latest_commit, vcs_instance_name: str) -> Repository:
         pass
 
     @staticmethod
