@@ -1,14 +1,13 @@
 # Standard Library
-import os
-from typing import Dict, List
+from typing import Dict
 
 # Third Party
 import requests
 from atlassian import Bitbucket
 
 # First Party
-from vcs_scraper.model import Branch, Repository
-from vcs_scraper.vcs_connectors.bitbucket_data_mapper import map_bitbucket_branch, map_bitbucket_repository
+from vcs_scraper.model import Repository
+from vcs_scraper.vcs_connectors.bitbucket_data_mapper import map_bitbucket_repository
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -55,8 +54,13 @@ class BitbucketConnector(VCSConnector):
     def get_repos(self, project_key):
         return list(self.api_client.repo_all_list(project_key))
 
-    def get_branches(self, project_key, repository_id):
-        return list(self.api_client.get_branches(project_key, repository_id))
+    def get_latest_commit(self, project_key, repository_id):
+        last_commit = None
+        latest_edited_branch = list(self.api_client.get_branches(project_key, repository_id,
+                                                                 order_by="MODIFICATION", limit=1))
+        if latest_edited_branch:
+            last_commit = latest_edited_branch[0]["latestCommit"]
+        return last_commit
 
     @staticmethod
     def get_clone_url(clone_urls, name):
@@ -66,32 +70,17 @@ class BitbucketConnector(VCSConnector):
         return ""
 
     @staticmethod
-    def export_repository(repository_information: Dict, branches_information: List[Dict],
-                          vcs_instance_name: str) \
-            -> Repository:
+    def export_repository(repository_information: Dict, latest_commit: str, vcs_instance_name: str) -> Repository:
         """
         A method which generate a repositoryInfo object about a single bitbucket repository.
 
         :param vcs_instance_name: Name of the VCS instance to which the repository belongs
         :param repository_information: Bitbucket repository information as returned by the Bitbucket API.
-        :param branches_information: Bitbucket branches information for a single repo as returned by the Bitbucket API.
+        :param latest_commit: Bitbucket latest_commit for a single repo as returned by the Bitbucket API.
         :return RepositoryInfo object
         """
-
-        branches: List[Branch] = []
-        for branch_information in branches_information:
-            if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
-                if branch_information["displayId"].lower() in ["main", "master"]:
-                    branch = Branch(repository_id=repository_information["id"],
-                                    **map_bitbucket_branch(branch_information))
-                    branches.append(branch)
-                    break
-            else:
-                branch = Branch(repository_id=repository_information["id"],
-                                **map_bitbucket_branch(branch_information))
-                branches.append(branch)
         http_clone_url = BitbucketConnector.get_clone_url(repository_information["links"]["clone"], "http")
-        repository = Repository(branches=branches,
+        repository = Repository(latest_commit=latest_commit,
                                 repository_url=http_clone_url,
                                 vcs_instance_name=vcs_instance_name,
                                 **map_bitbucket_repository(repository_information))

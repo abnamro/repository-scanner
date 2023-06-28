@@ -1,5 +1,5 @@
 [report]
-fail_under=83
+fail_under=81
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:

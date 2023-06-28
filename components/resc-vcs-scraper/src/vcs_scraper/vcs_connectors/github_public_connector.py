@@ -1,15 +1,13 @@
 # Standard Library
-import os
 from typing import List
 
 # Third Party
 import requests
 from github import Github
-from github.Branch import Branch as GithubBranch
 from github.Repository import Repository as GithubRepository
 
 # First Party
-from vcs_scraper.model import Branch, Repository, VCSInstance
+from vcs_scraper.model import Repository, VCSInstance
 from vcs_scraper.vcs_connectors.vcs_connector import VCSConnector
 
 
@@ -55,48 +53,27 @@ class GithubPublicConnector(VCSConnector):
         repo_details = self.api_client.get_repo(f"{project_key}/{repository_name}")
         return repo_details
 
-    def get_branches(self, project_key: str, repository_id: str) -> List[GithubBranch]:
-        branches = self.api_client.get_repo(f"{project_key}/{repository_id}").get_branches()
-        for branch in branches:
-            branch_details = self.get_branch_details(project_key=project_key, repository_name=repository_id,
-                                                     branch=branch.name)
-            branch.latest_commit = branch_details.commit.sha
-        return branches
-
-    def get_branch_details(self, project_key: str, repository_name: str, branch: str) -> GithubBranch:
-        branch = self.api_client.get_repo(f"{project_key}/{repository_name}").get_branch(branch)
-        return branch
+    def get_latest_commit(self, project_key: str, repository_id: str) -> str:
+        latest_commit = None
+        self.api_client.per_page = 1
+        commits = self.api_client.get_repo(f"{project_key}/{repository_id}").get_commits()
+        if commits:
+            latest_commit = commits[0].sha
+        self.api_client.per_page = None
+        return latest_commit
 
     @staticmethod
-    def export_repository(repository_information: GithubRepository, branches_information: List[GithubBranch],
-                          vcs_instance_name: str) \
+    def export_repository(repository_information: GithubRepository, latest_commit: str, vcs_instance_name: str) \
             -> Repository:
         """
         A method which generate a repository object about a single bitbucket repository.
 
         :param vcs_instance_name: Name of the VCS instance to which the repository belongs
         :param repository_information: Github repository information as returned by the Bitbucket API.
-        :param branches_information: Github branches information for a single repo as returned by the Bitbucket API.
+        :param latest_commit: Github latest_commit for this repo as returned by the Bitbucket API.
         :return Repository object
         """
-
-        branches: List[Branch] = []
-        for branch_information in branches_information:
-            if os.getenv('SCAN_ONLY_MASTER_BRANCH', "true").lower() in "true":
-                if branch_information.name.lower() in ["main", "master"]:
-                    branch = Branch(repository_id=repository_information["id"],
-                                    branch_name=branch_information.name,
-                                    latest_commit=branch_information.latest_commit,
-                                    branch_id=branch_information.name)
-                    branches.append(branch)
-                    break
-            else:
-                branch = Branch(repository_id=repository_information["id"],
-                                branch_name=branch_information.name,
-                                latest_commit=branch_information.latest_commit,
-                                branch_id=branch_information.name)
-                branches.append(branch)
-        repository = Repository(branches=branches,
+        repository = Repository(latest_commit=latest_commit,
                                 repository_url=repository_information["html_url"],
                                 vcs_instance_name=vcs_instance_name,
                                 repository_name=repository_information["name"],
