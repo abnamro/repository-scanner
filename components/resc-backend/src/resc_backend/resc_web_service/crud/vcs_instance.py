@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 # First Party
 from resc_backend.constants import DEFAULT_RECORDS_PER_PAGE_LIMIT, MAX_RECORDS_PER_PAGE_LIMIT
 from resc_backend.db import model
-from resc_backend.resc_web_service.crud import branch as branch_crud
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import repository as repository_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
@@ -147,7 +146,6 @@ def delete_vcs_instance(db_connection: Session, vcs_instance_id: int, delete_rel
         scan_finding_crud.delete_scan_finding_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
         finding_crud.delete_findings_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
         scan_crud.delete_scans_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
-        branch_crud.delete_branches_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
         repository_crud.delete_repositories_by_vcs_instance_id(db_connection, vcs_instance_id=vcs_instance_id)
     db_vcs_instance = db_connection.query(model.DBVcsInstance).filter_by(id_=vcs_instance_id).first()
     db_connection.delete(db_vcs_instance)

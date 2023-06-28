@@ -39,31 +39,32 @@ def create_findings(db_connection: Session, findings: List[finding_schema.Findin
     if len(findings) < 1:
         # Function is called with an empty list of findings
         return []
-    branch_id = findings[0].branch_id
+    repository_id = findings[0].repository_id
 
-    # get a list of known / registered findings for this branch
-    db_branch_findings = db_connection.query(model.DBfinding).filter(model.DBfinding.branch_id == branch_id).all()
+    # get a list of known / registered findings for this repository
+    db_repository_findings = db_connection.query(model.DBfinding).\
+        filter(model.DBfinding.repository_id == repository_id).all()
 
     # Compare new findings list with findings in the db
     new_findings = findings[:]
     db_findings = []
     for finding in findings:
-        for branch_finding in db_branch_findings:
+        for repository_finding in db_repository_findings:
             # Compare based on the unique key in the findings table
-            if branch_finding.commit_id == finding.commit_id and \
-                    branch_finding.rule_name == finding.rule_name and \
-                    branch_finding.file_path == finding.file_path and \
-                    branch_finding.line_number == finding.line_number and \
-                    branch_finding.column_start == finding.column_start and \
-                    branch_finding.column_end == finding.column_end:
+            if repository_finding.commit_id == finding.commit_id and \
+                    repository_finding.rule_name == finding.rule_name and \
+                    repository_finding.file_path == finding.file_path and \
+                    repository_finding.line_number == finding.line_number and \
+                    repository_finding.column_start == finding.column_start and \
+                    repository_finding.column_end == finding.column_end:
                 # Store the already known finding
-                db_findings.append(branch_finding)
-                # Remove from the db_branch_findings to increase performance for the next loop
-                db_branch_findings.remove(branch_finding)
+                db_findings.append(repository_finding)
+                # Remove from the db_repository_findings to increase performance for the next loop
+                db_repository_findings.remove(repository_finding)
                 # Remove from the to be created findings
                 new_findings.remove(finding)
                 break
-    logger.info(f"create_findings branch {branch_id}, Requested: {len(findings)}. "
+    logger.info(f"create_findings repository {repository_id}, Requested: {len(findings)}. "
                 f"New findings: {len(new_findings)}. Already in db: {len(db_findings)}")
 
     db_create_findings = []
@@ -175,7 +176,7 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                                           model.audit.DBaudit.id_ == max_audit_subquery.c.audit_id),
                       isouter=True)
         if (findings_filter.vcs_providers and findings_filter.vcs_providers is not None) \
-                or findings_filter.project_name or findings_filter.branch_name \
+                or findings_filter.project_name \
                 or findings_filter.repository_name or findings_filter.start_date_time \
                 or findings_filter.end_date_time:
             total_count_query = total_count_query \
@@ -183,10 +184,8 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
                       model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
                 .join(model.DBscan,
                       model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
-                .join(model.DBbranch,
-                      model.branch.DBbranch.id_ == model.scan.DBscan.branch_id) \
                 .join(model.DBrepository,
-                      model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
+                      model.repository.DBrepository.id_ == model.scan.DBscan.repository_id) \
                 .join(model.DBVcsInstance,
                       model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
 
@@ -196,8 +195,6 @@ def get_total_findings_count(db_connection: Session, findings_filter: FindingsFi
         if findings_filter.end_date_time:
             total_count_query = total_count_query.filter(model.scan.DBscan.timestamp <= findings_filter.end_date_time)
 
-        if findings_filter.branch_name:
-            total_count_query = total_count_query.filter(model.DBbranch.branch_name == findings_filter.branch_name)
         if findings_filter.repository_name:
             total_count_query = total_count_query.filter(
                 model.DBrepository.repository_name == findings_filter.repository_name)
@@ -283,10 +280,8 @@ def get_distinct_rules_from_findings(db_connection: Session, scan_id: int = -1,
                   model.scan_finding.DBscanFinding.finding_id == model.finding.DBfinding.id_) \
             .join(model.DBscan,
                   model.scan.DBscan.id_ == model.scan_finding.DBscanFinding.scan_id) \
-            .join(model.DBbranch,
-                  model.branch.DBbranch.id_ == model.scan.DBscan.branch_id) \
             .join(model.DBrepository,
-                  model.repository.DBrepository.id_ == model.branch.DBbranch.repository_id) \
+                  model.repository.DBrepository.id_ == model.scan.DBscan.repository_id) \
             .join(model.DBVcsInstance,
                   model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
     if finding_statuses:
@@ -404,19 +399,19 @@ def get_rule_findings_count_by_status(db_connection: Session, rule_pack_versions
                                 model.DBaudit.status,
                                 func.count(model.DBfinding.id_))
 
-    max_base_scan_subquery = db_connection.query(model.DBscan.branch_id,
+    max_base_scan_subquery = db_connection.query(model.DBscan.repository_id,
                                                  func.max(model.DBscan.id_).label("latest_base_scan_id"))
-    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.scan_type == ScanType.BASE)
+    max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.repository_id == ScanType.BASE)
     if rule_pack_versions:
         max_base_scan_subquery = max_base_scan_subquery.filter(model.DBscan.rule_pack.in_(rule_pack_versions))
-    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.branch_id).subquery()
+    max_base_scan_subquery = max_base_scan_subquery.group_by(model.DBscan.repository_id).subquery()
 
     max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
                                              func.max(model.DBaudit.id_).label("audit_id")) \
         .group_by(model.DBaudit.finding_id).subquery()
 
     query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
-    query = query.join(max_base_scan_subquery, model.DBfinding.branch_id == max_base_scan_subquery.c.branch_id)
+    query = query.join(max_base_scan_subquery, model.DBfinding.repository_id == max_base_scan_subquery.c.repository_id)
     query = query.join(model.DBscan, and_(model.DBscanFinding.scan_id == model.DBscan.id_,
                                           model.DBscan.id_ >= max_base_scan_subquery.c.latest_base_scan_id))
     if rule_tags:
@@ -600,20 +595,6 @@ def delete_finding(db_connection: Session, finding_id: int, delete_related: bool
     db_connection.commit()
 
 
-def delete_findings_by_branch_id(db_connection: Session, branch_id: int):
-    """
-        Delete findings for a given branch
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the branch
-    """
-    db_connection.query(model.DBfinding) \
-        .filter(model.finding.DBfinding.branch_id == branch_id) \
-        .delete(synchronize_session=False)
-    db_connection.commit()
-
-
 def delete_findings_by_repository_id(db_connection: Session, repository_id: int):
     """
         Delete findings for a given repository
@@ -623,9 +604,7 @@ def delete_findings_by_repository_id(db_connection: Session, repository_id: int)
         id of the repository
     """
     db_connection.query(model.DBfinding) \
-        .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
-                model.repository.DBrepository.id_ == repository_id) \
+        .filter(model.finding.DBfinding.repository_id == repository_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
 
@@ -639,8 +618,7 @@ def delete_findings_by_vcs_instance_id(db_connection: Session, vcs_instance_id: 
         id of the vcs instance
     """
     db_connection.query(model.DBfinding) \
-        .filter(model.finding.DBfinding.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+        .filter(model.finding.DBfinding.repository_id == model.repository.DBrepository.id_,
                 model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
                 model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
         .delete(synchronize_session=False)
@@ -673,8 +651,7 @@ def get_finding_audit_status_count_over_time(db_connection: Session, status: Fin
             .group_by(model.DBaudit.finding_id).subquery()
         query = query.join(max_audit_subquery, max_audit_subquery.c.audit_id == model.DBaudit.id_)
         query = query.join(model.DBfinding, model.DBfinding.id_ == model.DBaudit.finding_id)
-        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBfinding.branch_id)
-        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBfinding.repository_id)
         query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
         query = query.filter(model.DBaudit.status == status)
         query = query.group_by(model.DBVcsInstance.provider_type)
@@ -706,15 +683,15 @@ def get_finding_count_by_vcs_provider_over_time(db_connection: Session, weeks: i
                                     func.count(model.DBfinding.id_).label("finding_count")
                                     )
         max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
-                                            model.DBscan.branch_id) \
+                                            model.DBscan.repository_id) \
             .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
             .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
             .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .group_by(model.DBscan.branch_id).subquery()
+            .group_by(model.DBscan.repository_id).subquery()
 
         query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
         query = query.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id)
-        query = query.join(max_base_scan, and_(max_base_scan.c.branch_id == model.DBscan.branch_id,
+        query = query.join(max_base_scan, and_(max_base_scan.c.repository_id == model.DBscan.repository_id,
                                                or_(model.DBscan.id_ == max_base_scan.c.scan_id,
                                                    (and_(model.DBscan.id_ > max_base_scan.c.scan_id,
                                                          model.DBscan.scan_type == ScanType.INCREMENTAL,
@@ -725,8 +702,7 @@ def get_finding_count_by_vcs_provider_over_time(db_connection: Session, weeks: i
                                                    )
                                                )
                            )
-        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBscan.branch_id)
-        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBscan.repository_id)
         query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
         query = query.group_by(model.DBVcsInstance.provider_type)
 
@@ -757,11 +733,11 @@ def get_un_triaged_finding_count_by_vcs_provider_over_time(db_connection: Sessio
                                     func.count(model.DBfinding.id_).label("finding_count")
                                     )
         max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
-                                            model.DBscan.branch_id) \
+                                            model.DBscan.repository_id) \
             .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
             .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
             .filter(model.DBscan.scan_type == ScanType.BASE) \
-            .group_by(model.DBscan.branch_id).subquery()
+            .group_by(model.DBscan.repository_id).subquery()
 
         max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
                                                  func.max(model.DBaudit.id_).label("audit_id")) \
@@ -771,7 +747,7 @@ def get_un_triaged_finding_count_by_vcs_provider_over_time(db_connection: Sessio
 
         query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
         query = query.join(model.DBscan, model.DBscan.id_ == model.DBscanFinding.scan_id)
-        query = query.join(max_base_scan, and_(max_base_scan.c.branch_id == model.DBscan.branch_id,
+        query = query.join(max_base_scan, and_(max_base_scan.c.repository_id == model.DBscan.repository_id,
                                                or_(model.DBscan.id_ == max_base_scan.c.scan_id,
                                                    (and_(model.DBscan.id_ > max_base_scan.c.scan_id,
                                                          model.DBscan.scan_type == ScanType.INCREMENTAL,
@@ -782,8 +758,7 @@ def get_un_triaged_finding_count_by_vcs_provider_over_time(db_connection: Sessio
                                                    )
                                                )
                            )
-        query = query.join(model.DBbranch, model.DBbranch.id_ == model.DBscan.branch_id)
-        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBbranch.repository_id)
+        query = query.join(model.DBrepository, model.DBrepository.id_ == model.DBscan.repository_id)
         query = query.join(model.DBVcsInstance, model.DBVcsInstance.id_ == model.DBrepository.vcs_instance)
 
         query = query.join(max_audit_subquery, max_audit_subquery.c.finding_id == model.finding.DBfinding.id_,
