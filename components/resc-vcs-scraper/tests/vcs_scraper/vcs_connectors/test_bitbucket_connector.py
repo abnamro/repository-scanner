@@ -38,7 +38,8 @@ def test_export_repository_all_branches():
 
     vcs_instance_name = "test server"
 
-    result = BitbucketConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
+    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
+        result = BitbucketConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
 
     assert type(result) is Repository
     assert result.repository_name == "repo1"
