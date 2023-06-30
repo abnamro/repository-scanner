@@ -266,7 +266,7 @@ export default {
           this.limitRecords
         )
           .then((res) => {
-            const response = res.data;
+            const response = res.data.data;
             this.scanDateList = [];
 
             this.scanList = response.sort(function (a, b) {
