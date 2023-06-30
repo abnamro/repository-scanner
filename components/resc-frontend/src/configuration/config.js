@@ -20,6 +20,8 @@ export default class Config {
       ssoJwtSigningAlgorithm: '$VUE_APP_SSO_JWT_SIGNING_ALOGORITHM',
       ssoLoginPageMessage: '$VUE_APP_SSO_LOGIN_PAGE_MESSAGE',
       defaultPageSize: '100',
+      skipRecords: '0',
+      limitRecords: '100',
     };
   }
 

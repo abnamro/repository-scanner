@@ -36,19 +36,8 @@
         responsive
         small
         head-variant="light"
-        @row-clicked="toggleRepositoryDetails"
+        @row-clicked="goToScanFindings"
       >
-        <!-- Collapse Icon Column -->
-        <template v-slot:cell(toggle_row)="{ detailsShowing }">
-          <font-awesome-icon
-            size="lg"
-            class="collapse-arrow"
-            slot="dropdown-icon"
-            icon="angle-right"
-            :rotation="detailsShowing ? 90 : null"
-          />
-        </template>
-
         <!-- Health Bar Column -->
         <template #cell(findings)="data">
           <HealthBar
@@ -59,11 +48,6 @@
             :clarificationRequired="data.item.clarification_required"
             :totalCount="data.item.total_findings_count"
           />
-        </template>
-
-        <!-- Expand Table Row To Display RepositoryBranches Panel -->
-        <template v-slot:row-details="{ item }">
-          <RepositoryBranchesPanel :repository="item"></RepositoryBranchesPanel>
         </template>
       </b-table>
 
@@ -84,9 +68,10 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
+import DateUtils from '@/utils/date-utils';
 import HealthBar from '@/components/Common/HealthBar.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import RepositoryBranchesPanel from '@/components/RepositoryBranches/RepositoryBranchesPanel.vue';
+import PushNotification from '@/utils/push-notification';
 import RepositoryService from '@/services/repository-service';
 import RepositoriesPageFilter from '@/components/Filters/RepositoriesPageFilter.vue';
 import Spinner from '@/components/Common/Spinner.vue';
@@ -112,44 +97,54 @@ export default {
       includeZeroFindingRepos: false,
       fields: [
         {
-          key: 'toggle_row',
-          label: '',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '5%' },
-        },
-        {
           key: 'project_key',
           sortable: true,
           label: 'Project',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '20%' },
+          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
         },
         {
           key: 'repository_name',
           sortable: true,
           label: 'Repository',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '25%' },
+          thStyle: { borderTop: '0px', width: '15%', fontSize: 'small' },
         },
         {
           key: 'vcs_provider',
           sortable: true,
           label: 'VCS Provider',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '10%' },
+          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
         },
         {
           key: 'total_findings_count',
           sortable: true,
           label: 'Total Count',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '15%' },
+          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
+        },
+        {
+          key: 'last_scan_finding_count',
+          sortable: true,
+          label: 'Last Scan Count',
+          class: 'text-left',
+          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
+          formatter: 'formatCount',
+        },
+        {
+          key: 'last_scan_datetime',
+          sortable: true,
+          label: 'Last Scan Date',
+          class: 'text-left',
+          thStyle: { borderTop: '0px', width: '20%', fontSize: 'small' },
+          formatter: 'formatDate',
         },
         {
           key: 'findings',
           label: 'Findings(%)',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '25%' },
+          thStyle: { borderTop: '0px', width: '25%', fontSize: 'small' },
         },
       ],
     };
@@ -163,6 +158,13 @@ export default {
     },
   },
   methods: {
+    formatDate(timestamp) {
+      const date = DateUtils.formatDate(timestamp);
+      return date === 'Jan 01, 1' ? 'Not Scanned' : date;
+    },
+    formatCount(count) {
+      return count === -1 ? 'Not Available' : count;
+    },
     handlePageClick(page) {
       this.currentPage = page;
       this.fetchPaginatedRepositories();
@@ -172,17 +174,12 @@ export default {
       this.currentPage = 1;
       this.fetchPaginatedRepositories();
     },
-    toggleRepositoryDetails(row) {
-      if (row._showDetails) {
-        this.$set(row, '_showDetails', false);
-      } else {
-        this.currentItems.forEach((item) => {
-          this.$set(item, '_showDetails', false);
-        });
-        this.$nextTick(() => {
-          this.$set(row, '_showDetails', true);
-        });
-      }
+    goToScanFindings(record) {
+      const routeData = this.$router.resolve({
+        name: 'ScanFindings',
+        params: { scanId: record.last_scan_id },
+      });
+      window.open(routeData.href, '_blank');
     },
     handleFilterChange(vcsProvider, project, repository, includeZeroFindingRepos) {
       this.vcsFilter = vcsProvider;
@@ -195,6 +192,7 @@ export default {
       this.fetchPaginatedRepositories();
     },
     fetchPaginatedRepositories() {
+      this.repositoryList = [];
       this.showSpinner();
       RepositoryService.getRepositoriesWithFindingsMetadata(
         this.perPage,
@@ -206,7 +204,22 @@ export default {
       )
         .then((response) => {
           this.totalRows = response.data.total;
-          this.repositoryList = response.data.data;
+          for (const repo of response.data.data) {
+            if (repo.id_) {
+              RepositoryService.getLastScanForRepository(repo.id_)
+                .then((res) => {
+                  if (res.data) {
+                    repo.last_scan_id = res.data.id_;
+                    repo.last_scan_datetime = res.data.timestamp;
+                    repo.last_scan_finding_count = 10;
+                    this.repositoryList.push(repo);
+                  }
+                })
+                .catch((error) => {
+                  PushNotification.danger(error.message, 'Error', 5000);
+                });
+            }
+          }
           this.hideSpinner();
         })
         .catch((error) => {
@@ -263,7 +276,6 @@ export default {
   components: {
     HealthBar,
     Pagination,
-    RepositoryBranchesPanel,
     RepositoriesPageFilter,
     Spinner,
   },
