@@ -7,7 +7,7 @@
           "increment_number": 0,
           "rule_pack": "1.0.0",
           "repository_id": 1,
-          "id_": 2
+          "id_": 1
       },
       {
           "scan_type": "INCREMENTAL",
@@ -16,7 +16,7 @@
           "increment_number": 1,
           "rule_pack": "1.0.0",
           "repository_id": 1,
-          "id_": 1
+          "id_": 2
       }
   ]
 }
