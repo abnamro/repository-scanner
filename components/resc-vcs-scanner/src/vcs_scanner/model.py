@@ -5,7 +5,6 @@ from typing import List, Optional
 
 # Third Party
 from pydantic import BaseModel, conint, constr, validator
-from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
@@ -16,7 +15,7 @@ class RepositoryRuntime(BaseModel):
     repository_url: str
     project_key: str
     vcs_instance_name: str
-    branches: List[Branch]
+    latest_commit: str
 
     def convert_to_repository(self, vcs_instance_id: int) -> Repository:
         return Repository(
@@ -25,7 +24,7 @@ class RepositoryRuntime(BaseModel):
             repository_name=self.repository_name,
             repository_url=self.repository_url,
             vcs_instance=vcs_instance_id,
-            branches=self.branches
+            latest_commit=self.latest_commit
         )
 
 

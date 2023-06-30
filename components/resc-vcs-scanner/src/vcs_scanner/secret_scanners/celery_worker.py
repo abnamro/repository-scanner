@@ -68,7 +68,7 @@ def scan_repository(repository):
                                 repository_name=repository_runtime.repository_name,
                                 repository_url=repository_runtime.repository_url,
                                 vcs_instance=vcs_instance.id_,
-                                branches=repository_runtime.branches,
+                                latest_commit=repository_runtime.latest_commit,
                                 )
 
         secret_scanner = SecretScanner(

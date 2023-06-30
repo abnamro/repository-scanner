@@ -9,15 +9,13 @@ from typing import Dict, List, Optional
 
 # Third Party
 from resc_backend.constants import TEMP_RULE_FILE
-from resc_backend.resc_web_service.schema.branch import BranchCreate, BranchRead
 from resc_backend.resc_web_service.schema.finding import FindingBase, FindingCreate
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate, RepositoryRead
 from resc_backend.resc_web_service.schema.scan import Scan, ScanCreate, ScanRead
 from resc_backend.resc_web_service.schema.scan_type import ScanType
 from resc_backend.resc_web_service.schema.vcs_instance import VCSInstanceCreate, VCSInstanceRead
-from resc_backend.resc_web_service_interface.branches import create_branch, get_last_scan_for_branch
 from resc_backend.resc_web_service_interface.findings import create_findings_with_scan_id
-from resc_backend.resc_web_service_interface.repositories import create_repository
+from resc_backend.resc_web_service_interface.repositories import create_repository, get_last_scan_for_repository
 from resc_backend.resc_web_service_interface.rule_packs import download_rule_pack_toml_file, get_rule_packs
 from resc_backend.resc_web_service_interface.scans import create_scan
 from resc_backend.resc_web_service_interface.vcs_instances import create_vcs_instance
@@ -63,27 +61,14 @@ class RESTAPIWriter(OutputModule):
             logger.warning(f"Creating repository failed with error: {response.status_code}->{response.text}")
         return created_repository
 
-    def write_branch(self, repository: RepositoryRead, branch: BranchCreate) \
-            -> Optional[BranchRead]:
-        created_branch = None
-        branch = BranchCreate.create_from_base_class(
-            base_object=branch, repository_id=repository.id_)
-
-        response = create_branch(self.rws_url, branch)
-        if response.status_code == 201:
-            created_branch = BranchRead(**json.loads(response.text))
-        else:
-            logger.warning(f"Creating branch failed with error: {response.status_code}->{response.text}")
-        return created_branch
-
     def write_findings(
             self,
             scan_id: int,
-            branch_id: int,
+            repository_id: int,
             scan_findings: List[FindingBase], ):
         findings_create = []
         for finding in scan_findings:
-            new_finding = FindingCreate.create_from_base_class(base_object=finding, branch_id=branch_id)
+            new_finding = FindingCreate.create_from_base_class(base_object=finding, repository_id=repository_id)
             findings_create.append(new_finding)
 
         response = create_findings_with_scan_id(self.rws_url,
@@ -100,26 +85,25 @@ class RESTAPIWriter(OutputModule):
             scan_type_to_run: ScanType,
             last_scanned_commit: str,
             scan_timestamp: datetime,
-            branch: BranchRead,
+            repository: RepositoryRead,
             rule_pack: str) -> ScanRead:
         created_scan = None
         scan_object = ScanCreate.create_from_base_class(
             base_object=Scan(scan_type=scan_type_to_run, last_scanned_commit=last_scanned_commit,
-                             timestamp=scan_timestamp, rule_pack=rule_pack), branch_id=branch.id_)
+                             timestamp=scan_timestamp, rule_pack=rule_pack), repository_id=repository.id_)
 
         response = create_scan(self.rws_url, scan_object)
         if response.status_code == 201:
             created_scan = ScanRead(**json.loads(response.text))
-            logger.info(f"Successfully created scan for branch {branch.branch_name} ")
+            logger.info(f"Successfully created scan for repository {repository.repository_url} ")
         else:
             logger.warning(
                 f"Creating {scan_type_to_run} scan failed with error: {response.status_code}->{response.text}")
 
         return created_scan
 
-    def get_last_scan_for_branch(self, branch: BranchRead) -> ScanRead:
-        response = get_last_scan_for_branch(self.rws_url,
-                                            branch.id_)
+    def get_last_scan_for_repository(self, repository: RepositoryRead) -> ScanRead:
+        response = get_last_scan_for_repository(self.rws_url, repository.id_)
         if response.status_code == 200:
             return ScanRead(**json.loads(response.text))
         logger.warning(f"Retrieving last scan details failed with error: {response.status_code}->{response.text}")
