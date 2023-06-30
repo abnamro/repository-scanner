@@ -12,6 +12,7 @@ from resc_backend.constants import (
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_REPOSITORIES,
+    RWS_ROUTE_SCANS,
     RWS_VERSION_PREFIX
 )
 from resc_backend.db.model import DBfinding, DBrepository, DBscan, DBVcsInstance
@@ -514,3 +515,19 @@ class TestRepositories(unittest.TestCase):
         assert response.status_code == 404, response.text
         get_repository.assert_called_once_with(ANY, repository_id=repository_id)
         get_findings_metadata_by_repository_id.assert_not_called()
+
+    @patch("resc_backend.resc_web_service.crud.scan.get_scans_count")
+    @patch("resc_backend.resc_web_service.crud.scan.get_scans")
+    def test_get_scans_for_repository(self, get_scans, get_scans_count):
+        get_scans.return_value = self.db_scans[:2]
+        get_scans_count.return_value = len(self.db_scans[:2])
+        response = self.client.get(
+            f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}/1{RWS_ROUTE_SCANS}/")
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert data['total'] == len(self.db_scans[:2])
+        assert data['limit'] == 100
+        assert data['skip'] == 0
+        assert len(data["data"]) == len(self.db_scans[:2])
+        assert data["data"][0]["id_"] == self.db_scans[0].id_
+        assert data["data"][1]["id_"] == self.db_scans[1].id_
