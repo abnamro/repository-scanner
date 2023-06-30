@@ -41,13 +41,8 @@ const RepositoryService = {
     return axios.get(`/repositories/findings-metadata/?${queryParams}`);
   },
 
-  async getRepositoryBranches(repositoryId, perPage, skipRowCount) {
-    return axios.get(`/repositories/${repositoryId}/branches`, {
-      params: {
-        skip: skipRowCount,
-        limit: perPage,
-      },
-    });
+  async getLastScanForRepository(repositoryId) {
+    return axios.get(`/repositories/${repositoryId}/last-scan`);
   },
 
   async getVCSProviders() {

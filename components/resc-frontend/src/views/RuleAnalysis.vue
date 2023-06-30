@@ -122,7 +122,6 @@
               repository_name: item.repository_name,
               repository_url: item.repository_url,
               vcs_provider: item.vcs_provider,
-              branch_name: item.branch_name,
             }"
           ></FindingPanel>
         </template>
@@ -179,7 +178,6 @@ export default {
       selectedStatus: null,
       selectedProject: null,
       selectedRepository: null,
-      selectedBranch: null,
       selectedRule: null,
       selectedRuleTags: null,
       selectedRulePackVersions: [],
@@ -210,13 +208,6 @@ export default {
           key: 'repository_name',
           sortable: true,
           label: 'Repository',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'branch_name',
-          sortable: true,
-          label: 'Branch',
           class: 'text-left position-sticky',
           thStyle: { borderTop: '0px' },
         },
@@ -326,7 +317,6 @@ export default {
       filterObj.findingStatus = this.selectedStatus;
       filterObj.project = this.selectedProject;
       filterObj.repository = this.selectedRepository;
-      filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
       filterObj.ruleTags = this.selectedRuleTags;
       filterObj.rulePackVersions = this.selectedRulePackVersions;
@@ -361,7 +351,6 @@ export default {
       this.selectedStatus = filterObj.status;
       this.selectedProject = filterObj.project;
       this.selectedRepository = filterObj.repository;
-      this.selectedBranch = filterObj.branch;
       this.selectedRule = filterObj.rule;
       this.selectedRuleTags = filterObj.ruleTags;
       this.selectedRulePackVersions = filterObj.rulePackVersions;
