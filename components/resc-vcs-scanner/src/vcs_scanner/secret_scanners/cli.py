@@ -8,7 +8,6 @@ from argparse import ArgumentParser, Namespace
 from urllib.parse import urlparse
 
 # Third Party
-from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 # First Party
@@ -67,8 +66,6 @@ def create_cli_argparser() -> ArgumentParser:
     repository_common.add_argument("--repo-name", type=str, required=False, action=EnvDefault, envvar="RESC_REPO_NAME",
                                    help="The name of the repository. "
                                         "Can also be set via the RESC_REPO_NAME environment variable")
-    repository_common.add_argument("--branches", default=["master", "main"], nargs="+", required=False,
-                                   help="The name of the branches to scan, default main and master")
     repository_common.add_argument("--force-base-scan", required=False, action="store_true")
 
     repository_common.add_argument("--rws-url", type=str, required=False, action=EnvDefault, envvar="RESC_RWS_URL",
@@ -198,7 +195,7 @@ def scan_directory(args: Namespace):
         repository_id="local",
         project_key="local",
         vcs_instance_name="vcs_instance_name",
-        branches=[]
+        latest_commit=FAKE_COMMIT
     )
 
     output_plugin = STDOUTWriter(toml_rule_file_path=args.gitleaks_rules_path,
@@ -229,13 +226,6 @@ def scan_repository(args: Namespace):
     :param args:
         Namespace object containing the CLI arguments
     """
-    branches = []
-    for i, branch in enumerate(args.branches):
-        logger.info(f"Adding branch {branch} to the list of branches to be scanned")
-        branches.append(
-            Branch(**{"branch_name": branch, "branch_id": i, "latest_commit": FAKE_COMMIT})
-        )
-
     vcs_type = guess_vcs_provider(args.repo_url)
     vcs_name = determine_vcs_name(args.repo_url, vcs_type)
 
@@ -245,8 +235,7 @@ def scan_repository(args: Namespace):
         repository_id=args.repo_name,
         project_key=args.repo_name,
         vcs_instance_name=vcs_name,
-        branches=branches
-
+        latest_commit=FAKE_COMMIT
     )
 
     if args.rws_url:

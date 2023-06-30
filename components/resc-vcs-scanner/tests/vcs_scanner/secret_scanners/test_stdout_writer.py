@@ -3,7 +3,6 @@ from datetime import datetime
 from unittest.mock import call, patch
 
 # Third Party
-from resc_backend.resc_web_service.schema.branch import BranchBase, BranchRead
 from resc_backend.resc_web_service.schema.finding import Finding, FindingCreate
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate, RepositoryRead
@@ -26,30 +25,6 @@ def test_write_correct_repository(info_log):
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         .write_repository(repository)
     assert result == repository
-    info_log.assert_called_once_with(expected_call)
-
-
-# A test method to check the happy flow of the write_branch method.
-@patch("logging.Logger.info")
-def test_write_correct_branch(info_log):
-    repository = RepositoryRead(
-        id_=1,
-        project_key="project_key",
-        repository_id="repository_id",
-        repository_name="repository_name",
-        repository_url="https://repo.url",
-        vcs_instance=1
-    )
-
-    branch = BranchBase(branch_id=1,
-                        branch_name="branch_name",
-                        latest_commit="latest_commit")
-
-    expected_call = f"Scanning branch {branch.branch_name} of repository {repository.repository_name}"
-
-    result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
-        .write_branch(repository, branch)
-    assert result == branch
     info_log.assert_called_once_with(expected_call)
 
 
@@ -95,36 +70,38 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
 @patch("logging.Logger.info")
 def test_write_scan(info_log):
     rule_pack = "0.0.0"
-    branch = BranchRead(id_=2,
-                        branch_id="branch.branch_id",
-                        branch_name="branch.branch_name",
-                        latest_commit="latest_commit",
-                        repository_id=1)
+    repository = RepositoryRead(id_=1,
+                                project_key="project_key",
+                                repository_id=1,
+                                repository_name="repository_name",
+                                repository_url="http://repository.url",
+                                vcs_instance=1)
     expected_result = ScanRead(last_scanned_commit="NONE",
                                timestamp=datetime.now(),
-                               branch_id=1,
+                               repository_id=1,
                                id_=1,
                                rule_pack=rule_pack)
-    expected_call = f"Running {expected_result.scan_type} scan on branch {branch.branch_name}"
+    expected_call = f"Running {expected_result.scan_type} scan on repository {repository.repository_url}"
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
-        .write_scan(expected_result.scan_type, expected_result.last_scanned_commit, expected_result.timestamp, branch,
-                    rule_pack=rule_pack)
+        .write_scan(expected_result.scan_type, expected_result.last_scanned_commit, expected_result.timestamp,
+                    repository, rule_pack=rule_pack)
     assert result.id_ == expected_result.id_
-    assert result.branch_id == expected_result.branch_id
+    assert result.repository_id == expected_result.repository_id
     assert result.rule_pack == expected_result.rule_pack
     assert result.last_scanned_commit == expected_result.last_scanned_commit
     info_log.assert_called_once_with(expected_call)
 
 
 def test_get_last_scanned_commit():
-    branch = BranchRead(id_=1,
-                        branch_id="branch.branch_id",
-                        branch_name="branch.branch_name",
-                        latest_commit="latest_commit",
-                        repository_id=1)
+    repository = RepositoryRead(id_=1,
+                                project_key="project_key",
+                                repository_id=1,
+                                repository_name="repository_name",
+                                repository_url="http://repository.url",
+                                vcs_instance=1)
 
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
-        .get_last_scan_for_branch(branch)
+        .get_last_scan_for_repository(repository)
     assert result is None
 
 
@@ -142,7 +119,7 @@ def test_finding_tag_filter_no_filter():
                             status=FindingStatus.NOT_ANALYZED,
                             comment=f"comment_{1}",
                             rule_name=f"rule_{1}",
-                            branch_id=1)
+                            repository_id=1)
 
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag=None)
@@ -163,7 +140,7 @@ def test_finding_tag_filter_match_filter():
                             status=FindingStatus.NOT_ANALYZED,
                             comment=f"comment_{1}",
                             rule_name=f"rule_{1}",
-                            branch_id=1)
+                            repository_id=1)
 
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag="tag")
@@ -184,7 +161,7 @@ def test_finding_tag_filter_nomatch_filter():
                             status=FindingStatus.NOT_ANALYZED,
                             comment=f"comment_{1}",
                             rule_name=f"rule_{1}",
-                            branch_id=1)
+                            repository_id=1)
 
     result = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
         ._finding_tag_filter(finding=finding, rule_tags={"rule_1": ["tag"]}, filter_tag="resc")

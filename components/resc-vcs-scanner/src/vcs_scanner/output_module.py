@@ -3,7 +3,6 @@ import abc
 from typing import List
 
 # Third Party
-from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.finding import FindingCreate
 from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan import Scan, ScanRead
@@ -20,13 +19,10 @@ class OutputModule(metaclass=abc.ABCMeta):
     def write_repository(self, repository: Repository):
         pass
 
-    def write_branch(self, repository: Repository, branch: Branch):
-        pass
-
     def write_findings(
             self,
             scan_id: int,
-            branch_id: int,
+            repository_id: int,
             scan_findings: List[FindingCreate],):
         pass
 
@@ -35,9 +31,9 @@ class OutputModule(metaclass=abc.ABCMeta):
             scan_type_to_run: ScanType,
             last_scanned_commit: str,
             scan_timestamp: str,
-            branch: Branch,
+            repository: Repository,
             rule_pack: str) -> Scan:
         pass
 
-    def get_last_scan_for_branch(self, branch: Branch) -> ScanRead:
+    def get_last_scan_for_repository(self, repository: Repository) -> ScanRead:
         pass
