@@ -67,7 +67,8 @@ def scan_repository(repository):
                                 repository_id=repository_runtime.repository_id,
                                 repository_name=repository_runtime.repository_name,
                                 repository_url=repository_runtime.repository_url,
-                                vcs_instance=vcs_instance.id_
+                                vcs_instance=vcs_instance.id_,
+                                latest_commit=repository_runtime.latest_commit,
                                 )
 
         secret_scanner = SecretScanner(
@@ -78,8 +79,7 @@ def scan_repository(repository):
             repository=repository,
             username=vcs_instance.username,
             personal_access_token=vcs_instance.token,
-            force_base_scan=os.getenv('FORCE_BASE_SCAN', "false").lower() in "true",
-            latest_commit=repository_runtime.latest_commit
+            force_base_scan=os.getenv('FORCE_BASE_SCAN', "false").lower() in "true"
         )
 
         secret_scanner.run_repository_scan()

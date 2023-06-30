@@ -40,7 +40,8 @@ def test_clone_repo(clone_from):
                             repository_id=1,
                             repository_name="repository_name",
                             repository_url="https://repository.url",
-                            vcs_instance=1)
+                            vcs_instance=1,
+                            latest_commit="latest_commit")
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
         gitleaks_rules_path="/rules.toml",
@@ -72,7 +73,8 @@ def test_scan_repo(start_scan):
                             repository_id=1,
                             repository_name="repository_name",
                             repository_url="https://repository.url",
-                            vcs_instance=1)
+                            vcs_instance=1,
+                            latest_commit="latest_commit")
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
         gitleaks_rules_path="/rules.toml",
@@ -83,7 +85,7 @@ def test_scan_repo(start_scan):
         personal_access_token=personal_access_token,
     )
     repo_clone_path = f"{secret_scanner._scan_tmp_directory}/{repository.repository_name}"
-    result = secret_scanner.scan_repo(ScanType.BASE, None, repo_clone_path)
+    result = secret_scanner.scan_repo(ScanType.BASE, repository.latest_commit, repo_clone_path)
     assert result is None
     start_scan.assert_called_once()
 
@@ -96,7 +98,8 @@ def test_scan_directory(start_scan):
                             repository_id=1,
                             repository_name="local",
                             repository_url="https://repository.url",
-                            vcs_instance=1)
+                            vcs_instance=1,
+                            latest_commit="latest_commit")
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
         gitleaks_rules_path="/rules.toml",
@@ -118,7 +121,8 @@ def initialize_and_get_repo_scanner():
                             repository_id=1,
                             repository_name="local",
                             repository_url="https://repository.url",
-                            vcs_instance=1)
+                            vcs_instance=1,
+                            latest_commit="latest_commit")
 
     secret_scanner = SecretScanner(
         gitleaks_binary_path="/tmp/gitleaks",
@@ -129,18 +133,18 @@ def initialize_and_get_repo_scanner():
         username="",
         personal_access_token="")
 
-    return secret_scanner
+    return repository, secret_scanner
 
 
 def test_scan_type_is_base_when_a_latest_scan_is_not_present():
-    secret_scanner = initialize_and_get_repo_scanner()
+    repository, secret_scanner = initialize_and_get_repo_scanner()
 
-    scan_type = secret_scanner.determine_scan_type(None)
+    scan_type = secret_scanner.determine_scan_type(repository, None)
     assert scan_type == ScanType.BASE
 
 
 def test_scan_type_is_base_when_a_latest_scan_is_present_and_rule_pack_is_latest():
-    secret_scanner = initialize_and_get_repo_scanner()
+    repository, secret_scanner = initialize_and_get_repo_scanner()
 
     scan_read = ScanRead(id_=1,
                          repository_id=1,
@@ -150,12 +154,12 @@ def test_scan_type_is_base_when_a_latest_scan_is_present_and_rule_pack_is_latest
                          increment_number=0,
                          rule_pack="2.0.2")
 
-    scan_type = secret_scanner.determine_scan_type(scan_read, "latest_commit")
+    scan_type = secret_scanner.determine_scan_type(repository, scan_read)
     assert scan_type == ScanType.BASE
 
 
 def test_scan_type_is_incremental_when_a_latest_scan_is_present_and_rule_pack_is_same():
-    secret_scanner = initialize_and_get_repo_scanner()
+    repository, secret_scanner = initialize_and_get_repo_scanner()
 
     scan_read = ScanRead(id_=1,
                          repository_id=1,
@@ -163,14 +167,14 @@ def test_scan_type_is_incremental_when_a_latest_scan_is_present_and_rule_pack_is
                          last_scanned_commit="latest_commit_1",
                          timestamp=datetime.utcnow(),
                          increment_number=0,
-                         rule_pack=secret_scanner.rule_pack_version)
+                         rule_pack="2.0.1")
 
-    scan_type = secret_scanner.determine_scan_type(scan_read, "latest_commit")
+    scan_type = secret_scanner.determine_scan_type(repository, scan_read)
     assert scan_type == ScanType.INCREMENTAL
 
 
 def test_scan_type_is_incremental_when_a_latest_scan_is_present_and_rule_pack_is_same_and_last_commit_is_newer():
-    secret_scanner = initialize_and_get_repo_scanner()
+    repository, secret_scanner = initialize_and_get_repo_scanner()
 
     scan_read = ScanRead(id_=1,
                          repository_id=1,
@@ -178,7 +182,7 @@ def test_scan_type_is_incremental_when_a_latest_scan_is_present_and_rule_pack_is
                          last_scanned_commit="latest_commit_1",
                          timestamp=datetime.utcnow(),
                          increment_number=0,
-                         rule_pack=secret_scanner.rule_pack_version)
+                         rule_pack="2.0.1")
 
-    scan_type = secret_scanner.determine_scan_type(scan_read, "latest_commit")
+    scan_type = secret_scanner.determine_scan_type(repository, scan_read)
     assert scan_type == ScanType.INCREMENTAL
