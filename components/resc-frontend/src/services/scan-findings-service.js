@@ -1,5 +1,4 @@
 import axiosRetry from 'axios-retry';
-import scans_for_repository from '@/../tests/resources/mock_scans_for_a_repository.json';
 
 const axios = require('axios');
 axiosRetry(axios, { retries: 3 });
@@ -26,17 +25,13 @@ const ScanFindingsService = {
     return axios.get(`/scans/detected-rules/?${queryParams}`);
   },
 
-  async getScansByRepositoryId(repositoryId, perPage, skipRowCount) {
-    console.log('repositoryId==>' + repositoryId);
-    console.log('perPage==>' + perPage);
-    console.log('skipRowCount==>' + skipRowCount);
-    return scans_for_repository;
-    // return axios.get(`/branches/${repositoryId}/scans`, {
-    //   params: {
-    //     skip: skipRowCount,
-    //     limit: perPage,
-    //   },
-    // });
+  async getScansByRepositoryId(repositoryId, skipRowCount, perPage) {
+    return axios.get(`/repositories/${repositoryId}/scans`, {
+      params: {
+        skip: skipRowCount,
+        limit: perPage,
+      },
+    });
   },
 
   async getStatusList() {
