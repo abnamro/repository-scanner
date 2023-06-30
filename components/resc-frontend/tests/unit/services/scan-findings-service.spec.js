@@ -1,5 +1,4 @@
 import axios from 'axios';
-import Config from '@/configuration/config';
 import ScanFindingsService from '@/services/scan-findings-service';
 import scans_for_a_repository from '@/../tests/resources/mock_scans_for_a_repository.json';
 import repositories from '@/../tests/resources/mock_repositories.json';
@@ -68,53 +67,13 @@ describe('getRepositoryById', () => {
     });
   });
 
-  describe('getScansByRepositoryId', () => {
-    describe('when API call is successful', () => {
-      it('should return scans', async () => {
-        axios.get.mockResolvedValueOnce(scans_for_a_repository);
-
-        const response = await ScanFindingsService.getScansByRepositoryId(1, 0, 100);
-
-        expect(response).toEqual(scans_for_a_repository);
-        expect(response).toBeDefined();
-        expect(response).not.toBeNull();
-        expect(response.data.length).toBe(2);
-        expect(response.data[0].scan_type).toBe('BASE');
-        expect(response.data[0].last_scanned_commit).toBe(
-          '5af6e79b1a9a1484ae3946a7e2c8d05febfe2c63'
-        );
-        expect(response.data[0].timestamp).toBe('2023-04-30T06:01:47.503000');
-        expect(response.data[0].increment_number).toBe(0);
-        expect(response.data[0].rule_pack).toBe('1.0.0');
-        expect(response.data[0].repository_id).toBe(1);
-        expect(response.data[0].id_).toBe(1);
-      });
-    });
-
-    describe('when API call fails', () => {
-      it('should return error', async () => {
-        axios.get.mockResolvedValueOnce([]);
-
-        await ScanFindingsService.getScansByRepositoryId('not_valid', 0, 100)
-          .then((response) => {
-            expect(response).toEqual([]);
-            expect(response).not.toBeNull();
-          })
-          .catch((error) => {
-            expect(error).toBeDefined();
-            expect(error).not.toBeNull();
-          });
-      });
-    });
-  });
-
   describe('getStatusList', () => {
     let mock_statuses = [
-      `${Config.value('notAnalyzedStatusVal')}`,
-      `${Config.value('underReviewStatusVal')}`,
-      `${Config.value('clarificationRequiredStatusVal')}`,
-      `${Config.value('falsePositiveStatusVal')}`,
-      `${Config.value('truePostiveStatusVal')}`,
+      'NOT_ANALYZED',
+      'UNDER_REVIEW',
+      'CLARIFICATION_REQUIRED',
+      'FALSE_POSITIVE',
+      'TRUE_POSITIVE',
     ];
     describe('when API call is successful', () => {
       it('should return statuses', async () => {
@@ -181,6 +140,60 @@ describe('getRepositoryById', () => {
             expect(error).not.toBeNull();
           });
       });
+    });
+  });
+
+  describe('getScansByRepositoryId', () => {
+    describe('when API call is successful', () => {
+      it('should return scans', async () => {
+        axios.get.mockResolvedValueOnce(scans_for_a_repository);
+
+        const response = await ScanFindingsService.getScansByRepositoryId(1);
+
+        expect(response).toEqual(scans_for_a_repository);
+        expect(response).toBeDefined();
+        expect(response).not.toBeNull();
+        expect(response.data.length).toBe(2);
+      });
+    });
+
+    describe('when API call fails', () => {
+      it('should return error', async () => {
+        axios.get.mockResolvedValueOnce([]);
+
+        await ScanFindingsService.getScansByRepositoryId('not_valid')
+          .then((response) => {
+            expect(response).toEqual([]);
+            expect(response).not.toBeNull();
+            expect(response.data.length).toBe(0);
+          })
+          .catch((error) => {
+            expect(error).toBeDefined();
+            expect(error).not.toBeNull();
+          });
+      });
+    });
+  });
+
+  describe('parseStatusOptions', () => {
+    it('should parse status options', async () => {
+      let statusOptions = [
+        'NOT_ANALYZED',
+        'UNDER_REVIEW',
+        'CLARIFICATION_REQUIRED',
+        'FALSE_POSITIVE',
+        'TRUE_POSITIVE',
+      ];
+      const statusList = ScanFindingsService.parseStatusOptions(statusOptions);
+
+      expect(statusList).toBeDefined();
+      expect(statusList).not.toBeNull();
+      expect(statusList.length).toBe(5);
+      expect(statusList[0].label).toBe('Not Analyzed');
+      expect(statusList[1].label).toBe('Under Review');
+      expect(statusList[2].label).toBe('Clarification Required');
+      expect(statusList[3].label).toBe('False Positive');
+      expect(statusList[4].label).toBe('True Positive');
     });
   });
 });

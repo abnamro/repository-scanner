@@ -88,6 +88,7 @@ export default {
   data() {
     return {
       previousScans: [],
+      branchList: [],
       scanList: [],
       scanDateList: [],
       ruleList: [],
@@ -265,7 +266,7 @@ export default {
           this.limitRecords
         )
           .then((res) => {
-            const response = res.data.data;
+            const response = res.data;
             this.scanDateList = [];
 
             this.scanList = response.sort(function (a, b) {
