@@ -84,6 +84,29 @@ async def requires_auth(request: Request, credentials: HTTPBasicCredentials = De
                             headers={"WWW-Authenticate": "Bearer"}) from error
 
 
+async def add_security_headers(request: Request, call_next):
+    """
+        Function that is used to add several security headers to the API
+    """
+    security_headers = {
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+        "Cache-Control": "no-cache, no-store",
+        "Cross-Origin-Resource-Policy": "same-site",
+        "Referrer-Policy": "same-origin",
+        "X-Permitted-Cross-Domain-Policies": "none",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Content-Security-Policy": "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self' data:;"
+                                   " style-src 'self' https://fonts.googleapis.com 'unsafe-inline';"
+                                   " frame-ancestors 'self'; form-action 'self';"
+    }
+    response = await call_next(request)
+    for header, value in security_headers.items():
+        response.headers[header] = value
+    return response
+
+
 def user_has_resc_operator_role(claims: dict) -> bool:
     """
         Function that is used to determine if the user has the RESC_OPERATOR_ROLE
