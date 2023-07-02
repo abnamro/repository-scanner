@@ -4,8 +4,10 @@ import logging.config
 import os
 
 # Third Party
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from tenacity import RetryError
@@ -17,7 +19,8 @@ from resc_backend.db.connection import Session, engine
 from resc_backend.resc_web_service.dependencies import (
     check_db_initialized,
     requires_auth,
-    requires_no_auth
+    requires_no_auth,
+    add_security_headers
 )
 from resc_backend.resc_web_service.endpoints import (
     common,
@@ -126,6 +129,11 @@ app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX)
+
+
+# Apply the security headers to the app in the form of middleware
+app.middleware("http")(add_security_headers)
+
 
 # Add exception handlers
 add_exception_handlers(app=app)
