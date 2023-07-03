@@ -40,7 +40,8 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
                  personal_access_token: str,
                  scan_tmp_directory: str = ".",
                  local_path: str = None,
-                 force_base_scan: bool = False):
+                 force_base_scan: bool = False,
+                 latest_commit: str = None):
 
         self.gitleaks_rules_path: str = gitleaks_rules_path
         self.gitleaks_binary_path: str = gitleaks_binary_path
@@ -52,6 +53,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         self.personal_access_token: str = personal_access_token
         self.local_path = local_path
         self.force_base_scan = force_base_scan
+        self.latest_commit = latest_commit
         if self.local_path:
             self.repo_display_name = self.local_path.replace(".", "_").replace("/", "_")
         else:
@@ -81,13 +83,14 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         # Get last scanned commit for the repository
         last_scan_for_repository = self._output_module.get_last_scan_for_repository(repository=created_repository)
         last_scanned_commit = last_scan_for_repository.last_scanned_commit if last_scan_for_repository else None
-        scan_type_to_run = self.determine_scan_type(created_repository, last_scan_for_repository)
+        scan_type_to_run = self.determine_scan_type(latest_commit=self.latest_commit,
+                                                    last_scan_for_repository=last_scan_for_repository)
 
         if scan_type_to_run:
             # Insert in to scan table
             scan_timestamp_start = datetime.utcnow()
             created_scan = self._output_module.write_scan(
-                scan_type_to_run, created_repository.latest_commit,
+                scan_type_to_run, self.latest_commit,
                 scan_timestamp_start.isoformat(), created_repository,
                 rule_pack=self.rule_pack_version)
             if not created_scan:
@@ -230,7 +233,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         return None
 
     # Decide which type of scan to run
-    def determine_scan_type(self, repository: Repository, last_scan_for_repository: Scan):
+    def determine_scan_type(self, last_scan_for_repository: Scan, latest_commit: str = None):
         # Force base scan, or has no previous scan
         if self.force_base_scan or last_scan_for_repository is None:
             return ScanType.BASE
@@ -240,7 +243,7 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
             if last_scan_for_repository.rule_pack != self.rule_pack_version:
                 return ScanType.BASE
             # Last commit is different from previous scan
-            if repository and repository.latest_commit != last_scan_for_repository.last_scanned_commit:
+            if latest_commit and latest_commit != last_scan_for_repository.last_scanned_commit:
                 return ScanType.INCREMENTAL
         # Skip scanning, no conditions match
         return None
