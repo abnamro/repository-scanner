@@ -15,7 +15,7 @@ class RepositoryRuntime(BaseModel):
     repository_url: str
     project_key: str
     vcs_instance_name: str
-    latest_commit: str
+    latest_commit: Optional[str] = None
 
     def convert_to_repository(self, vcs_instance_id: int) -> Repository:
         return Repository(
