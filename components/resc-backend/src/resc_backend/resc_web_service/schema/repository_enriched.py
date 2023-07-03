@@ -1,4 +1,7 @@
 # pylint: disable=no-name-in-module
+# Standard Library
+import datetime
+
 # Third Party
 from pydantic import BaseModel, HttpUrl, conint, constr
 
@@ -12,6 +15,8 @@ class RepositoryEnrichedBase(BaseModel):
     repository_name: constr(min_length=1, max_length=100)
     repository_url: HttpUrl
     vcs_provider: VCSProviders
+    last_scan_id: conint(gt=0) = None
+    last_scan_timestamp: datetime.datetime = None
     true_positive: conint(gt=-1)
     false_positive: conint(gt=-1)
     not_analyzed: conint(gt=-1)

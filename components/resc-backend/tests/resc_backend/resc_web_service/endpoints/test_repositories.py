@@ -451,6 +451,8 @@ class TestRepositories(unittest.TestCase):
                 "repository_name": "dummy_repo",
                 "repository_url": "https://fake-ado.com",
                 "vcs_instance": "AZURE_DEVOPS",
+                "last_scan_id": 1,
+                "last_scan_timestamp": "2023-05-23T15:52:22.270000",
                 "id_": 1
             },
             "true_positive": 1,
@@ -468,6 +470,8 @@ class TestRepositories(unittest.TestCase):
         assert response["data"]["repository_name"] == "dummy_repo"
         assert response["data"]["repository_url"] == "https://fake-ado.com"
         assert response["data"]["vcs_instance"] == "AZURE_DEVOPS"
+        assert response["data"]["last_scan_id"] == 1
+        assert response["data"]["last_scan_timestamp"] == "2023-05-23T15:52:22.270000"
         assert response["data"]["id_"] == 1
         assert response["true_positive"] == 1
         assert response["false_positive"] == 2
