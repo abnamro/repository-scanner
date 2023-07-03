@@ -37,6 +37,12 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         list of DBrepository objects
     """
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
+
+    # Get latest scan timestamp
+    last_scan_timestamp_sub_query = db_connection.query(func.max(model.DBscan.timestamp)) \
+        .join(model.DBrepository, model.repository.DBrepository.id_ == model.scan.DBscan.repository_id) \
+        .filter(model.DBscan.repository_id == model.DBrepository.id_).scalar_subquery()
+
     query = db_connection.query(
         model.DBrepository.id_,
         model.DBrepository.project_key,
@@ -44,9 +50,14 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         model.DBrepository.repository_name,
         model.DBrepository.repository_url,
         model.DBrepository.vcs_instance,
-        model.DBVcsInstance.provider_type) \
+        model.DBVcsInstance.provider_type,
+        func.coalesce(model.DBscan.id_, None).label('last_scan_id'),
+        func.coalesce(model.DBscan.timestamp, None).label('last_scan_timestamp')) \
         .join(model.DBVcsInstance,
-              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
+        .outerjoin(model.DBscan,
+                   and_(model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
+                        model.scan.DBscan.timestamp == last_scan_timestamp_sub_query))
 
     if only_if_has_findings:
         max_base_scan_subquery = db_connection.query(model.DBscan.repository_id,
