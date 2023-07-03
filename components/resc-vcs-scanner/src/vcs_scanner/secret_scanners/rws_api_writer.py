@@ -53,8 +53,7 @@ class RESTAPIWriter(OutputModule):
 
     def write_repository(self, repository: RepositoryCreate) -> Optional[RepositoryRead]:
         created_repository = None
-        response = create_repository(self.rws_url,
-                                     repository)
+        response = create_repository(self.rws_url, repository)
         if response.status_code == 201:
             created_repository = RepositoryRead(**json.loads(response.text))
         else:
@@ -105,6 +104,8 @@ class RESTAPIWriter(OutputModule):
     def get_last_scan_for_repository(self, repository: RepositoryRead) -> ScanRead:
         response = get_last_scan_for_repository(self.rws_url, repository.id_)
         if response.status_code == 200:
+            if not response.text or response.text == 'null':
+                return None
             return ScanRead(**json.loads(response.text))
         logger.warning(f"Retrieving last scan details failed with error: {response.status_code}->{response.text}")
         return None
