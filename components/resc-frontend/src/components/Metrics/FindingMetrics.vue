@@ -43,6 +43,7 @@
 
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
+import Config from '@/configuration/config';
 import FindingsService from '@/services/findings-service';
 import MultiLineChart from '@/components/Charts/MultiLineChart.vue';
 import Spinner from '@/components/Common/Spinner.vue';
@@ -170,16 +171,16 @@ export default {
       datasetsObj.pointRadius = 3;
       datasetsObj.pointHoverRadius = 8;
 
-      if (vcsType === 'AZURE_DEVOPS') {
-        datasetsObj.label = 'Azure DevOps';
+      if (vcsType === `${Config.value('azureDevOpsVal')}`) {
+        datasetsObj.label = `${Config.value('azureDevOpsLabel')}`;
         colourCode = '#10D9A2';
       }
-      if (vcsType === 'BITBUCKET') {
-        datasetsObj.label = 'Bitbucket';
+      if (vcsType === `${Config.value('bitbucketVal')}`) {
+        datasetsObj.label = `${Config.value('bitbucketLabel')}`;
         colourCode = '#FF7F00';
       }
-      if (vcsType === 'GITHUB_PUBLIC') {
-        datasetsObj.label = 'GitHub';
+      if (vcsType === `${Config.value('githubPublicVal')}`) {
+        datasetsObj.label = `${Config.value('githubPublicLabel')}`;
         colourCode = '#05CBE1';
       }
       if (vcsType === 'Total') {
@@ -197,7 +198,7 @@ export default {
       const datasets = [];
       if (!this.arrayContainsAllZeros(this.azureDevOpsTotalFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'AZURE_DEVOPS',
+          `${Config.value('azureDevOpsVal')}`,
           this.azureDevOpsTotalFindingsCountList
         );
         datasets.push(datasetObj);
@@ -205,7 +206,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.bitbucketTotalFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'BITBUCKET',
+          `${Config.value('bitbucketVal')}`,
           this.bitbucketTotalFindingsCountList
         );
         datasets.push(datasetObj);
@@ -213,7 +214,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.gitHubTotalFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'GITHUB_PUBLIC',
+          `${Config.value('githubPublicVal')}`,
           this.gitHubTotalFindingsCountList
         );
         datasets.push(datasetObj);
@@ -234,7 +235,7 @@ export default {
       const datasets = [];
       if (!this.arrayContainsAllZeros(this.azureDevOpsTruePositiveFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'AZURE_DEVOPS',
+          `${Config.value('azureDevOpsVal')}`,
           this.azureDevOpsTruePositiveFindingsCountList
         );
         datasets.push(datasetObj);
@@ -242,7 +243,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.bitbucketTruePositiveFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'BITBUCKET',
+          `${Config.value('bitbucketVal')}`,
           this.bitbucketTruePositiveFindingsCountList
         );
         datasets.push(datasetObj);
@@ -250,7 +251,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.gitHubTruePositiveFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'GITHUB_PUBLIC',
+          `${Config.value('githubPublicVal')}`,
           this.gitHubTruePositiveFindingsCountList
         );
         datasets.push(datasetObj);
@@ -271,7 +272,7 @@ export default {
       const datasets = [];
       if (!this.arrayContainsAllZeros(this.azureDevOpsUnTriagedFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'AZURE_DEVOPS',
+          `${Config.value('azureDevOpsVal')}`,
           this.azureDevOpsUnTriagedFindingsCountList
         );
         datasets.push(datasetObj);
@@ -279,7 +280,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.bitbucketUnTriagedFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'BITBUCKET',
+          `${Config.value('bitbucketVal')}`,
           this.bitbucketUnTriagedFindingsCountList
         );
         datasets.push(datasetObj);
@@ -287,7 +288,7 @@ export default {
 
       if (!this.arrayContainsAllZeros(this.gitHubUnTriagedFindingsCountList)) {
         const datasetObj = this.prepareDataSetForVcsProvider(
-          'GITHUB_PUBLIC',
+          `${Config.value('githubPublicVal')}`,
           this.gitHubUnTriagedFindingsCountList
         );
         datasets.push(datasetObj);

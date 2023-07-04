@@ -38,6 +38,11 @@
         head-variant="light"
         @row-clicked="goToScanFindings"
       >
+        <!-- Repository Column -->
+        <template #cell(repository_name)="data">
+          {{ data.item.repository_name | truncate(25, '...') }}
+        </template>
+
         <!-- Health Bar Column -->
         <template #cell(findings)="data">
           <HealthBar
@@ -68,10 +73,10 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
+import CommonUtils from '@/utils/common-utils';
 import DateUtils from '@/utils/date-utils';
 import HealthBar from '@/components/Common/HealthBar.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import PushNotification from '@/utils/push-notification';
 import RepositoryService from '@/services/repository-service';
 import RepositoriesPageFilter from '@/components/Filters/RepositoriesPageFilter.vue';
 import Spinner from '@/components/Common/Spinner.vue';
@@ -101,50 +106,43 @@ export default {
           sortable: true,
           label: 'Project',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
+          thStyle: { borderTop: '0px', width: '10%' },
         },
         {
           key: 'repository_name',
           sortable: true,
           label: 'Repository',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '15%', fontSize: 'small' },
+          thStyle: { borderTop: '0px', width: '20%' },
         },
         {
           key: 'vcs_provider',
           sortable: true,
           label: 'VCS Provider',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
+          thStyle: { borderTop: '0px', width: '10%' },
+          formatter: 'formatVcsProvider',
+        },
+        {
+          key: 'last_scan_timestamp',
+          sortable: true,
+          label: 'Last Scan Date',
+          class: 'text-left',
+          thStyle: { borderTop: '0px', width: '20%' },
+          formatter: 'formatDate',
         },
         {
           key: 'total_findings_count',
           sortable: true,
-          label: 'Total Count',
+          label: 'Findings Count',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
-        },
-        {
-          key: 'last_scan_finding_count',
-          sortable: true,
-          label: 'Last Scan Count',
-          class: 'text-left',
-          thStyle: { borderTop: '0px', width: '10%', fontSize: 'small' },
-          formatter: 'formatCount',
-        },
-        {
-          key: 'last_scan_datetime',
-          sortable: true,
-          label: 'Last Scan Date',
-          class: 'text-left',
-          thStyle: { borderTop: '0px', width: '20%', fontSize: 'small' },
-          formatter: 'formatDate',
+          thStyle: { borderTop: '0px', width: '15%' },
         },
         {
           key: 'findings',
           label: 'Findings(%)',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '25%', fontSize: 'small' },
+          thStyle: { borderTop: '0px', width: '25%' },
         },
       ],
     };
@@ -160,10 +158,10 @@ export default {
   methods: {
     formatDate(timestamp) {
       const date = DateUtils.formatDate(timestamp);
-      return date === 'Jan 01, 1' ? 'Not Scanned' : date;
+      return timestamp ? date : 'Not Scanned';
     },
-    formatCount(count) {
-      return count === -1 ? 'Not Available' : count;
+    formatVcsProvider(vcsProvider) {
+      return CommonUtils.formatVcsProvider(vcsProvider);
     },
     handlePageClick(page) {
       this.currentPage = page;
@@ -175,11 +173,13 @@ export default {
       this.fetchPaginatedRepositories();
     },
     goToScanFindings(record) {
-      const routeData = this.$router.resolve({
-        name: 'ScanFindings',
-        params: { scanId: record.last_scan_id },
-      });
-      window.open(routeData.href, '_blank');
+      if (record.last_scan_id) {
+        const routeData = this.$router.resolve({
+          name: 'ScanFindings',
+          params: { scanId: record.last_scan_id },
+        });
+        window.open(routeData.href, '_blank');
+      }
     },
     handleFilterChange(vcsProvider, project, repository, includeZeroFindingRepos) {
       this.vcsFilter = vcsProvider;
@@ -204,22 +204,7 @@ export default {
       )
         .then((response) => {
           this.totalRows = response.data.total;
-          for (const repo of response.data.data) {
-            if (repo.id_) {
-              RepositoryService.getLastScanForRepository(repo.id_)
-                .then((res) => {
-                  if (res.data) {
-                    repo.last_scan_id = res.data.id_;
-                    repo.last_scan_datetime = res.data.timestamp;
-                    repo.last_scan_finding_count = 10;
-                    this.repositoryList.push(repo);
-                  }
-                })
-                .catch((error) => {
-                  PushNotification.danger(error.message, 'Error', 5000);
-                });
-            }
-          }
+          this.repositoryList = response.data.data;
           this.hideSpinner();
         })
         .catch((error) => {

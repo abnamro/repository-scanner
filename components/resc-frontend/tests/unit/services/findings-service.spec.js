@@ -1,5 +1,6 @@
 import FindingsService from '@/services/findings-service';
 import axios from 'axios';
+import Config from '@/configuration/config';
 import findings from '@/../tests/resources/mock_findings.json';
 import detailed_findings from '@/../tests/resources/mock_detailed_findings.json';
 import detailed_findings_with_rule_pack_version from '@/../tests/resources/mock_detailed_findings_with_rule_pack_version.json';
@@ -28,7 +29,11 @@ describe('function auditFindings', () => {
     // Mock axios response
     axios.put.mockResolvedValueOnce(findings.data.slice(-2));
 
-    const response = await FindingsService.auditFindings([1, 2], 'FALSE_POSITIVE', 'test');
+    const response = await FindingsService.auditFindings(
+      [1, 2],
+      `${Config.value('falsePositiveStatusVal')}`,
+      'test'
+    );
     expect(response).not.toBeDefined();
   });
 });
@@ -42,8 +47,8 @@ describe('function getDetailedFindings', () => {
       filterObj.limit = 100;
       filterObj.startDate = '2022-03-01T14:30:43';
       filterObj.endDate = '2022-03-20T14:30:43';
-      filterObj.vcsProvider = 'BITBUCKET';
-      filterObj.findingStatus = 'NOT_ANALYZED';
+      filterObj.vcsProvider = `${Config.value('bitbucketVal')}`;
+      filterObj.findingStatus = `${Config.value('notAnalyzedStatusVal')}`;
       filterObj.project = 'ABC';
       filterObj.repository = 'test';
       filterObj.branch = 'feature1';
@@ -70,8 +75,8 @@ describe('function getDetailedFindings', () => {
         filterObj.limit = 100;
         filterObj.startDate = '2022-03-01T14:30:43';
         filterObj.endDate = '2022-03-20T14:30:43';
-        filterObj.vcsProvider = 'BITBUCKET';
-        filterObj.findingStatus = 'NOT_ANALYZED';
+        filterObj.vcsProvider = `${Config.value('bitbucketVal')}`;
+        filterObj.findingStatus = `${Config.value('notAnalyzedStatusVal')}`;
         filterObj.project = 'ABC';
         filterObj.repository = 'test';
         filterObj.branch = 'feature1';
