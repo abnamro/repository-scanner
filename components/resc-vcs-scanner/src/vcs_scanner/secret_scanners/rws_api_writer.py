@@ -77,7 +77,7 @@ class RESTAPIWriter(OutputModule):
         if response.status_code != 201:
             logger.warning(f"Creating findings for scan {scan_id} "
                            f"failed with error: {response.status_code}->{response.text}")
-        logger.info(f"Found {len(scan_findings)} issues during scan: {scan_id} ")
+        logger.info(f"Found {len(scan_findings)} issues during scan for scan_id: {scan_id} ")
 
     def write_scan(
             self,
