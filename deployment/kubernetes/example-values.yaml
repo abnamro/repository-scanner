@@ -30,10 +30,6 @@ resc-vcs-scraper-projects:
     successfulJobsHistoryLimit: 1
     failedJobsHistoryLimit: 1
 
-resc-vcs-scraper-repositories:
-  config:
-    scan_only_master_branch: true # Set this to false if you want to scan all branches
-
 resc-vcs-scanner-secrets:
   config:
     force_base_scan: "false" # force_base_scan is set to false in order to enable incremental scanning of commits. If set to true, all commits will be scanned each time.
