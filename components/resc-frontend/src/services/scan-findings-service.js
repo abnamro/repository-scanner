@@ -37,36 +37,6 @@ const ScanFindingsService = {
   async getStatusList() {
     return axios.get(`/findings/supported-statuses/`);
   },
-
-  parseStatusOptions(statusOptions) {
-    const statusList = [];
-    statusOptions.forEach(function (value, index) {
-      const statusJson = {};
-      if (value === 'NOT_ANALYZED') {
-        statusJson['id'] = index;
-        statusJson['label'] = 'Not Analyzed';
-        statusJson['value'] = value;
-      } else if (value === 'UNDER_REVIEW') {
-        statusJson['id'] = index;
-        statusJson['label'] = 'Under Review';
-        statusJson['value'] = value;
-      } else if (value === 'CLARIFICATION_REQUIRED') {
-        statusJson['id'] = index;
-        statusJson['label'] = 'Clarification Required';
-        statusJson['value'] = value;
-      } else if (value === 'TRUE_POSITIVE') {
-        statusJson['id'] = index;
-        statusJson['label'] = 'True Positive';
-        statusJson['value'] = value;
-      } else if (value === 'FALSE_POSITIVE') {
-        statusJson['id'] = index;
-        statusJson['label'] = 'False Positive';
-        statusJson['value'] = value;
-      }
-      statusList.push(statusJson);
-    });
-    return statusList;
-  },
 };
 
 export default ScanFindingsService;

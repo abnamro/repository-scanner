@@ -57,6 +57,7 @@
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
 import DateUtils from '@/utils/date-utils';
+import CommonUtils from '@/utils/common-utils';
 import FindingsService from '@/services/findings-service';
 import Spinner from '@/components/Common/Spinner.vue';
 import spinnerMixin from '@/mixins/spinner.js';
@@ -137,19 +138,7 @@ export default {
       }
     },
     parseStatus(input) {
-      let status;
-      if (input === 'NOT_ANALYZED') {
-        status = 'Not Analyzed';
-      } else if (input === 'UNDER_REVIEW') {
-        status = 'Under Review';
-      } else if (input === 'CLARIFICATION_REQUIRED') {
-        status = 'Clarification Required';
-      } else if (input === 'TRUE_POSITIVE') {
-        status = 'True Positive';
-      } else if (input === 'FALSE_POSITIVE') {
-        status = 'False Positive';
-      }
-      return status;
+      return CommonUtils.parseStatusLabels(input);
     },
     fetchAuditsForFinding() {
       this.showSpinner();

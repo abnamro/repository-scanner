@@ -1,5 +1,6 @@
 import RepositoryService from '@/services/repository-service';
 import axios from 'axios';
+import Config from '@/configuration/config';
 import repositories from '@/../tests/resources/mock_repositories.json';
 
 jest.mock('axios');
@@ -25,7 +26,7 @@ describe('function getDistinctRepositories', () => {
       axios.get.mockResolvedValueOnce(allRepos);
 
       const response = await RepositoryService.getDistinctRepositories(
-        ['BITBUCKET', 'AZURE_DEVOPS'],
+        [`${Config.value('bitbucketVal')}`, `${Config.value('azureDevOpsVal')}`],
         ''
       );
       expect(response).toEqual(allRepos);
@@ -52,7 +53,10 @@ describe('function getDistinctRepositories', () => {
     it('should return all distinct repositories for bitbucket', async () => {
       axios.get.mockResolvedValueOnce(bitbucketRepos);
 
-      const response = await RepositoryService.getDistinctRepositories(['BITBUCKET'], null);
+      const response = await RepositoryService.getDistinctRepositories(
+        [`${Config.value('bitbucketVal')}`],
+        null
+      );
 
       expect(response).toEqual(bitbucketRepos);
       expect(response).toBeDefined();
@@ -65,7 +69,10 @@ describe('function getDistinctRepositories', () => {
     it('should return all distinct repositories for azure devops', async () => {
       axios.get.mockResolvedValueOnce(adoRepos);
 
-      const response = await RepositoryService.getDistinctRepositories(['AZURE_DEVOPS'], '');
+      const response = await RepositoryService.getDistinctRepositories(
+        [`${Config.value('azureDevOpsVal')}`],
+        ''
+      );
 
       expect(response).toEqual(adoRepos);
       expect(response).toBeDefined();
@@ -78,7 +85,10 @@ describe('function getDistinctRepositories', () => {
     it('should return all distinct bitbucket repositories for selected project', async () => {
       axios.get.mockResolvedValueOnce(bitbucketRepos);
 
-      const response = await RepositoryService.getDistinctRepositories(['BITBUCKET'], 'project-A');
+      const response = await RepositoryService.getDistinctRepositories(
+        [`${Config.value('bitbucketVal')}`],
+        'project-A'
+      );
 
       expect(response).toEqual(bitbucketRepos);
       expect(response).toBeDefined();
@@ -92,7 +102,7 @@ describe('function getDistinctRepositories', () => {
       axios.get.mockResolvedValueOnce(adoRepos);
 
       const response = await RepositoryService.getDistinctRepositories(
-        ['AZURE_DEVOPS'],
+        [`${Config.value('azureDevOpsVal')}`],
         'project-A'
       );
 
@@ -114,6 +124,11 @@ describe('function getRepositoriesWithFindingsMetadata', () => {
     expect(response).toBeDefined();
     expect(response).not.toBeNull();
     expect(response.data.length).toBe(2);
+    expect(response.data[0].project_key).toBe('RESC');
+    expect(response.data[0].repository_id).toBe('1');
+    expect(response.data[0].repository_name).toBe('test-repo1');
+    expect(response.data[0].repository_url).toBe('https://dev.azure.com/org1/xyz/_git/test-repo1');
+    expect(response.data[0].vcs_provider).toBe(`${Config.value('azureDevOpsVal')}`);
     expect(response.data[0].true_positive).toBe(1);
     expect(response.data[0].false_positive).toBe(2);
     expect(response.data[0].not_analyzed).toBe(3);
@@ -143,7 +158,11 @@ describe('function getRepositoriesWithFindingsMetadata', () => {
 });
 
 describe('getVCSProviders', () => {
-  let vcsProviders = ['AZURE_DEVOPS', 'BITBUCKET', 'GITHUB_PUBLIC'];
+  let vcsProviders = [
+    `${Config.value('azureDevOpsVal')}`,
+    `${Config.value('bitbucketVal')}`,
+    `${Config.value('githubPublicVal')}`,
+  ];
   describe('when API call is successful', () => {
     it('should return VCS providers', async () => {
       axios.get.mockResolvedValueOnce(vcsProviders);
@@ -197,7 +216,10 @@ describe('getDistinctProjects', () => {
     it('should return all distinct bitbucket projects', async () => {
       axios.get.mockResolvedValueOnce(bitbucketProjects);
 
-      const response = await RepositoryService.getDistinctProjects(['BITBUCKET'], '');
+      const response = await RepositoryService.getDistinctProjects(
+        [`${Config.value('bitbucketVal')}`],
+        ''
+      );
 
       expect(response).toEqual(bitbucketProjects);
       expect(response).toBeDefined();
@@ -210,7 +232,10 @@ describe('getDistinctProjects', () => {
     it('should return all distinct azure devops projects', async () => {
       axios.get.mockResolvedValueOnce(adoProjects);
 
-      const response = await RepositoryService.getDistinctProjects(['AZURE_DEVOPS'], '');
+      const response = await RepositoryService.getDistinctProjects(
+        [`${Config.value('azureDevOpsVal')}`],
+        ''
+      );
 
       expect(response).toEqual(adoProjects);
       expect(response).toBeDefined();
@@ -223,7 +248,10 @@ describe('getDistinctProjects', () => {
     it('should return all distinct bitbucket projects for selected project and repository name', async () => {
       axios.get.mockResolvedValueOnce(projectNameByRepoName);
 
-      const response = await RepositoryService.getDistinctProjects(['BITBUCKET'], 'repository-A');
+      const response = await RepositoryService.getDistinctProjects(
+        [`${Config.value('bitbucketVal')}`],
+        'repository-A'
+      );
 
       expect(response).toEqual(projectNameByRepoName);
       expect(response).toBeDefined();

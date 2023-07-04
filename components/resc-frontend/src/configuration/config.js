@@ -22,6 +22,22 @@ export default class Config {
       defaultPageSize: '100',
       skipRecords: '0',
       limitRecords: '100',
+      azureDevOpsVal: 'AZURE_DEVOPS',
+      azureDevOpsLabel: 'Azure DevOps',
+      bitbucketVal: 'BITBUCKET',
+      bitbucketLabel: 'Bitbucket',
+      githubPublicVal: 'GITHUB_PUBLIC',
+      githubPublicLabel: 'GitHub Public',
+      notAnalyzedStatusVal: 'NOT_ANALYZED',
+      notAnalyzedStatusLabel: 'Not Analyzed',
+      underReviewStatusVal: 'UNDER_REVIEW',
+      underReviewStatusLabel: 'Under Review',
+      clarificationRequiredStatusVal: 'CLARIFICATION_REQUIRED',
+      clarificationRequiredStatusLabel: 'Clarification Required',
+      truePostiveStatusVal: 'TRUE_POSITIVE',
+      truePostiveStatusLabel: 'True Positive',
+      falsePositiveStatusVal: 'FALSE_POSITIVE',
+      falsePositiveStatusLabel: 'False Positive',
     };
   }
 
