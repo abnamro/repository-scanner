@@ -96,7 +96,7 @@ def test_write_findings(info, post):
 
     _ = RESTAPIWriter(rws_url=url).write_findings(1, 1, findings)
     info.assert_called_once()
-    info.assert_called_with(f"Found {len(findings)} issues during scan: {1} ")
+    info.assert_called_with(f"Found {len(findings)} issues during scan for scan_id: {1} ")
 
 
 @patch("requests.post")
