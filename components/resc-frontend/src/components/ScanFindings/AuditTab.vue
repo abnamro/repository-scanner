@@ -49,6 +49,7 @@
 
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
+import CommonUtils from '@/utils/common-utils';
 import FindingsService from '@/services/findings-service';
 import ScanFindingsService from '@/services/scan-findings-service';
 import Spinner from '@/components/Common/Spinner.vue';
@@ -79,7 +80,7 @@ export default {
     fetchStatuses() {
       ScanFindingsService.getStatusList()
         .then((response) => {
-          this.statusList = ScanFindingsService.parseStatusOptions(response.data);
+          this.statusList = CommonUtils.parseStatusOptions(response.data);
         })
         .catch((error) => {
           AxiosConfig.handleError(error);

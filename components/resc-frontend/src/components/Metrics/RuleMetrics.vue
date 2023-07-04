@@ -136,6 +136,7 @@
 
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
+import Config from '@/configuration/config';
 import HealthBar from '@/components/Common/HealthBar.vue';
 import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
@@ -303,10 +304,10 @@ export default {
       let true_positive_count = 0;
       let false_positive_count = 0;
       data.item.finding_statuses_count.forEach((finding_status) => {
-        if (finding_status.status === 'TRUE_POSITIVE') {
+        if (finding_status.status === `${Config.value('truePostiveStatusVal')}`) {
           true_positive_count = finding_status.count;
         }
-        if (finding_status.status === 'FALSE_POSITIVE') {
+        if (finding_status.status === `${Config.value('falsePositiveStatusVal')}`) {
           false_positive_count = finding_status.count;
         }
       });
@@ -331,21 +332,21 @@ export default {
         let true_positive_rate = 0;
         this.totalFindingsCountForAllRules += rule.finding_count;
         rule.finding_statuses_count.forEach((finding_status) => {
-          if (finding_status.status === 'TRUE_POSITIVE') {
+          if (finding_status.status === `${Config.value('truePostiveStatusVal')}`) {
             this.truePositiveTotalCount += finding_status.count;
             tpCount = finding_status.count;
           }
-          if (finding_status.status === 'FALSE_POSITIVE') {
+          if (finding_status.status === `${Config.value('falsePositiveStatusVal')}`) {
             this.falsePositiveTotalCount += finding_status.count;
             fpCount = finding_status.count;
           }
-          if (finding_status.status === 'CLARIFICATION_REQUIRED') {
+          if (finding_status.status === `${Config.value('clarificationRequiredStatusVal')}`) {
             this.clarificationRequiredTotalCount += finding_status.count;
           }
-          if (finding_status.status === 'UNDER_REVIEW') {
+          if (finding_status.status === `${Config.value('underReviewStatusVal')}`) {
             this.underReviewTotalCount += finding_status.count;
           }
-          if (finding_status.status === 'NOT_ANALYZED') {
+          if (finding_status.status === `${Config.value('notAnalyzedStatusVal')}`) {
             this.notAnalyzedTotalCount += finding_status.count;
           }
         });
