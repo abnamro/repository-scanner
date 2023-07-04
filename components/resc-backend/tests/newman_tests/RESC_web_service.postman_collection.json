@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6db9b02e-2513-4d4e-a31d-c90f3a766832",
+		"_postman_id": "9337674c-4f7e-47f2-b9fd-2ee2166b6420",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -5153,202 +5153,6 @@
 							]
 						},
 						{
-							"name": "Get branches for a repository",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\").that.is.empty;",
-											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
-											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/branches?skip=0&limit=100",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"repositories",
-										":repository_id",
-										"branches"
-									],
-									"query": [
-										{
-											"key": "skip",
-											"value": "0"
-										},
-										{
-											"key": "limit",
-											"value": "100"
-										}
-									],
-									"variable": [
-										{
-											"key": "repository_id",
-											"value": "{{repository_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get branches for a repository with non existent repository id",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\").that.is.empty;",
-											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
-											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/branches?skip=0&limit=100",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"repositories",
-										":repository_id",
-										"branches"
-									],
-									"query": [
-										{
-											"key": "skip",
-											"value": "0"
-										},
-										{
-											"key": "limit",
-											"value": "100"
-										}
-									],
-									"variable": [
-										{
-											"key": "repository_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
 							"name": "Get all unique project names",
 							"event": [
 								{
@@ -6802,12 +6606,14 @@
 											"const responseJson = pm.response.json();",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"     pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(pm.environment.get(\"repository_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"project_key\"]).to.eql(\"test-project\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(\"test-repository-id1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_name\"]).to.eql(\"test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scan_id\"]).to.eql(null);",
+											"    pm.expect(responseJson[\"data\"][0][\"last_scan_timestamp\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"true_positive\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"false_positive\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"not_analyzed\"]).to.eql(0);",
@@ -6851,6 +6657,523 @@
 										{
 											"key": "onlyifhasfindings",
 											"value": "false"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get latest scan for a repository",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.eq(null);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/last-scan",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"last-scan"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "{{repository_id}}"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get latest scan for a repository with non existent ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.eq(null);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/last-scan",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"last-scan"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "999"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get latest scan for a repository with invalid ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});",
+											"",
+											"pm.test(\"Status is Unprocessable Entity\"), function (){",
+											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/last-scan",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"last-scan"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "invalid"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get scans for a repository",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
+											"    pm.expect(responseJson[\"data\"].length).to.eql(0);",
+											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/scans",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"scans"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "{{repository_id}}"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get scans for a repository with non existent ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\"OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\").that.is.empty;;",
+											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
+											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
+											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/scans",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"scans"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "999"
+										}
+									]
+								},
+								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
+							},
+							"response": [
+								{
+									"name": "Successful Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sts",
+												"v1",
+												"supported-vcs-providers"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
+								}
+							]
+						},
+						{
+							"name": "Get scans for a repository with invalid ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422\", function () {",
+											"    pm.response.to.have.status(422);",
+											"});",
+											"",
+											"pm.test(\"Status is Unprocessable Entity\"), function (){",
+											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.be.an(\"object\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
+											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
+											"});",
+											"",
+											"pm.test(\"Response time is less than 300ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(300);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/repositories/:repository_id/scans",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"repositories",
+										":repository_id",
+										"scans"
+									],
+									"variable": [
+										{
+											"key": "repository_id",
+											"value": "invalid"
 										}
 									]
 								},
@@ -7060,2043 +7383,6 @@
 					]
 				},
 				{
-					"name": "branches",
-					"item": [
-						{
-							"name": "Create a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 201\", function () {",
-											"    pm.response.to.have.status(201);",
-											"});",
-											"",
-											"pm.test(\"Status is Created\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" Created\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"id_\"]).to.be.greaterThan(0);",
-											"    pm.environment.set(\"branch_id\", responseJson[\"id_\"]);",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(\"test-branch-id1\");",
-											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
-											"    pm.expect(responseJson[\"latest_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"branch_id\": \"test-branch-id1\",\n  \"branch_name\": \"test-branch1\",\n  \"latest_commit\": \"testcommit12345\",\n  \"repository_id\": {{repository_id}}\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches"
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Create a branch with invalid body",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"branch_id\": \"test-branch-id1\",\n  \"branch_name\": \"test-branch1\",\n  \"latest_commit\": \"testcommit12345\",\n  \"repository_id\": \"invalid\"\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches"
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Fetch a branch by ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(\"test-branch-id1\");",
-											"    pm.expect(responseJson[\"latest_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
-											"    pm.expect(responseJson[\"id_\"]).to.eql(pm.environment.get(\"branch_id\"));",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Fetch a branch by non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});",
-											"",
-											"pm.test(\"Status is Not Found\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Not Found\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Branch not found\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Fetch a branch by invalid ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "invalid"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get all branches",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(\"test-branch-id1\");",
-											"    pm.expect(responseJson[\"data\"][0][\"latest_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
-											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(pm.environment.get(\"branch_id\"));",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches?skip=0&limit=100",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches"
-									],
-									"query": [
-										{
-											"key": "skip",
-											"value": "0"
-										},
-										{
-											"key": "limit",
-											"value": "100"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get all branches with invalid parameter",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"",
-											"    pm.expect(responseJson[\"detail\"][1][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][1][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches?skip=invalid&limit=invalid",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches"
-									],
-									"query": [
-										{
-											"key": "skip",
-											"value": "invalid"
-										},
-										{
-											"key": "limit",
-											"value": "invalid"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Update a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"id_\"]).to.be.greaterThan(0);",
-											"    pm.environment.set(\"branch_id\", responseJson[\"id_\"]);",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(\"test-branch-id1\");",
-											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
-											"    pm.expect(responseJson[\"latest_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"branch_id\": \"test-branch-id1\",\n  \"branch_name\": \"test-branch1\",\n  \"latest_commit\": \"testcommit12345\",\n  \"repository_id\": {{repository_id}}\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Update a branch with non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});",
-											"",
-											"pm.test(\"Status is Not Found\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" Not Found\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Branch not found\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"branch_id\": \"test-branch-id1\",\n  \"branch_name\": \"test-branch1\",\n  \"latest_commit\": \"testcommit12345\",\n  \"repository_id\": {{repository_id}}\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Update a branch with invalid body",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"branch_id\": \"test-branch-id1\",\n  \"branch_name\": \"test-branch1\",\n  \"latest_commit\": \"testcommit12345\",\n  \"repository_id\": \"str\"\n}"
-								},
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Created",
-									"code": 201,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"project_key\": \"sed magna pa\",\n \"repository_id\": \"ut incididunt cupidatat Lorem ad\",\n \"repository_name\": \"aliqua\",\n \"repository_url\": \"pariatur consequat qui fugiat\",\n \"vcs_provider\": \"Exc\",\n \"id_\": 78011707\n}"
-								},
-								{
-									"name": "Validation Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"project_key\": \"commodo do labore\",\n    \"repository_id\": \"non qui e\",\n    \"repository_name\": \"officia fugiat dolore in\",\n    \"repository_url\": \"enim Lorem ea\",\n    \"vcs_provider\": \"officia cupidatat dolor non\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/repositories-info",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"repositories-info"
-											]
-										}
-									},
-									"status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "{\n \"detail\": [\n  {\n   \"loc\": [\n    \"id deserunt\",\n    \"elit voluptate qui cupidatat magna\"\n   ],\n   \"msg\": \"ad adipisicing\",\n   \"type\": \"mollit\"\n  },\n  {\n   \"loc\": [\n    \"adipisicing et ut Ut\",\n    \"cillum culpa\"\n   ],\n   \"msg\": \"amet occaecat deserunt ex\",\n   \"type\": \"ad cupidatat in\"\n  }\n ]\n}"
-								}
-							]
-						},
-						{
-							"name": "Get scans for a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
-											"    pm.expect(responseJson[\"data\"].length).to.eql(0);",
-											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
-											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/scans",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"scans"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get scans for a branch with non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\").that.is.empty;;",
-											"    pm.expect(responseJson[\"total\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
-											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/scans",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"scans"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get scans for a branch with invalid ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/scans",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"scans"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "invalid"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get latest scan for a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.eq(null);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/last-scan",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"last-scan"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get latest scan for a branch with non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.eq(null);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/last-scan",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"last-scan"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get latest scan for a branch with invalid ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/last-scan",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"last-scan"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "invalid"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get findings metadata for a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"data\"][\"id_\"]).to.eql(pm.environment.get(\"branch_id\"));",
-											"    pm.expect(responseJson[\"data\"][\"branch_id\"]).to.eql(\"test-branch-id1\");",
-											"    pm.expect(responseJson[\"data\"][\"branch_name\"]).to.eql(\"test-branch1\");",
-											"    pm.expect(responseJson[\"data\"][\"latest_commit\"]).to.eql(\"testcommit12345\");",
-											"    pm.expect(responseJson[\"data\"][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
-											"    pm.expect(responseJson[\"true_positive\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"false_positive\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"not_analyzed\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"under_review\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"clarification_required\"]).to.eql(0);",
-											"    pm.expect(responseJson[\"total_findings_count\"]).to.eql(0);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/findings-metadata",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"findings-metadata"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get findings metadata for a branch with non existent ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});",
-											"",
-											"pm.test(\"Status is Not Found\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" Not Found\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Branch not found\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/findings-metadata",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"findings-metadata"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Get findings metadata for a branch with invalid ID",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id/findings-metadata",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id",
-										"findings-metadata"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "invalid"
-										}
-									]
-								},
-								"description": "    Retrieve all supported vcs providers\n:return: List[str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/supported-vcs-providers",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"supported-vcs-providers"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"in ea occaecat\",\n \"Excepteur dolor culpa occaecat eiusmod\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Delete a branch which doesn't exist",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.response.to.have.status(404);",
-											"});",
-											"",
-											"pm.test(\"Status is Not Found\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Not Found\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"]).to.eql(\"Branch not found\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "999"
-										}
-									]
-								},
-								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/detected-rules",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"detected-rules"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Delete a branch with invalid id",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 422\", function () {",
-											"    pm.response.to.have.status(422);",
-											"});",
-											"",
-											"pm.test(\"Status is Unprocessable Entity\"), function (){",
-											"    pm.response.to.have.property(\"status\",\"Unprocessable Entity\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"type\"]).to.eql(\"type_error.integer\");",
-											"    pm.expect(responseJson[\"detail\"][0][\"msg\"]).to.eql(\"value is not a valid integer\");",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "one"
-										}
-									]
-								},
-								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/detected-rules",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"detected-rules"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
-								}
-							]
-						}
-					]
-				},
-				{
 					"name": "scans",
 					"item": [
 						{
@@ -9124,7 +7410,7 @@
 											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",
@@ -9155,7 +7441,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
+									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"repository_id\": {{repository_id}}\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans",
@@ -9284,7 +7570,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"TEST\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": \"one\",\n  \"rule_pack\": 1,\n  \"branch_id\": \"str\"\n}"
+									"raw": "{\n  \"scan_type\": \"TEST\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": \"one\",\n  \"rule_pack\": 1,\n  \"repository_id\": \"str\"\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans",
@@ -9390,7 +7676,7 @@
 											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"id_\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"});",
 											"",
@@ -9650,7 +7936,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_pack\"]).to.eql(\"1.0.0\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"});",
 											"",
@@ -9845,7 +8131,7 @@
 											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"increment_number\"]).to.eql(0);",
 											"    pm.expect(responseJson[\"rule_pack\"]).to.eql(\"1.0.0\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"});",
 											"",
 											"pm.test(\"Response time is less than 300ms\", function () {",
@@ -9866,7 +8152,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
+									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"{{currentdate}}\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"repository_id\": {{repository_id}}\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id",
@@ -9995,7 +8281,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"branch_id\": {{branch_id}}\n}"
+									"raw": "{\n  \"scan_type\": \"BASE\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": 0,\n  \"rule_pack\": \"1.0.0\",\n  \"repository_id\": {{repository_id}}\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id",
@@ -10131,7 +8417,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"scan_type\": \"TEST\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": \"one\",\n  \"rule_pack\": 1,\n  \"branch_id\": \"str\"\n}"
+									"raw": "{\n  \"scan_type\": \"TEST\",\n  \"last_scanned_commit\": \"testcommit12345\",\n  \"timestamp\": \"2023-01-30T22:51:31.486Z\",\n  \"increment_number\": \"one\",\n  \"rule_pack\": 1,\n  \"repository_id\": \"str\"\n}"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id",
@@ -10956,7 +9242,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": {{branch_id}}\n  }\n\n]"
+									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"status\": \"NOT_ANALYZED\",\n    \"comment\": \"\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"repository_id\": {{repository_id}}\n  }\n\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id/findings",
@@ -11088,7 +9374,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"branch_id\": \"str\"\n  }\n\n]"
+									"raw": "[\n  {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"Rule-1\",\n    \"repository_id\": \"str\"\n  }\n\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/scans/:scan_id/findings",
@@ -11209,7 +9495,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_ids\"]).to.eql(null);",
 											"});",
@@ -11507,7 +9793,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_ids\"]).to.eql(null);",
 											"});",
@@ -11818,7 +10104,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_ids\"]).to.eql(null);",
 											"});",
@@ -12682,7 +10968,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": {{branch_id}}\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"repository_id\": {{repository_id}}\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12805,7 +11091,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"branch_id\": \"str\"\n  }\n]"
+									"raw": "[\n   {\n    \"file_path\": \"dummy_file.txt\",\n    \"line_number\": 10,\n    \"column_start\": 1,\n    \"column_end\": 8,\n    \"commit_id\": \"testcommit12345\",\n    \"commit_message\": \"test commit message\",\n    \"commit_timestamp\": \"2023-01-30T23:18:24.546Z\",\n    \"author\": \"test-author\",\n    \"email\": \"test-author@mail.com\",\n    \"event_sent_on\": null,\n    \"rule_name\": \"GitHub Personal Access Token\",\n    \"repository_id\": \"str\"\n  }\n]"
 								},
 								"url": {
 									"raw": "{{baseUrl}}/resc/v1/findings",
@@ -12918,7 +11204,7 @@
 											"    pm.expect(responseJson[\"data\"][1][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][1][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][1][\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[\"data\"][1][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][1][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][1][\"scan_ids\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][1][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.environment.set(\"finding_id\", responseJson[\"data\"][1][\"id_\"]);",
@@ -13219,7 +11505,7 @@
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"id_\"]).to.eql(pm.environment.get(\"finding_id\"));",
 											"    pm.expect(responseJson[\"scan_ids\"]).to.be.an(\"array\");",
 											"});",
@@ -13485,7 +11771,7 @@
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"data\"][0][\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(pm.environment.get(\"finding_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_ids\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -15117,7 +13403,7 @@
 											"    pm.expect(responseJson[\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"event_sent_on\"]).to.include(\"2023-01-31T13\");",
 											"    pm.expect(responseJson[\"rule_name\"]).to.eql(\"GitHub Personal Access Token\");",
-											"    pm.expect(responseJson[\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
+											"    pm.expect(responseJson[\"repository_id\"]).to.eql(pm.environment.get(\"repository_id\"));",
 											"    pm.expect(responseJson[\"id_\"]).to.eql(pm.environment.get(\"finding_id\"));",
 											"    pm.expect(responseJson[\"scan_ids\"]).to.be.an(\"array\");",
 											"    pm.expect(responseJson[\"scan_ids\"].length).to.eql(0);",
@@ -15954,11 +14240,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16078,11 +14362,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16197,11 +14479,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16316,11 +14596,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16435,11 +14713,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16554,11 +14830,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16673,11 +14947,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16792,11 +15064,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -16911,11 +15181,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -17042,11 +15310,9 @@
 											"    pm.expect(responseJson[\"data\"][0][\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"data\"][0][\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"data\"][0][\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.eql(1);",
 											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
@@ -17172,12 +15438,10 @@
 											"    pm.expect(responseJson[\"repository_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository\");",
 											"    pm.expect(responseJson[\"timestamp\"].substring(0, 10)).to.eql(pm.environment.get(\"currentdate\").substring(0, 10));",
 											"    pm.expect(responseJson[\"vcs_provider\"]).to.eql(\"AZURE_DEVOPS\");",
-											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
 											"    pm.expect(responseJson[\"last_scanned_commit\"]).to.eql(\"testcommit12345\");",
 											"    pm.expect(responseJson[\"scan_id\"]).to.eql(pm.environment.get(\"scan_id\"));",
 											"    pm.expect(responseJson[\"event_sent_on\"]).to.eql(null);",
-											"    pm.expect(responseJson[\"branch_name\"]).to.eql(\"test-branch1\");",
-											"    pm.expect(responseJson[\"commit_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository/commit/testcommit12345?refName=refs/heads/test-branch1&path=/dummy_file.txt\");",
+											"    pm.expect(responseJson[\"commit_url\"]).to.eql(\"https://dev.azure.com/test-org/test-project/_git/test-repository/commit/testcommit12345?path=/dummy_file.txt\");",
 											"    pm.expect(responseJson[\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"id_\"]).to.eql(1);",
 											"});",
@@ -18240,95 +16504,6 @@
 										{
 											"key": "scan_id",
 											"value": "{{scan_id}}"
-										}
-									]
-								},
-								"description": "    Retrieve all uniquely detected rules across all findings in the database\n:param db_connection:\n    Session of the database connection\n:return: [str]\n    The output will contain a list of strings of unique rules in the findings table"
-							},
-							"response": [
-								{
-									"name": "Successful Response",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/sts/v1/detected-rules",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"sts",
-												"v1",
-												"detected-rules"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "Content-Type",
-											"value": "application/json"
-										}
-									],
-									"cookie": [],
-									"body": "[\n \"occaecat ut ea et Ut\",\n \"ut nostrud\"\n]"
-								}
-							]
-						},
-						{
-							"name": "Delete a branch",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"pm.test(\"Status is OK\"), function (){",
-											"    pm.response.to.have.property(\"status\",\" OK\")",
-											"}",
-											"",
-											"const responseJson = pm.response.json();",
-											"pm.test(\"Response body matches\", function() {",
-											"    pm.expect(responseJson).to.be.an(\"object\");",
-											"    pm.expect(responseJson[\"ok\"]).to.eql(true);",
-											"});",
-											"",
-											"pm.test(\"Branch id doesn't exist\", function() {",
-											"    pm.environment.unset(\"branch_id\");",
-											"    pm.expect(pm.environment.get(\"branch_id\")).to.eql(undefined);",
-											"});",
-											"",
-											"pm.test(\"Response time is less than 300ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(300);",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/resc/v1/branches/:branch_id",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"resc",
-										"v1",
-										"branches",
-										":branch_id"
-									],
-									"variable": [
-										{
-											"key": "branch_id",
-											"value": "{{branch_id}}"
 										}
 									]
 								},
