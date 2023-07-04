@@ -10,7 +10,6 @@ config:
   debug_value: "0"
   loglevel: INFO
   schedule: "0 6 * * 6"
-  scan_only_master_branch: 
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 0
 resources:
