@@ -10313,7 +10313,6 @@
 											"    pm.expect(responseJson[\"data\"][0][\"email\"]).to.eql(\"test-author@mail.com\");",
 											"    pm.expect(responseJson[\"data\"][0][\"event_sent_on\"]).to.eql(null);",
 											"    pm.expect(responseJson[\"data\"][0][\"rule_name\"]).to.eql(\"Rule-1\");",
-											"    pm.expect(responseJson[\"data\"][0][\"branch_id\"]).to.eql(pm.environment.get(\"branch_id\"));",
 											"    pm.expect(responseJson[\"data\"][0][\"id_\"]).to.be.greaterThan(0);",
 											"    pm.expect(responseJson[\"data\"][0][\"scan_ids\"]).to.eql(null);",
 											"});",
