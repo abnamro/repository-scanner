@@ -20,7 +20,6 @@ from resc_backend.resc_web_service.dependencies import (
     requires_no_auth
 )
 from resc_backend.resc_web_service.endpoints import (
-    branches,
     common,
     detailed_findings,
     findings,
@@ -92,7 +91,6 @@ tags_metadata = [
     {"name": "resc-rules", "description": "Manage rule information"},
     {"name": "resc-rule-packs", "description": "Manage rule pack information"},
     {"name": "resc-repositories", "description": "Manage repository information"},
-    {"name": "resc-branches", "description": "Manage branch information"},
     {"name": "resc-scans", "description": "Manage scan information"},
     {"name": "resc-findings", "description": "Manage findings information"},
     {"name": "resc-vcs-instances", "description": "Manage vcs instance information"},
@@ -120,7 +118,6 @@ if os.getenv('ENABLE_CORS', '') == 'true':
 
 app.include_router(health.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(common.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(branches.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(rules.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(rule_packs.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(findings.router, prefix=RWS_VERSION_PREFIX)

@@ -178,8 +178,6 @@ export default {
       previousScanList: [],
       incrementNumber: null,
       repositoryId: null,
-      branchName: '',
-      branchId: null,
       repository: {},
       vcsInstance: {},
       selectedCheckBoxIds: [],
@@ -318,7 +316,6 @@ export default {
       ScanFindingsService.getRepositoryById(this.repositoryId)
         .then((response) => {
           this.repository = response.data;
-          this.repository.branch_name = this.branchName;
           this.fetchVCSInstance();
           this.hideSpinner();
         })
@@ -331,20 +328,9 @@ export default {
       this.selectedScanID = this.scanId;
       ScanFindingsService.getScanById(this.selectedScanID)
         .then((response) => {
-          this.branchId = response.data.branch_id;
+          this.repositoryId = response.data.repository_id;
           this.scanType = response.data.scan_type;
           this.incrementNumber = response.data.increment_number;
-          this.fetchBranch();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchBranch() {
-      ScanFindingsService.getBranchById(this.branchId)
-        .then((response) => {
-          this.repositoryId = response.data.repository_id;
-          this.branchName = response.data.branch_name;
           this.fetchRepository();
         })
         .catch((error) => {

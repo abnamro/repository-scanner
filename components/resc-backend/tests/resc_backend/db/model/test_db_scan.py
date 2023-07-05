@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 # First Party
-from resc_backend.db.model import Base, DBbranch, DBrepository, DBscan, DBVcsInstance
+from resc_backend.db.model import Base, DBrepository, DBscan, DBVcsInstance
 from resc_backend.db.model.rule_pack import DBrulePack
 
 sys.path.insert(0, "src")
@@ -36,15 +36,9 @@ class TestScan(unittest.TestCase):
                                        vcs_instance=1)
         self.session.add(self.repository)
 
-        self.branch = DBbranch(repository_id=1,
-                               branch_name="test_temp",
-                               branch_id='master',
-                               latest_commit="FAKE_HASH")
-        self.session.add(self.branch)
-
         self.rule_pack = DBrulePack(version="1.2")
 
-        self.scan = DBscan(branch_id=1, scan_type="BASE",
+        self.scan = DBscan(repository_id=1, scan_type="BASE",
                            last_scanned_commit="FAKE_HASH", timestamp=datetime.utcnow(), rule_pack="1.2",
                            increment_number=1)
 

@@ -92,7 +92,7 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
     - **email**: Email of the author
     - **event_sent_on**: event sent timestamp
     - **rule_name**: rule name
-    - **branch_id**: branch id of the finding
+    - **repository_id**: repository id of the finding
     - **return**: int
           The output will contain the number of successful created findings
       """

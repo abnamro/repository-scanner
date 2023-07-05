@@ -46,7 +46,7 @@ class TestFindings(unittest.TestCase):
                                 email=f"email_{i}",
                                 rule_name=f"rule_{i}",
                                 event_sent_on=datetime.utcnow(),
-                                branch_id=1)
+                                repository_id=1)
             self.db_findings.append(finding)
             self.db_findings[i - 1].id_ = i
             self.db_scan_findings.append(DBscanFinding(
@@ -70,7 +70,7 @@ class TestFindings(unittest.TestCase):
         for i in range(1, 6):
             self.enriched_findings.append(FindingRead(id_=i,
                                                       scan_ids=[i],
-                                                      branch_id=i,
+                                                      repository_id=i,
                                                       file_path=f"file_path_{i}",
                                                       line_number=i,
                                                       column_start=i,
@@ -96,7 +96,7 @@ class TestFindings(unittest.TestCase):
         assert data["email"] == finding.email
         assert data["rule_name"] == finding.rule_name
         assert data["scan_ids"] == [x.scan_id for x in scan_findings]
-        assert data["branch_id"] == finding.branch_id
+        assert data["repository_id"] == finding.repository_id
         assert data["id_"] == finding.id_
         assert finding.id_ == scan_findings[0].finding_id
         assert datetime.strptime(data["event_sent_on"], "%Y-%m-%dT%H:%M:%S.%f") == finding.event_sent_on
@@ -114,14 +114,14 @@ class TestFindings(unittest.TestCase):
         assert data["email"] == finding.email
         assert data["rule_name"] == finding.rule_name
         assert data["scan_ids"] == finding.scan_ids
-        assert data["branch_id"] == finding.branch_id
+        assert data["repository_id"] == finding.repository_id
         assert data["id_"] == finding.id_
         assert datetime.strptime(data["event_sent_on"], "%Y-%m-%dT%H:%M:%S.%f") == finding.event_sent_on
 
     @staticmethod
     def cast_db_finding_to_finding_create(finding: DBfinding, scan_findings: List[DBscanFinding]):
         return FindingCreate(scan_ids=[x.scan_id for x in scan_findings],
-                             branch_id=finding.branch_id,
+                             repository_id=finding.repository_id,
                              file_path=finding.file_path,
                              line_number=finding.line_number,
                              column_start=finding.column_start,

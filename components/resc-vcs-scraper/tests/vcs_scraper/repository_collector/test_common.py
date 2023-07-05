@@ -8,7 +8,7 @@ from celery import Celery
 
 # First Party
 from vcs_scraper.constants import AZURE_DEVOPS, BITBUCKET, REPOSITORY_QUEUE
-from vcs_scraper.model import Branch, Repository
+from vcs_scraper.model import Repository
 from vcs_scraper.vcs_connectors.vcs_connector_factory import VCSConnectorFactory
 from vcs_scraper.vcs_instances_parser import VCSInstance
 
@@ -54,16 +54,7 @@ def test_send_tasks_to_celery_queue(celery_send_task):
     repository_queue = REPOSITORY_QUEUE
     project_tasks = []
 
-    branches = [Branch(branch_id="/ref/head/main",
-                       latest_commit="abc",
-                       repository_id=1,
-                       branch_name="main"),
-                Branch(branch_id="/ref/head/master",
-                       latest_commit="xyz",
-                       repository_id=2,
-                       branch_name="master")]
-
-    repository = Repository(project_key="PROJ", repository_name="name", branches=branches,
+    repository = Repository(project_key="PROJ", repository_name="name", latest_commit="abc123",
                             repository_url="www.fake-vcs.com/proj/name", repository_id="xyz",
                             vcs_instance_name="test server")
 
@@ -103,8 +94,8 @@ def test_extract_ado_project_information_with_empty_project(mock_get):
 
 
 @patch("vcs_scraper.vcs_connectors.azure_devops_connector.AzureDevopsConnector.get_repos")
-@patch("vcs_scraper.vcs_connectors.azure_devops_connector.AzureDevopsConnector.get_branches")
-def test_extract_ado_project_information(mock_get_branches, mock_get_repos):
+@patch("vcs_scraper.vcs_connectors.azure_devops_connector.AzureDevopsConnector.get_latest_commit")
+def test_extract_ado_project_information(mock_get_latest_commit, mock_get_repos):
     azure_devops_client = VCSConnectorFactory.create_client_from_vcs_instance(ado_vcs_instance)
     project_key = "GRID0001"
 
@@ -115,25 +106,20 @@ def test_extract_ado_project_information(mock_get_branches, mock_get_repos):
         "web_url": "http://test.com/repo.git"
     }
 
-    branches_information = [{"name": "feature", "commit": {"commit_id": "ABCDEFG"}},
-                            {"name": "master", "commit": {"commit_id": "QRSTUVWXYZ"}}]
+    get_latest_commit = "abc123"
 
     get_repos = list([repository_information])
     mock_get_repos.side_effect = [get_repos]
-    mock_get_branches.side_effect = [branches_information]
+    mock_get_latest_commit.return_value = get_latest_commit
 
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        project_tasks = common.extract_project_information(project_key, azure_devops_client, ado_vcs_instance.name)
+    project_tasks = common.extract_project_information(project_key, azure_devops_client, ado_vcs_instance.name)
 
     assert len(project_tasks) == 1
     result = project_tasks[0]
     assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
-    assert result.branches[0].branch_id == "feature"
-    assert result.branches[0].latest_commit == "ABCDEFG"
-    assert result.branches[1].branch_id == "master"
-    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
+    assert result.latest_commit == get_latest_commit
 
 
 @patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_repos")
@@ -150,8 +136,8 @@ def test_extract_btbk_project_information_with_empty_project(mock_get):
 
 
 @patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_repos")
-@patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_branches")
-def test_extract_btbk_project_information(mock_get_branches, mock_get_repos):
+@patch("vcs_scraper.vcs_connectors.bitbucket_connector.BitbucketConnector.get_latest_commit")
+def test_extract_btbk_project_information(mock_get_latest_commit, mock_get_repos):
     bitbucket_client = VCSConnectorFactory.create_client_from_vcs_instance(btbk_vcs_instance)
     project_key = "PROJ"
 
@@ -163,22 +149,17 @@ def test_extract_btbk_project_information(mock_get_branches, mock_get_repos):
                             {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
     }
 
-    branches_information = [{"id": "features/1", "displayId": "1", "latestCommit": "ABCDEFG"},
-                            {"id": "/refs/heads/main", "displayId": "main", "latestCommit": "QRSTUVWXYZ"}]
+    get_latest_commit = "abc123"
 
     get_repos = list([repository_information])
     mock_get_repos.side_effect = [get_repos]
-    mock_get_branches.side_effect = [branches_information]
+    mock_get_latest_commit.return_value = get_latest_commit
 
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        project_tasks = common.extract_project_information(project_key, bitbucket_client, btbk_vcs_instance.name)
+    project_tasks = common.extract_project_information(project_key, bitbucket_client, btbk_vcs_instance.name)
 
     assert len(project_tasks) == 1
     result = project_tasks[0]
     assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == project_key
-    assert result.branches[0].branch_id == "features/1"
-    assert result.branches[0].latest_commit == "ABCDEFG"
-    assert result.branches[1].branch_id == "/refs/heads/main"
-    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
+    assert result.latest_commit == get_latest_commit

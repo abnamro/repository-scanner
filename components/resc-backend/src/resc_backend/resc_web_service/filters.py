@@ -20,7 +20,6 @@ class FindingsFilter:
     rule_tags: List[str] = None
     project_name: str = None
     repository_name: str = None
-    branch_name: str = None
     scan_ids: List[int] = None
     start_date_time: datetime = None
     end_date_time: datetime = None

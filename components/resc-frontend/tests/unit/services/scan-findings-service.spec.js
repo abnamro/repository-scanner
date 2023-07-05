@@ -1,7 +1,7 @@
 import axios from 'axios';
+import Config from '@/configuration/config';
 import ScanFindingsService from '@/services/scan-findings-service';
-import scans from '@/../tests/resources/mock_scans.json';
-import branches from '@/../tests/resources/mock_branches.json';
+import scans_for_a_repository from '@/../tests/resources/mock_scans_for_a_repository.json';
 import repositories from '@/../tests/resources/mock_repositories.json';
 
 jest.mock('axios');
@@ -26,17 +26,28 @@ describe('getRepositoryById', () => {
   describe('getScanById', () => {
     describe('when API call is successful', () => {
       it('should return scans', async () => {
-        axios.get.mockResolvedValueOnce(scans);
+        const scan = {
+          scan_type: 'BASE',
+          last_scanned_commit: '1fb42a9ee177ed8141a4ab162a3e33952a4cf6c0',
+          timestamp: '2023-05-23T15:52:22.270000',
+          increment_number: 0,
+          rule_pack: '1.0.0',
+          repository_id: 1,
+          id_: 1,
+        };
+        axios.get.mockResolvedValueOnce(scan);
 
         const response = await ScanFindingsService.getScanById(1);
 
-        expect(response).toEqual(scans);
+        expect(response).toEqual(scan);
         expect(response).toBeDefined();
-        expect(response).not.toBeNull();
-        expect(response.data.length).toBe(5);
-        expect(response.total).toBe(100);
-        expect(response.limit).toBe(5);
-        expect(response.skip).toBe(0);
+        expect(response.scan_type).toBe('BASE');
+        expect(response.last_scanned_commit).toBe('1fb42a9ee177ed8141a4ab162a3e33952a4cf6c0');
+        expect(response.timestamp).toBe('2023-05-23T15:52:22.270000');
+        expect(response.increment_number).toBe(0);
+        expect(response.rule_pack).toBe('1.0.0');
+        expect(response.repository_id).toBe(1);
+        expect(response.id_).toBe(1);
       });
     });
 
@@ -48,7 +59,6 @@ describe('getRepositoryById', () => {
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
-            expect(response.data.length).toBe(0);
           })
           .catch((error) => {
             expect(error).toBeDefined();
@@ -58,20 +68,26 @@ describe('getRepositoryById', () => {
     });
   });
 
-  describe('getBranchById', () => {
+  describe('getScansByRepositoryId', () => {
     describe('when API call is successful', () => {
-      it('should return branches', async () => {
-        axios.get.mockResolvedValueOnce(branches);
+      it('should return scans', async () => {
+        axios.get.mockResolvedValueOnce(scans_for_a_repository);
 
-        const response = await ScanFindingsService.getBranchById(1);
+        const response = await ScanFindingsService.getScansByRepositoryId(1, 0, 100);
 
-        expect(response).toEqual(branches);
+        expect(response).toEqual(scans_for_a_repository);
         expect(response).toBeDefined();
         expect(response).not.toBeNull();
         expect(response.data.length).toBe(2);
-        expect(response.total).toBe(200);
-        expect(response.limit).toBe(2);
-        expect(response.skip).toBe(0);
+        expect(response.data[0].scan_type).toBe('BASE');
+        expect(response.data[0].last_scanned_commit).toBe(
+          '5af6e79b1a9a1484ae3946a7e2c8d05febfe2c63'
+        );
+        expect(response.data[0].timestamp).toBe('2023-04-30T06:01:47.503000');
+        expect(response.data[0].increment_number).toBe(0);
+        expect(response.data[0].rule_pack).toBe('1.0.0');
+        expect(response.data[0].repository_id).toBe(1);
+        expect(response.data[0].id_).toBe(1);
       });
     });
 
@@ -79,11 +95,10 @@ describe('getRepositoryById', () => {
       it('should return error', async () => {
         axios.get.mockResolvedValueOnce([]);
 
-        await ScanFindingsService.getBranchById('not_valid')
+        await ScanFindingsService.getScansByRepositoryId('not_valid', 0, 100)
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
-            expect(response.data.length).toBe(0);
           })
           .catch((error) => {
             expect(error).toBeDefined();
@@ -95,11 +110,11 @@ describe('getRepositoryById', () => {
 
   describe('getStatusList', () => {
     let mock_statuses = [
-      'NOT_ANALYZED',
-      'UNDER_REVIEW',
-      'CLARIFICATION_REQUIRED',
-      'FALSE_POSITIVE',
-      'TRUE_POSITIVE',
+      `${Config.value('notAnalyzedStatusVal')}`,
+      `${Config.value('underReviewStatusVal')}`,
+      `${Config.value('clarificationRequiredStatusVal')}`,
+      `${Config.value('falsePositiveStatusVal')}`,
+      `${Config.value('truePostiveStatusVal')}`,
     ];
     describe('when API call is successful', () => {
       it('should return statuses', async () => {
@@ -119,41 +134,6 @@ describe('getRepositoryById', () => {
         axios.get.mockResolvedValueOnce([]);
 
         await ScanFindingsService.getStatusList('not valid')
-          .then((response) => {
-            expect(response).toEqual([]);
-            expect(response).not.toBeNull();
-            expect(response.data.length).toBe(0);
-          })
-          .catch((error) => {
-            expect(error).toBeDefined();
-            expect(error).not.toBeNull();
-          });
-      });
-    });
-  });
-
-  describe('getScansByBranchId', () => {
-    describe('when API call is successful', () => {
-      it('should return scans', async () => {
-        axios.get.mockResolvedValueOnce(scans);
-
-        const response = await ScanFindingsService.getScansByBranchId(1);
-
-        expect(response).toEqual(scans);
-        expect(response).toBeDefined();
-        expect(response).not.toBeNull();
-        expect(response.data.length).toBe(5);
-        expect(response.total).toBe(100);
-        expect(response.limit).toBe(5);
-        expect(response.skip).toBe(0);
-      });
-    });
-
-    describe('when API call fails', () => {
-      it('should return error', async () => {
-        axios.get.mockResolvedValueOnce([]);
-
-        await ScanFindingsService.getScansByBranchId('not_valid')
           .then((response) => {
             expect(response).toEqual([]);
             expect(response).not.toBeNull();
@@ -201,28 +181,6 @@ describe('getRepositoryById', () => {
             expect(error).not.toBeNull();
           });
       });
-    });
-  });
-
-  describe('parseStatusOptions', () => {
-    it('should parse status options', async () => {
-      let statusOptions = [
-        'NOT_ANALYZED',
-        'UNDER_REVIEW',
-        'CLARIFICATION_REQUIRED',
-        'FALSE_POSITIVE',
-        'TRUE_POSITIVE',
-      ];
-      const statusList = ScanFindingsService.parseStatusOptions(statusOptions);
-
-      expect(statusList).toBeDefined();
-      expect(statusList).not.toBeNull();
-      expect(statusList.length).toBe(5);
-      expect(statusList[0].label).toBe('Not Analyzed');
-      expect(statusList[1].label).toBe('Under Review');
-      expect(statusList[2].label).toBe('Clarification Required');
-      expect(statusList[3].label).toBe('False Positive');
-      expect(statusList[4].label).toBe('True Positive');
     });
   });
 });

@@ -1,27 +1,8 @@
 <template>
   <div>
     <div class="row">
-      <!-- Branch Filter -->
-      <div class="col-md-2 ml-3">
-        <b-form-group class="label-title text-left" label="Branch" label-for="branch-filter">
-          <multiselect
-            v-model="selectedBranch"
-            :options="branchList"
-            :multiple="false"
-            :searchable="false"
-            :allow-empty="false"
-            :show-labels="false"
-            label="branch_name"
-            track-by="id_"
-            :preselect-first="false"
-            @input="handleBranchFilterChange"
-          >
-          </multiselect>
-        </b-form-group>
-      </div>
-
       <!-- Scan Date Filter -->
-      <div class="col-md-3">
+      <div class="col-md-3 ml-3">
         <b-form-group class="label-title text-left" label="Scan Date" label-for="scan-date-filter">
           <multiselect
             v-model="selectedScan"
@@ -55,13 +36,9 @@
       <div class="col-md-3">
         <FindingStatusFilter @on-findings-status-change="onStatusFilterChange" />
       </div>
-    </div>
 
-    <!-- Include previous scan findings -->
-    <div class="row">
       <!-- Rule Tags Filter -->
-      <div class="col-md-1 ml-3"></div>
-      <div class="col-md-3 ml-2">
+      <div class="col-md-2">
         <RuleTagsFilter
           ref="ruleTagsFilterChildComponent"
           :options="ruleTagsList"
@@ -69,7 +46,11 @@
           @on-rule-tags-change="handleRuleTagsFilterChange"
         />
       </div>
-      <div class="col-md-2 ml-3 mt-4 pt-3">
+    </div>
+
+    <!-- Include previous scan findings -->
+    <div class="row">
+      <div class="col-md-2 ml-3 pt-3">
         <b-form-checkbox
           v-model="includePreviousScans"
           name="check-button"
@@ -87,13 +68,13 @@
 
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
+import Config from '@/configuration/config';
 import DateUtils from '@/utils/date-utils';
 import FindingStatusFilter from '@/components/Filters/FindingStatusFilter.vue';
 import Multiselect from 'vue-multiselect';
 import RuleFilter from '@/components/Filters/RuleFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
 import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
-import RepositoryService from '@/services/repository-service';
 import ScanFindingsService from '@/services/scan-findings-service';
 
 export default {
@@ -107,18 +88,18 @@ export default {
   data() {
     return {
       previousScans: [],
-      branchList: [],
       scanList: [],
       scanDateList: [],
       ruleList: [],
       ruleTagsList: [],
       statusList: [],
-      selectedBranch: null,
       selectedScan: null,
       selectedRule: null,
       selectedRuleTags: null,
       selectedStatus: null,
       includePreviousScans: false,
+      skipRecords: Number(`${Config.value('skipRecords')}`),
+      limitRecords: Number(`${Config.value('limitRecords')}`),
     };
   },
   methods: {
@@ -158,9 +139,6 @@ export default {
     },
     formatScanDateFilterOptions(scan) {
       return `${scan.scanDate}: ${scan.scanType}`;
-    },
-    handleBranchFilterChange() {
-      this.fetchScanDates();
     },
     handleScanDateFilterChange() {
       // On scan date reset the Rule tags filter selection
@@ -280,27 +258,30 @@ export default {
         });
     },
     fetchScanDates() {
-      if (this.selectedBranch.id_) {
-        ScanFindingsService.getScansByBranchId(this.selectedBranch.id_)
-          .then((response) => {
+      if (this.repository.id_) {
+        ScanFindingsService.getScansByRepositoryId(
+          this.repository.id_,
+          this.skipRecords,
+          this.limitRecords
+        )
+          .then((res) => {
+            const response = res.data.data;
             this.scanDateList = [];
 
-            this.scanList = response.data.data.sort(function (a, b) {
+            this.scanList = response.sort(function (a, b) {
               return new Date(b.timestamp) - new Date(a.timestamp);
             });
 
-            for (const scan of response.data.data) {
+            for (const scan of response) {
               const scanJson = {};
               scanJson['scanId'] = scan.id_;
               scanJson['scanDate'] = DateUtils.formatDate(scan.timestamp);
               scanJson['scanType'] = scan.scan_type === 'INCREMENTAL' ? 'Incremental' : 'Base';
               scanJson['rulePackVersion'] = scan.rule_pack;
 
-              // Set scan date value in select option when user clicks branch scan findings record from Repositories page
-              if (this.$route.params.scanId === scan.id_) {
+              // Set scan date value in select option when user clicks a record from Repositories page
+              if (this.$route.params.scanId == scan.id_) {
                 this.selectedScan = scanJson;
-              } else {
-                this.selectedScan = null;
               }
               this.scanDateList.push(scanJson);
             }
@@ -308,32 +289,8 @@ export default {
             //Sort scan dates
             this.scanDateList.sort(DateUtils.sortListByDate);
 
-            // On branch change set scan date value in select option
-            if (!this.selectedScan) {
-              this.selectedScan = this.scanDateList[0];
-            }
-
             //Rules depend upon scan/scan date selected
             this.fetchRules();
-          })
-          .catch((error) => {
-            AxiosConfig.handleError(error);
-          });
-      }
-    },
-    fetchBranches() {
-      if (this.repository.id_) {
-        RepositoryService.getRepositoryBranches(this.repository.id_, 10000000, 0)
-          .then((response) => {
-            for (const branch of response.data.data) {
-              if (branch.branch_name === this.repository.branch_name) {
-                this.selectedBranch = branch;
-              }
-              this.branchList.push(branch);
-            }
-
-            //Scan dates depend upon branch selected
-            this.fetchScanDates();
           })
           .catch((error) => {
             AxiosConfig.handleError(error);
@@ -344,7 +301,7 @@ export default {
   watch: {
     repository: function (newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.fetchBranches();
+        this.fetchScanDates();
       }
     },
   },

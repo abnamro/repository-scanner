@@ -15,7 +15,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 # First Party
 from resc_backend.constants import RESC_OPERATOR_ROLE
 from resc_backend.db.connection import Session, engine
-from resc_backend.db.model import DBbranch, DBfinding, DBrepository, DBrule, DBscan, DBscanFinding
+from resc_backend.db.model import DBfinding, DBrepository, DBrule, DBscan, DBscanFinding
 
 security = HTTPBearer()
 logger = logging.getLogger(__name__)
@@ -109,7 +109,6 @@ def get_db_connection():
 @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(100))
 def check_db_initialized():
     required_table_names = [
-        DBbranch.__tablename__,
         DBfinding.__tablename__,
         DBrepository.__tablename__,
         DBrule.__tablename__,

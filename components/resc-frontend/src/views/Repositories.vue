@@ -36,17 +36,12 @@
         responsive
         small
         head-variant="light"
-        @row-clicked="toggleRepositoryDetails"
+        :tbody-tr-class="rowClass"
+        @row-clicked="goToScanFindings"
       >
-        <!-- Collapse Icon Column -->
-        <template v-slot:cell(toggle_row)="{ detailsShowing }">
-          <font-awesome-icon
-            size="lg"
-            class="collapse-arrow"
-            slot="dropdown-icon"
-            icon="angle-right"
-            :rotation="detailsShowing ? 90 : null"
-          />
+        <!-- Repository Column -->
+        <template #cell(repository_name)="data">
+          {{ data.item.repository_name | truncate(25, '...') }}
         </template>
 
         <!-- Health Bar Column -->
@@ -59,11 +54,6 @@
             :clarificationRequired="data.item.clarification_required"
             :totalCount="data.item.total_findings_count"
           />
-        </template>
-
-        <!-- Expand Table Row To Display RepositoryBranches Panel -->
-        <template v-slot:row-details="{ item }">
-          <RepositoryBranchesPanel :repository="item"></RepositoryBranchesPanel>
         </template>
       </b-table>
 
@@ -84,9 +74,10 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
+import CommonUtils from '@/utils/common-utils';
+import DateUtils from '@/utils/date-utils';
 import HealthBar from '@/components/Common/HealthBar.vue';
 import Pagination from '@/components/Common/Pagination.vue';
-import RepositoryBranchesPanel from '@/components/RepositoryBranches/RepositoryBranchesPanel.vue';
 import RepositoryService from '@/services/repository-service';
 import RepositoriesPageFilter from '@/components/Filters/RepositoriesPageFilter.vue';
 import Spinner from '@/components/Common/Spinner.vue';
@@ -112,24 +103,18 @@ export default {
       includeZeroFindingRepos: false,
       fields: [
         {
-          key: 'toggle_row',
-          label: '',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '5%' },
-        },
-        {
           key: 'project_key',
           sortable: true,
           label: 'Project',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '20%' },
+          thStyle: { borderTop: '0px', width: '10%' },
         },
         {
           key: 'repository_name',
           sortable: true,
           label: 'Repository',
           class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '25%' },
+          thStyle: { borderTop: '0px', width: '20%' },
         },
         {
           key: 'vcs_provider',
@@ -137,11 +122,20 @@ export default {
           label: 'VCS Provider',
           class: 'text-left position-sticky',
           thStyle: { borderTop: '0px', width: '10%' },
+          formatter: 'formatVcsProvider',
+        },
+        {
+          key: 'last_scan_timestamp',
+          sortable: true,
+          label: 'Last Scan Date',
+          class: 'text-left',
+          thStyle: { borderTop: '0px', width: '20%' },
+          formatter: 'formatDate',
         },
         {
           key: 'total_findings_count',
           sortable: true,
-          label: 'Total Count',
+          label: 'Findings Count',
           class: 'text-left position-sticky',
           thStyle: { borderTop: '0px', width: '15%' },
         },
@@ -163,6 +157,16 @@ export default {
     },
   },
   methods: {
+    rowClass(item) {
+      return item.last_scan_id ? 'row-clickable' : 'row-unclickable';
+    },
+    formatDate(timestamp) {
+      const date = DateUtils.formatDate(timestamp);
+      return timestamp ? date : 'Not Scanned';
+    },
+    formatVcsProvider(vcsProvider) {
+      return CommonUtils.formatVcsProvider(vcsProvider);
+    },
     handlePageClick(page) {
       this.currentPage = page;
       this.fetchPaginatedRepositories();
@@ -172,16 +176,13 @@ export default {
       this.currentPage = 1;
       this.fetchPaginatedRepositories();
     },
-    toggleRepositoryDetails(row) {
-      if (row._showDetails) {
-        this.$set(row, '_showDetails', false);
-      } else {
-        this.currentItems.forEach((item) => {
-          this.$set(item, '_showDetails', false);
+    goToScanFindings(record) {
+      if (record.last_scan_id) {
+        const routeData = this.$router.resolve({
+          name: 'ScanFindings',
+          params: { scanId: record.last_scan_id },
         });
-        this.$nextTick(() => {
-          this.$set(row, '_showDetails', true);
-        });
+        window.open(routeData.href, '_blank');
       }
     },
     handleFilterChange(vcsProvider, project, repository, includeZeroFindingRepos) {
@@ -195,6 +196,7 @@ export default {
       this.fetchPaginatedRepositories();
     },
     fetchPaginatedRepositories() {
+      this.repositoryList = [];
       this.showSpinner();
       RepositoryService.getRepositoriesWithFindingsMetadata(
         this.perPage,
@@ -263,7 +265,6 @@ export default {
   components: {
     HealthBar,
     Pagination,
-    RepositoryBranchesPanel,
     RepositoriesPageFilter,
     Spinner,
   },

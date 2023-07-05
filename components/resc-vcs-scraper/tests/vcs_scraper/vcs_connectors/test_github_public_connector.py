@@ -1,7 +1,6 @@
 # Standard Library
 import os
 from unittest import mock
-from unittest.mock import MagicMock
 
 # Third Party
 from github import Github
@@ -51,17 +50,10 @@ def test_export_repository_all_branches():
         'html_url': "http://test.com/repo"
     }
 
-    branches_information = [MagicMock(),
-                            MagicMock()]
-    branches_information[0].name = "feature"
-    branches_information[0].latest_commit = "ABCDEFG"
-    branches_information[1].name = "master"
-    branches_information[1].latest_commit = "QRSTUVWXYZ"
+    latest_commit = "abc123"
 
     vcs_instance_name = "test server"
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        result = GithubPublicConnector.export_repository(repository_information, branches_information,
-                                                         vcs_instance_name)
+    result = GithubPublicConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
 
     assert type(result) is Repository
     assert result.project_key == "project1"
@@ -69,15 +61,7 @@ def test_export_repository_all_branches():
     assert result.repository_name == "repo1"
     assert result.repository_url == "http://test.com/repo"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 2
-    assert result.branches[0].branch_id == "feature"
-    assert result.branches[0].branch_name == "feature"
-    assert result.branches[0].repository_id == 1
-    assert result.branches[0].latest_commit == "ABCDEFG"
-    assert result.branches[1].branch_id == "master"
-    assert result.branches[1].branch_name == "master"
-    assert result.branches[1].repository_id == 1
-    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
+    assert result.latest_commit == "abc123"
 
 
 def test_create_github_client_from_vcs_instance():

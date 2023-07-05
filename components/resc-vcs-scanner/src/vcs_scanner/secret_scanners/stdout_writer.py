@@ -7,7 +7,6 @@ from typing import List, Optional
 # Third Party
 import tomlkit
 from prettytable import PrettyTable
-from resc_backend.resc_web_service.schema.branch import Branch
 from resc_backend.resc_web_service.schema.finding import FindingCreate
 from resc_backend.resc_web_service.schema.repository import Repository
 from resc_backend.resc_web_service.schema.scan import ScanRead
@@ -48,10 +47,6 @@ class STDOUTWriter(OutputModule):
     def write_repository(self, repository: Repository) -> Repository:
         logger.info(f"Scanning repository {repository.project_key}/{repository.repository_name}")
         return repository
-
-    def write_branch(self, repository: Repository, branch: Branch) -> Optional[Branch]:
-        logger.info(f"Scanning branch {branch.branch_name} of repository {repository.repository_name}")
-        return branch
 
     def _get_rule_tags(self) -> dict:
         """
@@ -104,13 +99,13 @@ class STDOUTWriter(OutputModule):
             return False
         return True
 
-    def write_findings(self, scan_id: int, branch_id: int, scan_findings: List[FindingCreate]):
+    def write_findings(self, scan_id: int, repository_id: int, scan_findings: List[FindingCreate]):
         """
             Write the findings to the STDOUT in a nice table and set the exit code based on the FindingActions found
         :param scan_id:
             id of the scan in question
-        :param branch_id:
-            id of the branch in question
+        :param repository_id:
+            id of the repository in question
         :param scan_findings:
             List of FindingCreate of all the findings from the scan
         """
@@ -171,13 +166,13 @@ class STDOUTWriter(OutputModule):
         sys.exit(exit_code)
 
     def write_scan(self, scan_type_to_run: ScanType, last_scanned_commit: str, scan_timestamp: datetime,
-                   branch: Branch, rule_pack: str) -> Optional[ScanRead]:
-        logger.info(f"Running {scan_type_to_run} scan on branch {branch.branch_name}")
+                   repository: Repository, rule_pack: str) -> Optional[ScanRead]:
+        logger.info(f"Running {scan_type_to_run} scan on repository {repository.repository_url}")
         return ScanRead(last_scanned_commit="NONE",
                         timestamp=datetime.now(),
-                        branch_id=1,
+                        repository_id=1,
                         id_=1,
                         rule_pack=rule_pack)
 
-    def get_last_scan_for_branch(self, branch: Branch) -> ScanRead:
+    def get_last_scan_for_repository(self, repository: Repository) -> ScanRead:
         return None

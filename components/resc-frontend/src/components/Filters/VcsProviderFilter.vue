@@ -25,6 +25,7 @@
 </template>
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
+import Config from '@/configuration/config';
 import Multiselect from 'vue-multiselect';
 import RepositoryService from '@/services/repository-service';
 
@@ -56,12 +57,12 @@ export default {
             const vcsJson = {};
             vcsJson['id'] = index;
             vcsJson['value'] = response.data[index];
-            if (response.data[index] === 'AZURE_DEVOPS') {
-              vcsJson['label'] = 'AZURE DEVOPS';
-            } else if (response.data[index] === 'BITBUCKET') {
-              vcsJson['label'] = 'BITBUCKET';
-            } else if (response.data[index] === 'GITHUB_PUBLIC') {
-              vcsJson['label'] = 'GITHUB PUBLIC';
+            if (response.data[index] === `${Config.value('azureDevOpsVal')}`) {
+              vcsJson['label'] = `${Config.value('azureDevOpsLabel')}`;
+            } else if (response.data[index] === `${Config.value('bitbucketVal')}`) {
+              vcsJson['label'] = `${Config.value('bitbucketLabel')}`;
+            } else if (response.data[index] === `${Config.value('githubPublicVal')}`) {
+              vcsJson['label'] = `${Config.value('githubPublicLabel')}`;
             }
             this.vcsProviders.push(vcsJson);
           }

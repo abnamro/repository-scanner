@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Config from '@/configuration/config';
 import RuleService from '@/services/rule-service';
 import rules from '@/../tests/resources/mock_rules.json';
 import rules_with_findings_status_count from '@/../tests/resources/mock_rules_with_findings_status_count.json';
@@ -19,15 +20,25 @@ describe('function getRulesWithFindingStatusCount', () => {
       expect(response.length).toBe(10);
       expect(response[0].rule_name).toBe('Rule-1');
       expect(response[0].finding_count).toBe(25);
-      expect(response[0].finding_statuses_count[0].status).toBe('TRUE_POSITIVE');
+      expect(response[0].finding_statuses_count[0].status).toBe(
+        `${Config.value('truePostiveStatusVal')}`
+      );
       expect(response[0].finding_statuses_count[0].count).toBe(11);
-      expect(response[0].finding_statuses_count[1].status).toBe('FALSE_POSITIVE');
+      expect(response[0].finding_statuses_count[1].status).toBe(
+        `${Config.value('falsePositiveStatusVal')}`
+      );
       expect(response[0].finding_statuses_count[1].count).toBe(2);
-      expect(response[0].finding_statuses_count[2].status).toBe('CLARIFICATION_REQUIRED');
+      expect(response[0].finding_statuses_count[2].status).toBe(
+        `${Config.value('clarificationRequiredStatusVal')}`
+      );
       expect(response[0].finding_statuses_count[2].count).toBe(3);
-      expect(response[0].finding_statuses_count[3].status).toBe('UNDER_REVIEW');
+      expect(response[0].finding_statuses_count[3].status).toBe(
+        `${Config.value('underReviewStatusVal')}`
+      );
       expect(response[0].finding_statuses_count[3].count).toBe(4);
-      expect(response[0].finding_statuses_count[4].status).toBe('NOT_ANALYZED');
+      expect(response[0].finding_statuses_count[4].status).toBe(
+        `${Config.value('notAnalyzedStatusVal')}`
+      );
       expect(response[0].finding_statuses_count[4].count).toBe(5);
     });
   });
@@ -70,7 +81,7 @@ describe('function getAllDetectedRules', () => {
       axios.get.mockResolvedValueOnce(rules);
 
       const response = await RuleService.getAllDetectedRules(
-        ['NOT_ANALYZED', 'TRUE_POSITIVES'],
+        [`${Config.value('notAnalyzedStatusVal')}`, `${Config.value('truePostiveStatusVal')}`],
         null,
         null,
         null,
@@ -91,7 +102,7 @@ describe('function getAllDetectedRules', () => {
 
       const response = await RuleService.getAllDetectedRules(
         null,
-        ['BITBUCKET', 'AZURE_DEVOPS'],
+        [`${Config.value('bitbucketVal')}`, `${Config.value('azureDevOpsVal')}`],
         null,
         null,
         null,
@@ -190,8 +201,8 @@ describe('function getAllDetectedRules', () => {
       axios.get.mockResolvedValueOnce(rules);
 
       const response = await RuleService.getAllDetectedRules(
-        ['NOT_ANALYZED', 'TRUE_POSITIVES'],
-        ['BITBUCKET', 'AZURE_DEVOPS'],
+        [`${Config.value('notAnalyzedStatusVal')}`, `${Config.value('truePostiveStatusVal')}`],
+        [`${Config.value('bitbucketVal')}`, `${Config.value('azureDevOpsVal')}`],
         'project-A',
         'repository-A',
         '2022-05-01T00:00:00',

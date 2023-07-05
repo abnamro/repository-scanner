@@ -22,35 +22,35 @@ def get_scan(db_connection: Session, scan_id: int) -> model.DBscan:
     return scan
 
 
-def get_latest_scan_for_branch(db_connection: Session, branch_id: int) -> model.DBscan:
+def get_latest_scan_for_repository(db_connection: Session, repository_id: int) -> model.DBscan:
     """
-        Retrieve the most recent scan of a given branch object
+        Retrieve the most recent scan of a given repository object
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        id of the branch object for which to retrieve the most recent scan
+    :param repository_id:
+        id of the repository object for which to retrieve the most recent scan
     :return: scan
-        scan object having the most recent timestamp for a given branch object
+        scan object having the most recent timestamp for a given repository object
     """
     subquery = (db_connection.query(func.max(model.DBscan.timestamp).label("max_time"))
-                .filter(model.scan.DBscan.branch_id == branch_id)).subquery()
+                .filter(model.scan.DBscan.repository_id == repository_id)).subquery()
 
     scan = db_connection.query(model.DBscan) \
         .join(subquery,
               and_(model.DBscan.timestamp == subquery.c.max_time)) \
-        .filter(model.scan.DBscan.branch_id == branch_id).first()
+        .filter(model.scan.DBscan.repository_id == repository_id).first()
 
     return scan
 
 
 def get_scans(db_connection: Session, skip: int = 0,
-              limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT, branch_id: int = -1) -> List[model.DBscan]:
+              limit: int = DEFAULT_RECORDS_PER_PAGE_LIMIT, repository_id: int = -1) -> List[model.DBscan]:
     """
-        Retrieve the scan records, ordered by scan_id and optionally filtered by branch
+        Retrieve the scan records, ordered by scan_id and optionally filtered by repository_id
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        optional int filtering the branch for which to retrieve scans
+    :param repository_id:
+        optional int filtering the repository for which to retrieve scans
     :param skip:
         integer amount of records to skip to support pagination
     :param limit:
@@ -61,27 +61,27 @@ def get_scans(db_connection: Session, skip: int = 0,
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
     query = db_connection.query(model.DBscan)
 
-    if branch_id > 0:
-        query = query.filter(model.DBscan.branch_id == branch_id)
+    if repository_id > 0:
+        query = query.filter(model.DBscan.repository_id == repository_id)
 
     scans = query.order_by(model.scan.DBscan.id_).offset(skip).limit(limit_val).all()
     return scans
 
 
-def get_scans_count(db_connection: Session, branch_id: int = -1) -> int:
+def get_scans_count(db_connection: Session, repository_id: int = -1) -> int:
     """
         Retrieve count of scan records optionally filtered by VCS provider
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        optional int filtering the branch for which to retrieve scans
+    :param repository_id:
+        optional int filtering the repository for which to retrieve scans
     :return: total_count
         count of scans
     """
     query = db_connection.query(func.count(model.DBscan.id_))
 
-    if branch_id > 0:
-        query = query.filter(model.DBscan.branch_id == branch_id)
+    if repository_id > 0:
+        query = query.filter(model.DBscan.repository_id == repository_id)
 
     total_count = query.scalar()
     return total_count
@@ -103,7 +103,7 @@ def create_scan(db_connection: Session, scan: scan_schema.ScanCreate) -> model.D
     db_scan = model.scan.DBscan(
         scan_type=scan.scan_type,
         last_scanned_commit=scan.last_scanned_commit,
-        branch_id=scan.branch_id,
+        repository_id=scan.repository_id,
         timestamp=scan.timestamp,
         increment_number=scan.increment_number,
         rule_pack=scan.rule_pack
@@ -114,14 +114,14 @@ def create_scan(db_connection: Session, scan: scan_schema.ScanCreate) -> model.D
     return db_scan
 
 
-def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_id: int,
-                                                 scan_timestamp: datetime):
+def get_repository_findings_metadata_for_latest_scan(db_connection: Session, repository_id: int,
+                                                     scan_timestamp: datetime):
     """
-        Retrieves the finding metadata for latest scan of a branch from the database
+        Retrieves the finding metadata for latest scan of a repository from the database
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        branch id of the latest scan
+    :param repository_id:
+        repository id of the latest scan
     :param scan_timestamp:
         timestamp of the latest scan
     :return: findings_metadata
@@ -129,7 +129,7 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
     """
     scan_ids_latest_to_base = []
     scans = get_scans(db_connection=db_connection,
-                      branch_id=branch_id, limit=1000000)
+                      repository_id=repository_id, limit=1000000)
     scans.sort(key=lambda x: x.timestamp, reverse=True)
     for scan in scans:
         if scan.timestamp <= scan_timestamp:
@@ -156,8 +156,9 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
             if finding_status == FindingStatus.CLARIFICATION_REQUIRED:
                 clarification_required_count = count
 
-    total_findings_count = true_positive_count + false_positive_count + not_analyzed_count \
-        + under_review_count + clarification_required_count
+    total_findings_count = \
+        true_positive_count + false_positive_count + not_analyzed_count + under_review_count + \
+        clarification_required_count
 
     findings_metadata = {
         "true_positive": true_positive_count,
@@ -171,28 +172,28 @@ def get_branch_findings_metadata_for_latest_scan(db_connection: Session, branch_
     return findings_metadata
 
 
-def delete_branch_findings_not_linked_to_any_scan(db_connection: Session, branch_id: int):
+def delete_repository_findings_not_linked_to_any_scan(db_connection: Session, repository_id: int):
     """
-        Delete findings for a given branch which are not linked to any scans
+        Delete findings for a given repository which are not linked to any scans
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        id of the branch
+    :param repository_id:
+        id of the repository
     """
     sub_query = db_connection.query(model.DBscanFinding.finding_id).distinct()
     db_connection.query(model.DBfinding) \
-        .filter(model.finding.DBfinding.id_.not_in(sub_query), model.finding.DBfinding.branch_id == branch_id) \
+        .filter(model.finding.DBfinding.id_.not_in(sub_query), model.finding.DBfinding.repository_id == repository_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
 
 
-def delete_scan(db_connection: Session, branch_id: int, scan_id: int, delete_related: bool = False):
+def delete_scan(db_connection: Session, repository_id: int, scan_id: int, delete_related: bool = False):
     """
         Delete a scan object
     :param db_connection:
         Session of the database connection
-    :param branch_id:
-        branch id for which findings will be deleted which are not linked to any scans
+    :param repository_id:
+        repository_id for which findings will be deleted which are not linked to any scans
     :param scan_id:
         id of the scan to be deleted
     :param delete_related:
@@ -204,21 +205,7 @@ def delete_scan(db_connection: Session, branch_id: int, scan_id: int, delete_rel
         .filter(model.scan.DBscan.id_ == scan_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
-    delete_branch_findings_not_linked_to_any_scan(db_connection, branch_id=branch_id)
-
-
-def delete_scans_by_branch_id(db_connection: Session, branch_id: int):
-    """
-        Delete scans for a given branch
-    :param db_connection:
-        Session of the database connection
-    :param branch_id:
-        id of the branch
-    """
-    db_connection.query(model.DBscan) \
-        .filter(model.scan.DBscan.branch_id == branch_id) \
-        .delete(synchronize_session=False)
-    db_connection.commit()
+    delete_repository_findings_not_linked_to_any_scan(db_connection, repository_id=repository_id)
 
 
 def delete_scans_by_repository_id(db_connection: Session, repository_id: int):
@@ -230,9 +217,7 @@ def delete_scans_by_repository_id(db_connection: Session, repository_id: int):
         id of the repository
     """
     db_connection.query(model.DBscan) \
-        .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
-                model.repository.DBrepository.id_ == repository_id) \
+        .filter(model.scan.DBscan.repository_id == repository_id) \
         .delete(synchronize_session=False)
     db_connection.commit()
 
@@ -246,8 +231,7 @@ def delete_scans_by_vcs_instance_id(db_connection: Session, vcs_instance_id: int
         id of the vcs instance
     """
     db_connection.query(model.DBscan) \
-        .filter(model.scan.DBscan.branch_id == model.branch.DBbranch.id_,
-                model.branch.DBbranch.repository_id == model.repository.DBrepository.id_,
+        .filter(model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
                 model.repository.DBrepository.vcs_instance == model.vcs_instance.DBVcsInstance.id_,
                 model.vcs_instance.DBVcsInstance.id_ == vcs_instance_id) \
         .delete(synchronize_session=False)

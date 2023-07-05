@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 def clone_repository(repository_url: str,
-                     branch_name: str,
                      repo_clone_path: str,
                      username: str = "",
                      personal_access_token: str = "") -> None:
@@ -20,8 +19,6 @@ def clone_repository(repository_url: str,
         Clones the given repository
     :param repository_url:
         Repository url to clone
-    :param branch_name:
-        Branch name of the repository url to clone
     :param repo_clone_path:
         Path where to clone the repository
     :param username:
@@ -31,5 +28,5 @@ def clone_repository(repository_url: str,
     """
     url = repository_url.replace("https://", "")
     repo_clone_url = f"https://{username}:{personal_access_token}@{url}"
-    Repo.clone_from(repo_clone_url, repo_clone_path, branch=branch_name)
-    logger.debug(f"Repository {repository_url}:{branch_name} cloned successfully")
+    Repo.clone_from(repo_clone_url, repo_clone_path)
+    logger.debug(f"Repository {repository_url} cloned successfully")

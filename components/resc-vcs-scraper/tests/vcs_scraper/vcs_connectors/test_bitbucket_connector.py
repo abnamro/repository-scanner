@@ -34,129 +34,17 @@ def test_export_repository_all_branches():
                             {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
     }
 
-    branches_information = [{"id": "features/1", "displayId": "1", "latestCommit": "ABCDEFG"},
-                            {"id": "/refs/heads/main", "displayId": "main", "latestCommit": "QRSTUVWXYZ"}]
+    latest_commit = "abc123"
 
     vcs_instance_name = "test server"
 
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        result = BitbucketConnector.export_repository(repository_information, branches_information,
-                                                      vcs_instance_name)
+    result = BitbucketConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
 
     assert type(result) is Repository
     assert result.repository_name == "repo1"
     assert result.project_key == "9999"
     assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 2
-    assert result.branches[0].branch_id == "features/1"
-    assert result.branches[0].latest_commit == "ABCDEFG"
-    assert result.branches[1].branch_id == "/refs/heads/main"
-    assert result.branches[1].latest_commit == "QRSTUVWXYZ"
-
-
-def test_export_repository_info_main_branch_only():
-    repository_information = {
-        "project": {"key": "9999"},
-        "name": "repo1",
-        "id": "1234",
-        "links": {"clone": [{"href": "ssh://git@test.com/repo.git", "name": "ssh"},
-                            {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
-    }
-
-    branches_information = [{"id": "/refs/heads/dontscanme1", "displayId": "dontscanme1", "latestCommit": "ABCDEFGH"},
-                            {"id": "/refs/heads/main", "displayId": "main", "latestCommit": "IJKLMNOP"},
-                            {"id": "/refs/heads/dontscanme2", "displayId": "dontscanme2", "latestCommit": "QRSTUVWXYZ"}]
-
-    vcs_instance_name = "test server"
-
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository(repository_information, branches_information,
-                                                      vcs_instance_name)
-
-    assert type(result) is Repository
-    assert result.repository_name == "repo1"
-    assert result.project_key == "9999"
-    assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 1
-    assert result.branches[0].branch_id == "/refs/heads/main"
-    assert result.branches[0].latest_commit == "IJKLMNOP"
-
-
-def test_export_repository_info_main_branch_only_upper_casing():
-    repository_information = {
-        "project": {"key": "9999"},
-        "name": "repo1",
-        "id": "1234",
-        "links": {"clone": [{"href": "ssh://git@test.com/repo.git", "name": "ssh"},
-                            {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
-    }
-
-    branches_information = [{"id": "/refs/heads/MAIN", "displayId": "MAIN", "latestCommit": "IJKLMNOP"},
-                            {"id": "/refs/heads/dontscanme1", "displayId": "dontscanme1", "latestCommit": "ABCDEFGH"},
-                            {"id": "/refs/heads/dontscanme2", "displayId": "dontscanme2", "latestCommit": "QRSTUVWXYZ"}]
-
-    vcs_instance_name = "test server"
-
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository(repository_information, branches_information,
-                                                      vcs_instance_name)
-
-    assert type(result) is Repository
-    assert result.repository_name == "repo1"
-    assert result.project_key == "9999"
-    assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 1
-    assert result.branches[0].branch_id == "/refs/heads/MAIN"
-    assert result.branches[0].latest_commit == "IJKLMNOP"
-
-
-def test_export_repository_info_main_branch_only_no_master():
-    repository_information = {
-        "project": {"key": "9999"},
-        "name": "repo1",
-        "id": "1234",
-        "links": {"clone": [{"href": "ssh://git@test.com/repo.git", "name": "ssh"},
-                            {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
-    }
-
-    branches_information = [{"id": "/refs/heads/dontscanme1", "displayId": "dontscanme1", "latestCommit": "ABCDEFGH"},
-                            {"id": "/refs/heads/dontscanme2", "displayId": "dontscanme2", "latestCommit": "QRSTUVWXYZ"}]
-
-    vcs_instance_name = "test server"
-
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository(repository_information, branches_information,
-                                                      vcs_instance_name)
-
-    assert type(result) is Repository
-    assert result.repository_name == "repo1"
-    assert result.project_key == "9999"
-    assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 0
-
-
-def test_export_repository_info_empty_branches():
-    repository_information = {
-        "project": {"key": "9999"},
-        "name": "repo1",
-        "id": "1234",
-        "links": {"clone": [{"href": "ssh://git@test.com/repo.git", "name": "ssh"},
-                            {"href": "http://test.com/repo.git", "name": "http"}], "self": "bla"}
-    }
-
-    branches_information = []
-
-    vcs_instance_name = "test server"
-
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "true"}):
-        result = BitbucketConnector.export_repository(repository_information, branches_information,
-                                                      vcs_instance_name)
-
-    assert type(result) is Repository
-    assert result.repository_name == "repo1"
-    assert result.project_key == "9999"
-    assert result.vcs_instance_name == "test server"
-    assert len(result.branches) == 0
+    assert result.latest_commit == "abc123"
 
 
 def test_get_clone_url():

@@ -1,10 +1,7 @@
 # pylint: disable=no-name-in-module
+
 # Third Party
 from pydantic import BaseModel, HttpUrl, conint, constr
-from pydantic.types import List
-
-# First Party
-from resc_backend.resc_web_service.schema.branch import Branch
 
 
 class RepositoryBase(BaseModel):
@@ -16,7 +13,7 @@ class RepositoryBase(BaseModel):
 
 
 class Repository(RepositoryBase):
-    branches: List[Branch]
+    pass
 
 
 class RepositoryCreate(RepositoryBase):

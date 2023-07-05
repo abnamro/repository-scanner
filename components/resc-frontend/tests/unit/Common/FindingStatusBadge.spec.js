@@ -1,15 +1,16 @@
 import { mount } from '@vue/test-utils';
 import App from '@/components/Common/FindingStatusBadge';
 import { BBadge } from 'bootstrap-vue';
+import Config from '@/configuration/config';
 
 describe('FindingStatusBadge data-line tests', () => {
   let wrapper;
 
-  const status_notAnalyzed = 'NOT_ANALYZED';
-  const status_underReveiw = 'UNDER_REVIEW';
-  const status_clarificationRequired = 'CLARIFICATION_REQUIRED';
-  const status_truePositive = 'TRUE_POSITIVE';
-  const status_falsePositive = 'FALSE_POSITIVE';
+  const status_notAnalyzed = `${Config.value('notAnalyzedStatusVal')}`;
+  const status_underReveiw = `${Config.value('underReviewStatusVal')}`;
+  const status_clarificationRequired = `${Config.value('clarificationRequiredStatusVal')}`;
+  const status_truePositive = `${Config.value('truePostiveStatusVal')}`;
+  const status_falsePositive = `${Config.value('falsePositiveStatusVal')}`;
 
   function initMountApp(status_type) {
     wrapper = mount(App, {
