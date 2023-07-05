@@ -95,7 +95,7 @@
 #rule-analysis-table th, #scan-findings-table th, #repositories-table th {
   cursor: pointer !important;
 }
-#rule-analysis-table tr, #scan-findings-table tr, #repositories-table tr, #rule-metrics-table tr {
+#rule-analysis-table tr, #scan-findings-table tr, #rule-metrics-table tr {
   cursor: pointer !important;
 }
 #rule-analysis-table .tabs, #scan-findings-table .tabs {
@@ -448,4 +448,10 @@
 .download-button{
   color: #3893e2;
   cursor: pointer;
+}
+.row-unclickable {
+  cursor: not-allowed !important;
+}
+.row-clickable  {
+  cursor: pointer !important;
 }
