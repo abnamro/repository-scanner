@@ -455,10 +455,3 @@
 .row-clickable  {
   cursor: pointer !important;
 }
-.card-box {
-  height: 100px;
-  width: 170px;
-}
-.card-box .card-header {
-  background-color: #e4f9f5;
-}
