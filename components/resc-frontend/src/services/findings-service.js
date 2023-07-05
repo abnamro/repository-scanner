@@ -42,9 +42,6 @@ const FindingsService = {
     if (filter.repository) {
       query_string += `&repository_name=${filter.repository}`;
     }
-    if (filter.branch) {
-      query_string += `&branch_name=${filter.branch}`;
-    }
     if (filter.startDate) {
       query_string += `&start_date_time=${filter.startDate}T00:00:00`;
     }

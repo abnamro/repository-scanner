@@ -88,7 +88,6 @@ export default {
   data() {
     return {
       previousScans: [],
-      branchList: [],
       scanList: [],
       scanDateList: [],
       ruleList: [],
