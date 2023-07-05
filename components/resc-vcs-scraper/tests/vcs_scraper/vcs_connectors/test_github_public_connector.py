@@ -53,8 +53,7 @@ def test_export_repository_all_branches():
     latest_commit = "abc123"
 
     vcs_instance_name = "test server"
-    with mock.patch.dict(os.environ, {"SCAN_ONLY_MASTER_BRANCH": "false"}):
-        result = GithubPublicConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
+    result = GithubPublicConnector.export_repository(repository_information, latest_commit, vcs_instance_name)
 
     assert type(result) is Repository
     assert result.project_key == "project1"

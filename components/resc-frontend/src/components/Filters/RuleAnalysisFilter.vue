@@ -146,7 +146,6 @@ export default {
       selectedStatus: null,
       selectedProject: null,
       selectedRepository: null,
-      selectedBranch: null,
       selectedRule: null,
       selectedRuleTags: null,
       selectedRulePackVersions: [],
@@ -242,7 +241,6 @@ export default {
       filterObj.status = this.selectedStatus;
       filterObj.project = this.selectedProject;
       filterObj.repository = this.selectedRepository;
-      filterObj.branch = this.selectedBranch;
       filterObj.rule = this.selectedRule;
       filterObj.rulePackVersions = rulePackVersions;
       filterObj.ruleTags = this.selectedRuleTags;
@@ -315,7 +313,6 @@ export default {
         filterObj.status = this.selectedStatus;
         filterObj.project = this.selectedProject;
         filterObj.repository = this.selectedRepository;
-        filterObj.branch = this.selectedBranch;
         filterObj.rule = selectedRules;
         filterObj.ruleTags = this.selectedRuleTags;
         filterObj.rulePackVersions = selectedVersions;

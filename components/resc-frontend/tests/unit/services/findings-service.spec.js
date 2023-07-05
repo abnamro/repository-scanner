@@ -51,7 +51,6 @@ describe('function getDetailedFindings', () => {
       filterObj.findingStatus = `${Config.value('notAnalyzedStatusVal')}`;
       filterObj.project = 'ABC';
       filterObj.repository = 'test';
-      filterObj.branch = 'feature1';
       filterObj.rule = 'Hardcoded-Username';
 
       const response = await FindingsService.getDetailedFindings(filterObj);
@@ -79,7 +78,6 @@ describe('function getDetailedFindings', () => {
         filterObj.findingStatus = `${Config.value('notAnalyzedStatusVal')}`;
         filterObj.project = 'ABC';
         filterObj.repository = 'test';
-        filterObj.branch = 'feature1';
         filterObj.rule = 'Hardcoded-Username';
         filterObj.rulePackVersions = '0.0.0';
 
