@@ -38,10 +38,10 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
     """
     limit_val = MAX_RECORDS_PER_PAGE_LIMIT if limit > MAX_RECORDS_PER_PAGE_LIMIT else limit
 
-    # Get latest scan timestamp
-    last_scan_timestamp_sub_query = db_connection.query(func.max(model.DBscan.timestamp)) \
-        .join(model.DBrepository, model.repository.DBrepository.id_ == model.scan.DBscan.repository_id) \
-        .filter(model.DBscan.repository_id == model.DBrepository.id_).scalar_subquery()
+    # Get the latest scan for repository
+    repo_last_scan_sub_query = db_connection.query(model.DBscan.repository_id,
+                                                   func.max(model.DBscan.timestamp).label("max_timestamp"))
+    repo_last_scan_sub_query = repo_last_scan_sub_query.group_by(model.DBscan.repository_id).subquery()
 
     query = db_connection.query(
         model.DBrepository.id_,
@@ -52,12 +52,14 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
         model.DBrepository.vcs_instance,
         model.DBVcsInstance.provider_type,
         func.coalesce(model.DBscan.id_, None).label('last_scan_id'),
-        func.coalesce(model.DBscan.timestamp, None).label('last_scan_timestamp')) \
-        .join(model.DBVcsInstance,
-              model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance) \
-        .outerjoin(model.DBscan,
-                   and_(model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
-                        model.scan.DBscan.timestamp == last_scan_timestamp_sub_query))
+        func.coalesce(model.DBscan.timestamp, None).label('last_scan_timestamp'))
+    query = query.join(model.DBVcsInstance,
+                       model.vcs_instance.DBVcsInstance.id_ == model.repository.DBrepository.vcs_instance)
+    query = query.join(repo_last_scan_sub_query,
+                       model.repository.DBrepository.id_ == repo_last_scan_sub_query.c.repository_id, isouter=True)
+    query = query.join(model.DBscan,
+                       and_(model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
+                            model.scan.DBscan.timestamp == repo_last_scan_sub_query.c.max_timestamp), isouter=True)
 
     if only_if_has_findings:
         max_base_scan_subquery = db_connection.query(model.DBscan.repository_id,

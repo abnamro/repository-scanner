@@ -369,10 +369,10 @@ def get_all_repositories_with_findings_metadata(
 def get_last_scan_for_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> scan_schema.ScanRead:
     """
-        Retrieve the latest scan object related to a branch
+        Retrieve the latest scan object related to a repository
 
     - **db_connection**: Session of the database connection
-    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
+    - **repository_id**: ID of the parent repository object for which scan objects to be retrieved
     - **return**: ScanRead
         The output will contain a ScanRead type object,
         or empty if no scan was found
@@ -399,7 +399,7 @@ def get_scans_for_repository(repository_id: int, skip: int = Query(default=0, ge
         Retrieve all scan objects related to a repository paginated
 
     - **db_connection**: Session of the database connection
-    - **branch_id**: ID of the parent branch object for which scan objects to be retrieved
+    - **repository_id**: ID of the parent repository object for which scan objects to be retrieved
     - **skip**: Integer amount of records to skip to support pagination
     - **limit**: Integer amount of records to return, to support pagination
     - **return**: [ScanRead]
