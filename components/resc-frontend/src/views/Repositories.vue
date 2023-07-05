@@ -36,6 +36,7 @@
         responsive
         small
         head-variant="light"
+        :tbody-tr-class="rowClass"
         @row-clicked="goToScanFindings"
       >
         <!-- Repository Column -->
@@ -156,6 +157,9 @@ export default {
     },
   },
   methods: {
+    rowClass(item) {
+      return item.last_scan_id ? 'row-clickable' : 'row-unclickable';
+    },
     formatDate(timestamp) {
       const date = DateUtils.formatDate(timestamp);
       return timestamp ? date : 'Not Scanned';
