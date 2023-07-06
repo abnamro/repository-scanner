@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 # Third Party
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 
 # First Party
 from resc_backend.constants import (
@@ -15,6 +15,7 @@ from resc_backend.constants import (
     RWS_ROUTE_AUDITED_COUNT_OVER_TIME,
     RWS_ROUTE_COUNT_PER_VCS_PROVIDER_BY_WEEK,
     RWS_ROUTE_METRICS,
+    RWS_ROUTE_PERSONAL_AUDITS,
     RWS_ROUTE_UN_TRIAGED_COUNT_OVER_TIME
 )
 from resc_backend.db.connection import Session
@@ -24,6 +25,8 @@ from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.schema.audit_count_over_time import AuditCountOverTime
 from resc_backend.resc_web_service.schema.finding_count_over_time import FindingCountOverTime
 from resc_backend.resc_web_service.schema.finding_status import FindingStatus
+from resc_backend.resc_web_service.schema.personal_audit_metrics import PersonalAuditMetrics
+from resc_backend.resc_web_service.schema.time_period import TimePeriod
 from resc_backend.resc_web_service.schema.vcs_provider import VCSProviders
 
 router = APIRouter(prefix=f"{RWS_ROUTE_METRICS}", tags=[METRICS_TAG])
@@ -190,3 +193,62 @@ def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db
     sorted_weekly_audit_counts = dict(sorted(weekly_audit_counts.items()))
     output = list(sorted_weekly_audit_counts.values())
     return output
+
+
+@router.get(f"{RWS_ROUTE_PERSONAL_AUDITS}",
+            response_model=PersonalAuditMetrics,
+            summary="Get personal audit metrics",
+            status_code=status.HTTP_200_OK,
+            responses={
+                200: {"description": "Get personal audit metrics"},
+                500: {"description": ERROR_MESSAGE_500},
+                503: {"description": ERROR_MESSAGE_503}
+            })
+def get_personal_audit_metrics(request: Request, db_connection: Session = Depends(get_db_connection)) \
+        -> PersonalAuditMetrics:
+    """
+        Retrieve personal audit metrics
+    - **db_connection**: Session of the database connection
+    - **return**: [DateCountModel]
+        The output will contain a PersonalAuditMetrics type objects
+    """
+    audit_counts = PersonalAuditMetrics()
+    audit_counts.today = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                             auditor=request.user, time_period=TimePeriod.DAY)
+    audit_counts.current_week = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                                    auditor=request.user, time_period=TimePeriod.WEEK)
+    audit_counts.last_week = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                                 auditor=request.user, time_period=TimePeriod.LAST_WEEK)
+    audit_counts.current_month = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                                     auditor=request.user, time_period=TimePeriod.MONTH)
+    audit_counts.current_year = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                                    auditor=request.user, time_period=TimePeriod.YEAR)
+    audit_counts.forever = audit_crud.get_personal_audit_count(db_connection=db_connection,
+                                                               auditor=request.user, time_period=TimePeriod.FOREVER)
+
+    audit_counts.rank_current_week = determine_audit_rank_current_week(auditor=request.user,
+                                                                       db_connection=db_connection)
+    return audit_counts
+
+
+def determine_audit_rank_current_week(auditor: str, db_connection: Session) -> int:
+    """
+        Retrieve personal audit ranking this week, compared to other auditors
+    - **db_connection**: Session of the database connection
+    - **auditor**: id of the auditor
+    - **return**: int
+        The output will be an integer nr of the ranking this week, defaulting to 0 if no audit was done by the auditor
+    """
+    audit_rank = 0
+    audit_counts_db = audit_crud.get_audit_count_by_auditor_over_time(db_connection=db_connection, weeks=1)
+
+    auditor_counts = {}
+    for audit in audit_counts_db:
+        auditor_counts[audit['auditor']] = audit['audit_count']
+
+    sorted_auditor_counts = sorted(auditor_counts.items(), key=lambda x: x[1], reverse=True)
+    for auditor_count in dict(sorted_auditor_counts):
+        audit_rank += 1
+        if auditor_count == auditor:
+            return audit_rank
+    return 0

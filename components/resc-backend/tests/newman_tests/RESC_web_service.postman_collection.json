@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9337674c-4f7e-47f2-b9fd-2ee2166b6420",
+		"_postman_id": "40e2dce5-2c5f-446c-973c-13b166153a09",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -17034,6 +17034,54 @@
 										"v1",
 										"metrics",
 										"audit-count-by-auditor-over-time"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Personal Audit Metrics",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Status is OK\"), function (){",
+											"    pm.response.to.have.property(\"status\",\" OK\")",
+											"}",
+											"",
+											"const responseJson = pm.response.json();",
+											"pm.test(\"Response body matches\", function() {",
+											"    pm.expect(responseJson).to.have.property('today');",
+											"    pm.expect(responseJson).to.have.property('current_week');",
+											"    pm.expect(responseJson).to.have.property('last_week');",
+											"    pm.expect(responseJson).to.have.property('current_month');",
+											"    pm.expect(responseJson).to.have.property('current_year');",
+											"    pm.expect(responseJson).to.have.property('forever');",
+											"    pm.expect(responseJson).to.have.property('rank_current_week');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/resc/v1/metrics/personal-audits",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"resc",
+										"v1",
+										"metrics",
+										"personal-audits"
 									]
 								}
 							},
