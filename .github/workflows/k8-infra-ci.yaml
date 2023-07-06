@@ -23,6 +23,7 @@ on:
 
 env:
   KUBERNETES_INFRA_DIR: deployment/kubernetes
+  KUBE_AUDIT_TAG: 0.22.0
 
 jobs:
   helm-chart-validation:
@@ -58,13 +59,13 @@ jobs:
     - name: Helm Template
       run: |
         cd ${{ env.KUBERNETES_INFRA_DIR }}
-        helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./gitleaks.toml
-
+        helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./gitleaks.toml   
+        
     - name: Run IaC scan using kics
       uses: checkmarx/kics-github-action@v1.6.3
       with:
         path: '${{ env.KUBERNETES_INFRA_DIR }}'
-        exclude_paths: '${{ env.KUBERNETES_INFRA_DIR }}/example-values.yaml'
+        exclude_paths: '${{ env.KUBERNETES_INFRA_DIR }}/example-values.yaml,${{ env.KUBERNETES_INFRA_DIR }}/resc_helm_template.yaml'
         fail_on: high,medium
 
     - name: Run IaC scan using Checkov
@@ -75,6 +76,32 @@ jobs:
         quiet: true
         soft_fail: true
         output_format: json
+    
+    - name: Export RESC Helm Template
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        helm template resc . -f ./example-values.yaml --set-file global.secretScanRulePackConfig=./gitleaks.toml > resc_helm_template.yaml
+ 
+    - name: Install kubeaudit
+      run: |
+       curl -LO https://github.com/Shopify/kubeaudit/releases/download/v${{env.KUBE_AUDIT_TAG}}/kubeaudit_${{env.KUBE_AUDIT_TAG}}_linux_amd64.tar.gz
+       tar -xzvf kubeaudit_${{env.KUBE_AUDIT_TAG}}_linux_amd64.tar.gz
+       mv kubeaudit /usr/local/bin/
+
+    - name: Run Kubeaudit Scan
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        kubeaudit all -f resc_helm_template.yaml
+         
+    - name: Install Datree
+      run: |
+        curl https://get.datree.io | /bin/bash
+
+    - name: Run Datree Scan
+      run: |
+        cd ${{ env.KUBERNETES_INFRA_DIR }}
+        datree test resc_helm_template.yaml --only-k8s-files --no-record --verbose
+        echo $?
 
   release-charts:
     name: Release Charts
