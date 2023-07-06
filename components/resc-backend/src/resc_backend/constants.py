@@ -23,6 +23,7 @@ RWS_ROUTE_RULE_PACKS = "/rule-packs"
 RWS_ROUTE_VCS = "/vcs-instances"
 
 
+RWS_ROUTE_PERSONAL_AUDITS = "/personal-audits"
 RWS_ROUTE_AUDIT_COUNT_BY_AUDITOR_OVER_TIME = "/audit-count-by-auditor-over-time"
 RWS_ROUTE_AUDITED_COUNT_OVER_TIME = "/audited-count-over-time"
 RWS_ROUTE_UN_TRIAGED_COUNT_OVER_TIME = "/un-triaged-count-over-time"
