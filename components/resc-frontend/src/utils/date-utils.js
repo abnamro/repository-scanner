@@ -14,6 +14,17 @@ const DateUtils = {
       minute: '2-digit',
     });
   },
+
+  getCurrentMonth() {
+    const currentMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
+    return currentMonth;
+  },
+
+  getCurrentYear() {
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    return currentYear;
+  },
 };
 
 export default DateUtils;
