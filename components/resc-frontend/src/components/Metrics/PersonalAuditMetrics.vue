@@ -153,23 +153,19 @@ export default {
     isDecimal(number) {
       return number % 1 !== 0;
     },
-    formatPercentageChange(percentage) {
-      return this.isDecimal(percentage) ? percentage.toFixed(2) : percentage.toLocaleString();
-    },
-    formatWeeklyRankLabel(rank) {
-      return rank ? this.convertToRank(rank) : 'No Activity';
-    },
     calculateAuditTrendInPercentage() {
-      let percentageChange = 0;
-      if (!this.currentWeekAuditCount && !this.lastWeekAuditCount) {
+      let percentageChange =
+        ((this.currentWeekAuditCount - this.lastWeekAuditCount) / this.lastWeekAuditCount) * 100;
+
+      if (isNaN(percentageChange)) {
         percentageChange = 0;
-      } else if (!this.lastWeekAuditCount && this.currentWeekAuditCount) {
-        percentageChange = 100;
-      } else {
-        percentageChange =
-          ((this.currentWeekAuditCount - this.lastWeekAuditCount) / this.lastWeekAuditCount) * 100;
       }
-      percentageChange = this.formatPercentageChange(percentageChange);
+
+      if (this.isDecimal(percentageChange)) {
+        percentageChange = percentageChange.toFixed(2);
+      } else {
+        percentageChange = percentageChange.toLocaleString();
+      }
 
       if (percentageChange < 0) {
         this.currentWeekAuditTrendIcon = 'arrow-down';
@@ -182,24 +178,24 @@ export default {
       }
       return `${percentageChange}%`;
     },
-    setIconsForAuditRank(rank) {
-      if (rank === 0) {
+    setIconsForAuditRank() {
+      if (this.weeklyRankValue === 0) {
         this.weeklyRankIcon = 'thumbs-down';
         this.weeklyRankIconColor = 'red';
         this.weeklyRankContentColor = 'red';
         this.weeklyRankValue = 'No Activity';
-      } else if (rank === 1) {
+      } else if (this.weeklyRankValue === 1) {
         this.weeklyRankIcon = 'trophy';
-        this.weeklyRankIconColor = '#FFC107';
-        this.weeklyRankContentColor = '#FFC107';
-      } else if (rank === 2) {
+        this.weeklyRankIconColor = '#F9DB08';
+        this.weeklyRankContentColor = '#2c3e50';
+      } else if (this.weeklyRankValue === 2) {
         this.weeklyRankIcon = 'medal';
         this.weeklyRankIconColor = '#B87333';
-        this.weeklyRankContentColor = '#B87333';
-      } else if (rank === 3) {
+        this.weeklyRankContentColor = '#2c3e50';
+      } else if (this.weeklyRankValue === 3) {
         this.weeklyRankIcon = 'award';
         this.weeklyRankIconColor = '#00BFFF';
-        this.weeklyRankContentColor = '#00BFFF';
+        this.weeklyRankContentColor = '#2c3e50';
       }
     },
     convertToRank(number) {
@@ -235,10 +231,10 @@ export default {
           this.currentYearAuditCount = response.data.current_year;
           this.allTimeAuditCount = response.data.forever;
           this.weeklyRankValue = response.data.rank_current_week;
-          this.weeklyRankLabel = this.formatWeeklyRankLabel(this.weeklyRankValue);
+          this.weeklyRankLabel = this.convertToRank(this.weeklyRankValue);
 
           this.currentWeekAuditTrendPercentageCount = this.calculateAuditTrendInPercentage();
-          this.setIconsForAuditRank(this.weeklyRankValue);
+          this.setIconsForAuditRank();
           this.hideSpinner();
         })
         .catch((error) => {
