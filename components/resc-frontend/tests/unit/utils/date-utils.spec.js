@@ -28,3 +28,19 @@ describe('function formatDate', () => {
     expect(formattedDate).toBe('May 19, 2022, 02:47 PM');
   });
 });
+
+describe('function getCurrentMonth', () => {
+  it('getCurrentMonth', async () => {
+    const currentMonth = DateUtils.getCurrentMonth();
+    expect(currentMonth).toBeDefined();
+    expect(currentMonth).toBe(new Date().toLocaleString('default', { month: 'long' }));
+  });
+});
+
+describe('function getCurrentYear', () => {
+  it('getCurrentYear', async () => {
+    const currentYear = DateUtils.getCurrentYear();
+    expect(currentYear).toBeDefined();
+    expect(currentYear).toBe(new Date().getFullYear());
+  });
+});

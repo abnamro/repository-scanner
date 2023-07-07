@@ -33,6 +33,13 @@ import {
   faDownload,
   faCheckCircle,
   faTimesCircle,
+  faArrowUp,
+  faArrowDown,
+  faTrophy,
+  faInfoCircle,
+  faThumbsDown,
+  faMedal,
+  faAward,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -53,7 +60,14 @@ library.add(
   faShieldAlt,
   faDownload,
   faCheckCircle,
-  faTimesCircle
+  faTimesCircle,
+  faArrowUp,
+  faArrowDown,
+  faTrophy,
+  faInfoCircle,
+  faThumbsDown,
+  faMedal,
+  faAward
 );
 
 Vue.config.productionTip = false;
