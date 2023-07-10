@@ -20,7 +20,7 @@
       <template #default>
         <div class="d-flex align-items-center justify-content-center font-weight-bold">
           <h5 class="mb-0 mr-2 mt-2 justify-content-center text-center" :style="contentStyle">
-            {{ cardBodyContent.toLocaleString() }}
+            {{ formatCardBodyContent }}
           </h5>
           <font-awesome-icon
             v-if="contentIconDefinition"
@@ -98,6 +98,9 @@ export default {
     },
     contentIconDefinition() {
       return this.contentIcon ? ['fas', this.contentIcon] : null;
+    },
+    formatCardBodyContent() {
+      return this.cardBodyContent ? this.cardBodyContent.toLocaleString() : 0;
     },
   },
   watch: {
