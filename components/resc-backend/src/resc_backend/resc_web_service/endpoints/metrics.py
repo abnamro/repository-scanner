@@ -187,8 +187,9 @@ def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db
     # set the counts based on the data from the database
     for audit in audit_counts:
         audit_week = f"{audit['year']} W{audit['week']:02d}"
-        weekly_audit_counts.get(audit_week).audit_by_auditor_count[audit['auditor']] = audit['audit_count']
-        weekly_audit_counts.get(audit_week).total += audit['audit_count']
+        if audit_week in weekly_audit_counts:
+            weekly_audit_counts.get(audit_week).audit_by_auditor_count[audit['auditor']] = audit['audit_count']
+            weekly_audit_counts.get(audit_week).total += audit['audit_count']
 
     sorted_weekly_audit_counts = dict(sorted(weekly_audit_counts.items()))
     output = list(sorted_weekly_audit_counts.values())
