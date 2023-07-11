@@ -261,6 +261,8 @@ Examples:
 ```bash
 docker pull mcr.microsoft.com/azure-sql-edge:1.0.5
 
+docker pull redis:7.0.11-alpine
+
 docker pull rabbitmq:3.11.9-management-alpine
 
 docker pull rescabnamro/resc-backend:latest

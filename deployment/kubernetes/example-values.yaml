@@ -3,6 +3,8 @@ global:
   rulePackVersion: "1.0.0" # Default rule pack version set to 1.0.0, increment the version for any rule pack change
   authenticationEnabled: "false"
   enableInClusterRabbitMqMgmt: "true"
+  enableInClusterRedis: "true"
+  enableRedisCache: "true"
   resc:
     image:
       repository: rescabnamro/
@@ -106,6 +108,17 @@ resc-rabbitmq:
       queues_password: "Y0urStr0ngPassword" # <enter queue password, default to Y0urStr0ngPassword>
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq" # "<enter path to store rabbitmq data>" # Linux: /Users/<username>/var/resc/rabbitmq, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq
   filemountType: "windows" # possible values windows/linux/azure
+
+resc-redis:
+  redis:
+    exposeToHostPort: 32379
+    config:
+      port: 6379
+      password: "Y0urStr0ngPassword"
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
 
 resc-vcs-instances:
   vcsInstances:

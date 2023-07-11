@@ -31,3 +31,5 @@ dependencies:
       version: "1.0.0"
     - name: resc-rules-init
       version: "1.0.0"
+    - name: resc-redis
+      version: "1.0.0"
