@@ -5,10 +5,8 @@ import os
 from redis import asyncio as aioredis
 
 # Third Party
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware import Middleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from tenacity import RetryError
@@ -25,7 +23,8 @@ from resc_backend.resc_web_service.configuration import (
     RESC_REDIS_CACHE_ENABLE,
     RESC_REDIS_SERVICE_HOST,
     RESC_REDIS_PORT,
-    REDIS_PASSWORD,)
+    REDIS_PASSWORD
+)
 from resc_backend.resc_web_service.dependencies import (
     check_db_initialized,
     requires_auth,
@@ -142,10 +141,8 @@ app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
 app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX)
 
-
 # Apply the security headers to the app in the form of middleware
 app.middleware("http")(add_security_headers)
-
 
 # Add exception handlers
 add_exception_handlers(app=app)

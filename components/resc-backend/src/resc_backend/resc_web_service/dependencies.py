@@ -13,7 +13,18 @@ from jwt import PyJWKClient
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # First Party
-from resc_backend.constants import RESC_OPERATOR_ROLE
+from resc_backend.constants import (
+    CACHE_CONTROL,
+    CONTENT_SECURITY_POLICY,
+    CROSS_ORIGIN_RESOURCE_POLICY,
+    REFERRER_POLICY,
+    RESC_OPERATOR_ROLE,
+    STRICT_TRANSPORT_SECURITY,
+    X_CONTENT_TYPE_OPTIONS,
+    X_FRAME_OPTIONS,
+    X_PERMITTED_CROSS_DOMAIN_POLICIES,
+    X_XSS_PROTECTION
+)
 from resc_backend.db.connection import Session, engine
 from resc_backend.db.model import DBfinding, DBrepository, DBrule, DBscan, DBscanFinding
 
@@ -89,17 +100,15 @@ async def add_security_headers(request: Request, call_next):
         Function that is used to add several security headers to the API
     """
     security_headers = {
-        "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-        "Cache-Control": "no-cache, no-store",
-        "Cross-Origin-Resource-Policy": "same-site",
-        "Referrer-Policy": "same-origin",
-        "X-Permitted-Cross-Domain-Policies": "none",
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "X-XSS-Protection": "1; mode=block",
-        "Content-Security-Policy": "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self' data:;"
-                                   " style-src 'self' https://fonts.googleapis.com 'unsafe-inline';"
-                                   " frame-ancestors 'self'; form-action 'self';"
+        "Strict-Transport-Security": STRICT_TRANSPORT_SECURITY,
+        "Cache-Control": CACHE_CONTROL,
+        "Cross-Origin-Resource-Policy": CROSS_ORIGIN_RESOURCE_POLICY,
+        "Referrer-Policy": REFERRER_POLICY,
+        "X-Permitted-Cross-Domain-Policies": X_PERMITTED_CROSS_DOMAIN_POLICIES,
+        "X-Content-Type-Options": X_CONTENT_TYPE_OPTIONS,
+        "X-Frame-Options": X_FRAME_OPTIONS,
+        "X-XSS-Protection": X_XSS_PROTECTION,
+        "Content-Security-Policy": CONTENT_SECURITY_POLICY
     }
     response = await call_next(request)
     for header, value in security_headers.items():
