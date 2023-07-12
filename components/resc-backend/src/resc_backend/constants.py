@@ -73,7 +73,7 @@ ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
 ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"
 
 # Redis Cache
-REDIS_CACHE_EXPIRE = 60*60*24
+REDIS_CACHE_EXPIRE = 60*60*24  # set to 24 hours
 
 # HTTP Security Response Headers
 STRICT_TRANSPORT_SECURITY = "max-age=31536000; includeSubDomains; preload"

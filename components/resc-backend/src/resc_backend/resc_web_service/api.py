@@ -20,9 +20,8 @@ from resc_backend.db.connection import Session, engine
 from resc_backend.helpers.environment_wrapper import validate_environment
 from resc_backend.resc_web_service.configuration import (
     REQUIRED_ENV_VARS,
-    RESC_REDIS_CACHE_ENABLE,
     RESC_REDIS_SERVICE_HOST,
-    RESC_REDIS_PORT,
+    RESC_REDIS_SERVICE_PORT,
     REDIS_PASSWORD
 )
 from resc_backend.resc_web_service.dependencies import (
@@ -45,7 +44,11 @@ from resc_backend.resc_web_service.endpoints import (
 )
 from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
 
-env_variables = validate_environment(REQUIRED_ENV_VARS)
+# Check if cache is enabled
+cache_enabled = os.getenv('RESC_REDIS_CACHE_ENABLE', 'false')
+cache_enabled = cache_enabled.lower() in ["true", 1]
+if cache_enabled:
+    env_variables = validate_environment(REQUIRED_ENV_VARS)
 
 
 def generate_logger_config(log_file_path, debug=True):
@@ -159,12 +162,9 @@ def cache_key_builder(func, namespace: str = "", *, request=None, response=None,
 
 @app.on_event("startup")
 def app_startup():
-    cache_enabled = f"{env_variables[RESC_REDIS_CACHE_ENABLE]}"
-    cache_enabled = cache_enabled.lower() in ["true", 1]
-
     if cache_enabled:
         host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
-        port = f"{env_variables[RESC_REDIS_PORT]}"
+        port = f"{env_variables[RESC_REDIS_SERVICE_PORT]}"
         password = f"{env_variables[REDIS_PASSWORD]}"
         redis_cache = aioredis.from_url(f"redis://{host}:{port}", password=password)
         FastAPICache.init(RedisBackend(redis_cache),
