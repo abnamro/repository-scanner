@@ -247,7 +247,7 @@ def determine_audit_rank_current_week(auditor: str, db_connection: Session) -> i
         The output will be an integer nr of the ranking this week, defaulting to 0 if no audit was done by the auditor
     """
     audit_rank = 0
-    audit_counts_db = audit_crud.get_audit_count_by_auditor_over_time(db_connection=db_connection, weeks=1)
+    audit_counts_db = audit_crud.get_audit_count_by_auditor_over_time(db_connection=db_connection, weeks=0)
 
     auditor_counts = {}
     for audit in audit_counts_db:
