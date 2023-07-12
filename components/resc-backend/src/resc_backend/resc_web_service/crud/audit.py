@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timedelta
 
 # Third Party
-from sqlalchemy import extract, func
+from sqlalchemy import and_, extract, func, or_
 from sqlalchemy.engine import Row
 from sqlalchemy.orm import Session
 
@@ -101,7 +101,9 @@ def get_audit_count_by_auditor_over_time(db_connection: Session, weeks: int = 13
                                 extract('week', model.DBaudit.timestamp).label("week"),
                                 model.DBaudit.auditor,
                                 func.count(model.DBaudit.id_).label("audit_count")) \
-        .filter(model.DBaudit.timestamp >= last_nth_week_date_time) \
+        .filter(or_(extract('year', model.DBaudit.timestamp) > extract('year', last_nth_week_date_time),
+                and_(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time),
+                extract('week', model.DBaudit.timestamp) >= extract('week', last_nth_week_date_time)))) \
         .group_by(extract('year', model.DBaudit.timestamp).label("year"),
                   extract('week', model.DBaudit.timestamp).label("week"),
                   model.DBaudit.auditor) \
