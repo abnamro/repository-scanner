@@ -12,7 +12,7 @@ REQUIRED_ENV_VARS = [
     EnvironmentVariable(
         RESC_REDIS_CACHE_ENABLE,
         "The REDIS authentication secret.",
-        required=True,
+        default=False,
     )
 ]
 

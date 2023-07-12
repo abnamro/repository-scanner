@@ -163,7 +163,9 @@ def cache_key_builder(func, namespace: str = "", *, request=None, response=None,
 @app.on_event("startup")
 def app_startup():
     cache_enabled = f"{env_variables[RESC_REDIS_CACHE_ENABLE]}"
-    if cache_enabled is True:
+    cache_enabled = cache_enabled.lower() in ["true", 1]
+
+    if cache_enabled:
         host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
         port = f"{env_variables[RESC_REDIS_PORT]}"
         password = f"{env_variables[REDIS_PASSWORD]}"
@@ -173,6 +175,9 @@ def app_startup():
                           key_builder=cache_key_builder,
                           enable=cache_enabled,
                           )
+    else:
+        FastAPICache.init(backend=None, enable=cache_enabled)
+
     try:
         _ = Session(bind=engine)
         check_db_initialized()
