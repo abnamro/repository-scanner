@@ -58,7 +58,7 @@ def get_repositories(db_connection: Session, vcs_providers: [VCSProviders] = Non
     query = query.join(repo_last_scan_sub_query,
                        model.repository.DBrepository.id_ == repo_last_scan_sub_query.c.repository_id, isouter=True)
     query = query.join(model.DBscan,
-                       and_(model.scan.DBscan.repository_id == model.repository.DBrepository.id_,
+                       and_(model.scan.DBscan.repository_id == repo_last_scan_sub_query.c.repository_id,
                             model.scan.DBscan.timestamp == repo_last_scan_sub_query.c.max_timestamp), isouter=True)
 
     if only_if_has_findings:
