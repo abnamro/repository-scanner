@@ -119,7 +119,7 @@ make clean
 
 - Pull the docker image from registry:  
 ```bash
-docker pull rescabnamro/resc-backend:1.0.0
+docker pull rescabnamro/resc-backend:latest
 ```
 
 - Alternatively, build the docker image locally by running following command:
@@ -130,13 +130,13 @@ docker pull rescabnamro/resc-backend:1.0.0
   Update MSSQL_PASSWORD value in the docker run command.  
 
 ```bash
-docker build -t rescabnamro/resc-backend:1.0.0 .
+docker build -t rescabnamro/resc-backend:latest .
 ```
 
 - Use the following command to run the RESC backend: 
 ```bash
 source db.env
-docker run -p 8000:8000 -e DB_CONNECTION_STRING -e MSSQL_ODBC_DRIVER -e MSSQL_USERNAME -e AUTHENTICATION_REQUIRED -e MSSQL_DB_HOST="host.docker.internal" -e MSSQL_PASSWORD="<enter password for local database>" -e MSSQL_SCHEMA="master" -e MSSQL_DB_PORT=30880 --name resc-backend rescabnamro/resc-backend:1.0.0 uvicorn resc_backend.resc_web_service.api:app --workers 1 --host 0.0.0.0 --port 8000
+docker run -p 8000:8000 -e DB_CONNECTION_STRING -e MSSQL_ODBC_DRIVER -e MSSQL_USERNAME -e RESC_REDIS_CACHE_ENABLE -e AUTHENTICATION_REQUIRED -e MSSQL_DB_HOST="host.docker.internal" -e MSSQL_PASSWORD="<enter password for local database>" -e MSSQL_SCHEMA="master" -e MSSQL_DB_PORT=30880 --name resc-backend rescabnamro/resc-backend:latest uvicorn resc_backend.resc_web_service.api:app --workers 1 --host 0.0.0.0 --port 8000
 ```
 
 Open http://127.0.0.1:8000 in a browser to access the API.
@@ -170,7 +170,7 @@ If you can override the images by providing below arguments to the script.
 cd tests/newman_tests
 ./run_newman_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -n <newman image:tag> 
 
-Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
 ```
 
 ### Run OWASP ZAP API Security tests locally:
@@ -185,7 +185,7 @@ If you can override the images by providing below arguments to the script.
 cd tests/zap_tests
 ./run_run_zap_api_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -z <zap image:tag>
 
-Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:1.0.1' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'owasp/zap2docker-weekly'
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'owasp/zap2docker-weekly'
 ```
 
 

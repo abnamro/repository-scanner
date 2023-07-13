@@ -73,4 +73,18 @@ ERROR_MESSAGE_500 = "Internal server error. Contact your system administrator"
 ERROR_MESSAGE_503 = "Unable to communicate with DataBase, Please contact your system administrator"
 
 # Redis Cache
-REDIS_CACHE_EXPIRE = 60*60*24
+REDIS_CACHE_EXPIRE = 60*60*24  # set to 24 hours
+
+# HTTP Security Response Headers
+STRICT_TRANSPORT_SECURITY = "max-age=31536000; includeSubDomains; preload"
+CACHE_CONTROL = "no-cache, no-store"
+CROSS_ORIGIN_RESOURCE_POLICY = "same-site"
+REFERRER_POLICY = "same-origin"
+X_PERMITTED_CROSS_DOMAIN_POLICIES = "none"
+X_CONTENT_TYPE_OPTIONS = "nosniff"
+X_FRAME_OPTIONS = "DENY"
+X_XSS_PROTECTION = "1; mode=block"
+CONTENT_SECURITY_POLICY = "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; " \
+                          "connect-src 'self'; img-src 'self' https://fastapi.tiangolo.com data:;style-src " \
+                          "'self' https://fonts.googleapis.com https://cdn.jsdelivr.net 'unsafe-inline';" \
+                          "frame-ancestors 'self'; form-action 'self';"

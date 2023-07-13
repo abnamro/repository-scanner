@@ -93,6 +93,7 @@ components of RESC.
 * [![Helm][Helm.sh]][Helm-url]
 * [![Vue][Vue.js]][Vue-url]
 * [![RabbitMQ][RabbitMQ.com]][RabbitMQ-url]
+* [![Redis][Redis.com]][Redis-url]
 
 ### VCS Scanner Worker flow diagram
 The flow diagram below shows the different stages that a VCS Scanner Worker goes through and the choices it is confronted with to
@@ -149,6 +150,8 @@ The Repository Scanner (RESC) Tool is licensed under the [MIT](https://github.co
 [Vue-url]: https://vuejs.org/
 [RabbitMQ.com]: https://img.shields.io/badge/RabbitMQ-ff6600?style=for-the-badge&logo=rabbitmq&logoColor=white
 [RabbitMQ-url]: https://rabbitmq.com/
+[Redis.com]: https://img.shields.io/badge/redis-%23DD0031.svg?&style=for-the-badge&logo=redis&logoColor=white
+[Redis-url]: https://redis.com/
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/zricethezav/gitleaks), we want to give Zachary Rice credits for creating and maintaining GitLeaks. GitLeaks has helped many organizations in securing their codebases for any leaked secrets.
