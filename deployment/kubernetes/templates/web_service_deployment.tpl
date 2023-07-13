@@ -14,6 +14,9 @@ spec:
     metadata:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
+        {{- with include "resc.rescWebserviceAnnotations" .}}
+          {{- nindent 8 .}}
+        {{- end }}
         container.apparmor.security.beta.kubernetes.io/resc-api: unconfined
       labels:
         {{ if .Values.additionalLabels }}
