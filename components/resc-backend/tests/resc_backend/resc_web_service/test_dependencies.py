@@ -6,31 +6,34 @@ import pytest
 from tenacity import RetryError, stop_after_attempt
 
 # First Party
-from resc_backend.constants import RESC_OPERATOR_ROLE
-from resc_backend.resc_web_service.dependencies import check_db_initialized, user_has_resc_operator_role
+from resc_backend.resc_web_service.dependencies import check_db_initialized, user_is_authorized
 
 
 # Tests how the method responds to a person with the correct role; RESC_OPERATOR_ROLE
 def test_correct_user_role():
-    claims = {"roles": RESC_OPERATOR_ROLE}
-    assert user_has_resc_operator_role(claims)
+    claims = {"roles": "OPERATOR"}
+    env_variables = {"SSO_JWT_CLAIM_KEY_AUTHORIZATION": "roles", "SSO_JWT_CLAIM_VALUE_AUTHORIZATION": "OPERATOR"}
+    assert user_is_authorized(claims, env_variables)
 
 
 # Tests how the method responds to a person with the incorrect role; PCP_OPERATOR_ROLE
 def test_incorrect_user_role():
     claims = {"roles": "Invalid role"}
-    assert not user_has_resc_operator_role(claims)
+    env_variables = {"SSO_JWT_CLAIM_KEY_AUTHORIZATION": "roles", "SSO_JWT_CLAIM_VALUE_AUTHORIZATION": "OPERATOR"}
+    assert not user_is_authorized(claims, env_variables)
 
 
 # Tests how the method responds to an empty role; " "
 def test_empty_user_role():
     claims = {"roles": ""}
-    assert not user_has_resc_operator_role(claims)
+    env_variables = {"SSO_JWT_CLAIM_KEY_AUTHORIZATION": "roles", "SSO_JWT_CLAIM_VALUE_AUTHORIZATION": "OPERATOR"}
+    assert not user_is_authorized(claims, env_variables)
 
 
 def test_no_claims():
     claims = {}
-    assert not user_has_resc_operator_role(claims)
+    env_variables = {"SSO_JWT_CLAIM_KEY_AUTHORIZATION": "roles", "SSO_JWT_CLAIM_VALUE_AUTHORIZATION": "OPERATOR"}
+    assert not user_is_authorized(claims, env_variables)
 
 
 @patch("logging.Logger.error")
