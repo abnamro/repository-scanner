@@ -29,7 +29,7 @@
 The Repository Scanner (RESC) is a tool used to detect secrets in source code management and version control systems 
 (e.g. GitHub, BitBucket, or Azure DevOps). Among the types of secrets that the Repository Scanner detects are credentials, 
 passwords, tokens, API keys, and certificates. The tool is maintained and updated by the ABN AMRO Bank to match the 
-constantly changing cyber security landscape. 
+constantly changing cyber-security landscape. 
 
 The Repository Scanner was created to prevent that credentials and other sensitive information are left unprotected in code repositories.
 Exposing sensitive information in such a way can have severe consequences for the security posture of an organization. An attacker can use 
@@ -43,6 +43,7 @@ instances of exposed sensitive information in the source code.
 * [Versions](#versions)
 * [Technical information](#technical-information)
 * [Getting started](#getting-started)
+* [Dummy data generation](#dummy-data-generation)
 * [Contributing guidelines](#contribution-guide)
 * [Contact](#contact)
 * [License](#license)
@@ -81,7 +82,7 @@ Every notable release of the Repository Scanner tool, the changes that come with
     * Complete overview of the found secrets through the User Interface with a direct link to the issue.
     * Able to sort the findings by secret type (tokens, certificates, passwords, etc.).
     * A statistics page that gives an overview of findings and how they increase/decrease monthly along with the amount of times a finding appears.
-    * The ability to import your own rulepack with custom rules to fit your personal means.
+    * The ability to import your own rule-pack with custom rules to fit your personal means.
 
 ## 🛠️ Technical information <a name = "technical-information"></a>
 The technologies that the Repository Scanner Tool is built on is listed below. There is also a list with direct links to the individual
@@ -126,6 +127,8 @@ The instructions below help you to get a copy of the project up and running on y
 [RESC-VCS-SCANNER](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner)  
 [RESC-FRONTEND](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend)  
 
+##  Dummy data generation <a name = "dummy-data-generation-guide"></a>
+A standalone utility to generate dummy data for testing purposes is located at ./components/resc_backend/src/resc_backend/bin/dummy-data-generator. More details can be found [here](./components/resc-backend/src/resc_backend/bin/dummy-data-generator/README.md)
 
 ## 💁🏽 Contributing guidelines <a name = "contribution-guide"></a>
 We believe that innovating together can lead to the most incredible results and developments. Contributions to the Repository Scanner tool are therefore highly encouraged. We have created [guidelines](https://github.com/abnamro/repository-scanner/blob/main/contributing.md) that we expect contributors to the project to follow.  By contributing to the project you also agree with our [Code of Conduct](https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md).
