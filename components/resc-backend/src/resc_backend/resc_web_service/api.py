@@ -19,10 +19,15 @@ from resc_backend.constants import RWS_VERSION_PREFIX
 from resc_backend.db.connection import Session, engine
 from resc_backend.helpers.environment_wrapper import validate_environment
 from resc_backend.resc_web_service.configuration import (
-    REQUIRED_ENV_VARS,
+    AUTHENTICATION_REQUIRED,
+    CONDITIONAL_REDIS_ENV_VARS,
+    CORS_ALLOWED_DOMAINS,
+    ENABLE_CORS,
+    REDIS_PASSWORD,
+    RESC_REDIS_CACHE_ENABLE,
     RESC_REDIS_SERVICE_HOST,
     RESC_REDIS_SERVICE_PORT,
-    REDIS_PASSWORD
+    WEB_SERVICE_ENV_VARS
 )
 from resc_backend.resc_web_service.dependencies import (
     check_db_initialized,
@@ -44,11 +49,8 @@ from resc_backend.resc_web_service.endpoints import (
 )
 from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
 
-# Check if cache is enabled
-cache_enabled = os.getenv('RESC_REDIS_CACHE_ENABLE', 'false')
-cache_enabled = cache_enabled.lower() in ["true", 1]
-if cache_enabled:
-    env_variables = validate_environment(REQUIRED_ENV_VARS)
+# Check and load environment variables
+env_variables = validate_environment(WEB_SERVICE_ENV_VARS)
 
 
 def generate_logger_config(log_file_path, debug=True):
@@ -115,7 +117,8 @@ tags_metadata = [
 ]
 
 # Check if authentication is required for api endpoints
-AUTH = [Depends(requires_no_auth)] if os.getenv('AUTHENTICATION_REQUIRED', '') == 'false' else [Depends(requires_auth)]
+auth_disabled = env_variables[AUTHENTICATION_REQUIRED].lower() in ["false"]
+AUTH = [Depends(requires_no_auth)] if auth_disabled else [Depends(requires_auth)]
 
 app = FastAPI(title="Repository Scanner (RESC)",
               description="RESC API helps you to perform several operations upon findings "
@@ -123,8 +126,8 @@ app = FastAPI(title="Repository Scanner (RESC)",
               version=get_package_version(),
               openapi_tags=tags_metadata, dependencies=AUTH)
 
-if os.getenv('ENABLE_CORS', '') == 'true':
-    origins = os.getenv('CORS_ALLOWED_DOMAINS', '').split(', ')
+if env_variables[ENABLE_CORS].lower() in ["true"]:
+    origins = env_variables[CORS_ALLOWED_DOMAINS].split(', ')
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -162,11 +165,14 @@ def cache_key_builder(func, namespace: str = "", *, request=None, response=None,
 
 @app.on_event("startup")
 def app_startup():
+    # Check if cache is enabled
+    cache_enabled = env_variables[RESC_REDIS_CACHE_ENABLE].lower() in ["true"]
     if cache_enabled:
-        host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
-        port = f"{env_variables[RESC_REDIS_SERVICE_PORT]}"
-        password = f"{env_variables[REDIS_PASSWORD]}"
-        redis_cache = aioredis.from_url(f"redis://{host}:{port}", password=password)
+        env_variables.update(validate_environment(CONDITIONAL_REDIS_ENV_VARS))
+        redis_host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
+        redis_port = f"{env_variables[RESC_REDIS_SERVICE_PORT]}"
+        redis_password = f"{env_variables[REDIS_PASSWORD]}"
+        redis_cache = aioredis.from_url(f"redis://{redis_host}:{redis_port}", password=redis_password)
         FastAPICache.init(RedisBackend(redis_cache),
                           prefix="resc-cache",
                           key_builder=cache_key_builder,
