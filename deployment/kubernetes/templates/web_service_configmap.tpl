@@ -27,6 +27,21 @@ data:
   {{ if .Values.resc.ssoConfig.ssoAccessTokenJwksUrl }}
   SSO_ACCESS_TOKEN_JWKS_URL: {{ .Values.resc.ssoConfig.ssoAccessTokenJwksUrl }}
   {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtSignAlgorithm }}
+  SSO_JWT_SIGN_ALGORITHM: {{ .Values.resc.ssoConfig.ssoJwtSignAlgorithm }}
+  {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtRequiredClaims }}
+  SSO_JWT_REQUIRED_CLAIMS: {{ .Values.resc.ssoConfig.ssoJwtRequiredClaims }}
+  {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtClaimKeyUserId }}
+  SSO_JWT_CLAIM_KEY_USER_ID: {{ .Values.resc.ssoConfig.ssoJwtClaimKeyUserId }}
+  {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtClaimKeyAuthorization }}
+  SSO_JWT_CLAIM_KEY_AUTHORIZATION: {{ .Values.resc.ssoConfig.ssoJwtClaimKeyAuthorization }}
+  {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtClaimValueAuthorization }}
+  SSO_JWT_CLAIM_VALUE_AUTHORIZATION: {{ .Values.resc.ssoConfig.ssoJwtClaimValueAuthorization }}
+  {{ end }}
   {{ if .Values.resc.corsAllowedDomains }}
   CORS_ALLOWED_DOMAINS: {{ .Values.resc.corsAllowedDomains }}
   {{ end }}
