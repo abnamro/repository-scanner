@@ -1,6 +1,5 @@
 # Standard Library
 import logging
-import os
 import ssl
 import urllib.error
 
@@ -18,7 +17,6 @@ from resc_backend.constants import (
     CONTENT_SECURITY_POLICY,
     CROSS_ORIGIN_RESOURCE_POLICY,
     REFERRER_POLICY,
-    RESC_OPERATOR_ROLE,
     STRICT_TRANSPORT_SECURITY,
     X_CONTENT_TYPE_OPTIONS,
     X_FRAME_OPTIONS,
@@ -27,6 +25,17 @@ from resc_backend.constants import (
 )
 from resc_backend.db.connection import Session, engine
 from resc_backend.db.model import DBfinding, DBrepository, DBrule, DBscan, DBscanFinding
+from resc_backend.helpers.environment_wrapper import validate_environment
+from resc_backend.resc_web_service.configuration import (
+    CONDITIONAL_SSO_ENV_VARS,
+    SSO_ACCESS_TOKEN_ISSUER_URL,
+    SSO_ACCESS_TOKEN_JWKS_URL,
+    SSO_JWT_CLAIM_KEY_AUTHORIZATION,
+    SSO_JWT_CLAIM_KEY_USER_ID,
+    SSO_JWT_CLAIM_VALUE_AUTHORIZATION,
+    SSO_JWT_REQUIRED_CLAIMS,
+    SSO_JWT_SIGN_ALGORITHM
+)
 
 security = HTTPBearer()
 logger = logging.getLogger(__name__)
@@ -36,14 +45,16 @@ async def requires_auth(request: Request, credentials: HTTPBasicCredentials = De
     """
         Function that is used to validate the JWT access token
     """
+    # Check and load environment variables
+    env_variables = validate_environment(CONDITIONAL_SSO_ENV_VARS)
+
     access_token = credentials.credentials
-    algorithm = ["RS256"]
-    issuer = os.getenv('SSO_ACCESS_TOKEN_ISSUER_URL', '')
-    jwks_url = os.getenv('SSO_ACCESS_TOKEN_JWKS_URL', '')
+    algorithm = [env_variables[SSO_JWT_SIGN_ALGORITHM]]
+    issuer = env_variables[SSO_ACCESS_TOKEN_ISSUER_URL]
+    jwks_url = env_variables[SSO_ACCESS_TOKEN_JWKS_URL]
     jwt_options = {
         "verify_signature": True, "verify_iss": True, "verify_exp": True,
-        "require": ["client_id", "iss", "corpid", "roles", "given_name", "family_name", "userid", "email",
-                    "department_number", "exp"]
+        "require": env_variables[SSO_JWT_REQUIRED_CLAIMS].split(",")
     }
     try:
         ssl._create_default_https_context = ssl._create_unverified_context  # pylint: disable=W0212
@@ -56,12 +67,12 @@ async def requires_auth(request: Request, credentials: HTTPBasicCredentials = De
             issuer=issuer,
             options=jwt_options,
         )
-
-        if not user_has_resc_operator_role(claims):
-            logger.error(f"Invalid login attempt for user {claims['email']}")
+        user_id = claims[env_variables[SSO_JWT_CLAIM_KEY_USER_ID]]
+        if not user_is_authorized(claims, env_variables):
+            logger.error(f"Invalid login attempt for user {user_id}")
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                                 detail="You don't have permission to access this resource.")
-        request.scope["user"] = claims['email']
+        request.scope["user"] = user_id
     except urllib.error.URLError as error:
         logger.error(f"Unable to contact server for token validation {jwks_url} Message: {error}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -116,11 +127,13 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 
-def user_has_resc_operator_role(claims: dict) -> bool:
+def user_is_authorized(claims: dict, env_variables: dict) -> bool:
     """
-        Function that is used to determine if the user has the RESC_OPERATOR_ROLE
+        Function that is used to determine if the user has the required claim and value to access the web service
     """
-    return bool("roles" in claims and claims["roles"] == RESC_OPERATOR_ROLE)
+    claim_key = env_variables[SSO_JWT_CLAIM_KEY_AUTHORIZATION]
+    claim_check_value = env_variables[SSO_JWT_CLAIM_VALUE_AUTHORIZATION]
+    return bool(claim_key in claims and claim_check_value in claims[claim_key])
 
 
 def requires_no_auth(request: Request):

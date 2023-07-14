@@ -32,6 +32,11 @@ resc:
   ssoConfig:
     ssoAccessTokenIssuerUrl: ""
     ssoAccessTokenJwksUrl: ""
+    ssoJwtSignAlgorithm: ""
+    ssoJwtRequiredClaims: ""
+    soJwtClaimKeyUserId: ""
+    ssoJwtClaimKeyAuthorization: ""
+    ssoJwtClaimValueAuthorization: ""
   corsAllowedDomains: ""
   enableCORS: "true"
 
