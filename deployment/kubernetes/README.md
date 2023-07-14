@@ -157,6 +157,11 @@ resc-web-service:
       ssoConfig:
         ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>"
         ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>"
+        ssoJwtSignAlgorithm: "<enter Access token sign algorithm>" 
+        ssoJwtRequiredClaims: "<enter Access token required claims as comma separated string>"
+        soJwtClaimKeyUserId: "<enter Access token claim key used for the user id>"
+        ssoJwtClaimKeyAuthorization: "<enter Access token claim key used for the authorization>"
+        ssoJwtClaimValueAuthorization: "<enter Access token claim value to look for in the key for authorization>"
       authRequired: "true"
 ```
 
@@ -186,6 +191,21 @@ Examples and explanation:
 
 7. accessTokenJwksUrl / ssoAccessTokenJwksUrl: "https://example.com/ext/employeeoidc/jwks"
     The access token JWKS URL is the endpoint where the server provides the public keys needed to verify the signature of an access token.
+
+8. ssoJwtSignAlgorithm: "RS256"
+    The signing algoritm used by the SSO provider to sign the access token.
+
+9. ssoJwtRequiredClaims: "email,roles,firstname"
+    List of claims required to be present in the SSO token.
+
+10. soJwtClaimKeyUserId: "email"
+    Claim key used to identify the user by (used for saving audit records under that user).
+
+11. ssoJwtClaimKeyAuthorization: "roles"
+    Claim key used for the authorization check, it needs to be present and have the value from ssoJwtClaimValueAuthorization as part of it.
+
+12. ssoJwtClaimValueAuthorization: "RESC_USER"
+    Claim value used to check the contents of the claim key defined in ssoJwtClaimKeyAuthorization if its part of the value, if not the user will not be allowed to use the system.
 
  </details>
     
