@@ -70,6 +70,11 @@ resc-web-service:
     ssoConfig:
       ssoAccessTokenIssuerUrl: "<enter Access token issuer url here>" # optional
       ssoAccessTokenJwksUrl: "<enter Access token JWKS url here>" # optional
+      ssoJwtSignAlgorithm: "<enter Access token sign algorithm>" # optional
+      ssoJwtRequiredClaims: "<enter Access token required claims as comma separated string>" # optional
+      soJwtClaimKeyUserId: "<enter Access token claim key used for the user id>" # optional
+      ssoJwtClaimKeyAuthorization: "<enter Access token claim key used for the authorization>" # optional
+      ssoJwtClaimValueAuthorization: "<enter Access token claim value to look for in the key for authorization>" # optional
     corsAllowedDomains: "http://localhost:8080, http://localhost:30000"
     authRequired: "false"
 

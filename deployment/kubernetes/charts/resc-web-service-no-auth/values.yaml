@@ -31,6 +31,11 @@ resc:
   ssoConfig:
     ssoAccessTokenIssuerUrl: "notApplicable"
     ssoAccessTokenJwksUrl: "notApplicable"
+    ssoJwtSignAlgorithm: "notApplicable"
+    ssoJwtRequiredClaims: "notApplicable"
+    soJwtClaimKeyUserId: "notApplicable"
+    ssoJwtClaimKeyAuthorization: "notApplicable"
+    ssoJwtClaimValueAuthorization: "notApplicable"
   corsAllowedDomains: "notApplicable"
   enableCORS: "false"
 
