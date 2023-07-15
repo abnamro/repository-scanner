@@ -9,7 +9,7 @@ pydantic==1.8.2
 uvicorn==0.17.6
 waitress==2.1.2
 pyjwt[crypto]==2.4.0
-cryptography==39.0.1
+cryptography==41.0.2
 tenacity==8.0.1
 tomlkit==0.11.1
 python-multipart==0.0.5
