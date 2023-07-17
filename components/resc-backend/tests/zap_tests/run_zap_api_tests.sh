@@ -70,7 +70,7 @@ echo "*** IP Address Of $RESC_DATABASE_CONTAINER Container is: $RESC_DATABASE_HO
 echo "*** Running $RESC_BACKEND_CONTAINER Container ***"
 docker run -d --env-file test.env -e MSSQL_ODBC_DRIVER="$MSSQL_ODBC_DRIVER" -e MSSQL_DB_HOST="$RESC_DATABASE_HOST_IP" \
 -e MSSQL_PASSWORD="$RESC_DATABASE_PASSWORD" --name $RESC_BACKEND_CONTAINER -p $RESC_API_PORT:$RESC_API_PORT "$RESC_BACKEND_IMAGE" \
-/bin/sh -c "alembic upgrade head && uvicorn resc_backend.resc_web_service.api:app --workers 1 --host 0.0.0.0 --port $RESC_API_PORT"
+/bin/sh -c "alembic upgrade head && python ./test_data/insert_test_data.py && uvicorn resc_backend.resc_web_service.api:app --workers 1 --host 0.0.0.0 --port $RESC_API_PORT"
 
 sleep 15
 echo "*** Printing Logs Of $RESC_BACKEND_CONTAINER Container ***"
@@ -79,6 +79,12 @@ docker logs $RESC_BACKEND_CONTAINER
 # Retrieve RESC API container IP address
 RESC_API_HOST_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $RESC_BACKEND_CONTAINER)
 echo "*** IP Address Of $RESC_BACKEND_CONTAINER Container is: $RESC_API_HOST_IP ***"
+
+if [[ -z $RESC_API_HOST_IP ]]
+then
+  echo "ERROR: Unable to run RESC API"
+  exit 1
+fi
 
 # Clean up
 function cleanUp() {

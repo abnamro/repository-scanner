@@ -132,7 +132,6 @@ class TestScans(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.scan.create_scan")
     def test_post_scan(self, create_scan):
         db_scan = self.db_scans[0]
-        print("db_scan", db_scan)
         create_scan.return_value = db_scan
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}",
                                     json=self.create_json_body(db_scan))
@@ -145,7 +144,6 @@ class TestScans(unittest.TestCase):
     def test_post_increment_scan(self, get_latest_scan_for_repository, create_scan):
         db_scan = self.db_scans[0]
         db_scan.scan_type = ScanType.INCREMENTAL
-        print("db_scan", db_scan)
         create_scan.return_value = db_scan
         get_latest_scan_for_repository.return_value = self.db_scans[1]
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}",
