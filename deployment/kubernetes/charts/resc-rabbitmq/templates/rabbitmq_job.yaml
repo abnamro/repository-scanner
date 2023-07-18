@@ -13,6 +13,11 @@ spec:
         {{- end }}
         container.apparmor.security.beta.kubernetes.io/resc-mq-init: unconfined
       labels:
+        {{ if .Values.additionalLabels }}
+        {{- range $key, $val := .Values.additionalLabels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end}}
+        {{ end }}
         kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
         kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
     spec:
@@ -41,6 +46,10 @@ spec:
             - secretRef:
                 name: {{ .Values.global.appName }}-rabbitmq-admin-secret
             {{ end }}
+          volumeMounts:
+            {{- with include "resc.mqInitAdditionalVolumeMounts" .}}
+              {{- nindent 12 .}}
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -52,6 +61,10 @@ spec:
               type: RuntimeDefault
             runAsNonRoot: true
             runAsUser: 10001
+      volumes:
+        {{- with include "resc.mqInitAdditionalVolumes" .}}
+          {{- nindent 8 .}}
+        {{- end }}
       restartPolicy: {{ .Values.mqInit.restartPolicy }}
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:

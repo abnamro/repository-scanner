@@ -22,3 +22,4 @@ resources:
 suspend: false
 useKubernetesSecret: "true"
 preStartUpCommand: ""
+additionalLabels:

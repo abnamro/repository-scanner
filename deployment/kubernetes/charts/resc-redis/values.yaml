@@ -16,3 +16,4 @@ redis:
     password:
 useKubernetesSecret: "true"
 preStartUpCommand: ""
+additionalLabels:

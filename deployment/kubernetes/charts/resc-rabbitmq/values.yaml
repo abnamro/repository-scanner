@@ -40,3 +40,4 @@ storageClass:
 useKubernetesSecret: "true"
 filemountType: "linux"
 preStartUpCommand: ""
+additionalLabels:
