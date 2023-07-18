@@ -14,6 +14,11 @@ spec:
       template:
         metadata:
           labels:
+            {{ if .Values.additionalLabels }}
+            {{- range $key, $val := .Values.additionalLabels }}
+            {{ $key }}: {{ $val | quote }}
+            {{- end}}
+            {{ end }}
             kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
             kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
           annotations:
@@ -52,6 +57,9 @@ spec:
               - name: config-volume
                 mountPath: {{ .Values.config.vcs_instance_file_path }}
                 subPath: vcs_instances_config.json
+              {{- with include "resc.vcsScraperProjectsAdditionalVolumeMounts" .}}
+                {{- nindent 14 .}}
+              {{- end }}
             env:
               - name: GET_HOSTS_FROM
                 value: dns
@@ -70,6 +78,9 @@ spec:
             - name: config-volume
               configMap:
                 name: {{ .Values.global.appName }}-vcs-instances-config
+            {{- with include "resc.vcsScraperProjectsAdditionalVolumes" .}}
+              {{- nindent 12 .}}
+            {{- end }}
           restartPolicy: {{ .Values.restartPolicy }}
           {{ if .Values.global.imagePullSecret }}
           imagePullSecrets:

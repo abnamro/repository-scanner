@@ -22,3 +22,4 @@ resources:
     memory: 6G
 useKubernetesSecret: "true"
 preStartUpCommand: ""
+additionalLabels:
