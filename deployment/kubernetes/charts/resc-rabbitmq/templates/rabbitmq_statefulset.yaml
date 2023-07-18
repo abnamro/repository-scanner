@@ -13,6 +13,11 @@ spec:
   template:
     metadata:
       labels:
+        {{ if .Values.additionalLabels }}
+        {{- range $key, $val := .Values.additionalLabels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end}}
+        {{ end }}
         app: {{ .Values.global.appName }}
         tier: rabbitmq
         kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
@@ -36,6 +41,9 @@ spec:
         - name: {{ .Values.global.appName }}-mq-pv-storage
           persistentVolumeClaim:
             claimName: {{ .Values.global.appName }}-mq-pv-volume-claim
+        {{- with include "resc.mqAdditionalVolumes" .}}
+          {{- nindent 8 .}}
+        {{- end }}
       containers:
         - name: {{ .Values.global.appName }}-mq
           image: {{ .Values.rabbitMQ.image.repository }}{{ .Values.rabbitMQ.image.name }}:{{ .Values.rabbitMQ.image.tag }}
@@ -68,6 +76,9 @@ spec:
             - mountPath: "/var/lib/rabbitmq/mnesia"
               subPath: "var/lib/rabbitmq/mnesia"
               name: {{ .Values.global.appName }}-mq-pv-storage
+            {{- with include "resc.mqAdditionalVolumeMounts" .}}
+              {{- nindent 12 .}}
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
