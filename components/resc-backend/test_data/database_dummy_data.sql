@@ -17,7 +17,7 @@ INSERT INTO rule_tag (rule_id, tag_id) VALUES
     (2, 1);
 
 INSERT INTO vcs_instance (name, provider_type, scheme, hostname, port, organization, vcs_scope, exceptions) VALUES
-    ('AZURE_DEVOPS_ACCEPTANCE', 'AZURE_DEVOPS', 'https', 'fake-dev.azure.com', 443, 'ado-org', 'ado-project1,ado-project2', 'ado-project3'),
+    ('AZURE_DEVOPS_ACCEPTANCE', 'AZURE_DEVOPS', 'https', 'fake-dev.azure.com', 443, 'ado-org', 'ado-project1,ado-project2', NULL),
     ('BITBUCKET_DEV', 'BITBUCKET', 'https', 'fake-bitbucket.com', 443, NULL, NULL, NULL);
 
 INSERT INTO repository (vcs_instance, project_key, repository_id, repository_name, repository_url) VALUES
