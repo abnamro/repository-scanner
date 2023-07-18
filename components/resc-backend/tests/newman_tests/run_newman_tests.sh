@@ -67,6 +67,12 @@ sleep 25
 RESC_DATABASE_HOST_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $RESC_DATABASE_CONTAINER)
 echo "*** IP Address Of $RESC_DATABASE_CONTAINER Container is: $RESC_DATABASE_HOST_IP ***"
 
+if [[ -z $RESC_DATABASE_HOST_IP ]]
+then
+  echo "ERROR: Unable to run RESC Database"
+  exit 1
+fi
+
 # Running RESC API container
 echo "*** Running $RESC_BACKEND_CONTAINER Container ***"
 docker run -d --env-file test.env -e MSSQL_ODBC_DRIVER="$MSSQL_ODBC_DRIVER" -e MSSQL_DB_HOST="$RESC_DATABASE_HOST_IP" \
