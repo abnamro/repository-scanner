@@ -66,6 +66,9 @@ spec:
             - name: config-volume
               mountPath: /tmp/odbc.ini
               subPath: odbc.ini
+            {{- with include "resc.rescWebserviceAdditionalVolumeMounts" .}}
+                {{- nindent 12 .}}
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -89,6 +92,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Values.global.appName }}-web-service-config{{ .Values.nameSuffix }}
+        {{- with include "resc.rescWebserviceAdditionalVolumes" .}}
+          {{- nindent 8 .}}
+        {{- end }}
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
       - name: {{ .Values.global.imagePullSecret }}

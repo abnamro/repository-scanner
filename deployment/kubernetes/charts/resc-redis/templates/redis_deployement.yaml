@@ -12,6 +12,11 @@ spec:
   template:
     metadata:
       labels:
+        {{ if .Values.additionalLabels }}
+        {{- range $key, $val := .Values.additionalLabels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end}}
+        {{ end }}
         app: {{ .Values.global.appName }}
         tier: redis
       annotations:
@@ -50,6 +55,9 @@ spec:
           name: data
         - mountPath: /redis-master
           name: config
+        {{- with include "resc.redisAdditionalVolumeMounts" .}}
+          {{- nindent 8 .}}
+        {{- end }}
       volumes:
         - name: data
           emptyDir: {}
@@ -59,5 +67,8 @@ spec:
             items:
             - key: redis-config
               path: redis.conf
+        {{- with include "resc.redisAdditionalVolumes" .}}
+          {{- nindent 8 .}}
+        {{- end }}
 
           
