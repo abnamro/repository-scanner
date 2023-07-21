@@ -43,6 +43,7 @@ instances of exposed sensitive information in the source code.
 * [Versions](#versions)
 * [Technical information](#technical-information)
 * [Getting started](#getting-started)
+* [Dummy data generation](#dummy-data-generation-guide)
 * [Contributing guidelines](#contribution-guide)
 * [Contact](#contact)
 * [License](#license)
@@ -126,6 +127,8 @@ The instructions below help you to get a copy of the project up and running on y
 [RESC-VCS-SCANNER](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner)  
 [RESC-FRONTEND](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend)  
 
+#  Dummy data generation <a name = "dummy-data-generation-guide"></a>
+A standalone utility to generate dummy data for testing purposes is located at ./components/resc_backend/src/resc_backend/bin/dummy-data-generator. More details can be found [here](./components/resc-backend/src/resc_backend/bin/dummy-data-generator/README.md)
 
 ## 💁🏽 Contributing guidelines <a name = "contribution-guide"></a>
 We believe that innovating together can lead to the most incredible results and developments. Contributions to the Repository Scanner tool are therefore highly encouraged. We have created [guidelines](https://github.com/abnamro/repository-scanner/blob/main/contributing.md) that we expect contributors to the project to follow.  By contributing to the project you also agree with our [Code of Conduct](https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md).
