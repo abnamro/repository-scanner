@@ -41,9 +41,11 @@ spec:
         - name: {{ .Values.global.appName }}-mq-pv-storage
           persistentVolumeClaim:
             claimName: {{ .Values.global.appName }}-mq-pv-volume-claim
+        {{ if eq .Values.useKubernetesSecret "false"}}
         {{- with include "resc.mqAdditionalVolumes" .}}
           {{- nindent 8 .}}
         {{- end }}
+        {{ end }}
       containers:
         - name: {{ .Values.global.appName }}-mq
           image: {{ .Values.rabbitMQ.image.repository }}{{ .Values.rabbitMQ.image.name }}:{{ .Values.rabbitMQ.image.tag }}
@@ -76,9 +78,11 @@ spec:
             - mountPath: "/var/lib/rabbitmq/mnesia"
               subPath: "var/lib/rabbitmq/mnesia"
               name: {{ .Values.global.appName }}-mq-pv-storage
+            {{ if eq .Values.useKubernetesSecret "false"}}
             {{- with include "resc.mqAdditionalVolumeMounts" .}}
               {{- nindent 12 .}}
             {{- end }}
+            {{ end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
