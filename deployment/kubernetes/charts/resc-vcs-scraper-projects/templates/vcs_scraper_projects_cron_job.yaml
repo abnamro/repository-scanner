@@ -57,9 +57,11 @@ spec:
               - name: config-volume
                 mountPath: {{ .Values.config.vcs_instance_file_path }}
                 subPath: vcs_instances_config.json
+              {{ if eq .Values.useKubernetesSecret "false"}}
               {{- with include "resc.vcsScraperProjectsAdditionalVolumeMounts" .}}
                 {{- nindent 14 .}}
               {{- end }}
+              {{ end }}
             env:
               - name: GET_HOSTS_FROM
                 value: dns
@@ -78,9 +80,11 @@ spec:
             - name: config-volume
               configMap:
                 name: {{ .Values.global.appName }}-vcs-instances-config
+            {{ if eq .Values.useKubernetesSecret "false"}}
             {{- with include "resc.vcsScraperProjectsAdditionalVolumes" .}}
               {{- nindent 12 .}}
             {{- end }}
+            {{ end }}
           restartPolicy: {{ .Values.restartPolicy }}
           {{ if .Values.global.imagePullSecret }}
           imagePullSecrets:

@@ -48,13 +48,6 @@ spec:
           env:
             - name: GET_HOSTS_FROM
               value: dns
-            {{ if eq .Values.useKubernetesSecret "true"}}
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.global.appName }}-redis-secret
-                  key: REDIS_PASSWORD
-          {{ end }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.global.appName }}-web-service-config{{ .Values.nameSuffix }}
@@ -66,9 +59,11 @@ spec:
             - name: config-volume
               mountPath: /tmp/odbc.ini
               subPath: odbc.ini
+            {{ if eq .Values.useKubernetesSecret "false"}}
             {{- with include "resc.rescWebserviceAdditionalVolumeMounts" .}}
                 {{- nindent 12 .}}
             {{- end }}
+            {{ end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -92,9 +87,11 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Values.global.appName }}-web-service-config{{ .Values.nameSuffix }}
+        {{ if eq .Values.useKubernetesSecret "false"}}
         {{- with include "resc.rescWebserviceAdditionalVolumes" .}}
           {{- nindent 8 .}}
         {{- end }}
+        {{ end }}
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
       - name: {{ .Values.global.imagePullSecret }}
