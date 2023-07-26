@@ -28,6 +28,7 @@ resc:
     dbPass: 
     odbcDriver: "ODBC Driver 18 for SQL Server"
     dbDSN: "rescdb"
+    redisPass:
   authRequired: "true"
   ssoConfig:
     ssoAccessTokenIssuerUrl: ""

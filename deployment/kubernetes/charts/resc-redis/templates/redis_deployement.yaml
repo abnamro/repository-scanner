@@ -37,12 +37,10 @@ spec:
         env:
           - name: MASTER
             value: "true"
-          {{ if eq .Values.useKubernetesSecret "true"}}
-          - name: REDIS_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.global.appName }}-redis-secret
-                key: REDIS_PASSWORD
+        envFrom:
+          {{ if eq .Values.useKubernetesSecret "true" }}
+          - secretRef:
+              name: {{ .Values.global.appName }}-redis-secret
           {{ end }}
         ports:
         - containerPort: {{ .Values.redis.config.port}}
@@ -55,9 +53,11 @@ spec:
           name: data
         - mountPath: /redis-master
           name: config
+        {{ if eq .Values.useKubernetesSecret "false"}}
         {{- with include "resc.redisAdditionalVolumeMounts" .}}
           {{- nindent 8 .}}
         {{- end }}
+        {{ end }}
       volumes:
         - name: data
           emptyDir: {}
@@ -67,8 +67,10 @@ spec:
             items:
             - key: redis-config
               path: redis.conf
+        {{ if eq .Values.useKubernetesSecret "false"}}
         {{- with include "resc.redisAdditionalVolumes" .}}
           {{- nindent 8 .}}
         {{- end }}
+        {{ end }}
 
           
