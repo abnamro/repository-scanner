@@ -22,46 +22,73 @@ on:
   workflow_dispatch:
 
 env:
-  RESC_HELM_WIZARD_DIR: deployment/resc-helm-wizard
+  CACHE_KEY_PREFIX: tox-dir
 
 jobs:
   python-basic-validation:
     name: Python Basic Validation
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: deployment/resc-helm-wizard
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9"]
+        include:
+          - name: Run tests with Python 3.9
+            python-version: "3.9"
+            toxenv: py
+          - name: Run tests with Python 3.10
+            python-version: "3.10"
+            toxenv: py
+          - name: Run tests with Python 3.11
+            python-version: "3.11"
+            toxenv: py
+          - name: Run flake8 with Python 3.11
+            python-version: "3.11"
+            toxenv: flake8
+          - name: Run isort with Python 3.11
+            python-version: "3.11"
+            toxenv: isort
+          - name: Run pylint with Python 3.11
+            python-version: "3.11"
+            toxenv: pylint
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
+      id: python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        check-latest: true
 
-    - name: Install test dependencies
-      run: |
-        cd ${{ env.RESC_HELM_WIZARD_DIR }}
-        pip install -r test-requirements.txt
-        tox
+    - name: Create tox cache key
+      id: tox-cache-key
+      run: >-
+        echo "key=${{ env.CACHE_KEY_PREFIX }}-${{ hashFiles('setup.cfg', 'test-requirements.txt', 'tox.ini') }}" >> $GITHUB_OUTPUT
 
-    - name: Test with pytest
-      run: |
-        cd ${{ env.RESC_HELM_WIZARD_DIR }}
-        tox -e pytest
+    - name: Cache .tox directory
+      id: cache-tox-dir
+      uses: actions/cache@v3.3.1
+      with:
+        path: .tox
+        key: >-
+          ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ steps.tox-cache-key.outputs.key }}
 
-    - name: Import sorting with isort
+    - name: Install tox
+      run: pip install -U pip setuptools tox
+
+    - name: Create ${{ matrix.python-version }} tox env. and install dependencies
+      if: steps.cache-tox-dir.outputs.cache-hit != 'true'
       run: |
-        cd ${{ env.RESC_HELM_WIZARD_DIR }}
-        tox -e sort
-    
-    - name: Lint with flake8
+        tox run -e ${{ matrix.toxenv }} --notest
+
+    - name: Test
       run: |
-        cd ${{ env.RESC_HELM_WIZARD_DIR }}
-        tox -e lint
+        tox run -e ${{ matrix.toxenv }}
 
     - name: Get Branch Name
       id: extract_branch
@@ -100,7 +127,6 @@ jobs:
 
       - name: Building python package
         run: |
-          cd ${{ env.RESC_HELM_WIZARD_DIR }}
           python -m pip install --upgrade pip
           pip install build wheel
           python setup.py sdist bdist_wheel
@@ -110,13 +136,12 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.__PYPI_TOKEN__ }}
-          packages_dir: ${{ env.RESC_HELM_WIZARD_DIR }}/dist
+          packages_dir: dist
           skip_existing: true
 
       - id: getversion
         name: Get package version
         run: | 
-          cd ${{ env.RESC_HELM_WIZARD_DIR }}
           wizard_version=$(python ./setup.py --version)
           echo "wizard_version=$wizard_version" >> $GITHUB_OUTPUT
       

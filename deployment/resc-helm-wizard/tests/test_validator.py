@@ -12,8 +12,6 @@ from resc_helm_wizard.validator import (
     vcs_url_validator
 )
 
-sys.path.insert(0, "src")
-
 
 def test_password_validator():
     error_message = "Password must contain at least one upper case, one lower case, " \
