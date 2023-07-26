@@ -5,8 +5,6 @@ from unittest.mock import patch
 # First Party
 from resc_helm_wizard.run_wizard import prompt_questions
 
-sys.path.insert(0, "src")
-
 
 @patch("resc_helm_wizard.questions.ask_operating_system")
 @patch("resc_helm_wizard.common.create_storage_for_db_and_rabbitmq")

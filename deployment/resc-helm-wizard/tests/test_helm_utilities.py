@@ -15,8 +15,6 @@ from resc_helm_wizard.helm_utilities import (
     validate_helm_deployment_status
 )
 
-sys.path.insert(0, "src")
-
 
 @patch("subprocess.check_output")
 @patch("logging.Logger.info")
