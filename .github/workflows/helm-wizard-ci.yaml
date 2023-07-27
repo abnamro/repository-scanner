@@ -65,18 +65,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
         check-latest: true
 
-    - name: Create tox cache key
-      id: tox-cache-key
-      run: >-
-        echo "key=${{ env.CACHE_KEY_PREFIX }}-${{ hashFiles('setup.cfg', 'test-requirements.txt', 'tox.ini') }}" >> $GITHUB_OUTPUT
-
     - name: Cache .tox directory
       id: cache-tox-dir
       uses: actions/cache@v3.3.1
       with:
         path: .tox
         key: >-
-          ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ steps.tox-cache-key.outputs.key }}
+          ${{ runner.os }}-${{ steps.python.outputs.python-version
+          }}-${{ env.CACHE_KEY_PREFIX }}-${{ hashFiles('setup.cfg', 'test-requirements.txt', 'tox.ini') }}
 
     - name: Install tox
       run: pip install -U pip setuptools tox
@@ -110,6 +106,9 @@ jobs:
     name: Python Build and Publish
     needs: python-basic-validation
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deployment/resc-helm-wizard
 
     strategy:
       matrix:
