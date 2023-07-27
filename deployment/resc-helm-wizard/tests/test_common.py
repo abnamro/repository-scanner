@@ -24,7 +24,6 @@ from resc_helm_wizard.common import (
 from resc_helm_wizard.helm_value import HelmValue
 from resc_helm_wizard.vcs_instance import VcsInstance
 
-
 THIS_DIR = Path(__file__).parent
 
 
