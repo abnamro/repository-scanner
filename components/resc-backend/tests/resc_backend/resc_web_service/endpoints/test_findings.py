@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
     RWS_ROUTE_AUDIT,
     RWS_ROUTE_BY_RULE,
     RWS_ROUTE_COUNT_BY_TIME,
@@ -184,13 +185,16 @@ class TestFindings(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.delete_finding")
-    def test_delete_findings(self, delete_finding, get_finding):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_delete_findings(self, clear_cache_by_namespace, delete_finding, get_finding):
         db_finding = self.db_findings[0]
         get_finding.return_value = db_finding
+        clear_cache_by_namespace.return_value = None
         response = self.client.delete(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{db_finding.id_}")
         assert response.status_code == 200, response.text
         get_finding.assert_called_once_with(ANY, finding_id=db_finding.id_)
         delete_finding.assert_called_once_with(ANY, finding_id=db_finding.id_, delete_related=True)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_FINDING)])
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.delete_finding")
@@ -205,10 +209,12 @@ class TestFindings(unittest.TestCase):
         delete_finding.assert_not_called()
 
     @patch("resc_backend.resc_web_service.crud.finding.create_findings")
-    def test_post_findings(self, create_finding):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_post_findings(self, clear_cache_by_namespace, create_finding):
         db_finding = self.db_findings[0]
         db_scan_findings = [self.db_scan_findings[0]]
         create_finding.return_value = [self.db_findings[0]]
+        clear_cache_by_namespace.return_value = None
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}",
                                     json=[self.create_json_body(db_finding, db_scan_findings)])
         assert response.status_code == 201
@@ -217,6 +223,7 @@ class TestFindings(unittest.TestCase):
         create_finding.assert_called_once_with(
             db_connection=ANY,
             findings=[self.cast_db_finding_to_finding_create(db_finding, db_scan_findings)])
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_FINDING)])
 
     @patch("resc_backend.resc_web_service.crud.finding.create_findings")
     def test_post_findings_no_body(self, create_finding):
@@ -239,11 +246,13 @@ class TestFindings(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
     @patch("resc_backend.resc_web_service.crud.finding.patch_finding")
-    def test_patch_findings(self, patch_finding, get_scan_findings, get_finding):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_patch_findings(self, clear_cache_by_namespace, patch_finding, get_scan_findings, get_finding):
         finding_id = 1
         db_finding = self.db_findings[0]
         db_finding.event_sent_on = datetime.utcnow()
         db_scan_findings = [self.db_scan_findings[0]]
+        clear_cache_by_namespace.return_value = None
         get_scan_findings.return_value = db_scan_findings
         patch_finding.return_value = db_finding
         get_finding.return_value = db_finding
@@ -255,16 +264,19 @@ class TestFindings(unittest.TestCase):
         patch_finding.assert_called_once_with(
             ANY, finding_id=db_finding.id_,
             finding_update=self.cast_db_finding_to_finding_patch(db_finding))
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_FINDING)])
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.finding.patch_finding")
-    def test_patch_event_sent_property_findings(self, patch_finding, get_finding):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_patch_event_sent_property_findings(self, clear_cache_by_namespace, patch_finding, get_finding):
         finding_id = 1
         db_finding = self.db_findings[1]
         get_finding.return_value = db_finding
         get_finding.return_value.id_ = finding_id
         expected_results = self.db_findings[1]
         expected_results.event_sent_on = "2022-07-21T11:15:06.160000"
+        clear_cache_by_namespace.return_value = None
         patch_finding.return_value = db_finding
         update_body = {"event_sent_on": "2022-07-21T11:15:06.160000"}
         response = self.client.patch(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}/{finding_id}",
@@ -283,6 +295,7 @@ class TestFindings(unittest.TestCase):
         assert data["author"] == expected_results.author
         assert data["email"] == expected_results.email
         assert data["rule_name"] == expected_results.rule_name
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_FINDING)])
 
     @patch("resc_backend.resc_web_service.crud.finding.get_total_findings_count")
     @patch("resc_backend.resc_web_service.crud.finding.get_findings")
@@ -421,11 +434,13 @@ class TestFindings(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.scan_finding.get_scan_findings")
     @patch("resc_backend.resc_web_service.crud.audit.create_audit")
-    def test_audit_findings(self, audit_findings, get_scan_findings, get_finding):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_audit_findings(self, clear_cache_by_namespace, audit_findings, get_scan_findings, get_finding):
         audit_multiple = AuditMultiple(finding_ids=[1, 2], status=FindingStatus.FALSE_POSITIVE, comment="Hello World!")
         get_scan_findings.return_value = [self.db_scan_findings[1]]
         get_finding.return_value = self.db_findings[1]
         audit_findings.return_value = 1
+        clear_cache_by_namespace.return_value = None
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_FINDINGS}{RWS_ROUTE_AUDIT}/",
                                     json=self.create_json_body_multiple_audit(audit_multiple))
         assert response.status_code == 201, response.text
@@ -437,6 +452,7 @@ class TestFindings(unittest.TestCase):
                                               auditor='Anonymous',
                                               status=audit_multiple.status, comment=audit_multiple.comment)],
                                         any_order=False)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_FINDING)])
 
     @patch("resc_backend.resc_web_service.crud.finding.get_finding")
     @patch("resc_backend.resc_web_service.crud.audit.create_audit")
