@@ -26,7 +26,7 @@ env:
 
 jobs:
   python-basic-validation:
-    name: Python Basic Validation
+    name: Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,10 +69,11 @@ jobs:
       id: cache-tox-dir
       uses: actions/cache@v3.3.1
       with:
-        path: .tox
+        path: deployment/resc-helm-wizard/.tox
         key: >-
           ${{ runner.os }}-${{ steps.python.outputs.python-version
-          }}-${{ env.CACHE_KEY_PREFIX }}-${{ hashFiles('setup.cfg', 'test-requirements.txt', 'tox.ini') }}
+          }}-${{ env.CACHE_KEY_PREFIX }}-${{
+          hashFiles('deployment/resc-helm-wizard/setup.cfg', 'deployment/resc-helm-wizard/test-requirements.txt', 'deployment/resc-helm-wizard/tox.ini') }}
 
     - name: Install tox
       run: pip install -U pip setuptools tox
