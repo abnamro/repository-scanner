@@ -61,11 +61,15 @@ def test_request_key_builder(mock_get_prefix):
 @pytest.mark.asyncio
 @patch("fastapi_cache.FastAPICache.get_enable")
 @patch("fastapi_cache.FastAPICache.clear")
-async def test_clear_cache_by_namespace(mock_clear, mock_get_enable):
+@patch("logging.Logger.info")
+async def test_clear_cache_by_namespace(mock_info_log, mock_clear, mock_get_enable):
     mock_clear.return_value = None
     mock_get_enable.return_value = True
-    await CacheManager.clear_cache_by_namespace(namespace="test-namespace")
-    mock_clear.assert_called_once_with(namespace="test-namespace")
+    namespace = "test-namespace"
+    expected_info_msg = f"Cache cleared for namespaces: {namespace}"
+    await CacheManager.clear_cache_by_namespace(namespace=namespace)
+    mock_clear.assert_called_once_with(namespace=namespace)
+    mock_info_log.assert_called_once_with(expected_info_msg)
 
 
 @pytest.mark.asyncio

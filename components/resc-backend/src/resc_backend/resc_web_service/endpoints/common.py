@@ -2,14 +2,16 @@
 from typing import List
 
 # Third Party
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, status
+from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
-    CACHE_MAX_AGE,
+    CACHE_NAMESPACE_VCS_INSTANCE,
     COMMON_TAG,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
+    REDIS_CACHE_EXPIRE,
     RWS_ROUTE_AUTH_CHECK,
     RWS_ROUTE_SUPPORTED_VCS_PROVIDERS
 )
@@ -28,13 +30,13 @@ router = APIRouter(tags=[COMMON_TAG])
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-def get_supported_vcs_providers(response: Response) -> List[str]:
+@cache(namespace=CACHE_NAMESPACE_VCS_INSTANCE, expire=REDIS_CACHE_EXPIRE)
+def get_supported_vcs_providers() -> List[str]:
     """
         Retrieve all supported vcs providers
     :return: List[str]
         The output will contain a list of strings of unique vcs providers
     """
-    response.headers["Cache-Control"] = CACHE_MAX_AGE
     supported_vcs = [vcs for vcs in VCSProviders if vcs]
     return supported_vcs
 

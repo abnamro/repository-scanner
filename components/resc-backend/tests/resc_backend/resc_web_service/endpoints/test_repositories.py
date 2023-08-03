@@ -2,13 +2,14 @@
 import json
 import unittest
 from datetime import datetime
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, call, patch
 
 # Third Party
 from fastapi.testclient import TestClient
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_REPOSITORY,
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_REPOSITORIES,
@@ -93,9 +94,11 @@ class TestRepositories(unittest.TestCase):
         assert data["vcs_instance"] == repository.vcs_instance
 
     @patch("resc_backend.resc_web_service.crud.repository.create_repository_if_not_exists")
-    def test_post_repositories(self, create_repository_if_not_exists):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_post_repositories(self, clear_cache_by_namespace, create_repository_if_not_exists):
         db_repository = self.db_repositories[0]
         create_repository_if_not_exists.return_value = db_repository
+        clear_cache_by_namespace.return_value = None
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}",
                                     json=self.create_json_body(db_repository))
         assert response.status_code == 201, response.text
@@ -104,6 +107,7 @@ class TestRepositories(unittest.TestCase):
             .assert_called_once_with(db_connection=ANY,
                                      repository=self.cast_db_repository_to_repository_create(
                                          db_repository))
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_REPOSITORY)])
 
     @patch("resc_backend.resc_web_service.crud.repository.get_repository")
     def test_get_repositories_non_existing(self, get_repository):
@@ -126,11 +130,13 @@ class TestRepositories(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.repository.get_repository")
     @patch("resc_backend.resc_web_service.crud.repository.update_repository")
-    def test_put_repositories(self, update_repository, get_repository):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_put_repositories(self, clear_cache_by_namespace, update_repository, get_repository):
         repository_id = 1
         get_repository.return_value = self.db_repositories[repository_id]
         update_repository.return_value = self.db_repositories[1]
         update_repository.return_value.id_ = get_repository.return_value.id_
+        clear_cache_by_namespace.return_value = None
         response = self.client.put(
             f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}/{repository_id}",
             json=self.create_json_body(self.db_repositories[1]))
@@ -141,10 +147,12 @@ class TestRepositories(unittest.TestCase):
             .assert_called_once_with(db_connection=ANY,
                                      repository=self.cast_db_repository_to_repository_create(
                                          self.db_repositories[1]), repository_id=repository_id)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_REPOSITORY)])
 
     @patch("resc_backend.resc_web_service.crud.repository.get_repository")
     @patch("resc_backend.resc_web_service.crud.repository.delete_repository")
-    def test_delete_repositories(self, delete_repository, get_repository):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_delete_repositories(self, clear_cache_by_namespace, delete_repository, get_repository):
         repository_id = 1
         get_repository.return_value = self.db_repositories[repository_id]
         response = self.client.delete(f"{RWS_VERSION_PREFIX}"
@@ -152,6 +160,7 @@ class TestRepositories(unittest.TestCase):
         assert response.status_code == 200, response.text
         get_repository.assert_called_once_with(ANY, repository_id=repository_id)
         delete_repository.assert_called_once_with(ANY, repository_id=repository_id, delete_related=True)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_REPOSITORY)])
 
     @patch("resc_backend.resc_web_service.crud.repository.create_repository")
     def test_post_repositories_no_body(self, create_repository):
