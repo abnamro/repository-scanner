@@ -64,6 +64,7 @@ class CacheManager:
         cache_enabled = FastAPICache.get_enable()
         if cache_enabled:
             await FastAPICache.clear(namespace=namespace)
+            logger.info(f"Cache cleared for namespaces: {namespace}")
 
     @staticmethod
     async def clear_all_cache():

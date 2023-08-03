@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_VCS_INSTANCE,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
@@ -15,6 +16,7 @@ from resc_backend.constants import (
     VCS_TAG
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import vcs_instance as vcs_instance_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
 from resc_backend.resc_web_service.helpers.resc_swagger_models import Model400, Model404
@@ -35,8 +37,8 @@ logger = logging.getLogger(__name__)
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
-                        db_connection: Session = Depends(get_db_connection)) \
+async def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
+                              db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
     """
         Create new VCS instance object
@@ -53,6 +55,9 @@ def create_vcs_instance(vcs_instance: vcs_instance_schema.VCSInstanceCreate,
         logger.debug(f"Error creating new vcs_instance object: {err}")
         raise HTTPException(status_code=400, detail="Error creating new vcs_instance object") from err
     vcs_instance = vcs_instance_schema.VCSInstanceRead.create_from_db_vcs_instance(created_vcs_instance)
+
+    # Clear cache related to VCS instances
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_VCS_INSTANCE)
     return vcs_instance
 
 
@@ -133,8 +138,8 @@ def get_all_vcs_instances(skip: int = Query(default=0, ge=0),
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.VCSInstanceCreate,
-                        db_connection: Session = Depends(get_db_connection)) \
+async def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.VCSInstanceCreate,
+                              db_connection: Session = Depends(get_db_connection)) \
         -> vcs_instance_schema.VCSInstanceRead:
     """
         Update a VCS instance
@@ -157,6 +162,9 @@ def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.
     db_vcs_instance = vcs_instance_crud.update_vcs_instance(db_connection=db_connection,
                                                             vcs_instance_id=vcs_instance_id, vcs_instance=vcs_instance)
     vcs_instance = vcs_instance_schema.VCSInstanceRead.create_from_db_vcs_instance(db_vcs_instance)
+
+    # Clear cache related to VCS instances
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_VCS_INSTANCE)
     return vcs_instance
 
 
@@ -169,7 +177,7 @@ def update_vcs_instance(vcs_instance_id: int, vcs_instance: vcs_instance_schema.
                    500: {"description": ERROR_MESSAGE_500},
                    503: {"description": ERROR_MESSAGE_503}
                })
-def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)):
+async def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a VCS instance by ID
 
@@ -181,4 +189,7 @@ def delete_vcs_instance(vcs_instance_id: int, db_connection: Session = Depends(g
     if db_vcs_instance is None:
         raise HTTPException(status_code=404, detail="VCS instance not found")
     vcs_instance_crud.delete_vcs_instance(db_connection, vcs_instance_id=vcs_instance_id, delete_related=True)
+
+    # Clear cache related to VCS instances
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_VCS_INSTANCE)
     return {"ok": True}

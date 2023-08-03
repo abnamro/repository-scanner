@@ -3,12 +3,15 @@ from typing import List, Optional
 
 # Third Party
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_REPOSITORY,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
+    REDIS_CACHE_EXPIRE,
     REPOSITORIES_TAG,
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
@@ -18,6 +21,7 @@ from resc_backend.constants import (
     RWS_ROUTE_SCANS
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import repository as repository_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
@@ -84,7 +88,7 @@ def get_all_repositories(skip: int = Query(default=0, ge=0),
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def create_repository(
+async def create_repository(
         repository: repository_schema.RepositoryCreate,
         db_connection: Session = Depends(get_db_connection)):
     """
@@ -97,7 +101,11 @@ def create_repository(
     - **repository_url**: repository url
     - **vcs_instance**: vcs instance id
     """
-    return repository_crud.create_repository_if_not_exists(db_connection=db_connection, repository=repository)
+    repository = repository_crud.create_repository_if_not_exists(db_connection=db_connection, repository=repository)
+
+    # Clear cache related to repository
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_REPOSITORY)
+    return repository
 
 
 @router.get("/{repository_id}",
@@ -133,7 +141,7 @@ def read_repository(repository_id: int, db_connection: Session = Depends(get_db_
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-def update_repository(
+async def update_repository(
         repository_id: int,
         repository: repository_schema.RepositoryCreate,
         db_connection: Session = Depends(get_db_connection)
@@ -152,8 +160,13 @@ def update_repository(
     db_repository = repository_crud.get_repository(db_connection, repository_id=repository_id)
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
-    return repository_crud.update_repository(
+
+    updated_repository = repository_crud.update_repository(
         db_connection=db_connection, repository_id=repository_id, repository=repository)
+
+    # Clear cache related to repository
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_REPOSITORY)
+    return updated_repository
 
 
 @router.delete("/{repository_id}",
@@ -165,7 +178,7 @@ def update_repository(
                    500: {"description": ERROR_MESSAGE_500},
                    503: {"description": ERROR_MESSAGE_503}
                })
-def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
+async def delete_repository(repository_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a repository
 
@@ -177,6 +190,9 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
     if db_repository is None:
         raise HTTPException(status_code=404, detail="Repository not found")
     repository_crud.delete_repository(db_connection, repository_id=repository_id, delete_related=True)
+
+    # Clear cache related to repository
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_REPOSITORY)
     return {"ok": True}
 
 
@@ -189,6 +205,7 @@ def delete_repository(repository_id: int, db_connection: Session = Depends(get_d
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                           repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                           onlyifhasfindings: bool = Query(default=False),
@@ -221,6 +238,7 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
                               projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
                               onlyifhasfindings: bool = Query(default=False),
@@ -292,6 +310,7 @@ def get_findings_metadata_for_repository(repository_id: int,
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
 def get_all_repositories_with_findings_metadata(
         skip: int = Query(default=0, ge=0),
         limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),

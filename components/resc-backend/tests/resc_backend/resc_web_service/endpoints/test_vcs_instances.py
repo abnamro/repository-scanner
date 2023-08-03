@@ -1,13 +1,13 @@
 # Standard Library
 import json
 import unittest
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, call, patch
 
 # Third Party
 from fastapi.testclient import TestClient
 
 # First Party
-from resc_backend.constants import RWS_ROUTE_VCS, RWS_VERSION_PREFIX
+from resc_backend.constants import CACHE_NAMESPACE_VCS_INSTANCE, RWS_ROUTE_VCS, RWS_VERSION_PREFIX
 from resc_backend.db.model import DBVcsInstance
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
@@ -57,9 +57,11 @@ class TestVCSInstances(unittest.TestCase):
         assert data["organization"] == vcs_instance.organization
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.create_vcs_instance_if_not_exists")
-    def test_post_vcs_instance(self, create_vcs_instance_if_not_exists):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_post_vcs_instance(self, clear_cache_by_namespace, create_vcs_instance_if_not_exists):
         db_vcs_instance = self.db_vcs_instances[0]
         create_vcs_instance_if_not_exists.return_value = db_vcs_instance
+        clear_cache_by_namespace.return_value = None
         response = self.client.post(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_VCS}",
                                     json=self.create_json_body(db_vcs_instance))
 
@@ -69,6 +71,7 @@ class TestVCSInstances(unittest.TestCase):
             .assert_called_once_with(db_connection=ANY,
                                      vcs_instance=self.cast_db_vcs_instance_to_vcs_instance_create(
                                          db_vcs_instance))
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_VCS_INSTANCE)])
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.create_vcs_instance_if_not_exists")
     def test_post_vcs_instance_no_body(self, create_vcs_instance_if_not_exists):
@@ -211,11 +214,13 @@ class TestVCSInstances(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.update_vcs_instance")
     @patch("resc_backend.resc_web_service.crud.vcs_instance.get_vcs_instance")
-    def test_update_vcs_instance(self, get_vcs_instance, update_vcs_instance):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_update_vcs_instance(self, clear_cache_by_namespace, get_vcs_instance, update_vcs_instance):
         vcs_instance_id = 1
         get_vcs_instance.return_value = self.db_vcs_instances[vcs_instance_id]
         update_vcs_instance.return_value = self.db_vcs_instances[1]
         update_vcs_instance.return_value.id_ = get_vcs_instance.return_value.id_
+        clear_cache_by_namespace.return_value = None
         response = self.client.put(
             f"{RWS_VERSION_PREFIX}{RWS_ROUTE_VCS}/{vcs_instance_id}",
             json=self.create_json_body(self.db_vcs_instances[1]))
@@ -226,6 +231,7 @@ class TestVCSInstances(unittest.TestCase):
             .assert_called_once_with(db_connection=ANY,
                                      vcs_instance=self.cast_db_vcs_instance_to_vcs_instance_create(
                                          self.db_vcs_instances[1]), vcs_instance_id=vcs_instance_id)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_VCS_INSTANCE)])
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.update_vcs_instance")
     @patch("resc_backend.resc_web_service.crud.vcs_instance.get_vcs_instance")
@@ -274,14 +280,17 @@ class TestVCSInstances(unittest.TestCase):
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.get_vcs_instance")
     @patch("resc_backend.resc_web_service.crud.vcs_instance.delete_vcs_instance")
-    def test_delete_vcs_instance(self, delete_vcs_instance, get_vcs_instance):
+    @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
+    def test_delete_vcs_instance(self, clear_cache_by_namespace, delete_vcs_instance, get_vcs_instance):
         vcs_instance_id = 1
         get_vcs_instance.return_value = self.db_vcs_instances[vcs_instance_id]
+        clear_cache_by_namespace.return_value = None
         response = self.client.delete(f"{RWS_VERSION_PREFIX}"
                                       f"{RWS_ROUTE_VCS}/{vcs_instance_id}")
         assert response.status_code == 200, response.text
         get_vcs_instance.assert_called_once_with(ANY, vcs_instance_id=vcs_instance_id)
         delete_vcs_instance.assert_called_once_with(ANY, vcs_instance_id=vcs_instance_id, delete_related=True)
+        clear_cache_by_namespace.assert_has_calls([call(namespace=CACHE_NAMESPACE_VCS_INSTANCE)])
 
     @patch("resc_backend.resc_web_service.crud.vcs_instance.get_vcs_instance")
     @patch("resc_backend.resc_web_service.crud.vcs_instance.delete_vcs_instance")

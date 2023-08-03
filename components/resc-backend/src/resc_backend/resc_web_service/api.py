@@ -163,6 +163,11 @@ def app_startup():
         raise SystemExit("Error while connecting to the database, retry timed out") from exc
 
 
+@app.on_event("shutdown")
+async def app_shutdown():
+    await CacheManager.clear_all_cache()
+
+
 @app.get("/")
 def view_docs():
     return RedirectResponse(url="/docs", status_code=HTTP_302_FOUND)

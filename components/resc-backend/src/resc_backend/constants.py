@@ -60,6 +60,8 @@ INCREMENTAL_SCAN = "INCREMENTAL"
 CACHE_MAX_AGE = "max-age=604800"
 CACHE_PREFIX = "resc-cache"
 CACHE_NAMESPACE_FINDING = "namespace-finding"
+CACHE_NAMESPACE_REPOSITORY = "namespace-repository"
+CACHE_NAMESPACE_VCS_INSTANCE = "namespace-vcs-instance"
 
 TOML_CUSTOM_DELIMITER = "#custom-delimiter#"
 TEMP_RULE_FILE = "/tmp/temp_resc_rule.toml"
