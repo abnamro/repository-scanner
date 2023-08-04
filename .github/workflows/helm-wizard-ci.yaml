@@ -135,8 +135,8 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.__PYPI_TOKEN__ }}
-          packages_dir: dist
-          skip_existing: true
+          packages_dir: deployment/resc-helm-wizard/dist
+          skip-existing: true
 
       - id: getversion
         name: Get package version
