@@ -56,7 +56,12 @@ MAX_RECORDS_PER_PAGE_LIMIT = 500
 BASE_SCAN = "BASE"
 INCREMENTAL_SCAN = "INCREMENTAL"
 
+# Cache
 CACHE_MAX_AGE = "max-age=604800"
+CACHE_PREFIX = "resc-cache"
+CACHE_NAMESPACE_FINDING = "namespace-finding"
+CACHE_NAMESPACE_REPOSITORY = "namespace-repository"
+CACHE_NAMESPACE_VCS_INSTANCE = "namespace-vcs-instance"
 
 TOML_CUSTOM_DELIMITER = "#custom-delimiter#"
 TEMP_RULE_FILE = "/tmp/temp_resc_rule.toml"
@@ -67,6 +72,7 @@ LOG_FILE_DUMMY_DATA_GENERATOR = "dummy-data-gen.log"
 
 # Logging
 LOG_FILE_PATH_RABBITMQ = "rabbitmq_initialization.log"
+LOG_FILE_CACHING = "redis_cache.log"
 LOGGING_FILE = "logging.ini"
 
 # Error message

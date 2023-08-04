@@ -128,7 +128,7 @@ export default {
           key: 'last_scan_timestamp',
           sortable: true,
           label: 'Last Scan Date',
-          class: 'text-left',
+          class: 'text-left position-sticky',
           thStyle: { borderTop: '0px', width: '20%' },
           formatter: 'formatDate',
         },

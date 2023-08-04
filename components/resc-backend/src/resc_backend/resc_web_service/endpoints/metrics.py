@@ -9,6 +9,7 @@ from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
     METRICS_TAG,
@@ -44,7 +45,7 @@ logger = logging.getLogger(__name__)
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-@cache(expire=REDIS_CACHE_EXPIRE)
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_finding_audit_count_over_time(db_connection: Session = Depends(get_db_connection),
                                       weeks: Optional[int] = Query(default=13, ge=1),
                                       audit_status: Optional[FindingStatus] = Query(default=FindingStatus.TRUE_POSITIVE)
@@ -73,7 +74,7 @@ def get_finding_audit_count_over_time(db_connection: Session = Depends(get_db_co
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-@cache(expire=REDIS_CACHE_EXPIRE)
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_finding_total_count_over_time(db_connection: Session = Depends(get_db_connection),
                                       weeks: Optional[int] = Query(default=13, ge=1)) -> list[FindingCountOverTime]:
     """
@@ -98,7 +99,7 @@ def get_finding_total_count_over_time(db_connection: Session = Depends(get_db_co
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-@cache(expire=REDIS_CACHE_EXPIRE)
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_finding_un_triaged_count_over_time(db_connection: Session = Depends(get_db_connection),
                                            weeks: Optional[int] = Query(default=13, ge=1)) \
         -> list[FindingCountOverTime]:
@@ -164,7 +165,7 @@ def convert_rows_to_finding_count_over_time(count_over_time: dict, weeks: int) -
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-@cache(expire=REDIS_CACHE_EXPIRE)
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db_connection),
                                          weeks: Optional[int] = Query(default=13, ge=1)) \
         -> list[AuditCountOverTime]:

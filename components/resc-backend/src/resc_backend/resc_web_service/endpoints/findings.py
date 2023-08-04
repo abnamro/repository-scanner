@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 # First Party
 from resc_backend.constants import (
     CACHE_MAX_AGE,
+    CACHE_NAMESPACE_FINDING,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
@@ -20,6 +21,7 @@ from resc_backend.constants import (
     RWS_ROUTE_TOTAL_COUNT_BY_RULE
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import audit as audit_crud
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
@@ -77,8 +79,8 @@ def get_all_findings(skip: int = Query(default=0, ge=0),
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def create_findings(findings: List[finding_schema.FindingCreate], db_connection: Session = Depends(get_db_connection)) \
-        -> int:
+async def create_findings(findings: List[finding_schema.FindingCreate],
+                          db_connection: Session = Depends(get_db_connection)) -> int:
     """
           Create new findings
 
@@ -99,6 +101,8 @@ def create_findings(findings: List[finding_schema.FindingCreate], db_connection:
     try:
         created_findings = finding_crud.create_findings(db_connection=db_connection, findings=findings)
 
+        # Clear cache related to findings
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
     except KeyError as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
     return len(created_findings)
@@ -139,7 +143,7 @@ def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connec
                   500: {"description": ERROR_MESSAGE_500},
                   503: {"description": ERROR_MESSAGE_503}
               })
-def patch_finding(
+async def patch_finding(
         finding_id: int,
         finding_update: finding_schema.FindingPatch,
         db_connection: Session = Depends(get_db_connection)
@@ -154,6 +158,9 @@ def patch_finding(
     db_finding = finding_crud.get_finding(db_connection, finding_id=finding_id)
     db_sca_findings = scan_finding_crud.get_scan_findings(db_connection, finding_id=finding_id)
     scan_ids = [x.scan_id for x in db_sca_findings]
+
+    # Clear cache related to findings
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
     return FindingRead.create_from_db_entities(
@@ -171,7 +178,7 @@ def patch_finding(
                    500: {"description": ERROR_MESSAGE_500},
                    503: {"description": ERROR_MESSAGE_503}
                })
-def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
+async def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
     """
         Delete a finding object
 
@@ -183,6 +190,9 @@ def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_conn
     if db_finding is None:
         raise HTTPException(status_code=404, detail="Finding not found")
     finding_crud.delete_finding(db_connection, finding_id=finding_id, delete_related=True)
+
+    # Clear cache related to findings
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
     return {"ok": True}
 
 
@@ -245,7 +255,7 @@ def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def audit_findings(
+async def audit_findings(
         request: Request,
         audit: audit_schema.AuditMultiple,
         db_connection: Session = Depends(get_db_connection)
@@ -270,6 +280,9 @@ def audit_findings(
             audit_crud.create_audit(db_connection=db_connection, finding_id=db_finding.id_,
                                     auditor=request.user, status=audit.status, comment=audit.comment)
         )
+
+        # Clear cache related to findings
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
     return len(audits)
 
 

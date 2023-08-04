@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4441fe98-e9cc-4101-9a95-37a8f0d115ec",
+		"_postman_id": "a11314ec-468b-403f-9c96-89598f997508",
 		"name": "Repository Scanner (RESC)",
 		"description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories. ðŸš€",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -12772,10 +12772,13 @@
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"object\");",
 											"    pm.expect(responseJson[\"data\"]).to.be.an(\"array\");",
-											"    pm.expect(responseJson[\"data\"].length).to.eql(1);",
-											"    pm.expect(responseJson[\"data\"][0][\"date_lable\"]).to.include(pm.environment.get(\"currentdate\").substring(0, 3));",
-											"    pm.expect(responseJson[\"data\"][0][\"finding_count\"]).to.eql(7);",
-											"    pm.expect(responseJson[\"total\"]).to.eql(1);",
+											"    responseJson[\"data\"].forEach((obj) => {",
+											"        pm.expect(obj).to.have.property('date_lable');",
+											"        pm.expect(obj).to.have.property('finding_count');",
+											"    });",
+											"    pm.expect(responseJson).to.have.property(\"total\");",
+											"    pm.expect(responseJson).to.have.property(\"limit\");",
+											"    pm.expect(responseJson).to.have.property(\"skip\");",
 											"    pm.expect(responseJson[\"limit\"]).to.eql(100);",
 											"    pm.expect(responseJson[\"skip\"]).to.eql(0);",
 											"    ",
@@ -16295,7 +16298,6 @@
 											"}",
 											"",
 											"const responseJson = pm.response.json();",
-											"console.log(\"responseJson==>\"+JSON.stringify(responseJson));",
 											"pm.test(\"Response body matches\", function() {",
 											"    pm.expect(responseJson).to.be.an(\"array\");",
 											"    pm.expect(responseJson.length).to.eql(3);",

@@ -1,8 +1,6 @@
 # pylint: disable=C0413,W0611,W0404
 # Standard Library
 import logging.config
-import os
-from redis import asyncio as aioredis
 
 # Third Party
 from fastapi import Depends, FastAPI
@@ -10,8 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from tenacity import RetryError
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 
 # First Party
 from resc_backend.common import get_package_version
@@ -48,6 +44,7 @@ from resc_backend.resc_web_service.endpoints import (
     vcs_instances
 )
 from resc_backend.resc_web_service.helpers.exception_handler import add_exception_handlers
+from resc_backend.resc_web_service.cache_manager import CacheManager
 
 # Check and load environment variables
 env_variables = validate_environment(WEB_SERVICE_ENV_VARS)
@@ -154,33 +151,9 @@ app.middleware("http")(add_security_headers)
 add_exception_handlers(app=app)
 
 
-def cache_key_builder(func, namespace: str = "", *, request=None, response=None, **kwargs):  # pylint: disable=W0613
-    return ":".join([
-        namespace,
-        request.method.lower(),
-        request.url.path,
-        repr(sorted(request.query_params.items()))
-    ])
-
-
 @app.on_event("startup")
 def app_startup():
-    # Check if cache is enabled
-    cache_enabled = env_variables[RESC_REDIS_CACHE_ENABLE].lower() in ["true"]
-    if cache_enabled:
-        env_variables.update(validate_environment(CONDITIONAL_REDIS_ENV_VARS))
-        redis_host = f"{env_variables[RESC_REDIS_SERVICE_HOST]}"
-        redis_port = f"{env_variables[RESC_REDIS_SERVICE_PORT]}"
-        redis_password = f"{env_variables[REDIS_PASSWORD]}"
-        redis_cache = aioredis.from_url(f"redis://{redis_host}:{redis_port}", password=redis_password)
-        FastAPICache.init(RedisBackend(redis_cache),
-                          prefix="resc-cache",
-                          key_builder=cache_key_builder,
-                          enable=cache_enabled,
-                          )
-    else:
-        FastAPICache.init(backend=None, enable=cache_enabled)
-
+    CacheManager.initialize_cache(env_variables=env_variables)
     try:
         _ = Session(bind=engine)
         check_db_initialized()
@@ -188,6 +161,11 @@ def app_startup():
         logger.info("Database is connected, expected table(s) found")
     except RetryError as exc:
         raise SystemExit("Error while connecting to the database, retry timed out") from exc
+
+
+@app.on_event("shutdown")
+async def app_shutdown():
+    await CacheManager.clear_all_cache()
 
 
 @app.get("/")
