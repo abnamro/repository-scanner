@@ -6,8 +6,6 @@ from unittest.mock import patch
 # First Party
 from resc_helm_wizard.kubernetes_utilities import create_namespace_if_not_exists
 
-sys.path.insert(0, "src")
-
 
 @patch("subprocess.run")
 @patch("subprocess.run")
