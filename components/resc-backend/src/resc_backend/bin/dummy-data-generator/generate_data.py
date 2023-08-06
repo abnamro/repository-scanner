@@ -207,21 +207,28 @@ class GenerateData:
         logger.info(f"Generated [{DBrepository.__tablename__}]")
 
     def generate_scans(self, amount_to_generate: int):
-        # Ensure that the very first scan with a rule-pack will always be a BASE scan.
-        scans = [dict(rule_pack=rule_pack_version,
-                      repository_id=random.choice(self.repo_ids),
-                      scan_type=ScanType.BASE,
-                      last_scanned_commit=f"commit_{random.randint(1, 100)}",
-                      timestamp=GenerateData.get_random_scan_datetime(),
-                      increment_number=0) for rule_pack_version in self.rule_pack_versions]
-        # now that every rule_pack has a BASE scan, incremental scans can also be generated for the same rule-pack.
-        for num in range(len(scans), amount_to_generate + 1):
-            scans.append(dict(rule_pack=random.choice(self.rule_pack_versions),
-                              repository_id=random.choice(self.repo_ids),
-                              scan_type=random.choice(self.scan_types),
-                              last_scanned_commit=f"commit_{random.randint(1, 100)}",
-                              timestamp=GenerateData.get_random_scan_datetime(),
-                              increment_number=0))
+        # Ensure that every repo gets a BASE scan with each of the rule_pack.
+        total_scans = []
+        for repo_id in self.repo_ids:
+            scans_allocated_per_repo = []
+            for rule_pack_version in self.rule_pack_versions:
+                scans_allocated_per_repo.append(dict(rule_pack=rule_pack_version,
+                                                     repository_id=repo_id,
+                                                     scan_type=ScanType.BASE,
+                                                     last_scanned_commit=f"commit_{random.randint(1, 100)}",
+                                                     timestamp=GenerateData.get_random_scan_datetime(),
+                                                     increment_number=0))
+            # now that every repo has a BASE scan, incremental scans can also be generated for the same rule-pack.
+            remaining_scans_per_repo = amount_to_generate - len(scans_allocated_per_repo)
+            for _ in range(0, remaining_scans_per_repo):
+                scan_type=random.choice(self.scan_types)
+                scans_allocated_per_repo.append(dict(rule_pack=random.choice(self.rule_pack_versions),
+                                                     repository_id=repo_id,
+                                                     scan_type=scan_type,
+                                                     last_scanned_commit=f"commit_{random.randint(1, 100)}",
+                                                     timestamp=GenerateData.get_random_scan_datetime(),
+                                                     increment_number=1 if scan_type == ScanType.INCREMENTAL else 0))
+            total_scans.extend(scans_allocated_per_repo)
         self.db_util.bulk_persist_data(DBscan, scans)
         logger.info(f"Generated [{DBscan.__tablename__}]")
 
@@ -233,8 +240,7 @@ class GenerateData:
             findings = []
             for num in range(chunk[0], chunk[-1] + 1):
                 column_start = random.randint(1, 500)
-                repo = random.choice(self.repo_ids)
-                findings.append(dict(repository_id=repo,
+                findings.append(dict(repository_id=random.choice(self.repo_ids),
                                      rule_name=random.choice(rule_names),
                                      file_path=f"/path/to/file/{num}",
                                      line_number=random.randint(1, 1000),
@@ -299,6 +305,13 @@ if __name__ == "__main__":
     values["repos"] = args.repos_generate_amount
     values["scans"] = args.max_scans_per_repo_generate_amount
     values["findings"] = args.findings_generate_amount
+
+    if values["additional"] and int(values["scans"] < 1 + len(values["additional"].split(","))):
+        print("Max scans per repo should be greater than or equal to total number of rule-packs.")
+        sys.exit(-1)
+
+    total_scans_to_generate = int(values["repos"]) * int(values["scans"])
+    values["scans"] = total_scans_to_generate
 
     generate_data = GenerateData()
     generate_data.init_data_generation(values)
