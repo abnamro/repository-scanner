@@ -22,6 +22,7 @@ from resc_backend.constants import (
     RWS_ROUTE_UN_TRIAGED_COUNT_OVER_TIME
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import audit as audit_crud
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.dependencies import get_db_connection
@@ -212,6 +213,7 @@ def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE, key_builder=CacheManager.personalized_key_builder)
 def get_personal_audit_metrics(request: Request, db_connection: Session = Depends(get_db_connection)) \
         -> PersonalAuditMetrics:
     """
