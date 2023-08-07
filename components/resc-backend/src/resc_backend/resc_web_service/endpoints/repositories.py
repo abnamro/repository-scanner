@@ -7,6 +7,7 @@ from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
     CACHE_NAMESPACE_REPOSITORY,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
@@ -310,7 +311,7 @@ def get_findings_metadata_for_repository(repository_id: int,
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-@cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_all_repositories_with_findings_metadata(
         skip: int = Query(default=0, ge=0),
         limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
