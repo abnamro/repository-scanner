@@ -123,9 +123,10 @@ class GitLeaksWrapper:
             results = json.load(report_file)
 
         for result in results:
-            timestamp = "cls._is_valid_timestamp(result[Date])"
-            if not timestamp:
+            commit_timestamp = cls._is_valid_timestamp(result["Date"])
+            if not commit_timestamp:
                 logger.debug(f"{result['date']} has an unexpected date format. Expected ISO 8601")
+                commit_timestamp = datetime.datetime.now()
             finding = FindingBase(file_path=result["File"],
                                   line_number=result["StartLine"],
                                   column_start=result["StartColumn"],
@@ -134,7 +135,7 @@ class GitLeaksWrapper:
                                   author=result["Author"],
                                   commit_id=result["Commit"],
                                   commit_message=result["Message"],
-                                  commit_timestamp=datetime.datetime.now(),
+                                  commit_timestamp=commit_timestamp,
                                   rule_name=result["RuleID"])
 
             findings.append(finding)
