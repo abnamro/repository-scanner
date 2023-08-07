@@ -1,5 +1,6 @@
 # Standard Library
 import logging
+from typing import Any, Callable, Dict, Tuple
 
 # Third Party
 from fastapi import Request, Response
@@ -47,8 +48,28 @@ class CacheManager:
         return cache_client
 
     @staticmethod
-    def request_key_builder(func, namespace: str = "", *, request: Request = None, response: Response = None,
-                            **kwargs):  # pylint: disable=W0613
+    def request_key_builder(func: Callable[..., Any],  # pylint: disable=W0613
+                            namespace: str = "",
+                            *,
+                            request: Request = None,
+                            response: Response = None,  # pylint: disable=W0613
+                            args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> str:  # pylint: disable=W0613
+        """
+        Build a unique key for caching based on the provided function, namespace, request, response,
+        arguments (args), and keyword arguments (kwargs).
+
+        Args:
+            func (Callable): The function for which the key is being built.
+            namespace (str, optional): A namespace to differentiate keys (default "").
+            request (Request, optional): The request object (default None).
+            response (Response, optional): The response object (default None).
+            args (Tuple[Any, ...]): Positional arguments passed to the function.
+            kwargs (Dict[str, Any]): Keyword arguments passed to the function.
+
+        Returns:
+            str: A unique key based on the input parameters.
+        """
+
         cache_key = ":".join([
             FastAPICache.get_prefix(),
             namespace,
@@ -56,7 +77,41 @@ class CacheManager:
             request.url.path,
             repr(sorted(request.query_params.items()))
         ])
-        logger.info(f"Cache created with key: {cache_key}")
+        logger.debug(f"Cache created with key: {cache_key}")
+        return cache_key
+
+    @staticmethod
+    def personalized_key_builder(func: Callable[..., Any],  # pylint: disable=W0613
+                                 namespace: str = "",
+                                 *,
+                                 request: Request = None,
+                                 response: Response = None,  # pylint: disable=W0613
+                                 args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> str:  # pylint: disable=W0613
+        """
+        Build a personalized unique key for caching based logged-in user on the provided function, namespace, request,
+        response, arguments (args), and keyword arguments (kwargs).
+        This should be used for apis specific to logged-in user.
+
+        Args:
+            func (Callable): The function for which the key is being built.
+            namespace (str, optional): A namespace to differentiate keys (default "").
+            request (Request, optional): The request object (default None).
+            response (Response, optional): The response object (default None).
+            args (Tuple[Any, ...]): Positional arguments passed to the function.
+            kwargs (Dict[str, Any]): Keyword arguments passed to the function.
+
+        Returns:
+            str: A unique key based on the input parameters.
+        """
+        cache_key = ":".join([
+            CACHE_PREFIX,
+            namespace,
+            request.user,
+            request.method.lower(),
+            request.url.path,
+            repr(sorted(request.query_params.items()))
+        ])
+        logger.debug(f"Cache created with key: {cache_key}")
         return cache_key
 
     @staticmethod
@@ -64,11 +119,11 @@ class CacheManager:
         cache_enabled = FastAPICache.get_enable()
         if cache_enabled:
             await FastAPICache.clear(namespace=namespace)
-            logger.info(f"Cache cleared for namespaces: {namespace}")
+            logger.debug(f"Cache cleared for namespaces: {namespace}")
 
     @staticmethod
     async def clear_all_cache():
         cache_enabled = FastAPICache.get_enable()
         if cache_enabled:
             await FastAPICache.clear()
-            logger.info("Cache cleared for all namespaces")
+            logger.debug("Cache cleared for all namespaces")

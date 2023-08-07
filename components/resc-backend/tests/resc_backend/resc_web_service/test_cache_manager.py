@@ -45,41 +45,64 @@ def test_initialize_cache_with_cache_disabled(mock_cache_init):
 
 
 @patch("fastapi_cache.FastAPICache.get_prefix")
-def test_request_key_builder(mock_get_prefix):
+@patch("logging.Logger.debug")
+def test_request_key_builder(mock_debug_log, mock_get_prefix):
     mock_get_prefix.return_value = CACHE_PREFIX
     mock_request = MagicMock(spec=Request)
     mock_request.method = "GET"
     mock_request.url.path = "http://example.com/path"
     mock_request.query_params.items.return_value = ["param", "value"]
+    expected_cache_key = f"{CACHE_PREFIX}:test-namespace:get:http://example.com/path:['param', 'value']"
+    expected_debug_msg = f"Cache created with key: {expected_cache_key}"
     response = Response()
     cache_key = CacheManager.request_key_builder(
-        func=None, namespace="test-namespace", request=mock_request, response=response
+        func=None, namespace="test-namespace", request=mock_request, response=response, args=None, kwargs=None,
     )
-    assert cache_key == f"{CACHE_PREFIX}:test-namespace:get:http://example.com/path:['param', 'value']"
+    assert cache_key == expected_cache_key
+    mock_debug_log.assert_called_once_with(expected_debug_msg)
+
+
+@patch("fastapi_cache.FastAPICache.get_prefix")
+@patch("logging.Logger.debug")
+def test_personalized_key_builder(mock_debug_log, mock_get_prefix):
+    mock_get_prefix.return_value = CACHE_PREFIX
+    mock_request = MagicMock(spec=Request)
+    mock_request.method = "GET"
+    mock_request.url.path = "http://example.com/path"
+    mock_request.user = "test-user"
+    mock_request.query_params.items.return_value = ["param", "value"]
+    expected_cache_key = f"{CACHE_PREFIX}:test-namespace:test-user:get:http://example.com/path:['param', 'value']"
+    expected_debug_msg = f"Cache created with key: {expected_cache_key}"
+    response = Response()
+    cache_key = CacheManager.personalized_key_builder(
+        func=None, namespace="test-namespace", request=mock_request, response=response, args=None, kwargs=None,
+    )
+    assert cache_key == expected_cache_key
+    mock_debug_log.assert_called_once_with(expected_debug_msg)
 
 
 @pytest.mark.asyncio
 @patch("fastapi_cache.FastAPICache.get_enable")
 @patch("fastapi_cache.FastAPICache.clear")
-@patch("logging.Logger.info")
-async def test_clear_cache_by_namespace(mock_info_log, mock_clear, mock_get_enable):
+@patch("logging.Logger.debug")
+async def test_clear_cache_by_namespace(mock_debug_log, mock_clear, mock_get_enable):
     mock_clear.return_value = None
     mock_get_enable.return_value = True
     namespace = "test-namespace"
-    expected_info_msg = f"Cache cleared for namespaces: {namespace}"
+    expected_debug_msg = f"Cache cleared for namespaces: {namespace}"
     await CacheManager.clear_cache_by_namespace(namespace=namespace)
     mock_clear.assert_called_once_with(namespace=namespace)
-    mock_info_log.assert_called_once_with(expected_info_msg)
+    mock_debug_log.assert_called_once_with(expected_debug_msg)
 
 
 @pytest.mark.asyncio
 @patch("fastapi_cache.FastAPICache.get_enable")
 @patch("fastapi_cache.FastAPICache.clear")
-@patch("logging.Logger.info")
-async def test_clear_all_cache(mock_info_log, mock_clear, mock_get_enable):
+@patch("logging.Logger.debug")
+async def test_clear_all_cache(mock_debug_log, mock_clear, mock_get_enable):
     mock_clear.return_value = None
     mock_get_enable.return_value = True
-    expected_info_msg = "Cache cleared for all namespaces"
+    expected_debug_msg = "Cache cleared for all namespaces"
     await CacheManager.clear_all_cache()
     mock_clear.assert_called_once()
-    mock_info_log.assert_called_once_with(expected_info_msg)
+    mock_debug_log.assert_called_once_with(expected_debug_msg)

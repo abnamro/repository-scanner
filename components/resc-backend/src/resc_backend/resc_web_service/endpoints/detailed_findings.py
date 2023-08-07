@@ -5,13 +5,16 @@ import urllib.parse
 
 # Third Party
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
     FINDINGS_TAG,
+    REDIS_CACHE_EXPIRE,
     RWS_ROUTE_DETAILED_FINDINGS
 )
 from resc_backend.db.connection import Session
@@ -35,6 +38,7 @@ logger = logging.getLogger(__name__)
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
                               limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                               db_connection: Session = Depends(get_db_connection),
@@ -132,6 +136,7 @@ def get_all_detailed_findings(skip: int = Query(default=0, ge=0),
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) \
         -> detailed_finding_schema.DetailedFindingRead:
     """

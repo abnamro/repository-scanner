@@ -16,13 +16,8 @@ from resc_backend.db.connection import Session, engine
 from resc_backend.helpers.environment_wrapper import validate_environment
 from resc_backend.resc_web_service.configuration import (
     AUTHENTICATION_REQUIRED,
-    CONDITIONAL_REDIS_ENV_VARS,
     CORS_ALLOWED_DOMAINS,
     ENABLE_CORS,
-    REDIS_PASSWORD,
-    RESC_REDIS_CACHE_ENABLE,
-    RESC_REDIS_SERVICE_HOST,
-    RESC_REDIS_SERVICE_PORT,
     WEB_SERVICE_ENV_VARS
 )
 from resc_backend.resc_web_service.dependencies import (

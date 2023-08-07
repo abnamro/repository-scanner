@@ -7,18 +7,24 @@ from typing import List, Optional
 import tomlkit
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import FileResponse
+from fastapi_cache.decorator import cache
 from packaging.version import Version
 from pydantic import Required
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
+    CACHE_NAMESPACE_RULE,
+    CACHE_NAMESPACE_RULE_PACK,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
+    REDIS_CACHE_EXPIRE,
     RULE_PACKS_TAG,
     RWS_ROUTE_RULE_PACKS
 )
 from resc_backend.db.connection import Session
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import rule as rule_crud
 from resc_backend.resc_web_service.crud import rule_pack as rule_pack_crud
 from resc_backend.resc_web_service.crud import rule_tag as rule_tag_crud
@@ -50,6 +56,7 @@ logger = logging.getLogger(__name__)
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_RULE_PACK, expire=REDIS_CACHE_EXPIRE)
 def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
                    active: Optional[bool] = Query(None, description="Filter on active rule packs"),
                    skip: int = Query(default=0, ge=0),
@@ -122,9 +129,9 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
-                               rule_file: UploadFile = File(...),
-                               db_connection: Session = Depends(get_db_connection)) -> dict:
+async def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
+                                     rule_file: UploadFile = File(...),
+                                     db_connection: Session = Depends(get_db_connection)) -> dict:
     """
         Upload TOML rule pack to database
 
@@ -173,6 +180,11 @@ def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\
     if created_rule_pack_version and created_rule_pack_version.version:
         insert_rules(version=version, toml_rule_dictionary=toml_rule_dictionary,
                      db_connection=db_connection)
+
+        # Clear cache related to rule-pack
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_RULE)
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_RULE_PACK)
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
     return {"filename": rule_file.filename}
 
 
@@ -284,6 +296,7 @@ def insert_rules(version: str, toml_rule_dictionary: dict, db_connection: Sessio
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_RULE_PACK, expire=REDIS_CACHE_EXPIRE)
 def get_rule_packs_tags(versions: Optional[List[str]] = Query(None, alias="version", title="version"),
                         db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
