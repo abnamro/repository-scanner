@@ -4,7 +4,7 @@
 #Description	: This script runs newman tests for RESC API
 #Args         : -b <resc-backend image:tag> -d <resc-database image:tag>  -n <newman image:tag>
 #Usage 1      : ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest'  \
-#                -d 'mcr.microsoft.com/azure-sql-edge:1.0.5'  \
+#                -d 'mcr.microsoft.com/azure-sql-edge:1.0.7'  \
 #                -n "postman/newman:5.3.1-alpine"
 #Usage 2      : ./run_newman_tests.sh , default values will be used
 #                if you don't provide any argument
@@ -24,7 +24,7 @@ do
 done
 
 RESC_BACKEND_IMAGE="${backend_image:-"rescabnamro/resc-backend:latest"}"
-RESC_DATABASE_IMAGE="${database_image:-"mcr.microsoft.com/azure-sql-edge:1.0.5"}"
+RESC_DATABASE_IMAGE="${database_image:-"mcr.microsoft.com/azure-sql-edge:1.0.7"}"
 RESC_NEWMAN_IMAGE="${newman_image:-"postman/newman:5.3.1-alpine"}"
 RESC_BACKEND_CONTAINER="resc-api-test"
 RESC_DATABASE_CONTAINER="resc-database-test"
