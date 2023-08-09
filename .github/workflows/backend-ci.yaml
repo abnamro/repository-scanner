@@ -142,7 +142,7 @@ jobs:
           cd ${{ env.RESC_BACKEND_DIR }}
           docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}} .
 
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability scanner - RESC-Backend
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}}
@@ -197,3 +197,33 @@ jobs:
           context: ${{ env.RESC_BACKEND_DIR }}/
           push: ${{ env.PUBLISH_IMAGE }}
           tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest, ${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{needs.python-build-and-publish.outputs.backend_version}}
+
+      - name: Run Trivy vulnerability scanner - Redis
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: redis:7.0.11-alpine
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy vulnerability scanner - RabbitMQ
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: rabbitmq:3.11.9-management-alpine
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Run Trivy vulnerability scanner - Database
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: mcr.microsoft.com/azure-sql-edge:1.0.7
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

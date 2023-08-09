@@ -170,7 +170,7 @@ If you can override the images by providing below arguments to the script.
 cd tests/newman_tests
 ./run_newman_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -n <newman image:tag> 
 
-Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'postman/newman:5.3.1-alpine'
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.7' -n 'postman/newman:5.3.1-alpine'
 ```
 
 ### Run OWASP ZAP API Security tests locally:
@@ -185,7 +185,7 @@ If you can override the images by providing below arguments to the script.
 cd tests/zap_tests
 ./run_run_zap_api_tests.sh -b <resc-backend image:tag> -d <resc-database image:tag>  -z <zap image:tag>
 
-Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.5' -n 'owasp/zap2docker-weekly'
+Example: ./run_newman_tests.sh -b 'rescabnamro/resc-backend:latest' -d 'mcr.microsoft.com/azure-sql-edge:1.0.7' -n 'owasp/zap2docker-weekly'
 ```
 
 
