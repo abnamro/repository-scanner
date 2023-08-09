@@ -20,7 +20,7 @@ The instructions for setting the database up can be found in the section [RESC-B
   <summary>Preview</summary>
   
   Ensure resc database is up and running locally. </br>
-  Open the terminal from `components/resc-backend/src/resc_backend/bin/dummy-data-generator` folder and run below commands.
+  Open the terminal from `components/resc-backend/src/resc_backend/bin/dummy_data_generator` folder and run below commands.
 
 #### Execute command:
   ```bash

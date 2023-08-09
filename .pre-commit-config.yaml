@@ -1,0 +1,115 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        pass_filenames: false
+        files: ^components/resc-vcs-scanner
+        entry: bash -c 'cd components/resc-vcs-scanner && isort src/ tests/ "$@"' --
+      - id: isort
+        pass_filenames: false
+        files: ^components/resc-vcs-scraper/
+        entry: bash -c 'cd components/resc-vcs-scraper && isort src/ tests/ "$@"' --
+      - id: isort
+        pass_filenames: false
+        files: ^components/resc-backend/
+        entry: bash -c 'cd components/resc-backend && isort src/ tests/ "$@"' --
+      - id: isort
+        pass_filenames: false
+        files: ^deployment/resc-helm-wizard/
+        entry: bash -c 'cd deployment/resc-helm-wizard && isort src/ tests/ "$@"' --
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+    - id: flake8
+      pass_filenames: false
+      files: ^components/resc-vcs-scanner
+      args: [--max-line-length=120]
+      entry: bash -c 'cd components/resc-vcs-scanner && flake8 src/ "$@"' --
+    - id: flake8
+      pass_filenames: false
+      files: ^components/resc-vcs-scraper
+      args: [--max-line-length=120]
+      entry: bash -c 'cd components/resc-vcs-scraper && flake8 src/ "$@"' --
+    - id: flake8
+      pass_filenames: false
+      files: ^components/resc-backend
+      args: [--max-line-length=120]
+      entry: bash -c 'cd components/resc-backend && flake8 src/ "$@"' --
+    - id: flake8
+      pass_filenames: false
+      files: ^deployment/resc-helm-wizard/
+      args: [--max-line-length=120]
+      entry: bash -c 'cd deployment/resc-helm-wizard && flake8 src/ "$@"' --
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v3.0.0a6
+    hooks:
+    - id: pylint
+      pass_filenames: false
+      files: ^components/resc-vcs-scanner
+      additional_dependencies: [
+        "celery==5.2.4",
+        "amqp==5.1.1",
+        "requests==2.31.0",
+        "typing==3.7.4.3",
+        "pydantic==1.8.2",
+        "GitPython==3.1.30",
+        "resc-backend>=1.4.0",
+        "tenacity==8.0.1",
+        "prettytable==3.6.0",
+        "termcolor==2.2.0",
+        "tomlkit==0.11.1",
+      ]
+      entry: bash -c 'cd components/resc-vcs-scanner && pylint src/' --
+    - id: pylint
+      pass_filenames: false
+      files: ^components/resc-vcs-scraper
+      additional_dependencies: [
+        "celery==5.2.3",
+        "atlassian-python-api==3.10.0",
+        "requests==2.31.0",
+        "azure-devops==6.0.0b4",
+        "tenacity==8.0.1",
+        "pydantic==1.8.2",
+        "pygithub==1.55"
+      ]
+      entry: bash -c 'cd components/resc-vcs-scraper && pylint src/' --
+    - id: pylint
+      pass_filenames: false
+      files: ^components/resc-backend
+      additional_dependencies: [
+        "celery==5.2.4",
+        "amqp==5.1.1",
+        "requests==2.31.0",
+        "sqlalchemy==1.4.37",
+        "alembic==1.8.0",
+        "fastapi==0.66.1",
+        "typing==3.7.4.3",
+        "pydantic==1.8.2",
+        "uvicorn==0.17.6",
+        "waitress==2.1.2",
+        "pyjwt[crypto]==2.4.0",
+        "cryptography==41.0.3",
+        "tenacity==8.0.1",
+        "tomlkit==0.11.1",
+        "python-multipart==0.0.5",
+        "aiofiles==0.8.0",
+        "GitPython==3.1.30",
+        "packaging==21.3",
+        "fastapi-cache2==0.2.1",
+        "redis==4.5.5"
+      ]
+      entry: bash -c 'cd components/resc-backend && pylint src/' --
+    - id: pylint
+      pass_filenames: false
+      files: ^deployment/resc-helm-wizard/
+      additional_dependencies: [
+        "requests",
+        "questionary",
+        "PyYAML"
+      ]
+      entry: bash -c 'cd deployment/resc-helm-wizard && pylint src/' --

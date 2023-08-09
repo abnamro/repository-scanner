@@ -67,8 +67,8 @@ TOML_CUSTOM_DELIMITER = "#custom-delimiter#"
 TEMP_RULE_FILE = "/tmp/temp_resc_rule.toml"
 ALLOWED_EXTENSION = ".toml"
 
-# Logging for dummy-data-generator
-LOG_FILE_DUMMY_DATA_GENERATOR = "dummy-data-gen.log"
+# Logging for dummy_data_generator
+LOG_FILE_DUMMY_DATA_GENERATOR = "dummy_data_gen.log"
 
 # Logging
 LOG_FILE_PATH_RABBITMQ = "rabbitmq_initialization.log"

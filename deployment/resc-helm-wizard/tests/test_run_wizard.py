@@ -1,5 +1,4 @@
 # Standard Library
-import sys
 from unittest.mock import patch
 
 # First Party

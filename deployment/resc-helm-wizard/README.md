@@ -13,7 +13,7 @@
 <!-- ABOUT THE COMPONENT -->
 ## About the component
 The helm values wizard is an interactive CLI tool to generate the values yaml file which can be used for helm deployment of RESC.
-On successful run, this CLI produces custom-values.yaml file in resc-helm-wizard directory.  
+On successful run, this CLI produces custom-values.yaml file in resc-helm-wizard directory.
 
 
 <!-- GETTING STARTED -->
@@ -34,7 +34,7 @@ Install the package:
 pip install resc-helm-wizard
 ```
 
-Run the wizard: 
+Run the wizard:
 ```bash
 resc-helm-wizard
 ```

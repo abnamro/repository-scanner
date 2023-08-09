@@ -1,6 +1,5 @@
 # Standard Library
 import os
-import sys
 from pathlib import Path
 from typing import List
 from unittest.mock import patch
