@@ -5,11 +5,15 @@ from typing import List, Optional
 
 # Third Party
 from fastapi import APIRouter, Depends, Query, status
+from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
+    CACHE_NAMESPACE_RULE,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
+    REDIS_CACHE_EXPIRE,
     RULES_TAG,
     RWS_ROUTE_DETECTED_RULES,
     RWS_ROUTE_FINDING_STATUS_COUNT,
@@ -37,6 +41,7 @@ logger = logging.getLogger(__name__)
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_RULE, expire=REDIS_CACHE_EXPIRE)
 def get_distinct_rules_from_findings(
         finding_statuses: List[FindingStatus] = Query(None, alias="findingstatus", title="FindingStatuses"),
         vcs_providers: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
@@ -80,6 +85,7 @@ def get_distinct_rules_from_findings(
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_rules_finding_status_count(
         rule_pack_versions: Optional[List[str]] = Query(None, alias="rule_pack_version", title="RulePackVersion"),
         rule_tags: Optional[List[str]] = Query(None, alias="rule_tag", title="RuleTag"),

@@ -3,16 +3,19 @@ from datetime import datetime
 from typing import List, Optional
 
 # Third Party
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi_cache.decorator import cache
 
 # First Party
 from resc_backend.constants import (
-    CACHE_MAX_AGE,
     CACHE_NAMESPACE_FINDING,
+    CACHE_NAMESPACE_FINDING_STATUS,
+    CACHE_NAMESPACE_RULE,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
     FINDINGS_TAG,
+    REDIS_CACHE_EXPIRE,
     RWS_ROUTE_AUDIT,
     RWS_ROUTE_BY_RULE,
     RWS_ROUTE_COUNT_BY_TIME,
@@ -48,6 +51,7 @@ router = APIRouter(prefix=f"{RWS_ROUTE_FINDINGS}", tags=[FINDINGS_TAG])
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_all_findings(skip: int = Query(default=0, ge=0),
                      limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                      db_connection: Session = Depends(get_db_connection)) \
@@ -103,6 +107,7 @@ async def create_findings(findings: List[finding_schema.FindingCreate],
 
         # Clear cache related to findings
         await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
+        await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_RULE)
     except KeyError as err:
         raise HTTPException(status_code=400, detail=str(err)) from err
     return len(created_findings)
@@ -118,6 +123,7 @@ async def create_findings(findings: List[finding_schema.FindingCreate],
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def read_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Read a finding by ID
@@ -204,6 +210,7 @@ async def delete_finding(finding_id: int, db_connection: Session = Depends(get_d
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_total_findings_count_by_rule(rule_name: str, db_connection: Session = Depends(get_db_connection)):
     """
         Retrieve total findings count for a given rule
@@ -224,6 +231,7 @@ def get_total_findings_count_by_rule(rule_name: str, db_connection: Session = De
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_findings_by_rule(rule_name: str, skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                          db_connection: Session = Depends(get_db_connection)) \
@@ -295,6 +303,7 @@ async def audit_findings(
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
+@cache(namespace=CACHE_NAMESPACE_FINDING, expire=REDIS_CACHE_EXPIRE)
 def get_finding_audits(finding_id: int, skip: int = Query(default=0, ge=0),
                        limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                        db_connection: Session = Depends(get_db_connection)) \
@@ -324,14 +333,14 @@ def get_finding_audits(finding_id: int, skip: int = Query(default=0, ge=0),
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-def get_supported_statuses(response: Response) -> List[str]:
+@cache(namespace=CACHE_NAMESPACE_FINDING_STATUS, expire=REDIS_CACHE_EXPIRE)
+def get_supported_statuses() -> List[str]:
     """
         Retrieve all supported statuses for findings
 
     - **return**: List[str]
         The output will contain a list of strings of unique statuses supported
     """
-    response.headers["Cache-Control"] = CACHE_MAX_AGE
     supported_finding_statuses = [finding_status for finding_status in FindingStatus if finding_status]
     return supported_finding_statuses
 

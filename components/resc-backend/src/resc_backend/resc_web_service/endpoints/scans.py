@@ -8,6 +8,8 @@ from sqlalchemy.exc import IntegrityError
 
 # First Party
 from resc_backend.constants import (
+    CACHE_NAMESPACE_FINDING,
+    CACHE_NAMESPACE_RULE,
     DEFAULT_RECORDS_PER_PAGE_LIMIT,
     ERROR_MESSAGE_500,
     ERROR_MESSAGE_503,
@@ -18,6 +20,7 @@ from resc_backend.constants import (
 )
 from resc_backend.db.connection import Session
 from resc_backend.db.model import DBscanFinding
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.crud import finding as finding_crud
 from resc_backend.resc_web_service.crud import scan as scan_crud
 from resc_backend.resc_web_service.crud import scan_finding as scan_finding_crud
@@ -187,9 +190,9 @@ def delete_scan(scan_id: int, db_connection: Session = Depends(get_db_connection
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-def create_scan_findings(scan_id: int,
-                         findings: List[finding_schema.FindingCreate],
-                         db_connection: Session = Depends(get_db_connection)) \
+async def create_scan_findings(scan_id: int,
+                               findings: List[finding_schema.FindingCreate],
+                               db_connection: Session = Depends(get_db_connection)) \
         -> int:
     """
         Creates findings and their associated scan_findings for a given scan
@@ -224,6 +227,10 @@ def create_scan_findings(scan_id: int,
 
     _ = scan_finding_crud.create_scan_findings(
         db_connection=db_connection, scan_findings=scan_findings)
+
+    # Clear cache related to findings
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_FINDING)
+    await CacheManager.clear_cache_by_namespace(namespace=CACHE_NAMESPACE_RULE)
 
     return len(created_findings)
 
