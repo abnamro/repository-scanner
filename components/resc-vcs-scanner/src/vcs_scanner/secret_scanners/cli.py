@@ -260,7 +260,8 @@ def scan_repository(args: Namespace):
         username=args.username,
         personal_access_token=args.password,
         local_path=f"{args.dir.absolute()}",
-        force_base_scan=args.force_base_scan
+        force_base_scan=args.force_base_scan,
+        latest_commit="unknown"
     )
 
     secret_scanner.run_repository_scan()

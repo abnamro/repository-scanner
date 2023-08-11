@@ -42,9 +42,14 @@ def extract_project_information(project_key, vcs_client, vcs_instance_name):
             logger.info(f"Fetching latest commit for repository: '{project_key}/{repository['name']}'")
             latest_commit = vcs_client.get_latest_commit(project_key=project_key, repository_id=repository["name"])
             task_parameters = vcs_client.export_repository(repository, latest_commit, vcs_instance_name)
-            project_tasks.append(task_parameters)
+            if latest_commit:
+                project_tasks.append(task_parameters)
+                logger.info(f"Information for repository: '{project_key}/{repository['name']}' "
+                            f"was fetched successfully")
+            else:
+                # Repository has no commits, will not forward to scanner
+                logger.info(f"Repository: '{project_key}/{repository['name']}' has no commits, skipping")
 
-            logger.info(f"Information for repository: '{project_key}/{repository['name']}' was fetched successfully")
         except requests.exceptions.HTTPError as http_exception:
             logger.error(
                 f"Error while processing repository '{project_key}/{repository['name']}':"
