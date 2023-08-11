@@ -7,6 +7,7 @@ spec:
   suspend: {{ .Values.suspend }}
   schedule: "{{ .Values.config.schedule }}"
   concurrencyPolicy: Forbid
+  startingDeadlineSeconds: {{ .Values.config.startingDeadlineSeconds }}
   successfulJobsHistoryLimit: {{ .Values.config.successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .Values.config.failedJobsHistoryLimit }}
   jobTemplate:

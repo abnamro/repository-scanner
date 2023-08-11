@@ -12,6 +12,7 @@ config:
   schedule:
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 0
+  startingDeadlineSeconds: 100
 resources:
   requests:
     cpu: 300m
