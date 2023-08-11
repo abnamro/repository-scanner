@@ -66,6 +66,11 @@ class SecretScanner(RESCWorker):  # pylint: disable=R0902
         return repo_clone_path
 
     def run_repository_scan(self) -> None:
+        if not self.latest_commit:
+            # There is no latest commit for this repository, assuming that its empty
+            logger.info(f"Skipping scanning of {self.repository.project_key}/{self.repository.repository_name} "
+                        f"there are no commits")
+            return
         logger.info(
             f"Started task for scanning {self.repository.repository_name} using "
             f"rule pack version: {self.rule_pack_version}")
