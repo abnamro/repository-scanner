@@ -122,10 +122,6 @@ resc-redis:
     config:
       port: 6379
       password: "Y0urStr0ngPassword" # <enter Redis password here for caching, default to Y0urStr0ngPassword>
-    resources:
-      limits:
-        cpu: 250m
-        memory: 256Mi
 
 resc-vcs-instances:
   vcsInstances:
