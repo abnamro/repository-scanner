@@ -7,6 +7,8 @@ metadata:
   labels:
     app: {{ .Values.global.appName }}
     tier: api{{ .Values.nameSuffix }}
+  annotations:
+    datree.skip/SERVICE_INCORRECT_TYPE_VALUE_NODEPORT: irrelevant as its only exposed for local environment and can be enabled/disabled from env specific values.yaml
 spec:
   {{ if .Values.exposeToHostPort }}
   type: NodePort
