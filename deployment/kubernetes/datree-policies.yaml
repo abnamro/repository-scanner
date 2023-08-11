@@ -6,7 +6,7 @@ policies:
       - identifier: INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE
         messageOnFailure: Incorrect value for key `host` - specify host instead of using a wildcard character ("*")
       #- identifier: CONTAINERS_MISSING_IMAGE_VALUE_VERSION # Not applicable to RESC
-      #  messageOnFailure: Incorrect value for key `image` - specify an image version to avoid unpleasant "version surprises" in the future
+        # messageOnFailure: Incorrect value for key `image` - specify an image version to avoid unpleasant "version surprises" in the future
       - identifier: DEPLOYMENT_MISSING_LABEL_ENV_VALUE
         messageOnFailure: 'Missing label object `env` - add a proper environment description (e.g. "prod", "testing", etc.) to the Deployment config'
       - identifier: CONTAINERS_MISSING_CPU_REQUEST_KEY
@@ -25,12 +25,12 @@ policies:
         messageOnFailure: Incorrect value for key `hostPID` - running on the host’s PID namespace enables access to sensitive information from processes running outside the container
       - identifier: K8S_DEPRECATED_APIVERSION_1.16
         messageOnFailure: Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.16)
-      - identifier: CONTAINERS_MISSING_IMAGE_VALUE_DIGEST
-        messageOnFailure: 'Incorrect value for key `image` - add a digest tag (starts with `@sha256:`) to represent an immutable version of the image'
+      # - identifier: CONTAINERS_MISSING_IMAGE_VALUE_DIGEST # Not applicable to RESC, version tag is better and we don't want to update our Kubernetes manifests with image digest tag on everytime we public a image
+        # messageOnFailure: 'Incorrect value for key `image` - add a digest tag (starts with `@sha256:`) to represent an immutable version of the image'
       - identifier: CONTAINERS_INCORRECT_HOSTIPC_VALUE_TRUE
         messageOnFailure: Incorrect value for key `hostIPC` - running on the host’s IPC namespace can be (maliciously) used to interact with other processes running outside the container
     #  - identifier: DEPLOYMENT_INCORRECT_REPLICAS_VALUE # Not applicable to RESC
-    #   messageOnFailure: Incorrect value for key `replicas` - don't relay on a single pod to do all of the work. Running 2 or more replicas will increase the availability of the service
+        # messageOnFailure: Incorrect value for key `replicas` - don't relay on a single pod to do all of the work. Running 2 or more replicas will increase the availability of the service
       - identifier: HPA_MISSING_MAXREPLICAS_KEY
         messageOnFailure: Missing property object `maxReplicas` - the value should be within the accepted boundaries recommended by the organization
       - identifier: CONTAINERS_MISSING_READINESSPROBE_KEY
