@@ -45,6 +45,9 @@ spec:
         ports:
         - containerPort: {{ .Values.redis.config.port}}
         resources:
+          requests:
+              cpu: {{ .Values.redis.resources.requests.cpu }}
+              memory: {{ .Values.redis.resources.requests.memory }}
           limits:
             cpu: {{ .Values.redis.resources.limits.cpu }}
             memory: {{ .Values.redis.resources.limits.memory }}
