@@ -6,6 +6,8 @@ metadata:
   labels:
     app: {{ .Values.global.appName }}
     tier: frontend
+  annotations:
+    datree.skip/SERVICE_INCORRECT_TYPE_VALUE_NODEPORT: irrelevant as frontend needs to be exposed outside of the cluster
 spec:
   {{ if .Values.exposeToHostPort }}
   type: NodePort
