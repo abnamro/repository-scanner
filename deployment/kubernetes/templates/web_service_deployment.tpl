@@ -59,11 +59,12 @@ spec:
             - name: config-volume
               mountPath: /tmp/odbc.ini
               subPath: odbc.ini
-            {{ if eq .Values.useKubernetesSecret "false"}}
+            {{- $additionalVolumeMounts := include "resc.rescWebserviceAdditionalVolumeMounts" . }}
+            {{- if $additionalVolumeMounts }}
             {{- with include "resc.rescWebserviceAdditionalVolumeMounts" .}}
                 {{- nindent 12 .}}
             {{- end }}
-            {{ end }}
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -87,11 +88,12 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Values.global.appName }}-web-service-config{{ .Values.nameSuffix }}
-        {{ if eq .Values.useKubernetesSecret "false"}}
+        {{- $additionalVolumes := include "resc.rescWebserviceAdditionalVolumes" . }}
+        {{- if $additionalVolumes }}
         {{- with include "resc.rescWebserviceAdditionalVolumes" .}}
           {{- nindent 8 .}}
         {{- end }}
-        {{ end }}
+        {{- end }}
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
       - name: {{ .Values.global.imagePullSecret }}

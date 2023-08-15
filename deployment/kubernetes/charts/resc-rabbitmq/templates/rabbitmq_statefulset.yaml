@@ -78,11 +78,12 @@ spec:
             - mountPath: "/var/lib/rabbitmq/mnesia"
               subPath: "var/lib/rabbitmq/mnesia"
               name: {{ .Values.global.appName }}-mq-pv-storage
-            {{ if eq .Values.useKubernetesSecret "false"}}
+            {{- $additionalVolumeMounts := include "resc.mqAdditionalVolumeMounts" . }}
+            {{- if $additionalVolumeMounts }}
             {{- with include "resc.mqAdditionalVolumeMounts" .}}
               {{- nindent 12 .}}
             {{- end }}
-            {{ end }}
+            {{- end }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
