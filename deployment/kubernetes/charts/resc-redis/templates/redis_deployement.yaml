@@ -45,6 +45,9 @@ spec:
         ports:
         - containerPort: {{ .Values.redis.config.port}}
         resources:
+          requests:
+              cpu: {{ .Values.redis.resources.requests.cpu }}
+              memory: {{ .Values.redis.resources.requests.memory }}
           limits:
             cpu: {{ .Values.redis.resources.limits.cpu }}
             memory: {{ .Values.redis.resources.limits.memory }}
@@ -53,11 +56,12 @@ spec:
           name: data
         - mountPath: /redis-master
           name: config
-        {{ if eq .Values.useKubernetesSecret "false"}}
+        {{- $additionalVolumeMounts := include "resc.redisAdditionalVolumeMounts" . }}
+        {{- if $additionalVolumeMounts }}
         {{- with include "resc.redisAdditionalVolumeMounts" .}}
           {{- nindent 8 .}}
         {{- end }}
-        {{ end }}
+        {{- end }}
       volumes:
         - name: data
           emptyDir: {}
@@ -67,10 +71,11 @@ spec:
             items:
             - key: redis-config
               path: redis.conf
-        {{ if eq .Values.useKubernetesSecret "false"}}
+        {{- $additionalVolumes := include "resc.redisAdditionalVolumes" . }}
+        {{- if $additionalVolumes }}
         {{- with include "resc.redisAdditionalVolumes" .}}
           {{- nindent 8 .}}
         {{- end }}
-        {{ end }}
+        {{- end }}
 
           

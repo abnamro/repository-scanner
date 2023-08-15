@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.global.appName }}-frontend
   namespace: {{ .Values.global.namespace }}
+  annotations:
+    datree.skip/CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID: irrelevant for nginx docker image, skipping.
 spec:
   replicas: {{ .Values.replicas}}
   selector:

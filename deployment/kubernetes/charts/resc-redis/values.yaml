@@ -1,4 +1,9 @@
 redis:
+  image:
+    repository:
+    name: redis
+    tag: 7.0.11-alpine
+    pullPolicy: IfNotPresent
   resources:
     requests:
       cpu: 250m
@@ -6,11 +11,6 @@ redis:
     limits:
       cpu: 250m
       memory: 256Mi
-  image:
-    repository:
-    name: redis
-    tag: 7.0.11-alpine
-    pullPolicy: IfNotPresent
   config:
     port: 6379
     password:
