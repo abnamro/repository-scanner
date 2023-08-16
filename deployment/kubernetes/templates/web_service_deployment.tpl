@@ -76,14 +76,20 @@ spec:
               type: RuntimeDefault
             runAsNonRoot: true
             runAsUser: 10001
-          {{ if eq .Values.resc.authRequired "false"  }}
-          readinessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 300
+          livenessProbe:
             httpGet:
               path: /resc/v1/health
               port: {{ .Values.port }}
-          {{ end }}
+            initialDelaySeconds: 10
+            periodSeconds: 300
+            timeoutSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /resc/v1/health
+              port: {{ .Values.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 300
+            timeoutSeconds: 60
       volumes:
         - name: config-volume
           configMap:
