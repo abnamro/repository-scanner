@@ -52,6 +52,22 @@ spec:
               type: RuntimeDefault
             runAsNonRoot: true
             runAsUser: 101
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.port }}
+              path: /login
+            initialDelaySeconds: 10
+            periodSeconds: 300
+            timeoutSeconds: 60
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - curl http://$RESC_API_SERVICE_HOST:$RESC_API_SERVICE_PORT/resc/v1/health
+            initialDelaySeconds: 10
+            periodSeconds: 300
+            timeoutSeconds: 60
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
