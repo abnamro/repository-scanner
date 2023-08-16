@@ -1,5 +1,6 @@
 # pylint: disable=no-name-in-module
 # Standard Library
+import datetime
 from typing import Optional
 
 # Third Party
@@ -29,6 +30,7 @@ class RulePack(RulePackBase):
 
 class RulePackRead(RulePackBase):
     version: constr(regex=RULE_PACK_VERSION_REGEX)
+    created: datetime.datetime
 
     class Config:
         orm_mode = True
