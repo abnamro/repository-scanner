@@ -86,6 +86,7 @@
 <script>
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
+import DateUtils from '@/utils/date-utils';
 import Spinner from '@/components/Common/Spinner.vue';
 import RulePackUploadModal from '@/components/RulePack/RulePackUploadModal.vue';
 import Pagination from '@/components/Common/Pagination.vue';
@@ -118,6 +119,14 @@ export default {
           label: 'Active',
           class: 'text-left position-sticky',
           thStyle: { borderTop: '0px' },
+        },
+        {
+          key: 'created',
+          sortable: true,
+          label: 'Created',
+          class: 'text-left position-sticky',
+          thStyle: { borderTop: '0px' },
+          formatter: 'formatDate',
         },
         {
           key: 'download',
@@ -181,6 +190,10 @@ export default {
         .catch((error) => {
           AxiosConfig.handleError(error);
         });
+    },
+    formatDate(timestamp) {
+      const date = DateUtils.formatDate(timestamp);
+      return timestamp ? date : 'Not Scanned';
     },
   },
 
