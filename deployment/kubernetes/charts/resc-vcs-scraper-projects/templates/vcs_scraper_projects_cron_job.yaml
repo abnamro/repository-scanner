@@ -3,6 +3,9 @@ kind: CronJob
 metadata:
   name: {{ .Values.global.appName }}-vcs-scraper-projects
   namespace: {{ .Values.global.namespace }}
+  annotations:
+    datree.skip/CONTAINERS_MISSING_LIVENESSPROBE_KEY: irrelevant for this short lived container, skipping.
+    datree.skip/CONTAINERS_MISSING_READINESSPROBE_KEY: irrelevant for this short lived container, skipping.
 spec:
   suspend: {{ .Values.suspend }}
   schedule: "{{ .Values.config.schedule }}"
