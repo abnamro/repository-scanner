@@ -98,17 +98,18 @@ spec:
               type: RuntimeDefault
             runAsNonRoot: true
             runAsUser: 10001
-          {{ if eq .Values.useKubernetesSecret "true"}}
+          livenessProbe:
+            exec:
+              command: [ "rabbitmq-diagnostics", "status" ]
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 15
           readinessProbe:
-            initialDelaySeconds: 15
-            periodSeconds: 300
-            httpGet:
-              path: /api/health/checks/alarms
-              port: {{ .Values.rabbitMQ.config.mgmtPort}}
-              httpHeaders:
-                - name: Authorization
-                  value: Basic {{ printf "%s:%s" .Values.rabbitMQ.config.admin_username .Values.rabbitMQ.config.admin_password | b64enc }}
-          {{ end }}
+            exec:
+              command: [ "rabbitmq-diagnostics", "ping" ]
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
       {{ if .Values.global.imagePullSecret_proxy }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret_proxy }}
