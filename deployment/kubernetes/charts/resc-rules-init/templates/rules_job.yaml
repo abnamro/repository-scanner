@@ -6,6 +6,8 @@ metadata:
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    datree.skip/CONTAINERS_MISSING_LIVENESSPROBE_KEY: irrelevant for this short lived container, skipping.
+    datree.skip/CONTAINERS_MISSING_READINESSPROBE_KEY: irrelevant for this short lived container, skipping.
 spec:
   ttlSecondsAfterFinished: 600
   template:
