@@ -80,16 +80,16 @@ spec:
             httpGet:
               path: /resc/v1/health
               port: {{ .Values.port }}
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 300
-            timeoutSeconds: 60
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               path: /resc/v1/health
               port: {{ .Values.port }}
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 300
-            timeoutSeconds: 60
+            timeoutSeconds: 10
       volumes:
         - name: config-volume
           configMap:

@@ -56,18 +56,16 @@ spec:
             httpGet:
               port: {{ .Values.port }}
               path: /login
-            initialDelaySeconds: 10
-            periodSeconds: 300
-            timeoutSeconds: 60
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
           readinessProbe:
-            exec:
-              command:
-              - sh
-              - -c
-              - curl http://$RESC_API_SERVICE_HOST:$RESC_API_SERVICE_PORT/resc/v1/health
-            initialDelaySeconds: 10
-            periodSeconds: 300
-            timeoutSeconds: 60
+            httpGet:
+              port: {{ .Values.port }}
+              path: /healthz
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
       {{ if .Values.global.imagePullSecret }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}

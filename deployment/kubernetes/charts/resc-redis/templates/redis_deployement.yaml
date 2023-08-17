@@ -62,6 +62,21 @@ spec:
           {{- nindent 8 .}}
         {{- end }}
         {{- end }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.redis.config.port }}
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "output=$(redis-cli -p {{ .Values.redis.config.port}} ping); if [ \"$output\" = \"PONG\" ]; then exit 0; else exit 1; fi"
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          timeoutSeconds: 10
       volumes:
         - name: data
           emptyDir: {}
@@ -77,5 +92,3 @@ spec:
           {{- nindent 8 .}}
         {{- end }}
         {{- end }}
-
-          
