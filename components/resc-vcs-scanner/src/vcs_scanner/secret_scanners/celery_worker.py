@@ -1,4 +1,4 @@
-# pylint: disable=E1101
+# pylint: disable=E1101,W0603
 # Standard Library
 import json
 import os
@@ -46,22 +46,29 @@ rabbitmq_queue = env_variables[RABBITMQ_QUEUE]
 rws_url = f"http://{env_variables[RESC_API_NO_AUTH_SERVICE_HOST]}:{env_variables[RESC_API_NO_AUTH_SERVICE_PORT]}"
 rws_writer: RESTAPIWriter = RESTAPIWriter(rws_url=rws_url)
 
-vcs_instances_list = load_vcs_instances(env_variables[VCS_INSTANCES_FILE_PATH])
-vcs_instances = rws_writer.write_vcs_instances(vcs_instances_list)
-
-downloaded_rule_pack_version = rws_writer.download_rule_pack()
+VCS_INSTANCES_LIST = None
+VCS_INSTANCES = None
+DOWNLOADED_RULE_PACK_VERSION = None
 
 
 @app.task(name="scan_repository", Queue=rabbitmq_queue)
 def scan_repository(repository):
-    active_rule_pack_version = rws_writer.check_active_rule_pack_version(rule_pack_version=downloaded_rule_pack_version)
+    global VCS_INSTANCES_LIST, VCS_INSTANCES, DOWNLOADED_RULE_PACK_VERSION
+    if not VCS_INSTANCES_LIST:
+        VCS_INSTANCES_LIST = load_vcs_instances(env_variables[VCS_INSTANCES_FILE_PATH])
+    if not VCS_INSTANCES:
+        VCS_INSTANCES = rws_writer.write_vcs_instances(VCS_INSTANCES_LIST)
+    if not DOWNLOADED_RULE_PACK_VERSION:
+        DOWNLOADED_RULE_PACK_VERSION = rws_writer.download_rule_pack()
+
+    active_rule_pack_version = rws_writer.check_active_rule_pack_version(rule_pack_version=DOWNLOADED_RULE_PACK_VERSION)
 
     repository_runtime = RepositoryRuntime(**json.loads(repository))
 
     logger.info(f"Received repository to scan via the queue '{rabbitmq_queue}' => "
                 f"{repository_runtime.project_key}/{repository_runtime.repository_name}")
     try:
-        vcs_instance = vcs_instances[repository_runtime.vcs_instance_name]
+        vcs_instance = VCS_INSTANCES[repository_runtime.vcs_instance_name]
 
         repository = Repository(project_key=repository_runtime.project_key,
                                 repository_id=repository_runtime.repository_id,

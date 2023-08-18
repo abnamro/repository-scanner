@@ -89,9 +89,9 @@ spec:
               - sh
               - -c
               - celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q "pong" && exit 0 || exit 1
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 60
-          timeoutSeconds: 20
+          timeoutSeconds: 120
         livenessProbe:
           exec:
             command:
@@ -100,7 +100,7 @@ spec:
               - celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q "pong" && exit 0 || exit 1
           initialDelaySeconds: 60
           periodSeconds: 60
-          timeoutSeconds: 20
+          timeoutSeconds: 120
       volumes:
         - name: config-volume
           configMap:
