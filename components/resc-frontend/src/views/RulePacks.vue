@@ -193,7 +193,7 @@ export default {
     },
     formatDate(timestamp) {
       const date = DateUtils.formatDate(timestamp);
-      return timestamp ? date : 'Not Scanned';
+      return timestamp ? date : 'Not Available';
     },
   },
 
