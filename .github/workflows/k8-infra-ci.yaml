@@ -104,7 +104,7 @@ jobs:
         cd ${{ env.KUBERNETES_INFRA_DIR }}
         # Running temporary exit code 0 till all the issues are fixed
         datree config set offline local
-        datree test resc_helm_template.yaml --only-k8s-files --no-record --verbose --only-k8s-files --policy-config datree-policies.yaml || exit 0
+        datree test resc_helm_template.yaml --only-k8s-files --no-record --verbose --policy-config datree-policies.yaml
 
   release-charts:
     name: Release Charts

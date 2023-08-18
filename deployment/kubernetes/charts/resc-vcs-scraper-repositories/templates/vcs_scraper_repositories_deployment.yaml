@@ -88,7 +88,7 @@ spec:
             command:
               - sh
               - -c
-              - celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q "pong" && exit 0 || exit 1
+              - "{{ .Values.preStartUpCommand }} celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q 'pong' && exit 0 || exit 1"
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 120
@@ -97,7 +97,7 @@ spec:
             command:
               - sh
               - -c
-              - celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q "pong" && exit 0 || exit 1
+              - "{{ .Values.preStartUpCommand }} celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q 'pong' && exit 0 || exit 1"
           initialDelaySeconds: 60
           periodSeconds: 60
           timeoutSeconds: 120

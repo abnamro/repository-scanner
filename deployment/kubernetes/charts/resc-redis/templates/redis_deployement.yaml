@@ -73,7 +73,7 @@ spec:
             command:
               - sh
               - -c
-              - "output=$(redis-cli -p $RESC_REDIS_SERVICE_PORT -a $REDIS_PASSWORD ping); if [ \"$output\" = \"PONG\" ]; then exit 0; else exit 1; fi"
+              - "{{ .Values.preStartUpCommand }} output=$(redis-cli -p $RESC_REDIS_SERVICE_PORT -a $REDIS_PASSWORD ping); if [ \"$output\" = \"PONG\" ]; then exit 0; else exit 1; fi"
           initialDelaySeconds: 20
           periodSeconds: 60
           timeoutSeconds: 10
