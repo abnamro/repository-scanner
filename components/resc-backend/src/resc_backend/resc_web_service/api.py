@@ -116,7 +116,7 @@ app = FastAPI(title="Repository Scanner (RESC)",
               description="RESC API helps you to perform several operations upon findings "
                           "obtained from multiple source code repositories.",
               version=get_package_version(),
-              openapi_tags=tags_metadata, dependencies=AUTH)
+              openapi_tags=tags_metadata)
 
 if env_variables[ENABLE_CORS].lower() in ["true"]:
     origins = env_variables[CORS_ALLOWED_DOMAINS].split(', ')
@@ -129,15 +129,15 @@ if env_variables[ENABLE_CORS].lower() in ["true"]:
     )
 
 app.include_router(health.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(common.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(rules.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(rule_packs.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(findings.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(scans.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX)
-app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX)
+app.include_router(common.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(rules.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(rule_packs.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(findings.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(detailed_findings.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(repositories.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(scans.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(vcs_instances.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
+app.include_router(metrics.router, prefix=RWS_VERSION_PREFIX, dependencies=AUTH)
 
 # Apply the security headers to the app in the form of middleware
 app.middleware("http")(add_security_headers)

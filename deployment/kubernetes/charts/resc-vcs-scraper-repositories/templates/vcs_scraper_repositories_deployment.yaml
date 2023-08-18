@@ -83,6 +83,24 @@ spec:
               type: RuntimeDefault
           runAsNonRoot: true
           runAsUser: 10001
+        readinessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "{{ .Values.preStartUpCommand }} celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q 'pong' && exit 0 || exit 1"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 120
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - -c
+              - "{{ .Values.preStartUpCommand }} celery -A vcs_scraper.repository_collector.common inspect ping -d celery@$HOSTNAME | grep -q 'pong' && exit 0 || exit 1"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 120
       volumes:
         - name: config-volume
           configMap:

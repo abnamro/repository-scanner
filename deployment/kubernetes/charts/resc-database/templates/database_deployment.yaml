@@ -62,10 +62,17 @@ spec:
             runAsUser: 10001
             seccompProfile:
               type: RuntimeDefault
-          readinessProbe:
-            initialDelaySeconds: 15
-            periodSeconds: 300
+          livenessProbe:
             tcpSocket:
               port: {{ .Values.database.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.database.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10
       automountServiceAccountToken: false
 {{ end }}
