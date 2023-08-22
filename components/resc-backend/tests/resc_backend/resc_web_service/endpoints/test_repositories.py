@@ -2,14 +2,20 @@
 import json
 import unittest
 from datetime import datetime
+from typing import Generator
 from unittest.mock import ANY, call, patch
 
 # Third Party
+import pytest
 from fastapi.testclient import TestClient
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
 
 # First Party
 from resc_backend.constants import (
     CACHE_NAMESPACE_REPOSITORY,
+    CACHE_PREFIX,
+    REDIS_CACHE_EXPIRE,
     RWS_ROUTE_DISTINCT_PROJECTS,
     RWS_ROUTE_DISTINCT_REPOSITORIES,
     RWS_ROUTE_REPOSITORIES,
@@ -18,9 +24,21 @@ from resc_backend.constants import (
 )
 from resc_backend.db.model import DBfinding, DBrepository, DBscan, DBVcsInstance
 from resc_backend.resc_web_service.api import app
+from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
 from resc_backend.resc_web_service.schema.repository import RepositoryCreate
 from resc_backend.resc_web_service.schema.vcs_instance import VCSProviders
+
+
+@pytest.fixture(autouse=True)
+def _init_cache() -> Generator[ANY, ANY, None]:
+    FastAPICache.init(InMemoryBackend(),
+                      prefix=CACHE_PREFIX,
+                      expire=REDIS_CACHE_EXPIRE,
+                      key_builder=CacheManager.request_key_builder,
+                      enable=True)
+    yield
+    FastAPICache.reset()
 
 
 class TestRepositories(unittest.TestCase):
@@ -92,6 +110,15 @@ class TestRepositories(unittest.TestCase):
         assert data["repository_name"] == repository.repository_name
         assert data["repository_url"] == repository.repository_url
         assert data["vcs_instance"] == repository.vcs_instance
+
+    @staticmethod
+    def assert_cache(cached_response):
+        assert FastAPICache.get_enable() is True
+        assert FastAPICache.get_prefix() == CACHE_PREFIX
+        assert FastAPICache.get_expire() == REDIS_CACHE_EXPIRE
+        assert FastAPICache.get_key_builder() is not None
+        assert FastAPICache.get_coder() is not None
+        assert cached_response.headers.get("cache-control") is not None
 
     @patch("resc_backend.resc_web_service.crud.repository.create_repository_if_not_exists")
     @patch("resc_backend.resc_web_service.cache_manager.CacheManager.clear_cache_by_namespace")
@@ -281,158 +308,240 @@ class TestRepositories(unittest.TestCase):
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_when_single_vcs_instance_selected(self, get_distinct_projects):
         get_distinct_projects.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].project_key
-        assert data[1] == self.db_repositories[1].project_key
-        assert data[2] == self.db_repositories[2].project_key
-        assert data[3] == self.db_repositories[3].project_key
-        assert data[4] == self.db_repositories[4].project_key
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].project_key
+            assert data[1] == self.db_repositories[1].project_key
+            assert data[2] == self.db_repositories[2].project_key
+            assert data[3] == self.db_repositories[3].project_key
+            assert data[4] == self.db_repositories[4].project_key
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_when_multiple_vcs_instance_selected(self, get_distinct_projects):
         get_distinct_projects.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}"
-                                   f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].project_key
-        assert data[1] == self.db_repositories[1].project_key
-        assert data[2] == self.db_repositories[2].project_key
-        assert data[3] == self.db_repositories[3].project_key
-        assert data[4] == self.db_repositories[4].project_key
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}"
+                                  f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].project_key
+            assert data[1] == self.db_repositories[1].project_key
+            assert data[2] == self.db_repositories[2].project_key
+            assert data[3] == self.db_repositories[3].project_key
+            assert data[4] == self.db_repositories[4].project_key
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}"
+                                         f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_by_repository_filter(self, get_distinct_projects):
         repository_name = "Test_Repository"
         get_distinct_projects.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
-                                   f"repositoryfilter={repository_name}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].project_key
-        assert data[1] == self.db_repositories[1].project_key
-        assert data[2] == self.db_repositories[2].project_key
-        assert data[3] == self.db_repositories[3].project_key
-        assert data[4] == self.db_repositories[4].project_key
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                  f"repositoryfilter={repository_name}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].project_key
+            assert data[1] == self.db_repositories[1].project_key
+            assert data[2] == self.db_repositories[2].project_key
+            assert data[3] == self.db_repositories[3].project_key
+            assert data[4] == self.db_repositories[4].project_key
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                         f"repositoryfilter={repository_name}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_by_vcs_instance_and_repository_filter(self, get_distinct_projects):
         repository_name = "Test_Repository"
-        get_distinct_projects.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}"
-                                   f"&repositoryfilter={repository_name}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].project_key
-        assert data[1] == self.db_repositories[1].project_key
-        assert data[2] == self.db_repositories[2].project_key
-        assert data[3] == self.db_repositories[3].project_key
-        assert data[4] == self.db_repositories[4].project_key
+        with self.client as client:
+            get_distinct_projects.return_value = self.db_repositories
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}"
+                                  f"&repositoryfilter={repository_name}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].project_key
+            assert data[1] == self.db_repositories[1].project_key
+            assert data[2] == self.db_repositories[2].project_key
+            assert data[3] == self.db_repositories[3].project_key
+            assert data[4] == self.db_repositories[4].project_key
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}"
+                                         f"&repositoryfilter={repository_name}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_projects")
     def test_get_distinct_projects_when_no_filter_selected(self, get_distinct_projects):
-        get_distinct_projects.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].project_key
-        assert data[1] == self.db_repositories[1].project_key
-        assert data[2] == self.db_repositories[2].project_key
-        assert data[3] == self.db_repositories[3].project_key
-        assert data[4] == self.db_repositories[4].project_key
+        with self.client as client:
+            get_distinct_projects.return_value = self.db_repositories
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].project_key
+            assert data[1] == self.db_repositories[1].project_key
+            assert data[2] == self.db_repositories[2].project_key
+            assert data[3] == self.db_repositories[3].project_key
+            assert data[4] == self.db_repositories[4].project_key
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_PROJECTS}/")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_repositories")
     def test_get_distinct_repositories_when_single_vcs_instance_selected(self, get_distinct_repositories):
         get_distinct_repositories.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].repository_name
-        assert data[1] == self.db_repositories[1].repository_name
-        assert data[2] == self.db_repositories[2].repository_name
-        assert data[3] == self.db_repositories[3].repository_name
-        assert data[4] == self.db_repositories[4].repository_name
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].repository_name
+            assert data[1] == self.db_repositories[1].repository_name
+            assert data[2] == self.db_repositories[2].repository_name
+            assert data[3] == self.db_repositories[3].repository_name
+            assert data[4] == self.db_repositories[4].repository_name
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_repositories")
     def test_get_distinct_repositories_when_multiple_vcs_instance_selected(self, get_distinct_repositories):
         get_distinct_repositories.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}"
-                                   f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].repository_name
-        assert data[1] == self.db_repositories[1].repository_name
-        assert data[2] == self.db_repositories[2].repository_name
-        assert data[3] == self.db_repositories[3].repository_name
-        assert data[4] == self.db_repositories[4].repository_name
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}"
+                                  f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].repository_name
+            assert data[1] == self.db_repositories[1].repository_name
+            assert data[2] == self.db_repositories[2].repository_name
+            assert data[3] == self.db_repositories[3].repository_name
+            assert data[4] == self.db_repositories[4].repository_name
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}"
+                                         f"&vcsprovider={VCSProviders.AZURE_DEVOPS}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_repositories")
     def test_get_distinct_repositories_by_project_name(self, get_distinct_repositories):
         project_name = "Test_Project"
         get_distinct_repositories.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
-                                   f"projectname={project_name}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].repository_name
-        assert data[1] == self.db_repositories[1].repository_name
-        assert data[2] == self.db_repositories[2].repository_name
-        assert data[3] == self.db_repositories[3].repository_name
-        assert data[4] == self.db_repositories[4].repository_name
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                  f"projectname={project_name}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].repository_name
+            assert data[1] == self.db_repositories[1].repository_name
+            assert data[2] == self.db_repositories[2].repository_name
+            assert data[3] == self.db_repositories[3].repository_name
+            assert data[4] == self.db_repositories[4].repository_name
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                         f"projectname={project_name}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_repositories")
     def test_get_distinct_repositories_by_vcs_instance_and_project_name(self, get_distinct_repositories):
         project_name = "Test_Project"
         get_distinct_repositories.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
-                                   f"vcsprovider={VCSProviders.BITBUCKET}"
-                                   f"&projectname={project_name}")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].repository_name
-        assert data[1] == self.db_repositories[1].repository_name
-        assert data[2] == self.db_repositories[2].repository_name
-        assert data[3] == self.db_repositories[3].repository_name
-        assert data[4] == self.db_repositories[4].repository_name
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                  f"vcsprovider={VCSProviders.BITBUCKET}"
+                                  f"&projectname={project_name}")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].repository_name
+            assert data[1] == self.db_repositories[1].repository_name
+            assert data[2] == self.db_repositories[2].repository_name
+            assert data[3] == self.db_repositories[3].repository_name
+            assert data[4] == self.db_repositories[4].repository_name
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/?"
+                                         f"vcsprovider={VCSProviders.BITBUCKET}"
+                                         f"&projectname={project_name}")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository.get_distinct_repositories")
     def test_get_distinct_repositories_when_no_filter_selected(self, get_distinct_repositories):
         get_distinct_repositories.return_value = self.db_repositories
-        response = self.client.get(f"{RWS_VERSION_PREFIX}"
-                                   f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/")
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data) == len(self.db_repositories)
-        assert data[0] == self.db_repositories[0].repository_name
-        assert data[1] == self.db_repositories[1].repository_name
-        assert data[2] == self.db_repositories[2].repository_name
-        assert data[3] == self.db_repositories[3].repository_name
-        assert data[4] == self.db_repositories[4].repository_name
+        with self.client as client:
+            response = client.get(f"{RWS_VERSION_PREFIX}"
+                                  f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/")
+            assert response.status_code == 200, response.text
+            data = response.json()
+            assert len(data) == len(self.db_repositories)
+            assert data[0] == self.db_repositories[0].repository_name
+            assert data[1] == self.db_repositories[1].repository_name
+            assert data[2] == self.db_repositories[2].repository_name
+            assert data[3] == self.db_repositories[3].repository_name
+            assert data[4] == self.db_repositories[4].repository_name
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}"
+                                         f"{RWS_ROUTE_REPOSITORIES}{RWS_ROUTE_DISTINCT_REPOSITORIES}/")
+            self.assert_cache(cached_response)
+            assert response.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud."
            "repository.get_findings_metadata_by_repository_id")
@@ -442,52 +551,59 @@ class TestRepositories(unittest.TestCase):
                                                          get_findings_metadata_by_repository_id):
         get_repositories.return_value = self.db_repositories[:2]
         get_repositories_count.return_value = len(self.db_repositories[:2])
-        response = self.client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}",
-                                   params={"skip": 0, "limit": 5})
-        assert response.status_code == 200, response.text
-        data = response.json()
-        assert len(data["data"]) == 2
-        self.assert_repository(data["data"][0], self.db_repositories[0])
-        self.assert_repository(data["data"][1], self.db_repositories[1])
-        assert data["total"] == 2
-        assert data["limit"] == 5
-        assert data["skip"] == 0
+        with self.client as client:
+            res = client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}",
+                             params={"skip": 0, "limit": 5})
+            assert res.status_code == 200, res.text
+            data = res.json()
+            assert len(data["data"]) == 2
+            self.assert_repository(data["data"][0], self.db_repositories[0])
+            self.assert_repository(data["data"][1], self.db_repositories[1])
+            assert data["total"] == 2
+            assert data["limit"] == 5
+            assert data["skip"] == 0
 
-        mocked_findings_meta_data = {
-            "data": {
-                "project_key": "dummmy_project",
-                "repository_id": "r2",
-                "repository_name": "dummy_repo",
-                "repository_url": "https://fake-ado.com",
-                "vcs_instance": "AZURE_DEVOPS",
-                "last_scan_id": 1,
-                "last_scan_timestamp": "2023-05-23T15:52:22.270000",
-                "id_": 1
-            },
-            "true_positive": 1,
-            "false_positive": 2,
-            "not_analyzed": 3,
-            "under_review": 4,
-            "clarification_required": 5,
-            "total_findings_count": 15
-        }
+            mocked_findings_meta_data = {
+                "data": {
+                    "project_key": "dummmy_project",
+                    "repository_id": "r2",
+                    "repository_name": "dummy_repo",
+                    "repository_url": "https://fake-ado.com",
+                    "vcs_instance": "AZURE_DEVOPS",
+                    "last_scan_id": 1,
+                    "last_scan_timestamp": "2023-05-23T15:52:22.270000",
+                    "id_": 1
+                },
+                "true_positive": 1,
+                "false_positive": 2,
+                "not_analyzed": 3,
+                "under_review": 4,
+                "clarification_required": 5,
+                "total_findings_count": 15
+            }
 
-        get_findings_metadata_by_repository_id.return_value = mocked_findings_meta_data
-        response = get_findings_metadata_by_repository_id.return_value
-        assert response["data"]["project_key"] == "dummmy_project"
-        assert response["data"]["repository_id"] == "r2"
-        assert response["data"]["repository_name"] == "dummy_repo"
-        assert response["data"]["repository_url"] == "https://fake-ado.com"
-        assert response["data"]["vcs_instance"] == "AZURE_DEVOPS"
-        assert response["data"]["last_scan_id"] == 1
-        assert response["data"]["last_scan_timestamp"] == "2023-05-23T15:52:22.270000"
-        assert response["data"]["id_"] == 1
-        assert response["true_positive"] == 1
-        assert response["false_positive"] == 2
-        assert response["not_analyzed"] == 3
-        assert response["under_review"] == 4
-        assert response["clarification_required"] == 5
-        assert response["total_findings_count"] == 15
+            get_findings_metadata_by_repository_id.return_value = mocked_findings_meta_data
+            response = get_findings_metadata_by_repository_id.return_value
+            assert response["data"]["project_key"] == "dummmy_project"
+            assert response["data"]["repository_id"] == "r2"
+            assert response["data"]["repository_name"] == "dummy_repo"
+            assert response["data"]["repository_url"] == "https://fake-ado.com"
+            assert response["data"]["vcs_instance"] == "AZURE_DEVOPS"
+            assert response["data"]["last_scan_id"] == 1
+            assert response["data"]["last_scan_timestamp"] == "2023-05-23T15:52:22.270000"
+            assert response["data"]["id_"] == 1
+            assert response["true_positive"] == 1
+            assert response["false_positive"] == 2
+            assert response["not_analyzed"] == 3
+            assert response["under_review"] == 4
+            assert response["clarification_required"] == 5
+            assert response["total_findings_count"] == 15
+
+            # Make the second request to retrieve response from cache
+            cached_response = client.get(f"{RWS_VERSION_PREFIX}{RWS_ROUTE_REPOSITORIES}",
+                                         params={"skip": 0, "limit": 5})
+            self.assert_cache(cached_response)
+            assert res.json() == cached_response.json()
 
     @patch("resc_backend.resc_web_service.crud.repository"
            ".get_findings_metadata_by_repository_id")
