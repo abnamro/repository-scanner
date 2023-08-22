@@ -4,7 +4,7 @@ requests==2.31.0
 typing==3.7.4.3
 pydantic==1.8.2
 GitPython==3.1.32
-resc-backend>=1.4.0
+resc-backend>=2.0.0
 tenacity==8.2.2
 prettytable==3.8.0
 termcolor==2.3.0
