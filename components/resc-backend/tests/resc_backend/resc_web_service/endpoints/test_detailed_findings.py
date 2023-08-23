@@ -43,6 +43,7 @@ class TestDetailedFindings(unittest.TestCase):
                 timestamp=datetime(year=1970, month=1, day=i),
                 vcs_provider="AZURE_DEVOPS",
                 last_scanned_commit=f"_{i}",
+                commit_url=f"_{i}",
                 event_sent_on=datetime(year=1970, month=1, day=i),
                 scan_id=i)
             )
@@ -68,6 +69,7 @@ class TestDetailedFindings(unittest.TestCase):
         assert datetime.strptime(data["timestamp"], "%Y-%m-%dT%H:%M:%S") == detailed_finding.timestamp
         assert data["vcs_provider"] == detailed_finding.vcs_provider
         assert data["last_scanned_commit"] == detailed_finding.last_scanned_commit
+        assert data["commit_url"] == detailed_finding.commit_url
         assert datetime.strptime(data["event_sent_on"], "%Y-%m-%dT%H:%M:%S") == detailed_finding.event_sent_on
 
     @patch("resc_backend.resc_web_service.crud.detailed_finding.get_detailed_finding")
