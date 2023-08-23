@@ -12,12 +12,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
 # First Party
-from resc_backend.constants import (
-    CACHE_PREFIX,
-    REDIS_CACHE_EXPIRE,
-    RWS_ROUTE_DETAILED_FINDINGS,
-    RWS_VERSION_PREFIX
-)
+from resc_backend.constants import CACHE_PREFIX, REDIS_CACHE_EXPIRE, RWS_ROUTE_DETAILED_FINDINGS, RWS_VERSION_PREFIX
 from resc_backend.resc_web_service.api import app
 from resc_backend.resc_web_service.cache_manager import CacheManager
 from resc_backend.resc_web_service.dependencies import requires_auth, requires_no_auth
