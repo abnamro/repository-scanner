@@ -14,14 +14,24 @@
         <a href="https://github.com/ABNAMRO">
             <img src="https://img.shields.io/badge/maintainer-%40ABNAMRO-09996B?style=for-the-badge">
         </a>
+        <a href="https://github.com/abnamro/repository-scanner/blob/main/LICENSE.md">
+            <img src="https://img.shields.io/github/license/abnamro/repository-scanner?style=for-the-badge">
+          </a>
         <a>
             <img src="https://img.shields.io/badge/launched-DEC%202022-teal?style=for-the-badge">
         </a>
         <a href="https://github.com/abnamro/repository-scanner/commits/main">
             <img src="https://img.shields.io/github/last-commit/abnamro/repository-scanner?style=for-the-badge&color=blue&label=updated">
         </a>
+         <a href="https://github.com/abnamro/repository-scanner/actions">
+            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/backend-ci.yaml?style=for-the-badge&logo=github">
+        </a>
         <a href="https://www.github.com/abnamro/repository-scanner/releases/latest">
             <img src="https://img.shields.io/github/v/release/abnamro/repository-scanner?style=for-the-badge&color=blueviolet&label=version">
+        </a>
+        <a href="https://pepy.tech/project/resc-vcs-scanner">
+            <img src="https://img.shields.io/github/downloads/abnamro/repository-scanner/total?style=for-the-badge">
+        </a>
         </a>
     </h3>
 </div>

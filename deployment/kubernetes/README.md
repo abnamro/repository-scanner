@@ -1,4 +1,9 @@
 # Repository Scanner (RESC) Deployment - Kubernetes
+<h3>
+         <a href="https://github.com/abnamro/repository-scanner/actions">
+            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/k8-infra-ci.yaml?style=for-the-badge&logo=github">
+        </a>
+</h3>
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
