@@ -7,6 +7,7 @@ metadata:
     app: {{ .Values.global.appName }}
 data:
   redis-config: |
-    maxmemory 6gb
+    maxmemory 1gb
     maxmemory-policy allkeys-lru 
     protected-mode yes
+    save 3600 1
