@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.global.appName }}-redis
   namespace: {{ .Values.global.namespace }}
+  annotations:
+    datree.skip/CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID: irrelevant for redis docker image, skipping.
 spec:
   selector:
     matchLabels:
@@ -20,6 +22,7 @@ spec:
         app: {{ .Values.global.appName }}
         tier: redis
         kubeaudit.io/allow-disabled-apparmor: "apparmor-needs-to-be-installed-on-host"
+        kubeaudit.io/allow-read-only-root-filesystem-false: "required-to-write-log-files"
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
         {{- with include "resc.redisAnnotations" .}}
@@ -72,7 +75,7 @@ spec:
           timeoutSeconds: 10
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           privileged: false
           capabilities:
             drop:
@@ -80,7 +83,7 @@ spec:
           seccompProfile:
             type: RuntimeDefault
           runAsNonRoot: true
-          runAsUser: 10001
+          runAsUser: 999
         livenessProbe:
           exec:
             command:
