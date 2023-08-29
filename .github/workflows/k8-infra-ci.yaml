@@ -23,7 +23,8 @@ on:
 
 env:
   KUBERNETES_INFRA_DIR: deployment/kubernetes
-  KUBE_AUDIT_TAG: 0.22.0
+  KUBE_AUDIT_VERSION: 0.22.0
+  DATREE_VERSION: 1.9.19
 
 jobs:
   helm-chart-validation:
@@ -84,8 +85,8 @@ jobs:
 
     - name: Install Kubeaudit
       run: |
-       curl -LO https://github.com/Shopify/kubeaudit/releases/download/v${{env.KUBE_AUDIT_TAG}}/kubeaudit_${{env.KUBE_AUDIT_TAG}}_linux_amd64.tar.gz
-       tar -xzvf kubeaudit_${{env.KUBE_AUDIT_TAG}}_linux_amd64.tar.gz
+       curl -LO https://github.com/Shopify/kubeaudit/releases/download/v${{env.KUBE_AUDIT_VERSION}}/kubeaudit_${{env.KUBE_AUDIT_VERSION}}_linux_amd64.tar.gz
+       tar -xzvf kubeaudit_${{env.KUBE_AUDIT_VERSION}}_linux_amd64.tar.gz
        mv kubeaudit /usr/local/bin/
 
     - name: Run Kubeaudit Scan
@@ -95,7 +96,9 @@ jobs:
 
     - name: Install Datree
       run: |
-        curl https://get.datree.io | /bin/bash
+        curl -L -o datree.zip https://github.com/datreeio/datree/releases/download/${{env.DATREE_VERSION}}/datree-cli_${{env.DATREE_VERSION}}_Linux_x86_64.zip
+        unzip datree.zip -d datree
+        mv datree/datree /usr/local/bin/
 
     - name: Run Datree Scan
       id: datree_scan
