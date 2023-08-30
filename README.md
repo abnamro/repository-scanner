@@ -74,15 +74,8 @@ consists of a MAJOR.MINOR.PATCH number (e.g. v1.2.4):
    - information corrections.
    - updated broken links.
 
-### Major releases
-Every notable release of the Repository Scanner tool, the changes that come with the release, and the release date are listed below. The full list of all releases can be found on the [Releases](https://github.com/abnamro/repository-scanner/releases) page:
-
-* **v1.0.0** – Initial release of the Repository Scanner:
-    * Able to scan for secrets in repositories.
-    * Complete overview of the found secrets through the User Interface with a direct link to the issue.
-    * Able to sort the findings by secret type (tokens, certificates, passwords, etc.).
-    * A statistics page that gives an overview of findings and how they increase/decrease monthly along with the amount of times a finding appears.
-    * The ability to import your own rulepack with custom rules to fit your personal means.
+### Releases
+Every notable release of the Repository Scanner tool, the changes that come with the release, and the release date can be found on the [Releases](https://github.com/abnamro/repository-scanner/releases) page.
 
 ## 🛠️ Technical information <a name = "technical-information"></a>
 The technologies that the Repository Scanner Tool is built on is listed below. There is also a list with direct links to the individual
