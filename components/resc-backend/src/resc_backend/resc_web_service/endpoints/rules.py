@@ -45,8 +45,8 @@ logger = logging.getLogger(__name__)
 def get_distinct_rules_from_findings(
         finding_statuses: List[FindingStatus] = Query(None, alias="findingstatus", title="FindingStatuses"),
         vcs_providers: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
-        project_name: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
-        repository_name: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+        project_name: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
+        repository_name: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
         start_date_time: Optional[datetime] = Query(None),
         end_date_time: Optional[datetime] = Query(None),
         rule_pack_versions: Optional[List[str]] = Query(None, alias="rule_pack_version", title="RulePackVersion"),

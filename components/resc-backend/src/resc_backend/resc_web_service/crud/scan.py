@@ -1,4 +1,4 @@
-# pylint: disable=E1101
+# pylint: disable=E1101,not-callable
 # Standard Library
 from datetime import datetime
 from typing import List

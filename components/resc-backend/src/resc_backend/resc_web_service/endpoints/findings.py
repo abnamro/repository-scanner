@@ -184,7 +184,7 @@ async def patch_finding(
                    500: {"description": ERROR_MESSAGE_500},
                    503: {"description": ERROR_MESSAGE_503}
                })
-async def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)) -> FindingRead:
+async def delete_finding(finding_id: int, db_connection: Session = Depends(get_db_connection)):
     """
         Delete a finding object
 
