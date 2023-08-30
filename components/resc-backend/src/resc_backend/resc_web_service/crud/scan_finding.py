@@ -1,3 +1,4 @@
+# pylint:disable=not-callable
 # Standard Library
 from typing import List
 

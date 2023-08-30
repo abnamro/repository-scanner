@@ -49,8 +49,8 @@ router = APIRouter(prefix=f"{RWS_ROUTE_REPOSITORIES}", tags=[REPOSITORIES_TAG])
 def get_all_repositories(skip: int = Query(default=0, ge=0),
                          limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
                          vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
-                         projectfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
-                         repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+                         projectfilter: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
+                         repositoryfilter: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
                          db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[repository_schema.RepositoryRead]:
     """
@@ -208,7 +208,7 @@ async def delete_repository(repository_id: int, db_connection: Session = Depends
             })
 @cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
 def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
-                          repositoryfilter: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+                          repositoryfilter: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
                           onlyifhasfindings: bool = Query(default=False),
                           db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
@@ -241,7 +241,7 @@ def get_distinct_projects(vcsproviders: List[VCSProviders] = Query(None, alias="
             })
 @cache(namespace=CACHE_NAMESPACE_REPOSITORY, expire=REDIS_CACHE_EXPIRE)
 def get_distinct_repositories(vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider", title="VCSProviders"),
-                              projectname: Optional[str] = Query('', regex=r"^[A-z0-9 .\-_%]*$"),
+                              projectname: Optional[str] = Query('', pattern=r"^[A-z0-9 .\-_%]*$"),
                               onlyifhasfindings: bool = Query(default=False),
                               db_connection: Session = Depends(get_db_connection)) -> List[str]:
     """
@@ -318,9 +318,9 @@ def get_all_repositories_with_findings_metadata(
         vcsproviders: List[VCSProviders] = Query(None, alias="vcsprovider",
                                                  title="VCSProviders"),
         projectfilter: Optional[str] = Query('',
-                                             regex=r"^[A-z0-9 .\-_%]*$"),
+                                             pattern=r"^[A-z0-9 .\-_%]*$"),
         repositoryfilter: Optional[str] = Query('',
-                                                regex=r"^[A-z0-9 .\-_%]*$"),
+                                                pattern=r"^[A-z0-9 .\-_%]*$"),
         onlyifhasfindings: bool = Query(default=False),
         db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[repository_enriched_schema.RepositoryEnrichedRead]:
@@ -383,6 +383,7 @@ def get_all_repositories_with_findings_metadata(
             status_code=status.HTTP_200_OK,
             responses={
                 200: {"description": "Retrieve the latest scan related to a repository"},
+                404: {"description": "Scan not found"},
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
@@ -398,7 +399,8 @@ def get_last_scan_for_repository(repository_id: int, db_connection: Session = De
         or empty if no scan was found
     """
     last_scan = scan_crud.get_latest_scan_for_repository(db_connection, repository_id=repository_id)
-
+    if last_scan is None:
+        raise HTTPException(status_code=404, detail="Scan not found")
     return last_scan
 
 
