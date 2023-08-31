@@ -1,9 +1,9 @@
 celery==5.3.1
 amqp==5.1.1
 requests==2.31.0
-sqlalchemy==1.4.37
+sqlalchemy==2.0.20
 alembic==1.11.2
-fastapi==0.66.1
+fastapi==0.103.0
 typing==3.7.4.3
 pydantic==1.8.2
 uvicorn==0.17.6

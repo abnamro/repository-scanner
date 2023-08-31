@@ -246,7 +246,7 @@ async def create_scan_findings(scan_id: int,
             })
 def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
                       limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                      rules: List[str] = Query([], regex=r"^[A-z0-9 .\-_%]*$", alias="rule", title="rule"),
+                      rules: List[str] = Query([], pattern=r"^[A-z0-9 .\-_%]*$", alias="rule", title="rule"),
                       statuses: List[FindingStatus] = Query(None, alias="status", title="status"),
                       db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[finding_schema.FindingRead]:
@@ -284,7 +284,7 @@ def get_scan_findings(scan_id: int, skip: int = Query(default=0, ge=0),
 def get_scans_findings(scan_ids: List[int] = Query([], alias="scan_id", title="Scan ids"),
                        skip: int = Query(default=0, ge=0),
                        limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
-                       rules: List[str] = Query([], regex=r"^[A-z0-9 .\-_%]*$", alias="rule", title="rule"),
+                       rules: List[str] = Query([], pattern=r"^[A-z0-9 .\-_%]*$", alias="rule", title="rule"),
                        statuses: List[FindingStatus] = Query(None, alias="status", title="status"),
                        db_connection: Session = Depends(get_db_connection)) \
         -> PaginationModel[finding_schema.FindingRead]:

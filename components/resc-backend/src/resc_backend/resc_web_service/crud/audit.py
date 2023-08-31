@@ -1,4 +1,4 @@
-# pylint: disable=R0916,R0912,C0121
+# pylint: disable=R0916,R0912,C0121,not-callable
 # Standard Library
 import logging
 from datetime import datetime, timedelta

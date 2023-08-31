@@ -57,7 +57,7 @@ logger = logging.getLogger(__name__)
                 503: {"description": ERROR_MESSAGE_503}
             })
 @cache(namespace=CACHE_NAMESPACE_RULE_PACK, expire=REDIS_CACHE_EXPIRE)
-def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
+def get_rule_packs(version: Optional[str] = Query(None, pattern=r"^\d+(?:\.\d+){2}$"),
                    active: Optional[bool] = Query(None, description="Filter on active rule packs"),
                    skip: int = Query(default=0, ge=0),
                    limit: int = Query(default=DEFAULT_RECORDS_PER_PAGE_LIMIT, ge=1),
@@ -91,7 +91,7 @@ def get_rule_packs(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}
                 500: {"description": ERROR_MESSAGE_500},
                 503: {"description": ERROR_MESSAGE_503}
             })
-async def download_rule_pack_toml_file(version: Optional[str] = Query(None, regex=r"^\d+(?:\.\d+){2}$"),
+async def download_rule_pack_toml_file(version: Optional[str] = Query(None, pattern=r"^\d+(?:\.\d+){2}$"),
                                        db_connection: Session = Depends(get_db_connection)) -> FileResponse:
     """
         Download rule pack in TOML format
@@ -129,7 +129,7 @@ async def download_rule_pack_toml_file(version: Optional[str] = Query(None, rege
                  500: {"description": ERROR_MESSAGE_500},
                  503: {"description": ERROR_MESSAGE_503}
              })
-async def upload_rule_pack_toml_file(version: str = Query(default=Required, regex=r"^\d+(?:\.\d+){2}$"),
+async def upload_rule_pack_toml_file(version: str = Query(default=Required, pattern=r"^\d+(?:\.\d+){2}$"),
                                      rule_file: UploadFile = File(...),
                                      db_connection: Session = Depends(get_db_connection)) -> dict:
     """

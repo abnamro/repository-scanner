@@ -1,4 +1,4 @@
-# pylint: disable=R0912,C0121,R0915
+# pylint: disable=R0912,C0121,R0915,not-callable
 # Standard Library
 from typing import List
 

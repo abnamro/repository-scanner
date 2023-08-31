@@ -140,10 +140,10 @@ def convert_rows_to_finding_count_over_time(count_over_time: dict, weeks: int) -
 
     # loop over the counts from the database
     for data in count_over_time:
-        week = f"{data['year']} W{data['week']:02d}"
-        finding_count = data["finding_count"]
+        week = f"{getattr(data, 'year')} W{getattr(data, 'week'):02d}"
+        finding_count = getattr(data, 'finding_count')
 
-        week_groups[week][data["provider_type"]] += finding_count
+        week_groups[week][getattr(data, 'provider_type')] += finding_count
         week_groups[week]["total"] += finding_count
 
     # Convert to the output format
@@ -182,7 +182,7 @@ def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db
     # get the unique auditors from the data
     auditors_default = {}
     for audit in audit_counts:
-        auditors_default[audit['auditor']] = 0
+        auditors_default[getattr(audit, 'auditor')] = 0
 
     # default to 0 per auditor for all weeks in range
     weekly_audit_counts = {}
@@ -194,10 +194,11 @@ def get_audit_count_by_auditor_over_time(db_connection: Session = Depends(get_db
 
     # set the counts based on the data from the database
     for audit in audit_counts:
-        audit_week = f"{audit['year']} W{audit['week']:02d}"
+        audit_week = f"{getattr(audit, 'year')} W{getattr(audit, 'week'):02d}"
         if audit_week in weekly_audit_counts:
-            weekly_audit_counts.get(audit_week).audit_by_auditor_count[audit['auditor']] = audit['audit_count']
-            weekly_audit_counts.get(audit_week).total += audit['audit_count']
+            weekly_audit_counts.get(audit_week).audit_by_auditor_count[getattr(audit, 'auditor')] = \
+                getattr(audit, 'audit_count')
+            weekly_audit_counts.get(audit_week).total += getattr(audit, 'audit_count')
 
     sorted_weekly_audit_counts = dict(sorted(weekly_audit_counts.items()))
     output = list(sorted_weekly_audit_counts.values())
@@ -254,7 +255,7 @@ def determine_audit_rank_current_week(auditor: str, db_connection: Session) -> i
 
     auditor_counts = {}
     for audit in audit_counts_db:
-        auditor_counts[audit['auditor']] = audit['audit_count']
+        auditor_counts[getattr(audit, 'auditor')] = getattr(audit, 'audit_count')
 
     sorted_auditor_counts = sorted(auditor_counts.items(), key=lambda x: x[1], reverse=True)
     for auditor_count in dict(sorted_auditor_counts):
