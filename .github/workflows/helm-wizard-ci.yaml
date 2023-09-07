@@ -44,15 +44,9 @@ jobs:
           - name: Run tests with Python 3.11
             python-version: "3.11"
             toxenv: py
-          - name: Run flake8 with Python 3.11
+          - name: Run pre-commit hooks with Python 3.11
             python-version: "3.11"
-            toxenv: flake8
-          - name: Run isort with Python 3.11
-            python-version: "3.11"
-            toxenv: isort
-          - name: Run pylint with Python 3.11
-            python-version: "3.11"
-            toxenv: pylint
+            toxenv: lint
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3

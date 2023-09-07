@@ -1,8 +1,8 @@
 # Standard Library
 import logging.config
 import sys
-from distutils.sysconfig import get_python_lib
 from os import path
+from sysconfig import get_path
 from typing import Dict, List, Optional
 
 # Third Party
@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_logging_settings_path():
-    if path.isfile(get_python_lib() + "/vcs_scanner"):
-        base_dir = get_python_lib() + "/vcs_scanner"
+    if path.isfile(get_path("purepath") + "/vcs_scanner"):
+        base_dir = get_path("purepath") + "/vcs_scanner"
     else:
         base_dir = path.dirname(__file__)
 

@@ -1,7 +1,7 @@
 # Standard Library
 import logging.config
-from distutils.sysconfig import get_python_lib
 from os import path
+from sysconfig import get_path
 
 # Third Party
 import pkg_resources
@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_logging_settings_path():
-    if path.isfile(get_python_lib() + "/resc"):
-        base_dir = get_python_lib() + "/resc"
+    if path.isfile(get_path("purelib") + "/resc"):
+        base_dir = get_path("purelib") + "/resc"
     else:
         base_dir = path.dirname(__file__)
 

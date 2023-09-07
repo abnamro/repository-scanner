@@ -7,10 +7,10 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 # Third Party
-from cliparser import CliParser
 from db_util import DbUtil
 
 # First Party
+from resc_backend.bin.dummy_data_generator.cliparser import CliParser
 from resc_backend.common import initialise_logs
 from resc_backend.constants import AZURE_DEVOPS, BITBUCKET, GITHUB_PUBLIC, LOG_FILE_DUMMY_DATA_GENERATOR
 from resc_backend.db.model import (
@@ -85,6 +85,7 @@ class GenerateData:
             return 100
         if size <= 100:
             return 50
+        return None
 
     @staticmethod
     def create_chunks(size: int, chunk_size: int):
@@ -215,13 +216,13 @@ class GenerateData:
                       timestamp=GenerateData.get_random_scan_datetime(),
                       increment_number=0) for rule_pack_version in self.rule_pack_versions]
         # now that every rule_pack has a BASE scan, incremental scans can also be generated for the same rule-pack.
-        for num in range(len(scans), amount_to_generate + 1):
-            scans.append(dict(rule_pack=random.choice(self.rule_pack_versions),
-                              repository_id=random.choice(self.repo_ids),
-                              scan_type=random.choice(self.scan_types),
-                              last_scanned_commit=f"commit_{random.randint(1, 100)}",
-                              timestamp=GenerateData.get_random_scan_datetime(),
-                              increment_number=0))
+        for _ in range(len(scans), amount_to_generate + 1):
+            scans.append({"rule_pack": random.choice(self.rule_pack_versions),
+                              "repository_id": random.choice(self.repo_ids),
+                              "scan_type": random.choice(self.scan_types),
+                              "last_scanned_commit": f"commit_{random.randint(1, 100)}",
+                              "timestamp": GenerateData.get_random_scan_datetime(),
+                              "increment_number": 0})
         self.db_util.bulk_persist_data(DBscan, scans)
         logger.info(f"Generated [{DBscan.__tablename__}]")
 

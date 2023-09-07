@@ -1,6 +1,3 @@
-# Standard Library
-import sys
-
 # First Party
 from resc_helm_wizard.validator import (
     azure_devops_token_validator,

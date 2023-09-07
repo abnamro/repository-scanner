@@ -1,6 +1,5 @@
 # Standard Library
 import subprocess
-import sys
 from unittest.mock import patch
 
 # First Party

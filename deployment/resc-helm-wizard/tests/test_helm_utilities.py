@@ -1,6 +1,5 @@
 # Standard Library
 import subprocess
-import sys
 import unittest.mock as mock
 from unittest.mock import patch
 
