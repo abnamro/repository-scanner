@@ -5,7 +5,6 @@ from typing import Dict
 # Third Party
 from azure.devops.connection import Connection
 from azure.devops.exceptions import AzureDevOpsServiceError
-from azure.devops.released.core.core_client import CoreClient
 from msrest.authentication import BasicAuthentication
 from msrest.exceptions import ClientRequestError
 
@@ -63,14 +62,21 @@ class AzureDevopsConnector(VCSConnector):
         try:
             self._core_api_client = self.api_client.clients.get_core_client()
             all_projects = []
-            call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects()
-            projects = call_results.value
-            all_projects.extend([project.name for project in projects])
-            while call_results.continuation_token:
-                call_results: CoreClient.GetProjectsResponseValue = self.core_api_client.get_projects(
-                    continuation_token=call_results.continuation_token)
-                projects = call_results.value
-                all_projects.extend([project.name for project in projects])
+
+            # Get the first page of projects
+            get_projects_response = self.core_api_client.get_projects()
+            while get_projects_response is not None:
+                for project in get_projects_response:
+                    all_projects.append(project.name)
+                if hasattr(get_projects_response, "continuation_token"):
+                    if get_projects_response.continuation_token is not None and \
+                            get_projects_response.continuation_token != "":
+                        # Get the next page of projects
+                        get_projects_response = self.core_api_client.get_projects(
+                            continuation_token=get_projects_response.continuation_token)
+                else:
+                    # All projects have been retrieved
+                    get_projects_response = None
 
             return all_projects
         except ClientRequestError as ex:
