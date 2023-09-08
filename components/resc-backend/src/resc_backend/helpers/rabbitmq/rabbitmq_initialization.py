@@ -70,7 +70,7 @@ def create_user(rabbitmq_api_base_url: str, username: str, password: str, role: 
     uri = rabbitmq_api_base_url + "/api/users/" + username
     user_data = {"password": password, "tags": role}
     response = requests.put(uri, json=user_data,
-                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password))
+                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password), timeout=10)
 
     if hasattr(response, "status_code") and int(response.status_code) == 201:
         logger.info(f"User: {username} with role: {role} created successfully.")
@@ -110,7 +110,7 @@ def set_resource_permissions(rabbitmq_api_base_url: str, v_host: str, username: 
                        "read": read_resources_regex}
 
     response = requests.put(uri, json=permission_data,
-                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password))
+                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password), timeout=10)
     if hasattr(response, "status_code") and int(response.status_code) == 201:
         logger.debug(f"vHost permission successfully assigned to user: {username} for vHost: {v_host}.")
         return True
@@ -155,7 +155,7 @@ def set_topic_permissions(rabbitmq_api_base_url: str, v_host: str, username: str
     topic_permission_data = {"exchange": topic_name, "write": write_permission, "read": read_permission}
 
     response = requests.put(uri, json=topic_permission_data,
-                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password))
+                            auth=HTTPBasicAuth(rabbitmq_admin_user, rabbitmq_admin_password), timeout=10)
 
     if hasattr(response, "status_code") and (int(response.status_code) == 201 or int(response.status_code) == 204):
         logger.debug(

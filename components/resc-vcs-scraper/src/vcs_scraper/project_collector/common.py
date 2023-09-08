@@ -2,6 +2,7 @@
 import logging
 
 # Third Party
+from celery.exceptions import CeleryError
 from tenacity import RetryError, Retrying, stop_after_attempt, wait_exponential
 
 # First Party
@@ -67,7 +68,7 @@ def collect_projects_from_vcs_instance(vcs_instance: VCSInstance) -> None:
                         celery_client.send_task(task_name, kwargs={"project_key": project_name,
                                                                    "vcs_instance_name": vcs_instance.name},
                                                 queue=destination_message_queue)
-                    except Exception as exc:
+                    except CeleryError as exc:
                         logger.error(f"{exc} sending '{project_name}' to 'projects'. Retrying ...")
                         raise
             projects_sent += 1

@@ -85,10 +85,10 @@ See below commands for running various (unit/linting) tests locally. To run thes
 
 Run below commands to make sure that the unit tests are running and that the code matches quality standards:
 ```bash
-pip install tox      # install tox locally
+pip install tox         # install tox locally
 
-tox -v -e sort       # Run this command to validate the import sorting
-tox -v -e lint       # Run this command to lint the code according to this repository's standard
-tox -v -e pytest     # Run this command to run the unit tests
-tox -v               # Run this command to run all of the above tests
+tox run -e py -v        # Run this command to run the unit tests
+tox run -e isort -v     # Run this command to validate the import sorting
+tox run -e pylint -v    # Run this command for Python static code analysis
+tox run -e flake8 -v    # Run this command for Python linting
 ```

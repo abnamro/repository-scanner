@@ -13,7 +13,7 @@ def test_get_rule_packs(get):
 
     _ = get_rule_packs(url)
     get.assert_called_once()
-    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''})
+    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''}, timeout=10)
 
 
 @patch("requests.get")
@@ -24,7 +24,7 @@ def test_get_rule_packs_when_version_provided(get):
 
     _ = get_rule_packs(url=url, version="1.0.0")
     get.assert_called_once()
-    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''})
+    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''}, timeout=10)
 
 
 @patch("requests.get")
@@ -35,7 +35,7 @@ def test_get_rule_packs_when_active_provided(get):
 
     _ = get_rule_packs(url=url, active=True)
     get.assert_called_once()
-    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''})
+    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''}, timeout=10)
 
 
 @patch("requests.get")
@@ -46,4 +46,4 @@ def test_get_rule_packs_when_version_and_active_provided(get):
 
     _ = get_rule_packs(url=url, version="1.0.0", active=False)
     get.assert_called_once()
-    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''})
+    get.assert_called_with(expected_url, params=expected_params, proxies={'http': '', 'https': ''}, timeout=10)

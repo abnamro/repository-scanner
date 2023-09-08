@@ -13,5 +13,5 @@ logger = logging.getLogger(__name__)
 
 def create_scan(url: str, scan: ScanCreate):
     api_url = f"{url}{RWS_VERSION_PREFIX}{RWS_ROUTE_SCANS}"
-    response = requests.post(api_url, data=scan.json(), proxies={"http": "", "https": ""})
+    response = requests.post(api_url, data=scan.json(), proxies={"http": "", "https": ""}, timeout=10)
     return response

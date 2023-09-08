@@ -98,7 +98,7 @@ class DetailedFindingRead(DetailedFinding):
                                                                file_path=values["file_path"],
                                                                commit_id=values["commit_id"])
         else:
-            raise Exception(f"Unsupported VCSProvider: {values['vcs_provider']}")
+            raise NotImplementedError(f"Unsupported VCSProvider: {values['vcs_provider']}")
         return values
 
     class Config:

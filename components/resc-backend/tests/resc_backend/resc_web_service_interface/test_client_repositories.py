@@ -20,4 +20,4 @@ def test_create_repository(post):
 
     _ = create_repository(url, repository)
     post.assert_called_once()
-    post.assert_called_with(expected_url, data=expected_json, proxies={'http': '', 'https': ''})
+    post.assert_called_with(expected_url, data=expected_json, proxies={'http': '', 'https': ''}, timeout=10)

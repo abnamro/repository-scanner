@@ -49,7 +49,6 @@ jobs:
       run: |
         cd ${{ env.RESC_VCS_SCANNER_DIR }}
         pip install -r test-requirements.txt
-        tox
 
     - name: Test with pytest
       run: |

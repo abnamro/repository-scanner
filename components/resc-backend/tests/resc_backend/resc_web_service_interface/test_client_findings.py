@@ -38,4 +38,4 @@ def test_create_findings(post):
 
     _ = create_findings(url, findings)
     post.assert_called_once()
-    post.assert_called_with(expected_url, json=findings_json, proxies={'http': '', 'https': ''})
+    post.assert_called_with(expected_url, json=findings_json, proxies={'http': '', 'https': ''}, timeout=10)
