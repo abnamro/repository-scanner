@@ -125,7 +125,7 @@ class GitLeaksWrapper:
         for result in results:
             commit_timestamp = cls._is_valid_timestamp(result["Date"])
             if not commit_timestamp:
-                logger.debug(f"{result['date']} has an unexpected date format. Expected ISO 8601")
+                logger.debug(f"{result['Date']} has an unexpected date format. Expected ISO 8601")
                 commit_timestamp = datetime.datetime.now()
             finding = FindingBase(file_path=result["File"],
                                   line_number=result["StartLine"],
