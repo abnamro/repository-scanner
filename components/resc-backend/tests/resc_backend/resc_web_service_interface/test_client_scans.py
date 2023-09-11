@@ -18,4 +18,4 @@ def test_create_scan(post):
 
     _ = create_scan(url, scan)
     post.assert_called_once()
-    post.assert_called_with(expected_url, data=expected_json, proxies={'http': '', 'https': ''})
+    post.assert_called_with(expected_url, data=expected_json, proxies={'http': '', 'https': ''}, timeout=10)

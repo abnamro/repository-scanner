@@ -48,7 +48,6 @@ jobs:
       run: |
         cd ${{ env.RESC_VCS_SCRAPER_DIR }}
         pip install -r test-requirements.txt
-        tox
 
     - name: Test with pytest
       run: |

@@ -55,5 +55,5 @@ def bootstrap_rabbitmq_users():
 
     server_up = wait_for_rabbitmq_server_to_up(rabbitmq_api_base_url=args.rabbitmq_url)
     if not server_up:
-        raise Exception("Wait for rabbitmq server to up has been failed.")
+        raise TimeoutError("Wait for rabbitmq server to up has been failed.")
     create_queue_user_and_set_permission(rabbitmq_api_base_url=args.rabbitmq_url)

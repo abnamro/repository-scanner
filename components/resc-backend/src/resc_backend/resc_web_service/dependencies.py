@@ -172,8 +172,8 @@ def check_db_initialized():
                 not_found_tables.append(table_name)
 
         if len(not_found_tables) > 0:
-            raise Exception(f"Unable to determine existence of required table(s) "
-                            f"{', '.join(not_found_tables)}")
+            raise RuntimeError(f"Unable to determine existence of required table(s) "
+                               f"{', '.join(not_found_tables)}")
     except Exception as ex:
         logger.error(f"Database is NOT connected or initialized | {ex} | Retrying...")
         raise

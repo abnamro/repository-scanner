@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def upload_rule_pack_toml_file(url: str, rule_file_path: str):
     with open(rule_file_path, "rb") as toml_file:
         files = {"rule_file": ("RESC-SECRETS-RULE.toml", toml_file, "application/octet-stream")}
-        response = requests.post(url=url, files=files, proxies={"http": "", "https": ""})
+        response = requests.post(url=url, files=files, proxies={"http": "", "https": ""}, timeout=10)
         toml_file.close()
     return response
 
@@ -25,7 +25,7 @@ def download_rule_pack_toml_file(rws_url: str, rule_pack_version: Optional[str] 
     if rule_pack_version:
         params = {"rule_pack_version": rule_pack_version}
     response = requests.get(url=f"{rws_url}{RWS_VERSION_PREFIX}{RWS_ROUTE_RULE_PACKS}",
-                            params=params)
+                            params=params, timeout=10)
 
     if response.status_code == 200:
         logger.debug(
@@ -42,5 +42,5 @@ def get_rule_packs(url: str, version: Optional[str] = None, active: Optional[boo
     params = {"active": active, "skip": skip, "limit": limit}
     if version:
         params["version"] = version
-    response = requests.get(api_url, params=params, proxies={"http": "", "https": ""})
+    response = requests.get(api_url, params=params, proxies={"http": "", "https": ""}, timeout=10)
     return response
