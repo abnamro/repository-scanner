@@ -33,7 +33,7 @@
             <img src="https://img.shields.io/github/downloads/abnamro/repository-scanner/total">
         </a>
         <a href="https://www.bestpractices.dev/projects/7799">
-            <img src="https://www.bestpractices.dev/projects/7799/badge?style=for-the-badge">
+            <img src="https://www.bestpractices.dev/projects/7799/badge">
         </a>
     </h3>
 </div>
