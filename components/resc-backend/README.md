@@ -1,7 +1,7 @@
 # Repository Scanner Backend (RESC-Backend)
 <h3>
          <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/backend-ci.yaml?style=for-the-badge&logo=github">
+            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/backend-ci.yaml?logo=github">
         </a>
         <a href="https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-backend">
             <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-backend&metric=alert_status">

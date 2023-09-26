@@ -1,7 +1,7 @@
 # Repository Scanner Version Control System Scraper (RESC-VCS-SCRAPER)
 <h3>
          <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scraper-ci.yaml?style=for-the-badge&logo=github">
+            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scraper-ci.yaml?logo=github">
         </a>
         <a href="https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-vcs-scraper">
             <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-vcs-scraper&metric=alert_status">
