@@ -35,6 +35,9 @@
         <a href="https://www.bestpractices.dev/projects/7799">
             <img src="https://www.bestpractices.dev/projects/7799/badge">
         </a>
+        <a href="https://github.com/abnamro/repository-scanner/actions">
+            <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-backend&metric=alert_status">
+        </a>
     </h3>
 </div>
 
