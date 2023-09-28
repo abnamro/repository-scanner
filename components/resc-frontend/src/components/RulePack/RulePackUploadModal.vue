@@ -28,7 +28,7 @@
             </b-form-group>
           </div>
           <div class="col-md-5">
-            <small><a href="https://semver.org/" target="_blank">semver</a></small>
+            <small><a href="https://semver.org/" target="_blank" rel="noopener">semver</a></small>
             <small> Example: 1.0.0</small>
           </div>
         </div>
