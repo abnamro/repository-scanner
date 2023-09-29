@@ -65,6 +65,44 @@ jobs:
         cd ${{ env.RESC_FRONTEND_DIR }}
         npx auditjs@latest ossi -q || true
 
+    - name: Running Jest and Coverage
+      run: |
+        cd ${{ env.RESC_FRONTEND_DIR }}
+        yarn jest --coverage || true
+        npm install jest-sonar-reporter --save-dev
+        
+      ## Removing the dir paths and making them relative paths.
+    - name: Fix coverage report
+      run: |
+        cd ${{ env.RESC_FRONTEND_DIR }}
+        sed -i "s+/home/runner/work/repository-scanner/repository-scanner/components/resc-frontend/++g" tests/unit/reports/coverage/lcov.info
+        cat tests/unit/reports/coverage/lcov.info
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: ${{ env.RESC_FRONTEND_DIR }}
+        args: >
+          -Dsonar.organization=abnamro-resc
+          -Dsonar.projectKey=abnamro-resc_resc-frontend
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.projectName=resc-frontend
+          -Dsonar.groupid=resc
+          -Dsonar.sources=src/
+          -Dsonar.inclusions=**/*
+          -Dsonar.exclusions=**/__mocks__/*
+          -Dsonar.tests=tests/
+          -Dsonar.cpd.exclusions=**/*.example.js,**/*.spec.js,**/*.?spec.js
+          -Dsonar.coverage.exclusions=**/*.html,**/*.json,**/*.spec.js,**/*.?spec.js,**/main.*,**/i18n.js,**/router/index.js,**/configuration/*.js
+          -Dsonar.javascript.jstest.reportsPath=tests/unit/reports/coverage
+          -Dsonar.javascript.lcov.reportPaths=tests/unit/reports/coverage/lcov.info
+          -Dsonar.pdf.skip=true
+          -Dsonar.branch.target=*
+          -Dsonar.branch.name=*
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.__SONAR_TOKEN_BACKEND__ }}
+
     - id: getversion
       name: Get package version
       run: | 

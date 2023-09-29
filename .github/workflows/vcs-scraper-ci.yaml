@@ -64,6 +64,28 @@ jobs:
         cd ${{ env.RESC_VCS_SCRAPER_DIR }}
         tox -e lint
 
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: ${{ env.RESC_VCS_SCRAPER_DIR }}
+        args: >
+          -Dsonar.organization=abnamro-resc
+          -Dsonar.projectKey=abnamro-resc_resc-vcs-scraper
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.projectName=resc-vcs-scraper
+          -Dsonar.groupid=resc
+          -Dsonar.sources=src/
+          -Dsonar.inclusions=**/*.py
+          -Dsonar.exclusions=**/*yml,**/*.xml,**/*.txt,**/*.html,**/*.js
+          -Dsonar.tests=tests/
+          -Dsonar.cpd.exclusions=**/*yml,**/*.xml,**/*.txt,**/*.html,**/*.js
+          -Dsonar.coverage.exclusions=**/*yml,**/*.xml,**/*.txt,**/*.html,**/*.js
+          -Dsonar.pdf.skip=true
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.__SONAR_TOKEN_BACKEND__ }}
+
     - name: Get Branch Name
       id: extract_branch
       run: |
