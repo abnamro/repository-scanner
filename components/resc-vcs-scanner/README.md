@@ -200,7 +200,7 @@ Run below commands to make sure that the unit tests are running and that the cod
 
 _**Note:**_ To run these tests you need to install [tox](https://pypi.org/project/tox/). This can be done on Linux and Windows with Git Bash.
 ```bash
-pip install tox      # install tox locally
+pip install -r test-requirements.txt      # install tox locally
 
 tox -v -e sort       # Run this command to validate the import sorting
 tox -v -e lint       # Run this command to lint the code according to this repository's standard
