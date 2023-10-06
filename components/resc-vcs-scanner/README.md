@@ -1,12 +1,10 @@
 # Repository Scanner Version Control System Scanner (RESC-VCS-SCANNER)
-<h3>
-         <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scanner-ci.yaml?logo=github">
-        </a>
-        <a href="https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-vcs-scanner">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-vcs-scanner&metric=alert_status">
-        </a>
-</h3>
+[![Python][python-shield]][python-url]
+[![Celery][celery-shield]][celery-url]
+[![Pydantic][pydantic-shield]][pydantic-url]
+[![Gitleaks][gitleaks-shield]][gitleaks-url]
+[![CI][ci-shield]][ci-url]
+[![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
@@ -208,3 +206,16 @@ tox -v -e pytest     # Run this command to run the unit tests
 tox -v               # Run this command to run all of the above tests
 ```
 
+<!-- MARKDOWN LINKS & IMAGES -->
+[python-shield]: https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white
+[python-url]: https://www.python.org
+[celery-shield]: https://img.shields.io/badge/Celery-5.3.1-green.svg?logo=celery&style=flat
+[celery-url]: https://docs.celeryq.dev
+[pydantic-shield]: https://img.shields.io/badge/Pydantic-1.8.2-e92063.svg?logo=pydantic&style=flat
+[pydantic-url]: https://docs.pydantic.dev
+[gitleaks-shield]: https://img.shields.io/badge/Gitleaks-8.16.4-blue?logo=gitleaks
+[gitleaks-url]: https://github.com/zricethezav/gitleaks
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scanner-ci.yaml?logo=github
+[ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/vcs-scanner-ci.yaml
+[sonar-cloud-shield]: https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-vcs-scanner&metric=alert_status
+[sonar-cloud-url]: https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-vcs-scanner

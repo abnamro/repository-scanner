@@ -1,9 +1,6 @@
 # Repository Scanner Helm Wizard (resc-helm-wizard)
-<h3>
-         <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/helm-wizard-ci.yaml?style=for-the-badge&logo=github">
-        </a>
-</h3>
+[![Python][python-shield]][python-url]
+[![CI][ci-shield]][ci-url]
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
@@ -92,3 +89,9 @@ tox run -e isort -v     # Run this command to validate the import sorting
 tox run -e pylint -v    # Run this command for Python static code analysis
 tox run -e flake8 -v    # Run this command for Python linting
 ```
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[python-shield]: https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white
+[python-url]: https://www.python.org
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/helm-wizard-ci.yaml?style=flat&logo=github
+[ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/helm-wizard-ci.yaml

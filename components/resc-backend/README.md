@@ -1,12 +1,15 @@
 # Repository Scanner Backend (RESC-Backend)
-<h3>
-         <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/backend-ci.yaml?logo=github">
-        </a>
-        <a href="https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-backend">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-backend&metric=alert_status">
-        </a>
-</h3>
+[![Python][python-shield]][python-url]
+[![FastAPI][fast-api-shield]][fast-api-url]
+[![SQLAlchemy][sqlalchemy-shield]][sqlalchemy-url]
+[![Celery][celery-shield]][celery-url]
+[![Pydantic][pydantic-shield]][pydantic-url]
+[![RabbitMQ][rabbitmq-shield]][rabbitmq-url]
+[![Redis][redis-shield]][redis-url]
+[![Azure SQL Edge][database-shield]][database-url]
+[![CI][ci-shield]][ci-url]
+[![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
+
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
@@ -295,4 +298,27 @@ _**Note:**_ Autogenerate cannot detect all the required changes.The created revi
 - [How to create a connection string](https://docs.sqlalchemy.org/en/14/core/engines.html)
 
 - [Connect and view the database tables from Intellij IDEA Ultimate edition](https://www.jetbrains.com/help/idea/db-tutorial-connecting-to-ms-sql-server.html#connect-by-using-sql-server-authentication)
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[python-shield]: https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white
+[python-url]: https://www.python.org
+[fast-api-shield]: https://img.shields.io/badge/FastAPI-0.2.1-009688.svg?style=flat&logo=FastAPI&logoColor=white
+[fast-api-url]: https://fastapi.tiangolo.com
+[sqlalchemy-shield]: https://img.shields.io/badge/SQLAlchemy-2.0.20-306998?logo=python
+[sqlalchemy-url]: https://fastapi.tiangolo.com
+[celery-shield]: https://img.shields.io/badge/Celery-5.3.1-green.svg?logo=celery&style=flat
+[celery-url]: https://docs.celeryq.dev
+[pydantic-shield]: https://img.shields.io/badge/Pydantic-1.8.2-e92063.svg?logo=pydantic&style=flat
+[pydantic-url]: https://docs.pydantic.dev
+[rabbitmq-shield]: https://img.shields.io/badge/RabbitMQ-3.11.9-orange?logo=rabbitmq
+[rabbitmq-url]: https://www.rabbitmq.com
+[redis-shield]: https://img.shields.io/badge/Redis-7.0.12-red?logo=redis
+[redis-url]: https://redis.com/ 
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/backend-ci.yaml?logo=github
+[database-shield]: https://img.shields.io/badge/Azure%20SQL%20Edge-1.0.7-blue?logo=microsoftazure
+[database-url]: https://azure.microsoft.com/en-us/services/sql-edge
+[ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/backend-ci.yaml
+[sonar-cloud-shield]: https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-backend&metric=alert_status
+[sonar-cloud-url]: https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-backend
   

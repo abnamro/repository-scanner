@@ -1,12 +1,9 @@
 # Repository Scanner Frontend (RESC-Frontend)
-<h3>
-         <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/frontend-ci.yaml?logo=github">
-        </a>
-        <a href="https://sonarcloud.io/summary/new_code id=abnamro-resc_resc-frontend">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-frontend&metric=alert_status">
-        </a>
-</h3>
+[![Vue.js][vuejs-shield]][vuejs-url]
+[![BootstrapVue][bootstrapvue-shield]][bootstrapvue-url]
+[![Chart.js][chartjs-shield]][chartjs-url]
+[![CI][ci-shield]][ci-url]
+[![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
 
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
@@ -100,3 +97,16 @@ Linting and fixing files: ```npm run lint:autofix```
 
 ### Useful commands
 Compiles and minifies for production: ```npm run build```
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[vuejs-shield]: https://img.shields.io/badge/Vue.js-v2.6.11-brightgreen?logo=vue.js
+[vuejs-url]: https://vuejs.org
+[bootstrapvue-shield]: https://img.shields.io/badge/BootstrapVue-v2.21.2-563D7C?logo=bootstrap
+[bootstrapvue-url]: https://bootstrap-vue.org
+[chartjs-shield]: https://img.shields.io/badge/Chart.js-v3.8.0-ff5733?style=flat&logo=chart.js
+[chartjs-url]: https://www.chartjs.org
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/frontend-ci.yaml?logo=github
+[ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/frontend-ci.yaml
+[sonar-cloud-shield]: https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-frontend&metric=alert_status
+[sonar-cloud-url]: https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-frontend
