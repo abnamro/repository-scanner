@@ -18,20 +18,28 @@ from termcolor import colored
 from vcs_scanner.helpers.finding_action import FindingAction
 from vcs_scanner.model import VCSInstanceRuntime
 from vcs_scanner.output_module import OutputModule
+from vcs_scanner.secret_scanners.ignore_list_provider import IgnoredListProvider
 
 logger = logging.getLogger(__name__)
 
 
 class STDOUTWriter(OutputModule):
 
-    def __init__(self, toml_rule_file_path: str, exit_code_warn: int, exit_code_block: int, filter_tag: str = None):
+    def __init__(self,
+                 toml_rule_file_path: str,
+                 exit_code_warn: int,
+                 exit_code_block: int,
+                 filter_tag: str = None,
+                 ignore_findings_path: str = ""):
         self.toml_rule_file_path: str = toml_rule_file_path
         self.exit_code_warn: int = exit_code_warn
         self.exit_code_block: int = exit_code_block
         self.filter_tag: str = filter_tag
         self.exit_code_success = 0
+        self.ignore_findings_providers: IgnoredListProvider = IgnoredListProvider(ignore_findings_path)
 
-    def write_vcs_instance(self, vcs_instance_runtime: VCSInstanceRuntime) -> Optional[VCSInstanceRead]:
+    def write_vcs_instance(self,
+                           vcs_instance_runtime: VCSInstanceRuntime) -> Optional[VCSInstanceRead]:
         vcs_instance = VCSInstanceRead(id_=1,
                                        name=vcs_instance_runtime.name,
                                        provider_type=vcs_instance_runtime.provider_type,
@@ -66,13 +74,15 @@ class STDOUTWriter(OutputModule):
         return rule_tags
 
     @staticmethod
-    def _determine_finding_action(finding: FindingCreate, rule_tags: dict) -> FindingAction:
+    def _determine_finding_action(finding: FindingCreate, rule_tags: dict, ignore_dictionary: dict) -> FindingAction:
         """
             Determine the action to take for the finding, based on the rule tags
         :param finding:
             FindingCreate instance of the finding
         :param rule_tags:
-            Dictionary continuing all the rules and there respective tags
+            Dictionary containing all the rules and there respective tags
+        :param ignore_dictionary:
+            Dictionary containing all the list of ignored blockers
         :return: FindingAction.
             FindingAction to take for this finding
         """
@@ -81,6 +91,12 @@ class STDOUTWriter(OutputModule):
             rule_action = FindingAction.WARN
         if FindingAction.BLOCK in rule_tags.get(finding.rule_name, []):
             rule_action = FindingAction.BLOCK
+
+        if rule_action == FindingAction.BLOCK:
+            key: str = finding.file_path + "|" + finding.rule_name + "|" + str(finding.line_number)
+            if key in ignore_dictionary:
+                rule_action = FindingAction.IGNORED
+
         return rule_action
 
     def _finding_tag_filter(self, finding: FindingCreate, rule_tags: dict, filter_tag: str) -> bool:
@@ -89,7 +105,7 @@ class STDOUTWriter(OutputModule):
         :param finding:
             FindingCreate instance of the finding
         :param rule_tags:
-            Dictionary continuing all the rules and there respective tags
+            Dictionary containing all the rules and there respective tags
         :Param: filter_tag.
             filter_tag will check for the tag
         :return bool:
@@ -122,14 +138,15 @@ class STDOUTWriter(OutputModule):
         exit_code = self.exit_code_success
 
         rule_tags = self._get_rule_tags()
+        ignore_dictionary = self.ignore_findings_providers.get_ignore_list()
         for finding in scan_findings:
             should_process_finding = self._finding_tag_filter(finding, rule_tags, self.filter_tag)
             if should_process_finding:
-                finding_action = self._determine_finding_action(finding, rule_tags)
+                finding_action = self._determine_finding_action(finding, rule_tags, ignore_dictionary)
                 if finding_action == FindingAction.BLOCK:
                     finding_action_value = colored(finding_action.value, "red", attrs=["bold"])
                     block_count += 1
-                elif finding_action == FindingAction.WARN:
+                elif finding_action in [FindingAction.WARN, FindingAction.IGNORED]:
                     finding_action_value = colored(finding_action.value, "light_red", attrs=["bold"])
                     warn_count += 1
                 elif finding_action == FindingAction.INFO:
@@ -140,7 +157,8 @@ class STDOUTWriter(OutputModule):
                     info_count += 1
 
                 if exit_code != self.exit_code_block:
-                    if exit_code == self.exit_code_success and finding_action == FindingAction.WARN:
+                    if exit_code == self.exit_code_success and \
+                       finding_action in [FindingAction.WARN, FindingAction.IGNORED]:
                         exit_code = self.exit_code_warn
                     elif finding_action == FindingAction.BLOCK:
                         exit_code = self.exit_code_block

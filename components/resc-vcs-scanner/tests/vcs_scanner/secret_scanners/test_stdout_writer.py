@@ -1,6 +1,7 @@
 # Standard Library
 from datetime import datetime
 from unittest.mock import call, patch
+from pathlib import Path
 
 # Third Party
 from resc_backend.resc_web_service.schema.finding import Finding, FindingCreate
@@ -10,6 +11,8 @@ from resc_backend.resc_web_service.schema.scan import ScanRead
 
 # First Party
 from vcs_scanner.secret_scanners.stdout_writer import STDOUTWriter
+
+THIS_DIR = Path(__file__).parent.parent
 
 
 # A test method to check the happy flow of the write_repository method.
@@ -49,7 +52,9 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
                                 event_sent_on=datetime.utcnow(),
                                 rule_name=f"rule_{i}"))
 
-    _ = STDOUTWriter(toml_rule_file_path="toml_path", exit_code_warn=2, exit_code_block=1) \
+    _ = STDOUTWriter(toml_rule_file_path="toml_path",
+                     exit_code_warn=2,
+                     exit_code_block=1) \
         .write_findings(1, 1, findings)
     calls = [call('\n'
                   '+-------+--------+------+----------+-------------+\n'
@@ -66,6 +71,88 @@ def test_write_findings(info_log, exit_mock, _get_rule_tags):
     info_log.assert_has_calls(calls, any_order=True)
     exit_mock.assert_called_with(0)
 
+
+@patch("sys.exit")
+@patch("logging.Logger.info")
+def test_write_findings_with_rules(info_log, exit_mock):
+    findings = []
+    toml_rule_path = THIS_DIR.parent / "fixtures/rules.toml"
+    for i in range(1, 6):
+        findings.append(Finding(file_path=f"file_path_{i}",
+                                line_number=i,
+                                column_start=i,
+                                column_end=i,
+                                commit_id=f"commit_id_{i}",
+                                commit_message=f"commit_message_{i}",
+                                commit_timestamp=datetime.utcnow(),
+                                author=f"author_{i}",
+                                email=f"email_{i}",
+                                status=FindingStatus.NOT_ANALYZED,
+                                comment=f"comment_{i}",
+                                event_sent_on=datetime.utcnow(),
+                                rule_name=f"rule_{i}"))
+
+    _ = STDOUTWriter(toml_rule_file_path=str(toml_rule_path),
+                     exit_code_warn=2,
+                     exit_code_block=1) \
+        .write_findings(1, 1, findings)
+    calls = [call('\n'
+                  '+-------+--------+------+----------+-------------+\n'
+                  '| Level | Rule   | Line | Position | File path   |\n'
+                  '+-------+--------+------+----------+-------------+\n'
+                  '| Block | rule_1 |    1 | 1-1      | file_path_1 |\n'
+                  '| Block | rule_2 |    2 | 2-2      | file_path_2 |\n'
+                  '| Info  | rule_4 |    4 | 4-4      | file_path_4 |\n'
+                  '| Info  | rule_5 |    5 | 5-5      | file_path_5 |\n'
+                  '| Warn  | rule_3 |    3 | 3-3      | file_path_3 |\n'
+                  '+-------+--------+------+----------+-------------+'),
+             call("Findings detected : Total - 5, Block - 2, Warn - 1, Info - 2"),
+             call("Scan failed due to policy violations: [Block:2]"),
+             call("Findings threshold check results: FAIL")]
+    info_log.assert_has_calls(calls, any_order=True)
+    exit_mock.assert_called_with(1)
+
+@patch("sys.exit")
+@patch("logging.Logger.info")
+def test_write_findings_with_rules_and_ignore(info_log, exit_mock):
+    findings = []
+    toml_rule_path = THIS_DIR.parent / "fixtures/rules.toml"
+    ignore_list_path = THIS_DIR.parent / "fixtures/ignore-findings-list-for-writer.dsv"
+    for i in range(1, 6):
+        findings.append(Finding(file_path=f"file_path_{i}",
+                                line_number=i,
+                                column_start=i,
+                                column_end=i,
+                                commit_id=f"commit_id_{i}",
+                                commit_message=f"commit_message_{i}",
+                                commit_timestamp=datetime.utcnow(),
+                                author=f"author_{i}",
+                                email=f"email_{i}",
+                                status=FindingStatus.NOT_ANALYZED,
+                                comment=f"comment_{i}",
+                                event_sent_on=datetime.utcnow(),
+                                rule_name=f"rule_{i}"))
+
+    _ = STDOUTWriter(toml_rule_file_path=str(toml_rule_path),
+                     exit_code_warn=2,
+                     exit_code_block=1,
+                     ignore_findings_path=ignore_list_path) \
+        .write_findings(1, 1, findings)
+    calls = [call('\n'
+                  '+---------+--------+------+----------+-------------+\n'
+                  '| Level   | Rule   | Line | Position | File path   |\n'
+                  '+---------+--------+------+----------+-------------+\n'
+                  '| Block   | rule_2 |    2 | 2-2      | file_path_2 |\n'
+                  '| Ignored | rule_1 |    1 | 1-1      | file_path_1 |\n'
+                  '| Info    | rule_4 |    4 | 4-4      | file_path_4 |\n'
+                  '| Info    | rule_5 |    5 | 5-5      | file_path_5 |\n'
+                  '| Warn    | rule_3 |    3 | 3-3      | file_path_3 |\n'
+                  '+---------+--------+------+----------+-------------+'),
+             call("Findings detected : Total - 5, Block - 1, Warn - 2, Info - 2"),
+             call("Scan failed due to policy violations: [Block:1]"),
+             call("Findings threshold check results: FAIL")]
+    info_log.assert_has_calls(calls, any_order=True)
+    exit_mock.assert_called_with(1)
 
 @patch("logging.Logger.info")
 def test_write_scan(info_log):
