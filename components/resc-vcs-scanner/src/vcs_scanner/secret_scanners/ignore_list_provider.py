@@ -35,8 +35,8 @@ class IgnoredListProvider():  # pylint: disable=R0902
                         continue
 
                     if len(row) < 3:
-                        stringRow: str = "".join(row)
-                        logger.warning(f"Skipping: incomplete entry for {stringRow}")
+                        string_row: str = "".join(row)
+                        logger.warning(f"Skipping: incomplete entry for {string_row}")
                         continue
 
                     if len(row) > 3:
