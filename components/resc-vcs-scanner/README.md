@@ -163,7 +163,7 @@ To create vcs_instances_config.json file please refer to: [Structure of vcs_inst
   cd components/resc-vcs-scanner
   pip install virtualenv
   virtualenv venv
-  source venv/Scripts/activate
+  source venv/bin/activate
   ```
  #### 2. Install resc_vcs_scanner package:
   ```bash
@@ -174,25 +174,56 @@ The CLI has 3 modes of operation, please make use of the --help argument to see 
 - Scanning a non-git directory: 
   ```bash
   secret_scanner dir --help
-  secret_scanner dir --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --dir=<directory to scan>
+  secret_scanner dir --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --ignored-blocker-path=<path to resc-ignore.dsv file> --dir=<directory to scan>
   ```
 
 - Scanning an already cloned git repository: 
   ```bash
   secret_scanner repo local --help
-  secret_scanner repo local --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --dir=<directory of repository to scan>
+  secret_scanner repo local --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --ignored-blocker-path=<path to resc-ignore.dsv file> --dir=<directory of repository to scan>
   ```
 
 - Scanning a remote git repository: 
   ```bash
   secret_scanner repo remote --help
-  secret_scanner repo remote --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --repo-url=<url of repository to scan>
+  secret_scanner repo remote --gitleaks-rules-path=<path to gitleaks toml rule> --gitleaks-path=<path to gitleaks binary> --ignored-blocker-path=<path to resc-ignore.dsv file> --repo-url=<url of repository to scan>
   ```
 Most CLI arguments can also be provided by setting the corresponding environment variable. 
 Please see the --help options on the arguments that can be provided using environment variables, and the expected environment variable names.
 These will always be prefixed with RESC_
 
 Example: the argument **--gitleaks-path** can be provided using the environment variable **RESC_GITLEAKS_PATH**
+</details>
+
+### Ignoring findings
+
+<details>
+  <summary>Preview</summary>
+
+It is possible to ignore some blocker findings (e.g. false positive) by providing
+a `resc-ignore.dsv` file. The bockers will be downgraded to a warning level and marked as **ignored**. Such file has the following structure:
+
+```sh
+# This is a comment
+finding_path|finding_rule|finding_line_number|expiration_date
+finding_path_2|finding_rule_2|finding_line_number_2
+```
+
+- `finding_path` contains the path to the file with the blocking finding.
+- `finding_rule` contains the name of the blocking rule.
+- `finding_line_number` contains the line number of the finding.
+- `expiration_date` is optional, contains the date in ISO 8601 format until which this ignore rule should be considered valid.
+
+For example, if we want to ignore the finding in file `/etc/passwd` for rule `root_value_found` on line `1` until April 1st 2024 at 23:59 the following line should be used.
+```sh
+/etc/passwd|root_value_found|1|2024-04-01T23:59:00
+```
+To ignore this finding _ad vitam aeternam_:
+```sh
+/etc/passwd|root_value_found|1
+```
+
+
 </details>
 
 ## Testing 
