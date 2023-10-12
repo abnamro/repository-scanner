@@ -112,6 +112,7 @@ def test_write_findings_with_rules(info_log, exit_mock):
     info_log.assert_has_calls(calls, any_order=True)
     exit_mock.assert_called_with(1)
 
+
 @patch("sys.exit")
 @patch("logging.Logger.info")
 def test_write_findings_with_rules_and_ignore(info_log, exit_mock):
@@ -153,6 +154,7 @@ def test_write_findings_with_rules_and_ignore(info_log, exit_mock):
              call("Findings threshold check results: FAIL")]
     info_log.assert_has_calls(calls, any_order=True)
     exit_mock.assert_called_with(1)
+
 
 @patch("logging.Logger.info")
 def test_write_scan(info_log):

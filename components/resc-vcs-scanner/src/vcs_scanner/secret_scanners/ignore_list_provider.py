@@ -27,7 +27,7 @@ class IgnoredListProvider():  # pylint: disable=R0902
                 csv_ignore_list = csv.reader(ignore_findings_file, delimiter='|')
                 for row in csv_ignore_list:
                     expire: datetime = datetime.now()
- 
+
                     # rows starting with # are comments
                     if row[0][:1] == '#':
                         continue
