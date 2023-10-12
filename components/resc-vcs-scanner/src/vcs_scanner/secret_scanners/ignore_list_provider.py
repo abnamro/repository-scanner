@@ -1,9 +1,11 @@
 # pylint: disable=E1101
 # Standard Library
+import csv
 import logging
 from datetime import datetime
+
+# Third Party
 import dateutil.parser
-import csv
 
 logger = logging.getLogger(__name__)
 

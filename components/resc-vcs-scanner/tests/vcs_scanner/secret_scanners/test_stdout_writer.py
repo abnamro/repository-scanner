@@ -1,7 +1,7 @@
 # Standard Library
 from datetime import datetime
-from unittest.mock import call, patch
 from pathlib import Path
+from unittest.mock import call, patch
 
 # Third Party
 from resc_backend.resc_web_service.schema.finding import Finding, FindingCreate
