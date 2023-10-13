@@ -91,7 +91,7 @@ tox run -e flake8 -v    # Run this command for Python linting
 ```
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[python-shield]: https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white
+[python-shield]: https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54
 [python-url]: https://www.python.org
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/helm-wizard-ci.yaml?style=flat&logo=github
 [ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/helm-wizard-ci.yaml

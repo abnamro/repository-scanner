@@ -100,11 +100,11 @@ Compiles and minifies for production: ```npm run build```
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[vuejs-shield]: https://img.shields.io/badge/Vue.js-v2.6.11-brightgreen?logo=vue.js
+[vuejs-shield]: https://img.shields.io/badge/VueJS-%2335495e.svg?style=flat&logo=vuedotjs&logoColor=%234FC08D
 [vuejs-url]: https://vuejs.org
-[bootstrapvue-shield]: https://img.shields.io/badge/BootstrapVue-v2.21.2-563D7C?logo=bootstrap
+[bootstrapvue-shield]: https://img.shields.io/badge/BootstrapVue-%238511FA.svg?style=flat&logo=bootstrap&logoColor=white
 [bootstrapvue-url]: https://bootstrap-vue.org
-[chartjs-shield]: https://img.shields.io/badge/Chart.js-v3.8.0-ff5733?style=flat&logo=chart.js
+[chartjs-shield]: https://img.shields.io/badge/Chart.js-F5788D.svg?style=flat&logo=chart.js&logoColor=white
 [chartjs-url]: https://www.chartjs.org
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/frontend-ci.yaml?logo=github
 [ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/frontend-ci.yaml

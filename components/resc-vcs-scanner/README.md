@@ -207,13 +207,13 @@ tox -v               # Run this command to run all of the above tests
 ```
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[python-shield]: https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white
+[python-shield]: https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54
 [python-url]: https://www.python.org
-[celery-shield]: https://img.shields.io/badge/Celery-5.3.1-green.svg?logo=celery&style=flat
+[celery-shield]: https://img.shields.io/badge/Celery-green.svg?logo=celery&style=flat
 [celery-url]: https://docs.celeryq.dev
-[pydantic-shield]: https://img.shields.io/badge/Pydantic-1.8.2-e92063.svg?logo=pydantic&style=flat
+[pydantic-shield]: https://img.shields.io/badge/Pydantic-e92063.svg?logo=pydantic&style=flat
 [pydantic-url]: https://docs.pydantic.dev
-[gitleaks-shield]: https://img.shields.io/badge/Gitleaks-8.16.4-blue?logo=gitleaks
+[gitleaks-shield]: https://img.shields.io/badge/Gitleaks-121013?logo=github&logoColor=white
 [gitleaks-url]: https://github.com/zricethezav/gitleaks
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scanner-ci.yaml?logo=github
 [ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/vcs-scanner-ci.yaml

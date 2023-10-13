@@ -314,9 +314,9 @@ Use the database password defined for dbPass in custom-values.yaml file.
 <!-- MARKDOWN LINKS & IMAGES -->
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/k8-infra-ci.yaml?style=flat&logo=github
 [ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/k8-infra-ci.yaml
-[docker-shield]: https://img.shields.io/badge/Docker-latest-2496ED?logo=docker
+[docker-shield]: https://img.shields.io/badge/Docker-2CA5E0?style=flat&logo=docker&logoColor=white
 [docker-url]: https://www.docker.com
-[k8-shield]: https://img.shields.io/badge/Kubernetes-latest-326CE5?logo=kubernetes
+[k8-shield]: https://img.shields.io/badge/kubernetes-326ce5.svg?&style=flat&logo=kubernetes&logoColor=white
 [k8-url]: https://kubernetes.io
-[helm-shield]: https://img.shields.io/badge/Helm-latest-277A9F?logo=helm
+[helm-shield]: https://img.shields.io/badge/Helm-0F1689?style=flat&logo=Helm&labelColor=0F1689
 [helm-url]: https://helm.sh

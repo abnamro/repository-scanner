@@ -18,6 +18,11 @@
 [![LastUpdated][updated-shield]][updated-url]
 [![Build][build-shield]][build-url]
 [![Version][version-shield]][version-url]
+[![Python][python-shield]][python-url]
+[![Vue.js][vuejs-shield]][vuejs-url]
+[![Docker][docker-shield]][docker-url]
+[![Kubernetes][k8-shield]][k8-url]
+[![Helm][helm-shield]][helm-url]
 [![Downloads][downloads-shield]][downloads-url]
 [![DockerPulls][docker-pulls-shield]][docker-pulls-url]
 [![OpenSSFBestPractices][openssf-shield]][openssf-url]
@@ -123,4 +128,29 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 [openssf-url]: https://www.bestpractices.dev/projects/7799
 [sonar-cloud-shield]: https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-backend&metric=alert_status
 [sonar-cloud-url]: https://sonarcloud.io/organizations/abnamro-resc/projects
+[python-shield]: https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54
+[python-url]: https://www.python.org
+[vuejs-shield]: https://img.shields.io/badge/VueJS-%2335495e.svg?style=flat&logo=vuedotjs&logoColor=%234FC08D
+[vuejs-url]: https://vuejs.org
+[docker-shield]: https://img.shields.io/badge/Docker-2CA5E0?style=flat&logo=docker&logoColor=white
+[docker-url]: https://www.docker.com
+[k8-shield]: https://img.shields.io/badge/kubernetes-326ce5.svg?&style=flat&logo=kubernetes&logoColor=white
+[k8-url]: https://kubernetes.io
+[helm-shield]: https://img.shields.io/badge/Helm-0F1689?style=flat&logo=Helm&labelColor=0F1689
+[helm-url]: https://helm.sh
+
+[Python.org]: https://img.shields.io/badge/Python-2b5b84?style=for-the-badge&logo=python&logoColor=white
+[Python-url]: https://www.python.org/
+[Docker.com]: https://img.shields.io/badge/Docker-0b214a?style=for-the-badge&logo=docker&logoColor=white
+[Docker-url]: https://www.docker.com/
+[Kubernetes.io]: https://img.shields.io/badge/Kubernetes-3371e3?style=for-the-badge&logo=kubernetes&logoColor=white
+[Kubernetes-url]: https://www.kubernetes.io/
+[Helm.sh]: https://img.shields.io/badge/Helm-091c84?style=for-the-badge&logo=helm&logoColor=white
+[Helm-url]: https://helm.sh/
+[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
+[Vue-url]: https://vuejs.org/
+[RabbitMQ.com]: https://img.shields.io/badge/RabbitMQ-ff6600?style=for-the-badge&logo=rabbitmq&logoColor=white
+[RabbitMQ-url]: https://rabbitmq.com/
+[Redis.com]: https://img.shields.io/badge/redis-%23DD0031.svg?&style=for-the-badge&logo=redis&logoColor=white
+[Redis-url]: https://redis.com/
 
