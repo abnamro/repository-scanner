@@ -1,12 +1,9 @@
 # Repository Scanner Version Control System Scraper (RESC-VCS-SCRAPER)
-<h3>
-         <a href="https://github.com/abnamro/repository-scanner/actions">
-            <img src="https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scraper-ci.yaml?logo=github">
-        </a>
-        <a href="https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-vcs-scraper">
-            <img src="https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-vcs-scraper&metric=alert_status">
-        </a>
-</h3>
+[![Python][python-shield]][python-url]
+[![Celery][celery-shield]][celery-url]
+[![Pydantic][pydantic-shield]][pydantic-url]
+[![CI][ci-shield]][ci-url]
+[![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -163,3 +160,15 @@ tox -v -e lint       # Run this command to lint the code according to this repos
 tox -v -e pytest     # Run this command to run the unit tests
 tox -v               # Run this command to run all of the above tests
 ```
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[python-shield]: https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54
+[python-url]: https://www.python.org
+[celery-shield]: https://img.shields.io/badge/Celery-green.svg?logo=celery&style=flat
+[celery-url]: https://docs.celeryq.dev
+[pydantic-shield]: https://img.shields.io/badge/Pydantic-e92063.svg?logo=pydantic&style=flat
+[pydantic-url]: https://docs.pydantic.dev
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/abnamro/repository-scanner/vcs-scraper-ci.yaml?style=flat&logo=github
+[ci-url]: https://github.com/abnamro/repository-scanner/actions/workflows/vcs-scraper-ci.yaml
+[sonar-cloud-shield]: https://sonarcloud.io/api/project_badges/measure?project=abnamro-resc_resc-vcs-scraper&metric=alert_status
+[sonar-cloud-url]: https://sonarcloud.io/summary/new_code?id=abnamro-resc_resc-vcs-scraper

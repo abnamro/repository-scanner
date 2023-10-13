@@ -30,7 +30,7 @@ Who are more relevant Threat Actors and where do they attack from?
 
 
 ## Threat Model Diagram
-<img src="../images/RESC-ThreatModel.svg">  
+<img src="../images/RESC-ThreatModel.png">  
   
 ## Attack Target: Project Collector  
 Collects a list of all project names and feeds them to the message queue.  
