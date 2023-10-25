@@ -65,7 +65,7 @@ jobs:
     #     tox -e lint
 
     - name: SonarCloud Scan
-      if: ${{ env.GITHUB_TOKEN != '' }}
+      if: ${{ github.event.pull_request.head.repo.repository-scanner }} != ${{ github.repository }} && ${{ env.GITHUB_TOKEN != '' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
