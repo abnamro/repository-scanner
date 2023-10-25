@@ -67,8 +67,6 @@ jobs:
       run: |
             echo "repo name:=$(echo ${{ github.repository }}"
             echo "PR: ${{ github.event.pull_request.head.repo.repository-scanner }}"
-            cd ${{ env.RESC_BACKEND_DIR }}
-            python -m pip install --upgrade pip
 
     - name: SonarCloud Scan
       if: ${{ github.event.pull_request.head.repo.repository-scanner }} == ${{ github.repository }} && ${{ env.SONAR_TOKEN != '' }}
