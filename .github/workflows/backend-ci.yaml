@@ -63,9 +63,14 @@ jobs:
     #   run: |
     #     cd ${{ env.RESC_BACKEND_DIR }}
     #     tox -e lint
+    - name: Building python package
+      run: |
+            echo repo: ${{ github.repository }}
+            echo PR: ${{ github.event.pull_request.title }}
+            echo pull request: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: SonarCloud Scan
-      if: ${{ github.event.pull_request.head.repo.repository-scanner }} == ${{ github.repository }} && ${{ env.SONAR_TOKEN != '' }}
+      if: ${{ github.event.pull_request.head.repo.full_name }} == ${{ github.repository }} && ${{ env.SONAR_TOKEN != '' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
