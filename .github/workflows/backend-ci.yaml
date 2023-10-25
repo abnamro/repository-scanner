@@ -71,7 +71,7 @@ jobs:
 
     - name: SonarCloud Scan
       # if: ${{ github.event.pull_request.head.repo.full_name }} == ${{ github.repository }} && env.SONAR_TOKEN != null
-      if: ${{ github.event.pull_request.head.repo.full_name == 'mdusman123/repository-scanner' }}
+      if: ${{ github.event.pull_request.head.repo.full_name == '' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
