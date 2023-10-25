@@ -65,8 +65,9 @@ jobs:
     #     tox -e lint
     - name: Building python package
       run: |
-            echo ${{ github.repository }}
-            echo ${{ github.event.pull_request.head.repo.repository-scanner }}
+            echo repo: ${{ github.repository }}
+            echo PR: ${{ github.event.pull_request.title }}
+            echo pull request: ${{ github.event.pull_request.head.repo.abnamro/repository-scanner }}
 
     - name: SonarCloud Scan
       if: ${{ github.event.pull_request.head.repo.repository-scanner }} == ${{ github.repository }} && ${{ env.SONAR_TOKEN != '' }}
