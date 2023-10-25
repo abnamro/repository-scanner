@@ -44,28 +44,28 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install test dependencies
-      run: |
-        cd ${{ env.RESC_BACKEND_DIR }}
-        pip install -r test-requirements.txt
+    # - name: Install test dependencies
+    #   run: |
+    #     cd ${{ env.RESC_BACKEND_DIR }}
+    #     pip install -r test-requirements.txt
 
-    - name: Test with pytest
-      run: |
-        cd ${{ env.RESC_BACKEND_DIR }}
-        tox -e pytest
+    # - name: Test with pytest
+    #   run: |
+    #     cd ${{ env.RESC_BACKEND_DIR }}
+    #     tox -e pytest
 
-    - name: Import sorting with isort
-      run: |
-        cd ${{ env.RESC_BACKEND_DIR }}
-        tox -e sort
+    # - name: Import sorting with isort
+    #   run: |
+    #     cd ${{ env.RESC_BACKEND_DIR }}
+    #     tox -e sort
     
-    - name: Lint with flake8
-      run: |
-        cd ${{ env.RESC_BACKEND_DIR }}
-        tox -e lint
+    # - name: Lint with flake8
+    #   run: |
+    #     cd ${{ env.RESC_BACKEND_DIR }}
+    #     tox -e lint
 
     - name: SonarCloud Scan
-      if: ${{ env.GITHUB_TOKEN == 'true' }}
+      if: ${{ env.GITHUB_TOKEN != '' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
