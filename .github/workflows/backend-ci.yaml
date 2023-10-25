@@ -63,7 +63,7 @@ jobs:
     #   run: |
     #     cd ${{ env.RESC_BACKEND_DIR }}
     #     tox -e lint
-
+    # testing if this step is getting skiped or not
     - name: SonarCloud Scan
       if: ${{ github.event.pull_request.head.repo.repository-scanner }} != ${{ github.repository }} && ${{ env.GITHUB_TOKEN != '' }}
       uses: SonarSource/sonarcloud-github-action@master
