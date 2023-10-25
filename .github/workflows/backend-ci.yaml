@@ -66,11 +66,12 @@ jobs:
     - name: Building python package
       run: |
             echo repo: ${{ github.repository }}
+            echo repo1 github.repository
             echo PR: ${{ github.event.pull_request.title }}
             echo pull request: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: SonarCloud Scan
-      if: ${{ github.event.pull_request.head.repo.full_name == ${{ github.repository }} }}
+      if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
