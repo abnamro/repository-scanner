@@ -67,7 +67,7 @@ jobs:
       run: |
             echo repo: ${{ github.repository }}
             echo PR: ${{ github.event.pull_request.title }}
-            echo pull request: ${{ github.event.pull_request.head.repo.abnamro/repository-scanner }}
+            echo pull request: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: SonarCloud Scan
       if: ${{ github.event.pull_request.head.repo.repository-scanner }} == ${{ github.repository }} && ${{ env.SONAR_TOKEN != '' }}
