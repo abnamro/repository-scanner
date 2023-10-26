@@ -23,7 +23,7 @@ class IgnoredListProvider():  # pylint: disable=R0902
         """
         ignored = {}
 
-        if self.ignore_findings_path == None:
+        if self.ignore_findings_path is None:
             return ignored
 
         try:
