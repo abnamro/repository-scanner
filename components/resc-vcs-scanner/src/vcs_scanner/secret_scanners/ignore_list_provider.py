@@ -23,6 +23,9 @@ class IgnoredListProvider():  # pylint: disable=R0902
         """
         ignored = {}
 
+        if self.ignore_findings_path is None:
+            return ignored
+
         try:
             # read dsv: `path|rule_name|line_number|expiry_date`
             with open(self.ignore_findings_path, encoding="utf-8") as ignore_findings_file:
