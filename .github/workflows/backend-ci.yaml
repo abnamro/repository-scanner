@@ -71,7 +71,7 @@ jobs:
             echo pull request: ${{ github.event.pull_request.head.repo.full_name }}
 
     - name: SonarCloud Scan
-      if: ${{ github.event.pull_request.head.repo.full_name == 'abnamro/repository-scanner' }} e }}
+      if: ${{ github.event.pull_request.head.repo.full_name == 'abnamro/repository' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_BACKEND_DIR }}
