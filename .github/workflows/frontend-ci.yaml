@@ -78,7 +78,9 @@ jobs:
         sed -i "s+/home/runner/work/repository-scanner/repository-scanner/components/resc-frontend/++g" tests/unit/reports/coverage/lcov.info
         cat tests/unit/reports/coverage/lcov.info
 
+    # This step will only execute if PR is created internally.
     - name: SonarCloud Scan
+      if: ${{ github.event.pull_request.head.repo.full_name == 'abnamro/repository-scanner' }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_FRONTEND_DIR }}
