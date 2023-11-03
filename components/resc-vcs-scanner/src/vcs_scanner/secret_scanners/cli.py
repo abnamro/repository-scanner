@@ -207,6 +207,7 @@ def scan_directory(args: Namespace):
                                  exit_code_warn=args.exit_code_warn,
                                  exit_code_block=args.exit_code_block,
                                  filter_tag=args.filter_tag,
+                                 working_dir=args.dir,
                                  ignore_findings_path=args.ignored_blocker_path)
     with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
         rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())
@@ -254,6 +255,7 @@ def scan_repository(args: Namespace):
                                      exit_code_warn=args.exit_code_warn,
                                      exit_code_block=args.exit_code_block,
                                      filter_tag=args.filter_tag,
+                                     working_dir=args.dir,
                                      ignore_findings_path=args.ignored_blocker_path)
         with open(args.gitleaks_rules_path, encoding="utf-8") as rule_pack:
             rule_pack_version = get_rule_pack_version_from_file(rule_pack.read())

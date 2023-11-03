@@ -30,12 +30,15 @@ class STDOUTWriter(OutputModule):
                  exit_code_warn: int,
                  exit_code_block: int,
                  filter_tag: str = None,
-                 ignore_findings_path: str = ""):
+                 working_dir: str = "",
+                 ignore_findings_path: str = "",
+                 ):
         self.toml_rule_file_path: str = toml_rule_file_path
         self.exit_code_warn: int = exit_code_warn
         self.exit_code_block: int = exit_code_block
         self.filter_tag: str = filter_tag
         self.exit_code_success = 0
+        self.working_dir = working_dir
         self.ignore_findings_providers: IgnoredListProvider = IgnoredListProvider(ignore_findings_path)
 
     def write_vcs_instance(self,
@@ -74,15 +77,13 @@ class STDOUTWriter(OutputModule):
         return rule_tags
 
     @staticmethod
-    def _determine_finding_action(finding: FindingCreate, rule_tags: dict, ignore_dictionary: dict) -> FindingAction:
+    def _determine_finding_action(finding: FindingCreate, rule_tags: dict) -> FindingAction:
         """
             Determine the action to take for the finding, based on the rule tags
         :param finding:
             FindingCreate instance of the finding
         :param rule_tags:
             Dictionary containing all the rules and there respective tags
-        :param ignore_dictionary:
-            Dictionary containing all the list of ignored blockers
         :return: FindingAction.
             FindingAction to take for this finding
         """
@@ -92,10 +93,43 @@ class STDOUTWriter(OutputModule):
         if FindingAction.BLOCK in rule_tags.get(finding.rule_name, []):
             rule_action = FindingAction.BLOCK
 
-        if rule_action == FindingAction.BLOCK:
-            key: str = finding.file_path + "|" + finding.rule_name + "|" + str(finding.line_number)
-            if key in ignore_dictionary:
-                rule_action = FindingAction.IGNORED
+        return rule_action
+
+    @staticmethod
+    def _determine_if_ignored(rule_action: FindingAction,
+                              finding: FindingCreate,
+                              ignore_dictionary: dict,
+                              working_dir: str) -> FindingAction:
+        """
+            Determine whether to ignore a blocker or not.
+        :param rule_action:
+            FindingAction containing the decision depending of rules.
+        :param finding:
+            FindingCreate instance of the finding
+        :param ignore_dictionary:
+            Dictionary containing all the list of ignored blockers
+        :return: FindingAction.
+            FindingAction to take for this finding
+        """
+        if rule_action is not FindingAction.BLOCK:
+            logger.info(f"{rule_action}: {finding.file_path}")
+            return rule_action
+
+        if working_dir is None or working_dir == "":
+            working_dir = "/"
+
+        working_dir = str(working_dir)
+        if working_dir[-1] != "/":
+            working_dir = working_dir + "/"
+
+        path_length: int = len(working_dir)
+        finding_path: str = str(finding.file_path)
+        if finding_path[:path_length] == working_dir:
+            finding_path = finding_path[path_length:]
+
+        key: str = finding_path + "|" + finding.rule_name + "|" + str(finding.line_number)
+        if key in ignore_dictionary:
+            return FindingAction.IGNORED
 
         return rule_action
 
@@ -142,7 +176,12 @@ class STDOUTWriter(OutputModule):
         for finding in scan_findings:
             should_process_finding = self._finding_tag_filter(finding, rule_tags, self.filter_tag)
             if should_process_finding:
-                finding_action = self._determine_finding_action(finding, rule_tags, ignore_dictionary)
+                finding_action = self._determine_finding_action(finding, rule_tags)
+                finding_action = self._determine_if_ignored(finding_action,
+                                                            finding,
+                                                            ignore_dictionary,
+                                                            self.working_dir)
+
                 if finding_action == FindingAction.BLOCK:
                     finding_action_value = colored(finding_action.value, "red", attrs=["bold"])
                     block_count += 1

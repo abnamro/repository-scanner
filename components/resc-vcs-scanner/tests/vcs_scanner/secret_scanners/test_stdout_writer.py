@@ -156,6 +156,50 @@ def test_write_findings_with_rules_and_ignore(info_log, exit_mock):
     exit_mock.assert_called_with(1)
 
 
+@patch("sys.exit")
+@patch("logging.Logger.info")
+def test_write_findings_with_rules_and_ignore_with_directory(info_log, exit_mock):
+    findings = []
+    toml_rule_path = THIS_DIR.parent / "fixtures/rules.toml"
+    ignore_list_path = THIS_DIR.parent / "fixtures/ignore-findings-list-for-writer.dsv"
+    for i in range(1, 6):
+        findings.append(Finding(file_path=f"directory_path/file_path_{i}",
+                                line_number=i,
+                                column_start=i,
+                                column_end=i,
+                                commit_id=f"commit_id_{i}",
+                                commit_message=f"commit_message_{i}",
+                                commit_timestamp=datetime.utcnow(),
+                                author=f"author_{i}",
+                                email=f"email_{i}",
+                                status=FindingStatus.NOT_ANALYZED,
+                                comment=f"comment_{i}",
+                                event_sent_on=datetime.utcnow(),
+                                rule_name=f"rule_{i}"))
+
+    _ = STDOUTWriter(toml_rule_file_path=str(toml_rule_path),
+                     exit_code_warn=2,
+                     exit_code_block=1,
+                     working_dir="directory_path/",
+                     ignore_findings_path=ignore_list_path) \
+        .write_findings(1, 1, findings)
+    calls = [call('\n'
+                  '+---------+--------+------+----------+----------------------------+\n'
+                  '| Level   | Rule   | Line | Position | File path                  |\n'
+                  '+---------+--------+------+----------+----------------------------+\n'
+                  '| Block   | rule_2 |    2 | 2-2      | directory_path/file_path_2 |\n'
+                  '| Ignored | rule_1 |    1 | 1-1      | directory_path/file_path_1 |\n'
+                  '| Info    | rule_4 |    4 | 4-4      | directory_path/file_path_4 |\n'
+                  '| Info    | rule_5 |    5 | 5-5      | directory_path/file_path_5 |\n'
+                  '| Warn    | rule_3 |    3 | 3-3      | directory_path/file_path_3 |\n'
+                  '+---------+--------+------+----------+----------------------------+'),
+             call("Findings detected : Total - 5, Block - 1, Warn - 2, Info - 2"),
+             call("Scan failed due to policy violations: [Block:1]"),
+             call("Findings threshold check results: FAIL")]
+    info_log.assert_has_calls(calls, any_order=True)
+    exit_mock.assert_called_with(1)
+
+
 @patch("logging.Logger.info")
 def test_write_scan(info_log):
     rule_pack = "0.0.0"
