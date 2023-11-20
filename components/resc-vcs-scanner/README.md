@@ -36,7 +36,7 @@ These instructions will help you to get a copy of the project up and running on 
   **Prerequisites:**   
   * RabbitMQ and RESC web service must be up and running locally.</br>
   If you have already deployed RESC through helm in Kubernetes, then rabbitmq and resc webservice are already running for you.</br> 
-  * Install Gitleaks [v8.8.8](https://github.com/zricethezav/gitleaks/releases/tag/v8.8.8) on your system.
+  * Install Gitleaks [v8.18.0](https://github.com/zricethezav/gitleaks/releases/tag/v8.18.0) on your system.
   * Download the rule config toml file to `/tmp/temp_resc_rule.toml` location by running below command from a Git Bash terminal.
   * Send some repositories to 'repositories' topics of RabbitMQ server by referring the README of RESC-VCS-SCRAPER component.
 
