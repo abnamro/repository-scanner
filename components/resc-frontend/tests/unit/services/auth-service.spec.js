@@ -1,17 +1,12 @@
 import AuthService from '@/services/auth-service';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index';
+import { setActivePinia, createPinia } from 'pinia';
 
 const axios = require('axios');
 const jose = require('jose');
 
 jest.mock('jose');
 jest.mock('axios');
-
-jest.mock('@/store/index.js', () => ({
-  getters: {
-    idToken: 'fake-id-token',
-  },
-}));
 
 describe('function generateCodeVerifier', () => {
   it('fetch a base64 encoded code verifier', async () => {
@@ -94,6 +89,15 @@ describe('function isValidJwtToken', () => {
 });
 
 describe('function isUserAuthenticated', () => {
+  beforeEach(() => {
+    // creates a fresh pinia and makes it active
+    // so it's automatically picked up by any useStore() call
+    // without having to pass it to it: `useStore(pinia)`
+    setActivePinia(createPinia());
+    const store = useAuthUserStore();
+    store.$patch({ idToken: 'fake-id-token' });
+  });
+
   it('verify if user is authenticated or not', async () => {
     const claims = {
       sub: 't12345',
@@ -127,6 +131,15 @@ describe('function doAuthCheck', () => {
 });
 
 describe('function isTokenExpired', () => {
+  beforeEach(() => {
+    // creates a fresh pinia and makes it active
+    // so it's automatically picked up by any useStore() call
+    // without having to pass it to it: `useStore(pinia)`
+    setActivePinia(createPinia());
+    const store = useAuthUserStore();
+    store.$patch({ idToken: 'fake-id-token' });
+  });
+
   it('verify if jwt token is valid or not', async () => {
     const claims = {
       sub: 't12345',
@@ -138,7 +151,8 @@ describe('function isTokenExpired', () => {
       email: 'johndoe@example.com',
     };
     jose.decodeJwt.mockResolvedValue(claims);
-    const isTokenExpired = AuthService.isTokenExpired(Store.getters.idToken);
+    const store = useAuthUserStore();
+    const isTokenExpired = AuthService.isTokenExpired(store.idToken);
     expect(isTokenExpired).toBe(false);
   });
 });

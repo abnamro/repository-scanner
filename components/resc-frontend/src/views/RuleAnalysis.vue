@@ -154,7 +154,7 @@ import Pagination from '@/components/Common/Pagination.vue';
 import RuleAnalysisFilter from '@/components/Filters/RuleAnalysisFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
 import spinnerMixin from '@/mixins/spinner.js';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 
 export default {
   name: 'RuleAnalysis',
@@ -262,11 +262,12 @@ export default {
   },
   methods: {
     isRedirectedFromRuleMetricsPage() {
-      const sourceRoute = Store.getters.sourceRoute;
-      const destinationRoute = Store.getters.destinationRoute;
+      const store = useAuthUserStore();
+      const sourceRoute = store.sourceRoute;
+      const destinationRoute = store.destinationRoute;
       return sourceRoute === '/metrics/rule-metrics' &&
         destinationRoute === '/rule-analysis' &&
-        Store.getters.previousRouteState
+        store.previousRouteState
         ? true
         : false;
     },
@@ -385,6 +386,7 @@ export default {
         });
     },
     fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage() {
+      const store = useAuthUserStore();
       RulePackService.getRulePackVersions(10000, 0)
         .then((response) => {
           this.rulePackVersions = [];
@@ -393,13 +395,13 @@ export default {
             this.rulePackVersions.push(rulePack);
           });
           //Select rule pack versions passed from rule analysis scrren
-          if (Store.getters.previousRouteState) {
-            for (const obj of Store.getters.previousRouteState.rulePackVersions) {
+          if (store.previousRouteState) {
+            for (const obj of store.previousRouteState.rulePackVersions) {
               this.selectedRulePackVersions.push(obj.version);
               this.selectedRulePackVersionsList.push(obj);
             }
             this.fetchRuleTags();
-            Store.commit('update_previous_route_state', null);
+            store.update_previous_route_state(null);
           }
         })
         .catch((error) => {
@@ -451,7 +453,8 @@ export default {
     if (this.isRedirectedFromRuleMetricsPage()) {
       this.fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage();
     } else {
-      Store.commit('update_previous_route_state', null);
+      const store = useAuthUserStore();
+      store.update_previous_route_state(null);
       this.fetchRulePackVersions();
       this.fetchDistinctProjects();
       this.fetchDistinctRepositories();

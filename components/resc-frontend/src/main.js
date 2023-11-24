@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import AxiosConfig from '@/configuration/axios-config';
 
 import {
@@ -77,8 +78,11 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 AxiosConfig.axiosSetUp();
 
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+
 new Vue({
   router,
-  store,
+  pinia,
   render: (h) => h(App),
 }).$mount('#app');

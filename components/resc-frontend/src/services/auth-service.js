@@ -1,7 +1,7 @@
 import AuthUtils from '@/utils/auth-utils';
 import AxiosConfig from '@/configuration/axios-config.js';
 import Router from '@/router/index.js';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 import Config from '@/configuration/config';
 import axiosRetry from 'axios-retry';
 
@@ -61,6 +61,7 @@ const AuthService = {
   doLogin() {
     const authCode = this.getAuthCode(window.location.href);
     const codeVerifier = this.getCodeVerifier();
+    const store = useAuthUserStore();
 
     if (authCode && codeVerifier) {
       const data = qs.stringify({
@@ -74,7 +75,7 @@ const AuthService = {
       return new Promise((resolve, reject) => {
         this.getAuthTokens(data)
           .then((response) => {
-            Store.commit('update_auth_tokens', {
+            store.update_auth_tokens({
               id_token: response.data.id_token,
               access_token: response.data.access_token,
             });
@@ -83,8 +84,8 @@ const AuthService = {
               const isAuthorized = await this.isUserAuthorized();
               if (isAuthorized) {
                 this.updateUserDetailsInStore();
-                if (Store.getters.destinationRoute) {
-                  Router.push(Store.getters.destinationRoute).catch((error) => {
+                if (store.destinationRoute) {
+                  Router.push(store.destinationRoute).catch((error) => {
                     AxiosConfig.handleError(error);
                   });
                 } else {
@@ -110,10 +111,11 @@ const AuthService = {
   },
 
   doLogOut() {
-    Store.commit('update_auth_tokens', null);
-    Store.commit('update_user_details', null);
-    Store.commit('update_source_route', null);
-    Store.commit('update_destination_route', null);
+    const store = useAuthUserStore();
+    store.update_auth_tokens(null);
+    store.update_user_details(null);
+    store.update_source_route(null);
+    store.update_destination_route(null);
     this.removeCodeVerifier();
     Router.push('/login').catch((error) => {
       AxiosConfig.handleError(error);
@@ -142,9 +144,10 @@ const AuthService = {
   },
 
   async isUserAuthenticated() {
-    if (Store.getters.idToken && !this.isTokenExpired(Store.getters.idToken)) {
+    const store = useAuthUserStore();
+    if (store.idToken && !this.isTokenExpired(store.idToken)) {
       const isAuthenticated = await this.isValidJwtToken(
-        Store.getters.idToken,
+        store.idToken,
         `${Config.value('ssoIdTokenJwksUrl')}`
       );
       return isAuthenticated ? true : false;
@@ -164,7 +167,8 @@ const AuthService = {
   },
 
   getLoggedInUserDetails() {
-    const claims = jose.decodeJwt(Store.getters.idToken);
+    const store = useAuthUserStore();
+    const claims = jose.decodeJwt(store.idToken);
     return {
       firstName: claims.given_name,
       lastName: claims.family_name,
@@ -179,7 +183,8 @@ const AuthService = {
 
   updateUserDetailsInStore() {
     const userDetails = this.getLoggedInUserDetails();
-    Store.commit('update_user_details', {
+    const store = useAuthUserStore();
+    store.update_user_details({
       firstName: userDetails.firstName,
       lastName: userDetails.lastName,
       email: userDetails.email,

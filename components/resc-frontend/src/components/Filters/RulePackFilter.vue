@@ -32,7 +32,7 @@
 </template>
 <script>
 import Multiselect from 'vue-multiselect';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 
 export default {
   name: 'RulePackFilter',
@@ -59,11 +59,12 @@ export default {
       return active ? `${version} (active)` : version;
     },
     isRedirectedFromRuleMetricsPage() {
-      const sourceRoute = Store.getters.sourceRoute;
-      const destinationRoute = Store.getters.destinationRoute;
+      const store = useAuthUserStore();
+      const sourceRoute = store.sourceRoute;
+      const destinationRoute = store.destinationRoute;
       return sourceRoute === '/metrics/rule-metrics' &&
         destinationRoute === '/rule-analysis' &&
-        Store.getters.previousRouteState
+        store.previousRouteState
         ? true
         : false;
     },

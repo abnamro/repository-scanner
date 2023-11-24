@@ -39,6 +39,7 @@
 <script>
 import AuthService from '@/services/auth-service';
 import Config from '@/configuration/config';
+import { useAuthUserStore } from '@/store/index.js';
 
 export default {
   name: 'TopBarMenu',
@@ -51,17 +52,18 @@ export default {
       return authenticationRequired === 'true' ? true : false;
     },
     avatarText() {
-      return this.$store.getters.firstName && this.$store.getters.lastName
-        ? `${this.$store.getters.firstName.charAt(0)}${this.$store.getters.lastName.charAt(0)}`
+      const store = useAuthUserStore();
+      return store.firstName && store.lastName
+        ? `${store.firstName.charAt(0)}${store.lastName.charAt(0)}`
         : null;
     },
     userFullName() {
-      return this.$store.getters.firstName && this.$store.getters.lastName
-        ? `${this.$store.getters.firstName} ${this.$store.getters.lastName}`
-        : null;
+      const store = useAuthUserStore();
+      return store.firstName && store.lastName ? `${store.firstName} ${store.lastName}` : null;
     },
     userEmail() {
-      return this.$store.getters.email ? `${this.$store.getters.email}` : null;
+      const store = useAuthUserStore();
+      return store.email ? `${store.email}` : null;
     },
   },
   methods: {

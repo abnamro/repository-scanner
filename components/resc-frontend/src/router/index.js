@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Config from '@/configuration/config';
 import FindingMetrics from '@/components/Metrics/FindingMetrics';
 import AuditMetrics from '@/components/Metrics/AuditMetrics';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 import Analytics from '@/views/Analytics';
 import Repositories from '@/views/Repositories';
 import ScanFindings from '@/views/ScanFindings';
@@ -91,10 +91,11 @@ const router = new VueRouter({
 
 export const loginGuard = () => (to, from, next) => {
   if (authenticationRequired && authenticationRequired === 'false') {
-    Store.commit('update_source_route', from.fullPath);
-    Store.commit('update_destination_route', to.fullPath);
-    Store.commit('update_auth_tokens', null);
-    Store.commit('update_user_details', null);
+    const store = useAuthUserStore();
+    store.update_source_route(from.fullPath);
+    store.update_destination_route(to.fullPath);
+    store.update_auth_tokens(null);
+    store.update_user_details(null);
     return next();
   } else if (authenticationRequired && authenticationRequired === 'true') {
     if (to.matched.some((record) => record.meta.noAuth)) {
@@ -102,11 +103,12 @@ export const loginGuard = () => (to, from, next) => {
     } else {
       (async () => {
         const isAuthenticated = await AuthService.isUserAuthenticated();
-        Store.commit('update_source_route', from.fullPath);
-        Store.commit('update_destination_route', to.fullPath);
+        const store = useAuthUserStore();
+        store.update_source_route(from.fullPath);
+        store.update_destination_route(to.fullPath);
         if (!isAuthenticated) {
-          Store.commit('update_auth_tokens', null);
-          Store.commit('update_user_details', null);
+          store.update_auth_tokens(null);
+          store.update_user_details(null);
           return next({
             path: '/login',
           });
