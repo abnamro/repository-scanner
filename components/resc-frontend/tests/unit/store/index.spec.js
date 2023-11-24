@@ -1,4 +1,5 @@
-import store from '@/store/index';
+import { useAuthUserStore } from '@/store/index';
+import { setActivePinia, createPinia } from 'pinia';
 
 describe('Store management unit test', () => {
   afterEach(() => {
@@ -7,28 +8,32 @@ describe('Store management unit test', () => {
   });
 
   describe('store Mutations', () => {
+    beforeEach(() => {
+      // creates a fresh pinia and makes it active
+      // so it's automatically picked up by any useStore() call
+      // without having to pass it to it: `useStore(pinia)`
+      setActivePinia(createPinia());
+    });
+
     it('Check update_auth_tokens', async () => {
-      await store.commit('update_auth_tokens', null);
-      await expect(store.state.accessToken).toBe(null);
-      await expect(store.state.idToken).toBe(null);
-      await expect(store.getters.idToken).toBe(null);
-      await expect(store.getters.accessToken).toBe(null);
+      const store = useAuthUserStore();
+      await store.update_auth_tokens(null);
+      await expect(store.accessToken).toBe(null);
+      await expect(store.idToken).toBe(null);
     });
 
     it('Check update_destination_route', async () => {
-      await store.commit('update_destination_route', null);
-      await expect(store.state.destinationRoute).toBe(null);
-      await expect(store.getters.destinationRoute).toBe(null);
+      const store = useAuthUserStore();
+      await store.update_destination_route(null);
+      await expect(store.destinationRoute).toBe(null);
     });
 
     it('Check update_user_details', async () => {
-      await store.commit('update_user_details', null);
-      await expect(store.state.firstName).toBe(null);
-      await expect(store.state.lastName).toBe(null);
-      await expect(store.state.email).toBe(null);
-      await expect(store.getters.firstName).toBe(null);
-      await expect(store.getters.lastName).toBe(null);
-      await expect(store.getters.email).toBe(null);
+      const store = useAuthUserStore();
+      await store.update_user_details(null);
+      await expect(store.firstName).toBe(null);
+      await expect(store.lastName).toBe(null);
+      await expect(store.email).toBe(null);
     });
   });
 });

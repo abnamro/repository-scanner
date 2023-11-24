@@ -107,7 +107,7 @@ import RepositoryFilter from '@/components/Filters/RepositoryFilter.vue';
 import RuleFilter from '@/components/Filters/RuleFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
 import RuleService from '@/services/rule-service';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 import VcsProviderFilter from '@/components/Filters/VcsProviderFilter.vue';
 import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
 import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
@@ -285,21 +285,22 @@ export default {
         });
     },
     applyRuleFilterInRuleAnalysisPage() {
+      const store = useAuthUserStore();
       const selectedRules = [];
       const selectedVersions = [];
-      if (Store.getters.previousRouteState) {
-        selectedRules.push(Store.getters.previousRouteState.ruleName);
-        if (Store.getters.previousRouteState.rulePackVersions) {
-          for (const obj of Store.getters.previousRouteState.rulePackVersions) {
+      if (store.previousRouteState) {
+        selectedRules.push(store.previousRouteState.ruleName);
+        if (store.previousRouteState.rulePackVersions) {
+          for (const obj of store.previousRouteState.rulePackVersions) {
             selectedVersions.push(obj.version);
           }
         }
-        if (Store.getters.previousRouteState.ruleTags) {
-          this.selectedRuleTags = Store.getters.previousRouteState.ruleTags;
+        if (store.previousRouteState.ruleTags) {
+          this.selectedRuleTags = store.previousRouteState.ruleTags;
         }
       }
-      const sourceRoute = Store.getters.sourceRoute;
-      const destinationRoute = Store.getters.destinationRoute;
+      const sourceRoute = store.sourceRoute;
+      const destinationRoute = store.destinationRoute;
 
       if (
         selectedRules.length > 0 &&

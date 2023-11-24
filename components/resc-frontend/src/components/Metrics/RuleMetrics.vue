@@ -144,7 +144,7 @@ import RuleService from '@/services/rule-service';
 import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
 import Spinner from '@/components/Common/Spinner.vue';
 import spinnerMixin from '@/mixins/spinner.js';
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 
 export default {
   name: 'RuleMetrics',
@@ -367,7 +367,8 @@ export default {
       }
     },
     goToRuleAnalysisPage(record) {
-      Store.commit('update_previous_route_state', {
+      const store = useAuthUserStore();
+      store.update_previous_route_state({
         ruleName: record.rule_name,
         rulePackVersions: this.selectedVersionsList,
         ruleTags: this.selectedRuleTags,

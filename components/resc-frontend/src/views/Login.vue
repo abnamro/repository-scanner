@@ -43,9 +43,9 @@ export default {
     },
   },
   created() {
-    if (this.$store.getters.idToken && !AuthService.isTokenExpired(this.$store.getters.idToken)) {
-      if (this.$store.getters.destinationRoute) {
-        this.$router.push(this.$store.getters.destinationRoute).catch((error) => {
+    if (this.$store.idToken && !AuthService.isTokenExpired(this.$store.idToken)) {
+      if (this.$store.destinationRoute) {
+        this.$router.push(this.$store.destinationRoute).catch((error) => {
           AxiosConfig.handleError(error);
         });
       } else {

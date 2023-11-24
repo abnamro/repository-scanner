@@ -1,4 +1,4 @@
-import Store from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index.js';
 import Config from '@/configuration/config';
 import AuthService from '@/services/auth-service';
 import PushNotification from '@/utils/push-notification';
@@ -11,8 +11,9 @@ const AxiosConfig = {
 
     axios.interceptors.request.use(
       function (config) {
-        if (Store.getters.accessToken) {
-          if (AuthService.isTokenExpired(Store.getters.accessToken)) {
+        const store = useAuthUserStore();
+        if (store.accessToken) {
+          if (AuthService.isTokenExpired(store.accessToken)) {
             PushNotification.danger(
               'Your session has expired. You will be redirected to the Login page.',
               'Session Expired',
@@ -27,7 +28,7 @@ const AxiosConfig = {
               cancelToken: new axios.CancelToken((cancel) => cancel()),
             };
           } else {
-            config.headers.Authorization = `Bearer ${Store.getters.accessToken}`;
+            config.headers.Authorization = `Bearer ${store.accessToken}`;
             config.headers.Accept = 'application/json';
           }
         }

@@ -1,6 +1,6 @@
 {
   "name": "resc-frontend",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "ABN AMRO Bank",
   "description": "Repository Scanner Frontend",
   "repository": {
@@ -29,14 +29,14 @@
     "core-js": "^3.6.5",
     "crypto-js": "^4.2.0",
     "jose": "^4.5.0",
+    "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "qs": "^6.10.3",
     "vue": "^2.6.11",
     "vue-chartjs": "^4.1.1",
     "vue-multiselect": "^2.1.6",
     "vue-router": "^3.2.0",
-    "vue-sidebar-menu": "4.8.1",
-    "vuex": "^3.4.0",
-    "vuex-persistedstate": "^4.1.0"
+    "vue-sidebar-menu": "4.8.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
