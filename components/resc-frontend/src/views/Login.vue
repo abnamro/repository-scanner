@@ -29,6 +29,7 @@
 import AuthService from '@/services/auth-service';
 import AxiosConfig from '@/configuration/axios-config.js';
 import Config from '@/configuration/config';
+import { useAuthUserStore } from '@/store/index.js';
 
 export default {
   name: 'Login',
@@ -43,9 +44,10 @@ export default {
     },
   },
   created() {
-    if (this.$store.idToken && !AuthService.isTokenExpired(this.$store.idToken)) {
-      if (this.$store.destinationRoute) {
-        this.$router.push(this.$store.destinationRoute).catch((error) => {
+    const store = useAuthUserStore();
+    if (store.idToken && !AuthService.isTokenExpired(store.idToken)) {
+      if (store.destinationRoute) {
+        this.$router.push(store.destinationRoute).catch((error) => {
           AxiosConfig.handleError(error);
         });
       } else {
