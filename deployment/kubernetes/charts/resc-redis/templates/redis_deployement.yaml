@@ -35,7 +35,7 @@ spec:
       {{ end }}
       containers:
       - name: {{ .Values.global.appName }}-redis
-        image: {{ .Values.redis.image.name }}:{{ .Values.redis.image.tag }}
+        image: {{ .Values.redis.image.repository }}{{ .Values.redis.image.name }}:{{ .Values.redis.image.tag }}
         imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
         command: ["sh", "-c"]
         args: ["{{ .Values.preStartUpCommand }} redis-server /redis-master/redis.conf --requirepass \"$REDIS_PASSWORD\""]

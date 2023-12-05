@@ -69,11 +69,7 @@ spec:
           - name: GET_HOSTS_FROM
             value: dns
         securityContext:
-          {{ if eq .Values.useKubernetesSecret "true" }}
           allowPrivilegeEscalation: false
-          {{ else }}
-          allowPrivilegeEscalation: true
-          {{ end }}
           readOnlyRootFilesystem: false
           privileged: false
           capabilities:
