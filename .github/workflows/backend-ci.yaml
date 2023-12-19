@@ -126,9 +126,8 @@ jobs:
       - name: Building python package
         run: |
           cd ${{ env.RESC_BACKEND_DIR }}
-          python -m pip install --upgrade pip
-          pip install build wheel
-          python setup.py sdist bdist_wheel
+          python -m pip install --upgrade pip build
+          python -m build
 
       - name: Publish python package to PyPI
         if: ${{ needs.python-basic-validation.outputs.branch_name == 'main' }}
