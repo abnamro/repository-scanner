@@ -69,6 +69,7 @@ jobs:
             echo repo1 github.repository
             echo PR: ${{ github.event.pull_request.title }}
             echo pull request: ${{ github.event.pull_request.head.repo.full_name }}
+            echo ref: github.ref
 
     - name: SonarCloud Scan
       if: ${{ github.event.pull_request.head.repo.full_name == 'abnamro/repository' || github.ref == 'refs/heads/main' }}  
