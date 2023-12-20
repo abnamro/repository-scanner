@@ -67,7 +67,7 @@ jobs:
 
     # This step will only execute if PR is created internally.
     - name: SonarCloud Scan
-      if: ${{ github.event.pull_request.head.repo.full_name == 'abnamro/repository-scanner' }}
+      if: ${{ (github.event.pull_request.head.repo.full_name == 'abnamro/repository-scanner') || (github.ref == 'refs/heads/main') }}
       uses: SonarSource/sonarcloud-github-action@master
       with:
         projectBaseDir: ${{ env.RESC_VCS_SCANNER_DIR }}
