@@ -5,6 +5,7 @@ import sys
 # Third Party
 import pyodbc
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy import text
 
 # First Party
 from resc_backend.common import initialise_logs
@@ -12,7 +13,7 @@ from resc_backend.constants import LOG_FILE_DUMMY_DATA_GENERATOR
 from resc_backend.db.connection import Session, engine
 from resc_backend.db.model import Base
 
-CONNECTION_CHECK_QUERY = "select 1 from finding"
+CONNECTION_CHECK_QUERY = text("select 1 from finding")
 RESC_DB_MODEL_MODULE = "resc_backend.db.model"
 
 logger_config = initialise_logs(LOG_FILE_DUMMY_DATA_GENERATOR)
@@ -82,7 +83,7 @@ class DbUtil:
          specified attribute of the class 'klass'.
          ex: id_, name, version"""
         try:
-            return [r.__getitem__(attr) for r in self.session.query(klass.__getattribute__(klass, attr))]
+            return [r[0] for r in self.session.query(klass.__getattribute__(klass, attr))]
         except AttributeError as ex:
             logger.error(f"{klass} does not have any attribute [{attr}].")
             self.handle_and_exit(ex)
