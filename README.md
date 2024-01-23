@@ -26,6 +26,7 @@
 [![Downloads][downloads-shield]][downloads-url]
 [![DockerPulls][docker-pulls-shield]][docker-pulls-url]
 [![OpenSSFBestPractices][openssf-shield]][openssf-url]
+[![OpenSSF Scorecard][ossf-shield]][ossf-url]
 [![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
 
 The Repository Scanner (RESC) is a tool used to detect secrets in source code management and version control systems 
@@ -138,6 +139,9 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 [k8-url]: https://kubernetes.io
 [helm-shield]: https://img.shields.io/badge/Helm-0F1689?style=flat&logo=Helm&labelColor=0F1689
 [helm-url]: https://helm.sh
+
+[ossf-shield]: https://api.securityscorecards.dev/projects/github.com/abnamro/repository-scanner/badge
+[ossf-url]: https://securityscorecards.dev/viewer/?uri=github.com/abnamro/repository-scanner
 
 [Python.org]: https://img.shields.io/badge/Python-2b5b84?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
