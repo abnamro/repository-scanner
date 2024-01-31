@@ -1,47 +1,42 @@
 <template>
   <div>
-    <div class="row text-left">
+    <div class="row text-start">
       <!-- Finding info -->
       <div class="col-md-5">
         <b-card-text
-          ><span class="font-weight-bold">Commit ID: </span
-          ><a class="custom-link" v-bind:href="finding.commit_url" target="_blank">{{
-            finding.commit_id
+          ><span class="fw-bold">Commit ID: </span
+          ><a class="custom-link" v-bind:href="findingRef.commit_url" target="_blank">{{
+            findingRef.commit_id
           }}</a></b-card-text
         >
         <b-card-text
-          ><span class="font-weight-bold">File Path: </span>{{ finding.file_path }}</b-card-text
+          ><span class="fw-bold">File Path: </span>{{ findingRef.file_path }}</b-card-text
         >
         <b-card-text
-          ><span class="font-weight-bold">Line Number: </span>{{ finding.line_number }}</b-card-text
+          ><span class="fw-bold">Line Number: </span>{{ findingRef.line_number }}</b-card-text
         >
         <b-card-text
-          ><span class="font-weight-bold">Position: </span>{{ finding.column_start }} -
-          {{ finding.column_end }}</b-card-text
+          ><span class="fw-bold">Position: </span>{{ findingRef.column_start }} -
+          {{ findingRef.column_end }}</b-card-text
+        >
+        <b-card-text><span class="fw-bold">Author: </span>{{ findingRef.author }}</b-card-text>
+        <b-card-text><span class="fw-bold">Email: </span>{{ findingRef.email }}</b-card-text>
+        <b-card-text
+          ><span class="fw-bold">Commit Time: </span>{{ findingRef.commit_timestamp }}</b-card-text
         >
         <b-card-text
-          ><span class="font-weight-bold">Author: </span>{{ finding.author }}</b-card-text
+          ><span class="fw-bold elipsis">Commit Message: </span
+          >{{ findingRef.commit_message }}</b-card-text
         >
-        <b-card-text><span class="font-weight-bold">Email: </span>{{ finding.email }}</b-card-text>
-        <b-card-text
-          ><span class="font-weight-bold">Commit Time: </span
-          >{{ finding.commit_timestamp }}</b-card-text
-        >
-        <b-card-text
-          ><span class="font-weight-bold">Commit Message: </span
-          >{{ finding.commit_message | truncate(50, '...') }}</b-card-text
-        >
-        <b-card-text
-          ><span class="font-weight-bold">Rulepack: </span>{{ finding.rule_pack }}</b-card-text
-        >
+        <b-card-text><span class="fw-bold">Rulepack: </span>{{ findingRef.rule_pack }}</b-card-text>
       </div>
 
       <!-- Audit and History Tabs -->
       <div class="col-md-7">
-        <b-card no-body class="text-left card-color">
+        <b-card no-body class="text-start card-color">
           <b-tabs pills card>
-            <AuditTab :finding="finding"></AuditTab>
-            <HistoryTab :finding="finding"></HistoryTab>
+            <AuditTab :finding="findingRef"></AuditTab>
+            <HistoryTab :finding="findingRef"></HistoryTab>
           </b-tabs>
         </b-card>
       </div>
@@ -49,33 +44,18 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import AuditTab from '@/components/ScanFindings/AuditTab.vue';
 import HistoryTab from '@/components/ScanFindings/HistoryTab.vue';
+import type { AugmentedDetailedFindingRead } from '@/services/shema-to-types';
+import { ref } from 'vue';
 
-export default {
-  name: 'FindingPanel',
-  props: {
-    finding: {
-      type: Object,
-      required: true,
-    },
-    repository: {
-      type: Object,
-      required: true,
-    },
-  },
-  filters: {
-    truncate: function (text, length, suffix) {
-      if (text.length > length) {
-        return text.substring(0, length) + suffix;
-      } else {
-        return text;
-      }
-    },
-  },
-  components: { AuditTab, HistoryTab },
+type Props = {
+  finding: AugmentedDetailedFindingRead;
 };
+
+const props = defineProps<Props>();
+const findingRef = ref(props.finding);
 </script>
 <style scoped>
 .custom-link {
@@ -83,5 +63,8 @@ export default {
 }
 a:hover {
   color: #005e5d;
+}
+.elipsis {
+  text-overflow: ellipsis;
 }
 </style>

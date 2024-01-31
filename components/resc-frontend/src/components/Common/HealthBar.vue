@@ -2,8 +2,7 @@
   <div>
     <b-progress class="mt-2" :max="total" height="0.8rem" show-value>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent(truePositiveCount)"
-        title="True Positive"
+        v-b-popover.hover.bottom="getPopOverContent('True Positive', truePositiveCount)"
         :value="truePositiveCount"
         variant="danger"
       >
@@ -14,8 +13,7 @@
         </div>
       </b-progress-bar>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent(falsePositiveCount)"
-        title="False Positive"
+        v-b-popover.hover.bottom="getPopOverContent('False Positive', falsePositiveCount)"
         :value="falsePositiveCount"
         variant="success"
       >
@@ -26,8 +24,9 @@
         </div>
       </b-progress-bar>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent(clarificationRequiredCount)"
-        title="Clarification Required"
+        v-b-popover.hover.bottom="
+          getPopOverContent('Clarification Required', clarificationRequiredCount)
+        "
         :value="clarificationRequiredCount"
         variant="warning"
       >
@@ -38,8 +37,7 @@
         </div>
       </b-progress-bar>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent(underReviewCount)"
-        title="Under Review"
+        v-b-popover.hover.bottom="getPopOverContent('Under Review', underReviewCount)"
         :value="underReviewCount"
         variant="info"
       >
@@ -49,11 +47,11 @@
           >
         </div>
       </b-progress-bar>
+      <!-- @vue-ignore -->
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent(notAnalyzedCount)"
-        title="Not Analyzed"
+        v-b-popover.hover.bottom="getPopOverContent('Not Analyzed', notAnalyzedCount)"
         :value="notAnalyzedCount"
-        variant="secondary"
+        variant="not-analyzed"
       >
         <div>
           <small
@@ -64,53 +62,32 @@
     </b-progress>
   </div>
 </template>
-<script>
-export default {
-  name: 'HealthBar',
-  props: {
-    truePositive: {
-      type: Number,
-      required: true,
-    },
-    falsePositive: {
-      type: Number,
-      required: true,
-    },
-    notAnalyzed: {
-      type: Number,
-      required: true,
-    },
-    underReview: {
-      type: Number,
-      required: true,
-    },
-    clarificationRequired: {
-      type: Number,
-      required: true,
-    },
-    totalCount: {
-      type: Number,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      truePositiveCount: this.truePositive,
-      falsePositiveCount: this.falsePositive,
-      notAnalyzedCount: this.notAnalyzed,
-      underReviewCount: this.underReview,
-      clarificationRequiredCount: this.clarificationRequired,
-      total: this.totalCount,
-    };
-  },
-  methods: {
-    showFindingsInPercentage(count) {
-      return String(Math.round((count / this.totalCount) * 100));
-    },
-    getPopOverContent(count) {
-      const percentage = this.showFindingsInPercentage(count);
-      return `count: ${count}, percentage: ${percentage}%`;
-    },
-  },
+<script setup lang="ts">
+import { ref } from 'vue';
+type Props = {
+  truePositive: number;
+  falsePositive: number;
+  notAnalyzed: number;
+  underReview: number;
+  clarificationRequired: number;
+  totalCount: number;
 };
+const props = defineProps<Props>();
+
+const truePositiveCount = ref(props.truePositive);
+const falsePositiveCount = ref(props.falsePositive);
+const notAnalyzedCount = ref(props.notAnalyzed);
+const underReviewCount = ref(props.underReview);
+const clarificationRequiredCount = ref(props.clarificationRequired);
+const total = ref(props.totalCount);
+
+const percent = 100;
+function showFindingsInPercentage(count: number) {
+  return String(Math.round((count / total.value) * percent));
+}
+
+function getPopOverContent(title: string, count: number) {
+  const percentage = showFindingsInPercentage(count);
+  return `${title}<hr>count: ${count}, percentage: ${percentage}%`;
+}
 </script>

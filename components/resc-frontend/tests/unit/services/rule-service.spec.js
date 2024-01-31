@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 import Config from '@/configuration/config';
 import RuleService from '@/services/rule-service';
 import rules from '@/../tests/resources/mock_rules.json';
 import rules_with_findings_status_count from '@/../tests/resources/mock_rules_with_findings_status_count.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('function getRulesWithFindingStatusCount', () => {
   describe('when getRulesWithFindingStatusCount API call is successful with valid rule pack versions filter', () => {

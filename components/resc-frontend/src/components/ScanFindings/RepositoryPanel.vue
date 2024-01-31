@@ -1,23 +1,23 @@
 <template>
   <div class="row">
-    <table class="table table-sm table-borderless">
+    <table class="table table-sm table-borderless" aria-hidden="true">
       <tbody>
         <tr>
           <th>VCS Instance</th>
           <td>
-            <span class="badge badge-color">{{ repository.vcs_instance_name }}</span>
+            <span class="badge bg-secondary">{{ props.vcs_instance.name }}</span>
           </td>
         </tr>
         <tr>
           <th>Project</th>
           <td>
-            <span class="badge badge-color">{{ repository.project_key }}</span>
+            <span class="badge bg-secondary">{{ props.repository.project_key }}</span>
           </td>
         </tr>
         <tr>
           <th>Repository</th>
           <td>
-            <span class="badge badge-color">{{ repository.repository_name }}</span>
+            <span class="badge bg-secondary">{{ props.repository.repository_name }}</span>
           </td>
         </tr>
       </tbody>
@@ -25,15 +25,13 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'RepositoryPanel',
-  props: {
-    repository: {
-      type: Object,
-      required: true,
-    },
-  },
-  components: {},
+<script setup lang="ts">
+import type { RepositoryRead, VCSInstanceRead } from '@/services/shema-to-types';
+
+type Props = {
+  repository: RepositoryRead;
+  vcs_instance: VCSInstanceRead;
 };
+
+const props = defineProps<Props>();
 </script>

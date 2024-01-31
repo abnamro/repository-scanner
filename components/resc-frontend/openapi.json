@@ -1,0 +1,4215 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Repository Scanner (RESC)",
+    "description": "RESC API helps you to perform several operations upon findings obtained from multiple source code repositories.",
+    "version": "3.0.0"
+  },
+  "paths": {
+    "/resc/v1/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Health check",
+        "description": "Retrieve the health status of RESC APIs",
+        "operationId": "health_check_resc_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Retrieve the health status",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        }
+      }
+    },
+    "/resc/v1/supported-vcs-providers": {
+      "get": {
+        "tags": ["resc-common"],
+        "summary": "Get supported vcs-providers",
+        "description": "Retrieve the supported vcs-providers, example: Bitbucket, AzureDevOps, Github etc",
+        "operationId": "get_supported_vcs_providers_resc_v1_supported_vcs_providers_get",
+        "responses": {
+          "200": {
+            "description": "Retrieve the supported vcs-providers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Supported Vcs Providers Resc V1 Supported Vcs Providers Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/auth-check": {
+      "get": {
+        "tags": ["resc-common"],
+        "summary": "Authorization check",
+        "description": "The output returns 200 OK if auth check is successful else returns 403 Forbidden",
+        "operationId": "auth_check_resc_v1_auth_check_get",
+        "responses": {
+          "200": {
+            "description": "Validate authorization check from the access-token",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/detected-rules": {
+      "get": {
+        "tags": ["resc-rules"],
+        "summary": "Get unique rules from findings",
+        "description": "Retrieve all uniquely detected rules across all findings in the database\n\n- **db_connection**: Session of the database connection\n- **finding_statuses**: Optional, filter on supported finding statuses\n- **vcs_providers**: Optional, filter on supported vcs provider types\n- **project_name**: Optional, filter on project name. It is used as a full string match filter\n- **repository_name**: Optional, filter on repository name. It is used as a string contains filter\n- **start_date_time**: Optional, filter on start date\n- **end_date_time**: Optional, filter on end date\n- **rule_pack_version**: Optional, filter on rule pack version\n- **return**: List[str] The output will contain a list of strings of unique rules in the findings table",
+        "operationId": "get_distinct_rules_from_findings_resc_v1_detected_rules_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/FindingStatus" },
+              "type": "array",
+              "title": "FindingStatuses"
+            },
+            "name": "findingstatus",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/VCSProviders" },
+              "type": "array",
+              "title": "VCSProviders"
+            },
+            "name": "vcsprovider",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Project Name",
+              "default": ""
+            },
+            "name": "project_name",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Repository Name",
+              "default": ""
+            },
+            "name": "repository_name",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start Date Time"
+            },
+            "name": "start_date_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End Date Time"
+            },
+            "name": "end_date_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string" },
+              "type": "array",
+              "title": "RulePackVersion"
+            },
+            "name": "rule_pack_version",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the unique detected rules across all the findings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Distinct Rules From Findings Resc V1 Detected Rules Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/rules/finding-status-count": {
+      "get": {
+        "tags": ["resc-rules"],
+        "summary": "Get detected rules with counts per status",
+        "description": "Retrieve all detected rules with finding counts per supported status\n\n- **rule_pack_version**: Optional, filter on rule pack version\n- **rule_tag**: Optional, filter on rule tag\n- **db_connection**: Session of the database connection\n- **return**: List[str] The output will contain a list of strings of unique rules with counts per status",
+        "operationId": "get_rules_finding_status_count_resc_v1_rules_finding_status_count_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string" },
+              "type": "array",
+              "title": "RulePackVersion"
+            },
+            "name": "rule_pack_version",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string" },
+              "type": "array",
+              "title": "RuleTag"
+            },
+            "name": "rule_tag",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the detected rules with counts per status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RuleFindingCountModel"
+                  },
+                  "type": "array",
+                  "title": "Response Get Rules Finding Status Count Resc V1 Rules Finding Status Count Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/rule-packs/versions": {
+      "get": {
+        "tags": ["resc-rule-packs"],
+        "summary": "Get rule packs",
+        "description": "Retrieve rule packs\n\n- **db_connection**: Session of the database connection\n- **version**: Optional, filter on rule pack version\n- **active**: Optional, filter on active rule pack\n- **skip**: Integer amount of records to skip, to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [RulePackRead]\n    The output will contain a PaginationModel containing the list of RulePackRead type objects,\n    or an empty list if no rule pack was found",
+        "operationId": "get_rule_packs_resc_v1_rule_packs_versions_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+(?:\\.\\d+){2}$",
+              "title": "Version"
+            },
+            "name": "version",
+            "in": "query"
+          },
+          {
+            "description": "Filter on active rule packs",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Active",
+              "description": "Filter on active rule packs"
+            },
+            "name": "active",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the rule-packs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_RulePackRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/rule-packs": {
+      "get": {
+        "tags": ["resc-rule-packs"],
+        "summary": "Download rule pack in TOML format",
+        "description": "Download rule pack in TOML format\n\n- **db_connection**: Session of the database connection\n- **version**: Optional, filter on rule pack version\n- **return**: [FileResponse] The output returns rule pack file downloaded in TOML format",
+        "operationId": "download_rule_pack_toml_file_resc_v1_rule_packs_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+(?:\\.\\d+){2}$",
+              "title": "Version"
+            },
+            "name": "version",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download the rule-pack in TOML format",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": {
+            "description": "No rule-pack of version <version_id> found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "422": {
+            "description": "Version <version_id> is not a valid semantic version",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model422" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-rule-packs"],
+        "summary": "Upload rule pack in TOML format",
+        "description": "Upload TOML rule pack to database\n\n- **db_connection**: Session of the database connection\n- **version**: Version of the rule pack to be uploaded\n- **rule_file**: TOML rule pack file to be uploaded\n- **return**: dict The output returns uploaded rule pack name in dictionary format",
+        "operationId": "upload_rule_pack_toml_file_resc_v1_rule_packs_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+(?:\\.\\d+){2}$",
+              "title": "Version"
+            },
+            "name": "version",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Body_upload_rule_pack_toml_file_resc_v1_rule_packs_post"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upload the rule-pack in TOML format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Upload Rule Pack Toml File Resc V1 Rule Packs Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No properties defined for rule allow list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model400" }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule-pack version <version_id> already exists",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model409" }
+              }
+            }
+          },
+          "422": {
+            "description": "Version <version_id> is not a valid semantic version",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model422" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/rule-packs/tags": {
+      "get": {
+        "tags": ["resc-rule-packs"],
+        "summary": "Get rule packs' tags",
+        "description": "Retrieve rule pack related tags\n\n:param db_connection: Session of the database connection\n:param versions: Optional, filter on rule pack version, if not provided filter on active.\n:return: List[str]\n    The output will contain a list of tags related to one or more rule-packs.",
+        "operationId": "get_rule_packs_tags_resc_v1_rule_packs_tags_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string" },
+              "type": "array",
+              "title": "version"
+            },
+            "name": "version",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the tags related to a rule-pack[s]",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Rule Packs Tags Resc V1 Rule Packs Tags Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get findings",
+        "description": "Retrieve all findings objects paginated\n\n- **db_connection**: Session of the database connection\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [FindingRead]\n    The output will contain a PaginationModel containing the list of FindingRead type objects,\n    or an empty list if no finding was found",
+        "operationId": "get_all_findings_resc_v1_findings_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the findings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_FindingRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-findings"],
+        "summary": "Create a finding",
+        "description": "Create new findings\n\n- **db_connection**: Session of the database connection\n- **file_path**: file path\n- **line_number**: Line number\n- **commit_id**: commit hash\n- **commit_message**: Commit message\n- **commit_timestamp**: Commit timestamp\n- **author**: Author name\n- **email**: Email of the author\n- **event_sent_on**: event sent timestamp\n- **rule_name**: rule name\n- **repository_id**: repository id of the finding\n- **return**: int\n      The output will contain the number of successful created findings",
+        "operationId": "create_findings_resc_v1_findings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": { "$ref": "#/components/schemas/FindingCreate" },
+                "type": "array",
+                "title": "Findings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Create new findings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Create Findings Resc V1 Findings Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error creating findings",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model400" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/{finding_id}": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Fetch a finding by ID",
+        "description": "Read a finding by ID\n\n- **db_connection**: Session of the database connection\n- **finding_id**: ID of the finding for which details need to be fetched",
+        "operationId": "read_finding_resc_v1_findings__finding_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Finding Id" },
+            "name": "finding_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve finding <finding_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FindingRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Finding <finding_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["resc-findings"],
+        "summary": "Delete a finding",
+        "description": "Delete a finding object\n\n- **db_connection**: Session of the database connection\n- **finding_id**: ID of the finding to delete\n- **return**: The output will contain a success or error message based on the success of the deletion",
+        "operationId": "delete_finding_resc_v1_findings__finding_id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Finding Id" },
+            "name": "finding_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete finding <finding_id>",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": {
+            "description": "Finding <finding_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "patch": {
+        "tags": ["resc-findings"],
+        "summary": "Partially update a finding by ID",
+        "description": "Partially update a finding by ID\n\n- **db_connection**: Session of the database connection\n- **finding_id**: ID of the finding for which details need to be updated\n- **event_sent_on**: Event sent timestamp",
+        "operationId": "patch_finding_resc_v1_findings__finding_id__patch",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Finding Id" },
+            "name": "finding_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/FindingPatch" }],
+                "title": "Finding Update"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Modify finding <finding_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FindingRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Finding <finding_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/total-count-by-rule/{rule_name}": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get total findings count by rule",
+        "description": "Retrieve total findings count for a given rule\n\n- **db_connection**: Session of the database connection\n- **rule_name**: name of the rule",
+        "operationId": "get_total_findings_count_by_rule_resc_v1_findings_total_count_by_rule__rule_name__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "title": "Rule Name" },
+            "name": "rule_name",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve total findings count of rule <rule_name>",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/by-rule/{rule_name}": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get findings by rule",
+        "description": "Retrieve all findings objects paginated by rule\n\n- **db_connection**: Session of the database connection\n- **rule_name**: Name of the rule to filter the findings by\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [FindingRead]\n    The output will contain a PaginationModel containing the list of FindingRead type objects,\n    or an empty list if no finding was found for the given rule",
+        "operationId": "get_findings_by_rule_resc_v1_findings_by_rule__rule_name__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "string", "title": "Rule Name" },
+            "name": "rule_name",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the findings of rule <rule_name>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_FindingRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/audit/": {
+      "post": {
+        "tags": ["resc-findings"],
+        "summary": "audit single/multiple findings",
+        "description": "Audit single/multiple findings, updating the status and comment\n\n- **db_connection**: Session of the database connection\n- **finding_ids**: List of finding IDs for which audit to be performed\n- **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,\n              CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE\n- **comment**: Comment\n- **return**: int\n    The output will contain count of successful saved audits",
+        "operationId": "audit_findings_resc_v1_findings_audit__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/AuditMultiple" }],
+                "title": "Audit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Audit(s) successfully saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Audit Findings Resc V1 Findings Audit  Post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Finding <finding_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/{finding_id}/audit": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get audit(s) for finding",
+        "description": "Retrieve all audit objects paginated for a finding\n\n- **db_connection**: Session of the database connection\n- **finding_id**: id of the finding to get the audit for\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [AuditRead]\n    The output will contain a PaginationModel containing the list of AuditRead type objects,\n    or an empty list if no audit info was found",
+        "operationId": "get_finding_audits_resc_v1_findings__finding_id__audit_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Finding Id" },
+            "name": "finding_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the audit entries for a finding",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_AuditRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/supported-statuses/": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get all supported statuses for findings",
+        "description": "Retrieve all supported statuses for findings\n\n- **return**: List[str]\n    The output will contain a list of strings of unique statuses supported",
+        "operationId": "get_supported_statuses_resc_v1_findings_supported_statuses__get",
+        "responses": {
+          "200": {
+            "description": "Retrieve all the supported statuses for the findings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Supported Statuses Resc V1 Findings Supported Statuses  Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/findings/count-by-time/{time_type}": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get all the findings by time period",
+        "description": "Retrieve all findings count by time period objects paginated\n\n- **db_connection**: Session of the database connection\n- **time_type**: required, filter on time type. Available values: month, week, day\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **start_date_time**: Optional, filter on start date\n- **end_date_time**: Optional, filter on end date\n- **return**: PaginationModel[DateCountModel]\n    The output will contain a PaginationModel containing the list of DateCountModel type objects,\n    or an empty list if no data was found",
+        "operationId": "get_count_by_time_resc_v1_findings_count_by_time__time_type__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/DateFilter" },
+            "name": "time_type",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Start Date Time"
+            },
+            "name": "start_date_time",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "title": "End Date Time"
+            },
+            "name": "end_date_time",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the findings by time-period <time_type>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_DateCountModel_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/detailed-findings": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Get all detailed findings",
+        "description": "Retrieve all findings objects paginated\n- **query_string**\n\n    A query string with the following format:\n        param1=value1&param2=value2&param3=value3\n\n    Where the possible parameters are:\n\n        - vcs_providers [enum] of type VCSProviders, possible values are: BITBUCKET, AZURE_DEVOPS.\n            Will default to all if non-specified.\n\n        - finding_statuses [enum of type FindingStatus], possible values are:NOT_ANALYZED,FALSE_POSITIVE,\n          TRUE_POSITIVE. Will default to all if non-specified.\n\n        - rule_pack_versions of type [String]\n\n        - rule_names of type [String]\n\n        - rule_tags of type [String] findings in the result will have at least one of the specified tags\n          for the rules\n\n        - project_name of type String\n\n        - repository_names of type [String]\n\n        - scan_ids of type list Integer\n\n        - start_date_time of type datetime with the following format: 1970-01-31T00:00:00\n\n        - end_date_time of type datetime with the following format: 1970-01-31T00:00:00\n\n- **db_connection**\n\n    Session of the database connection\n\n- **skip**\n\n    Integer amount of records to skip to support pagination\n\n- **limit**\n\n    Integer amount of records to return, to support pagination\n\n- **return** [FindingRead]\n\n    The output will contain a PaginationModel containing the list of DetailedFinding type objects,\n    or an empty list if no finding was found",
+        "operationId": "get_all_detailed_findings_resc_v1_detailed_findings_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": { "type": "string", "title": "Query String" },
+            "name": "query_string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the findings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_DetailedFindingRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/detailed-findings/{finding_id}": {
+      "get": {
+        "tags": ["resc-findings"],
+        "summary": "Fetch detailed finding by ID",
+        "description": "Retrieve detailed finding by its ID\n\n- **db_connection**: Session of the database connection\n- **finding_id**: ID of the finding for which details need to be fetched\n- **return**: [DetailedFindingRead]\n    The output will contain the details of a finding",
+        "operationId": "read_finding_resc_v1_detailed_findings__finding_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Finding Id" },
+            "name": "finding_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve detailed finding <finding_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DetailedFindingRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Finding <finding_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get repositories",
+        "description": "Retrieve all repository objects paginated\n\n- **db_connection**: Session of the database connection\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **vcsproviders**: Optional, filter on supported vcs provider types\n- **projectfilter**: Optional, filter on project name. It is used as a string contains filter\n- **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter\n- **return**: [RepositoryRead]\n    The output will contain a PaginationModel containing the list of RepositoryRead type objects,\n    or an empty list if no repository",
+        "operationId": "get_all_repositories_resc_v1_repositories_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/VCSProviders" },
+              "type": "array",
+              "title": "VCSProviders"
+            },
+            "name": "vcsprovider",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Projectfilter",
+              "default": ""
+            },
+            "name": "projectfilter",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Repositoryfilter",
+              "default": ""
+            },
+            "name": "repositoryfilter",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the repositories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_RepositoryRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-repositories"],
+        "summary": "Create a repository",
+        "description": "Create a repository with all the information\n\n- **db_connection**: Session of the database connection\n- **project_key**: each repository must have a project name or key\n- **repository_id**: repository id\n- **repository_name**: repository name\n- **repository_url**: repository url\n- **vcs_instance**: vcs instance id",
+        "operationId": "create_repository_resc_v1_repositories_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/RepositoryCreate" }],
+                "title": "Repository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Create a new repository",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RepositoryRead" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/{repository_id}": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Fetch a repository by ID",
+        "description": "Read a repository by ID\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the repository for which details need to be fetched",
+        "operationId": "read_repository_resc_v1_repositories__repository_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve repository <repository_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RepositoryRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Repository <repository_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "put": {
+        "tags": ["resc-repositories"],
+        "summary": "Update an existing repository",
+        "description": "Update an existing repository\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the repository\n- **project_key**: project name that needs to be updated\n- **repository_id**: repository id that needs to be updated\n- **repository_name**: repository name that needs to be updated\n- **repository_url**: repository url that needs to be updated\n- **vcs_instance**: vcs instance id that needs to be updated",
+        "operationId": "update_repository_resc_v1_repositories__repository_id__put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/RepositoryCreate" }],
+                "title": "Repository"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update repository <repository_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RepositoryRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Repository <repository_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["resc-repositories"],
+        "summary": "Delete a repository",
+        "description": "Delete a repository\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the repository to delete\n- **return**: The output will contain a success or error message based on the success of the deletion",
+        "operationId": "delete_repository_resc_v1_repositories__repository_id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete repository <repository_id>",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": {
+            "description": "Repository <repository_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/distinct-projects/": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get all unique project names",
+        "description": "Retrieve all unique project names\n\n- **db_connection**: Session of the database connection\n- **vcsproviders**: Optional, filter on supported vcs provider types\n- **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter\n- **onlyifhasfindings**: Optional, filter all projects those have findings\n- **return**: List[str]\n    The output will contain a list of unique projects",
+        "operationId": "get_distinct_projects_resc_v1_repositories_distinct_projects__get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/VCSProviders" },
+              "type": "array",
+              "title": "VCSProviders"
+            },
+            "name": "vcsprovider",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Repositoryfilter",
+              "default": ""
+            },
+            "name": "repositoryfilter",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Onlyifhasfindings",
+              "default": false
+            },
+            "name": "onlyifhasfindings",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the unique project-names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Distinct Projects Resc V1 Repositories Distinct Projects  Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/distinct-repositories/": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get all unique repository names",
+        "description": "Retrieve all unique repository names\n\n- **db_connection**: Session of the database connection\n- **vcsproviders**: Optional, filter of supported vcs provider types\n- **projectname**: Optional, filter on project name. It is used as a full string match filter\n- **onlyifhasfindings**: Optional, filter all repositories that have findings\n- **return**: List[str]\n    The output will contain a list of unique repositories",
+        "operationId": "get_distinct_repositories_resc_v1_repositories_distinct_repositories__get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/VCSProviders" },
+              "type": "array",
+              "title": "VCSProviders"
+            },
+            "name": "vcsprovider",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Projectname",
+              "default": ""
+            },
+            "name": "projectname",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Onlyifhasfindings",
+              "default": false
+            },
+            "name": "onlyifhasfindings",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the unique repository names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Distinct Repositories Resc V1 Repositories Distinct Repositories  Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/{repository_id}/findings-metadata": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get findings metadata for a repository",
+        "description": "Retrieve findings metadata for a repository\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the repository object for which findings metadata to be retrieved\n- **return**: RepositoryRead, findings count per status\n    The output will contain a RepositoryRead type object along with findings count per status,\n    or empty if no scan was found",
+        "operationId": "get_findings_metadata_for_repository_resc_v1_repositories__repository_id__findings_metadata_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve findings metadata for repository <repository_id>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingCountModel_RepositoryRead_"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Repository <repository_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/findings-metadata/": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get all repositories with findings metadata",
+        "description": "Retrieve all repository objects paginated\n\n- **db_connection**: Session of the database connection\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **vcsproviders**: Optional, filter on supported vcs provider types\n- **projectfilter**: Optional, filter on project name. It is used as a string contains filter\n- **repositoryfilter**: Optional, filter on repository name. It is used as a string contains filter\n- **onlyifhasfindings**: Optional, filter all repositories those have findings\n- **return**: [RepositoryEnrichedRead]\n    The output will contain a PaginationModel containing the list of RepositoryEnrichedRead type objects,\n    or an empty list if no repository",
+        "operationId": "get_all_repositories_with_findings_metadata_resc_v1_repositories_findings_metadata__get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/VCSProviders" },
+              "type": "array",
+              "title": "VCSProviders"
+            },
+            "name": "vcsprovider",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Projectfilter",
+              "default": ""
+            },
+            "name": "projectfilter",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "Repositoryfilter",
+              "default": ""
+            },
+            "name": "repositoryfilter",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "title": "Onlyifhasfindings",
+              "default": false
+            },
+            "name": "onlyifhasfindings",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the findings metadata for all the repositories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_RepositoryEnrichedRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/{repository_id}/last-scan": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get latest scan for repository",
+        "description": "Retrieve the latest scan object related to a repository\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the parent repository object for which scan objects to be retrieved\n- **return**: ScanRead\n    The output will contain a ScanRead type object,\n    or empty if no scan was found",
+        "operationId": "get_last_scan_for_repository_resc_v1_repositories__repository_id__last_scan_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve the latest scan related to a repository",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ScanRead" }
+              }
+            }
+          },
+          "404": { "description": "Scan not found" },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/repositories/{repository_id}/scans": {
+      "get": {
+        "tags": ["resc-repositories"],
+        "summary": "Get scans for repository",
+        "description": "Retrieve all scan objects related to a repository paginated\n\n- **db_connection**: Session of the database connection\n- **repository_id**: ID of the parent repository object for which scan objects to be retrieved\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [ScanRead]\n    The output will contain a PaginationModel containing the list of ScanRead type objects,\n    or an empty list if no scan was found",
+        "operationId": "get_scans_for_repository_resc_v1_repositories__repository_id__scans_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Repository Id" },
+            "name": "repository_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the scans related to a repository",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_ScanRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/scans": {
+      "get": {
+        "tags": ["resc-scans"],
+        "summary": "Get scans",
+        "description": "Retrieve all scan objects paginated\n\n- **db_connection**: Session of the database connection\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **return**: [ScanRead]\n    The output will contain a PaginationModel containing the list of ScanRead type objects,\n    or an empty list if no scan was found",
+        "operationId": "get_all_scans_resc_v1_scans_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the scan objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_ScanRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-scans"],
+        "summary": "Create a scan",
+        "description": "Create a scan with all the information\n\n- **db_connection**: Session of the database connection\n- **scan_type**: scan type, supported values are BASE or INCREMENTAL\n- **last_scanned_commit**: last scanned commit hash\n- **timestamp**: creation timestamp\n- **increment_number**: scan increment number\n- **rule_pack**: rule pack version\n- **repository_id**: repository id",
+        "operationId": "create_scan_resc_v1_scans_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/ScanCreate" }],
+                "title": "Scan"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Create a new scan",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ScanRead" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error creating a new scan",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model400" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/scans/{scan_id}": {
+      "get": {
+        "tags": ["resc-scans"],
+        "summary": "Fetch a scan by ID",
+        "description": "Read a scan by ID\n\n- **db_connection**: Session of the database connection\n- **scan_id**: ID of the scan for which details need to be fetched",
+        "operationId": "read_scan_resc_v1_scans__scan_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Scan Id" },
+            "name": "scan_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve scan <scan_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ScanRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Scan <scan_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "put": {
+        "tags": ["resc-scans"],
+        "summary": "Update an existing scan",
+        "description": "Update an existing scan\n\n- **db_connection**: Session of the database connection\n- **scan_type**: scan type, supported values are BASE or INCREMENTAL\n- **last_scanned_commit**: last scanned commit\n- **timestamp**: scan timestamp\n- **increment_number**: scan increment number\n- **rule_pack**: rule pack version\n- **repository_id**: repository id",
+        "operationId": "update_scan_resc_v1_scans__scan_id__put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Scan Id" },
+            "name": "scan_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/ScanCreate" }],
+                "title": "Scan"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update scan <scan_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ScanRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "Scan <scan_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["resc-scans"],
+        "summary": "Delete a scan",
+        "description": "Delete a scan object\n\n- **db_connection**: Session of the database connection\n- **scan_id**: ID of the scan to delete\n- **return**: The output will contain a success or error message based on the success of the deletion",
+        "operationId": "delete_scan_resc_v1_scans__scan_id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Scan Id" },
+            "name": "scan_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete scan <scan_id>",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": {
+            "description": "Scan <scan_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/scans/{scan_id}/findings": {
+      "get": {
+        "tags": ["resc-scans"],
+        "summary": "Get scan findings associated with a scan ID",
+        "description": "Retrieve all finding objects paginated related to a scan_id\n\n- **db_connection**: Session of the database connection\n- **scan_id**: Id of the scan for which to retrieve the findings\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **rules**: optional, filter on rule name. It is used as a string contains filter\n- **statuses**:  optional, filter on status of findings\n- **return**: [FindingRead]\n    The output will contain a PaginationModel containing the list of FindingRead type objects,\n    or an empty list if no scan was found",
+        "operationId": "get_scan_findings_resc_v1_scans__scan_id__findings_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Scan Id" },
+            "name": "scan_id",
+            "in": "path"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string", "pattern": "^[A-z0-9 .\\-_%]*$" },
+              "type": "array",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "rule",
+              "default": []
+            },
+            "name": "rule",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/FindingStatus" },
+              "type": "array",
+              "title": "status"
+            },
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve findings associated with scan <scan_id>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_FindingRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-scans"],
+        "summary": "Create scan findings",
+        "description": "Creates findings and their associated scan_findings for a given scan\n\n- **db_connection**: Session of the database connection\n- **scan_id**:  Id of the scan for which findings need to be inserted\n- **file_path**: file path\n- **line_number**: Line number\n- **column_start**: Column start\n- **column_end**: Column end\n- **commit_id**: commit hash\n- **commit_message**: Commit message\n- **commit_timestamp**: Commit timestamp\n- **author**: Author name\n- **email**: Email of the author\n- **status**: Status of the finding, Valid values are NOT_ANALYZED, UNDER_REVIEW,\n              CLARIFICATION_REQUIRED, FALSE_POSITIVE, TRUE_POSITIVE\n- **comment**: Comment\n- **event_sent_on**: event sent timestamp\n- **rule_name**: rule name\n- **repository_id**: repository id of the finding\n- **return**: [FindingRead]\n    The output will contain a PaginationModel containing the list of FindingRead type objects,\n    or an empty list if no scan was found",
+        "operationId": "create_scan_findings_resc_v1_scans__scan_id__findings_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Scan Id" },
+            "name": "scan_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": { "$ref": "#/components/schemas/FindingCreate" },
+                "type": "array",
+                "title": "Findings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Create findings and their associated scan_findings for scan <scan_id>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "title": "Response Create Scan Findings Resc V1 Scans  Scan Id  Findings Post"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/scans/findings/": {
+      "get": {
+        "tags": ["resc-scans"],
+        "summary": "Get scan findings",
+        "description": "Retrieve all finding objects paginated related to a scan_id\n\n- **db_connection**: Session of the database connection\n- **scan_ids**: Optional, List of scan IDs for which findings to be retrieved\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **rule**: optional, filter on rule name. It is used as a string contains filter\n- **statuses**:  optional, filter on status of findings\n- **return**: [FindingRead]\n    The output will contain a PaginationModel containing the list of FindingRead type objects,\n    or an empty list if no scan was found",
+        "operationId": "get_scans_findings_resc_v1_scans_findings__get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "integer" },
+              "type": "array",
+              "title": "Scan ids",
+              "default": []
+            },
+            "name": "scan_id",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "string", "pattern": "^[A-z0-9 .\\-_%]*$" },
+              "type": "array",
+              "pattern": "^[A-z0-9 .\\-_%]*$",
+              "title": "rule",
+              "default": []
+            },
+            "name": "rule",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "items": { "$ref": "#/components/schemas/FindingStatus" },
+              "type": "array",
+              "title": "status"
+            },
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve findings associated with scan <scan_id>",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_FindingRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/scans/detected-rules/": {
+      "get": {
+        "tags": ["resc-scans"],
+        "summary": "Get unique rules from scans",
+        "description": "Retrieve all uniquely detected rules for given scans\n\n- **db_connection**: Session of the database connection\n- **scan_ids**: scan ids for which to retrieve the unique rules\n- **return**: List[str]\n    The output will contain a list of strings of unique rules for given scan ids",
+        "operationId": "get_distinct_rules_from_scans_resc_v1_scans_detected_rules__get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "items": { "type": "integer" },
+              "type": "array",
+              "title": "Scan ids",
+              "default": []
+            },
+            "name": "scan_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the unique rules associated with specified scans",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": { "type": "string" },
+                  "type": "array",
+                  "title": "Response Get Distinct Rules From Scans Resc V1 Scans Detected Rules  Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/vcs-instances": {
+      "get": {
+        "tags": ["resc-vcs-instances"],
+        "summary": "Get all VCS instances",
+        "description": "Retrieve all VCS instance objects paginated\n\n- **db_connection**: Session of the database connection\n- **skip**: Integer amount of records to skip to support pagination\n- **limit**: Integer amount of records to return, to support pagination\n- **vcs_provider_type**: Optional filter on the VCS provider type\n- **vcs_instance_name**: Optional filter on VCS instance name\n- **return**: [VCSInstanceRead]\n    The output will contain a PaginationModel containing the list of VCSInstanceRead type objects,\n    or an empty list if no VCS instance was found",
+        "operationId": "get_all_vcs_instances_resc_v1_vcs_instances_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0.0,
+              "title": "Skip",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Limit",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/VCSProviders" },
+            "name": "vcs_provider_type",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": { "type": "string", "title": "Vcs Instance Name" },
+            "name": "vcs_instance_name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve all the VCS Instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationModel_VCSInstanceRead_"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "post": {
+        "tags": ["resc-vcs-instances"],
+        "summary": "Create a VCS instance",
+        "description": "Create new VCS instance object\n\n- **db_connection**: Session of the database connection\n- **vcs_instance**: VCSInstanceCreate type object of the VCS Instance to create\n- **return**: VCSInstanceRead\n    The output will contain a VCSInstanceRead type object if the creation was successful",
+        "operationId": "create_vcs_instance_resc_v1_vcs_instances_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/VCSInstanceCreate" }],
+                "title": "Vcs Instance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Create new VCS instance",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VCSInstanceRead" }
+              }
+            }
+          },
+          "400": {
+            "description": "Error creating new VCS instance",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model400" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/vcs-instances/{vcs_instance_id}": {
+      "get": {
+        "tags": ["resc-vcs-instances"],
+        "summary": "Fetch a VCS instance by ID",
+        "description": "Retrieve a VCS instance object based on the provided id\n\n- **db_connection**: Session of the database connection\n- **vcs_instance_id**: ID of the VCS instance for which details need to be fetched\n- **return**: VCSInstanceRead\n    The output will contain a VCSInstanceRead type object from the requested ID",
+        "operationId": "read_vcs_instance_resc_v1_vcs_instances__vcs_instance_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Vcs Instance Id" },
+            "name": "vcs_instance_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve VCS Instance <vcs_instance_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VCSInstanceRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "VCS Instance <vcs_instance_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "put": {
+        "tags": ["resc-vcs-instances"],
+        "summary": "Update an existing VCS instance",
+        "description": "Update a VCS instance\n\n- **db_connection**: Session of the database connection\n- **vcs_instance_id**: ID of the VCS instance to update\n- **provider_type**: VCS instance name that needs to be updated\n- **hostname**: Host name of the VCS instance that needs to be updated\n- **port**: Port number of the VCS instance that needs to be updated\n- **scheme**: Scheme of the VCS instance that needs to be updated. Allowed values http or https\n- **exceptions**: List of projects which needs to be updated to exception list, default empty list\n- **scope**: List of projects which needs to be updated to scope\n- **organization**: Name of organization to be updated, default is empty\n- **return**: VCSInstanceRead\n    The output will contain a VCSInstanceRead type object with the new properties",
+        "operationId": "update_vcs_instance_resc_v1_vcs_instances__vcs_instance_id__put",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Vcs Instance Id" },
+            "name": "vcs_instance_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [{ "$ref": "#/components/schemas/VCSInstanceCreate" }],
+                "title": "Vcs Instance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update VCS Instance <vcs_instance_id>",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VCSInstanceRead" }
+              }
+            }
+          },
+          "404": {
+            "description": "VCS Instance <vcs_instance_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["resc-vcs-instances"],
+        "summary": "Delete a VCS instance",
+        "description": "Delete a VCS instance by ID\n\n- **db_connection**: Session of the database connection\n- **vcs_instance_id**: ID of the VCS instance to delete\n- **return**: The output will contain a success or error message based on the success of the deletion",
+        "operationId": "delete_vcs_instance_resc_v1_vcs_instances__vcs_instance_id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "type": "integer", "title": "Vcs Instance Id" },
+            "name": "vcs_instance_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete VCS Instance <vcs_instance_id>",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "404": {
+            "description": "VCS Instance <vcs_instance_id> not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Model404" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/metrics/audited-count-over-time": {
+      "get": {
+        "tags": ["resc-metrics"],
+        "summary": "Get count of audit status over time for given weeks per vcs provider",
+        "description": "Retrieve count of audited findings over time for given weeks per vcs provider\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects",
+        "operationId": "get_finding_audit_count_over_time_resc_v1_metrics_audited_count_over_time_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Weeks",
+              "default": 13
+            },
+            "name": "weeks",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "allOf": [{ "$ref": "#/components/schemas/FindingStatus" }],
+              "default": "TRUE_POSITIVE"
+            },
+            "name": "audit_status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve count of audit status over time for given weeks per vcs provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FindingCountOverTime"
+                  },
+                  "type": "array",
+                  "title": "Response Get Finding Audit Count Over Time Resc V1 Metrics Audited Count Over Time Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/metrics/count-per-vcs-provider-by-week": {
+      "get": {
+        "tags": ["resc-metrics"],
+        "summary": "Get count of findings over time for given weeks per vcs provider",
+        "description": "Retrieve count of findings over time for given weeks per vcs provider\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects",
+        "operationId": "get_finding_total_count_over_time_resc_v1_metrics_count_per_vcs_provider_by_week_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Weeks",
+              "default": 13
+            },
+            "name": "weeks",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve count of findings over time for given weeks per vcs provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FindingCountOverTime"
+                  },
+                  "type": "array",
+                  "title": "Response Get Finding Total Count Over Time Resc V1 Metrics Count Per Vcs Provider By Week Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/metrics/un-triaged-count-over-time": {
+      "get": {
+        "tags": ["resc-metrics"],
+        "summary": "Get count of UnTriaged findings over time for given weeks per vcs provider",
+        "description": "Retrieve count of UnTriaged findings over time for given weeks per vcs provider\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit status count\n- **audit_status**: audit status for which to retrieve the counts, defaults to True positive\n- **return**: [DateCountModel]\n    The output will contain a list of DateCountModel type objects",
+        "operationId": "get_finding_un_triaged_count_over_time_resc_v1_metrics_un_triaged_count_over_time_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Weeks",
+              "default": 13
+            },
+            "name": "weeks",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve count of UnTriaged findings over time for given weeks per vcs provider",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FindingCountOverTime"
+                  },
+                  "type": "array",
+                  "title": "Response Get Finding Un Triaged Count Over Time Resc V1 Metrics Un Triaged Count Over Time Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/metrics/audit-count-by-auditor-over-time": {
+      "get": {
+        "tags": ["resc-metrics"],
+        "summary": "Get count of Audits by Auditor over time for given weeks",
+        "description": "Retrieve count of Audits by Auditor over time for given weeks\n- **db_connection**: Session of the database connection\n- **weeks**: Nr of weeks for which to retrieve the audit counts\n- **return**: [AuditCountOverTime]\n    The output will contain a list of AuditCountOverTime type objects",
+        "operationId": "get_audit_count_by_auditor_over_time_resc_v1_metrics_audit_count_by_auditor_over_time_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1.0,
+              "title": "Weeks",
+              "default": 13
+            },
+            "name": "weeks",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve count of Audits by Auditor over time for given weeks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditCountOverTime"
+                  },
+                  "type": "array",
+                  "title": "Response Get Audit Count By Auditor Over Time Resc V1 Metrics Audit Count By Auditor Over Time Get"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/resc/v1/metrics/personal-audits": {
+      "get": {
+        "tags": ["resc-metrics"],
+        "summary": "Get personal audit metrics",
+        "description": "Retrieve personal audit metrics\n- **db_connection**: Session of the database connection\n- **return**: [DateCountModel]\n    The output will contain a PersonalAuditMetrics type objects",
+        "operationId": "get_personal_audit_metrics_resc_v1_metrics_personal_audits_get",
+        "responses": {
+          "200": {
+            "description": "Get personal audit metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonalAuditMetrics"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error. Contact your system administrator"
+          },
+          "503": {
+            "description": "Unable to communicate with DataBase, Please contact your system administrator"
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "View Docs",
+        "operationId": "view_docs__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuditCountOverTime": {
+        "properties": {
+          "time_period": { "type": "string", "title": "Time Period" },
+          "audit_by_auditor_count": {
+            "additionalProperties": { "type": "integer" },
+            "type": "object",
+            "title": "Audit By Auditor Count"
+          },
+          "total": { "type": "integer", "title": "Total", "default": 0 }
+        },
+        "type": "object",
+        "required": ["time_period", "audit_by_auditor_count"],
+        "title": "AuditCountOverTime"
+      },
+      "AuditMultiple": {
+        "properties": {
+          "finding_ids": {
+            "items": { "type": "integer", "exclusiveMinimum": 0.0 },
+            "type": "array",
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Finding Ids"
+          },
+          "status": { "$ref": "#/components/schemas/FindingStatus" },
+          "comment": { "type": "string", "maxLength": 255, "title": "Comment" }
+        },
+        "type": "object",
+        "required": ["finding_ids", "status", "comment"],
+        "title": "AuditMultiple"
+      },
+      "AuditRead": {
+        "properties": {
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " },
+          "status": { "$ref": "#/components/schemas/FindingStatus" },
+          "auditor": { "type": "string", "maxLength": 250, "title": "Auditor" },
+          "comment": { "type": "string", "maxLength": 255, "title": "Comment" },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": ["id_", "status", "auditor", "timestamp"],
+        "title": "AuditRead"
+      },
+      "Body_upload_rule_pack_toml_file_resc_v1_rule_packs_post": {
+        "properties": {
+          "rule_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Rule File"
+          }
+        },
+        "type": "object",
+        "required": ["rule_file"],
+        "title": "Body_upload_rule_pack_toml_file_resc_v1_rule_packs_post"
+      },
+      "DateCountModel": {
+        "properties": {
+          "date_lable": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Date Lable"
+          },
+          "finding_count": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Finding Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": ["date_lable"],
+        "title": "DateCountModel"
+      },
+      "DateFilter": {
+        "type": "string",
+        "enum": ["month", "week", "day"],
+        "title": "DateFilter",
+        "description": "An enumeration."
+      },
+      "DetailedFindingRead": {
+        "properties": {
+          "file_path": { "type": "string", "title": "File Path" },
+          "line_number": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Line Number"
+          },
+          "column_start": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column Start"
+          },
+          "column_end": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column End"
+          },
+          "commit_id": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Commit Id"
+          },
+          "commit_message": { "type": "string", "title": "Commit Message" },
+          "commit_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Commit Timestamp"
+          },
+          "author": { "type": "string", "maxLength": 200, "title": "Author" },
+          "email": { "type": "string", "maxLength": 100, "title": "Email" },
+          "status": {
+            "allOf": [{ "$ref": "#/components/schemas/FindingStatus" }],
+            "default": "NOT_ANALYZED"
+          },
+          "comment": { "type": "string", "maxLength": 255, "title": "Comment" },
+          "rule_name": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Rule Name"
+          },
+          "rule_pack": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Rule Pack"
+          },
+          "project_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Project Key"
+          },
+          "repository_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Name"
+          },
+          "repository_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Repository Url"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "vcs_provider": { "$ref": "#/components/schemas/VCSProviders" },
+          "last_scanned_commit": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Scanned Commit"
+          },
+          "scan_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Scan Id"
+          },
+          "event_sent_on": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event Sent On"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " },
+          "commit_url": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Commit Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_path",
+          "line_number",
+          "column_start",
+          "column_end",
+          "commit_id",
+          "commit_message",
+          "commit_timestamp",
+          "author",
+          "email",
+          "rule_name",
+          "rule_pack",
+          "project_key",
+          "repository_name",
+          "repository_url",
+          "timestamp",
+          "vcs_provider",
+          "last_scanned_commit",
+          "scan_id",
+          "id_"
+        ],
+        "title": "DetailedFindingRead"
+      },
+      "FindingCountModel_RepositoryRead_": {
+        "properties": {
+          "data": { "$ref": "#/components/schemas/RepositoryRead" },
+          "true_positive": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "True Positive"
+          },
+          "false_positive": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "False Positive"
+          },
+          "not_analyzed": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Not Analyzed"
+          },
+          "under_review": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Under Review"
+          },
+          "clarification_required": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Clarification Required"
+          },
+          "total_findings_count": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total Findings Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "true_positive",
+          "false_positive",
+          "not_analyzed",
+          "under_review",
+          "clarification_required",
+          "total_findings_count"
+        ],
+        "title": "FindingCountModel[RepositoryRead]",
+        "description": "    Generic encapsulation class for findings count end points to standardize output of the API\n    example creation, FindingCountModel[FindingRead](data=db_findings, true_positive=true_positive,\n    false_positive=false_positive, not_analyzed=not_analyzed, under_review=under_review,\n    clarification_required=clarification_required, total_findings_count=total_findings_count)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "FindingCountOverTime": {
+        "properties": {
+          "time_period": { "type": "string", "title": "Time Period" },
+          "vcs_provider_finding_count": {
+            "allOf": [
+              { "$ref": "#/components/schemas/VcsProviderFindingCount" }
+            ],
+            "title": "Vcs Provider Finding Count",
+            "default": { "AZURE_DEVOPS": 0, "BITBUCKET": 0, "GITHUB_PUBLIC": 0 }
+          },
+          "total": { "type": "integer", "title": "Total", "default": 0 }
+        },
+        "type": "object",
+        "required": ["time_period"],
+        "title": "FindingCountOverTime"
+      },
+      "FindingCreate": {
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "File Path"
+          },
+          "line_number": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Line Number"
+          },
+          "column_start": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column Start"
+          },
+          "column_end": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column End"
+          },
+          "commit_id": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Commit Id"
+          },
+          "commit_message": { "type": "string", "title": "Commit Message" },
+          "commit_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Commit Timestamp"
+          },
+          "author": { "type": "string", "maxLength": 200, "title": "Author" },
+          "email": { "type": "string", "maxLength": 100, "title": "Email" },
+          "event_sent_on": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event Sent On"
+          },
+          "rule_name": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Rule Name"
+          },
+          "repository_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Repository Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_path",
+          "line_number",
+          "column_start",
+          "column_end",
+          "commit_id",
+          "commit_message",
+          "commit_timestamp",
+          "author",
+          "email",
+          "rule_name",
+          "repository_id"
+        ],
+        "title": "FindingCreate"
+      },
+      "FindingPatch": {
+        "properties": {
+          "event_sent_on": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event Sent On"
+          }
+        },
+        "type": "object",
+        "required": ["event_sent_on"],
+        "title": "FindingPatch"
+      },
+      "FindingRead": {
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "File Path"
+          },
+          "line_number": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Line Number"
+          },
+          "column_start": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column Start"
+          },
+          "column_end": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Column End"
+          },
+          "commit_id": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Commit Id"
+          },
+          "commit_message": { "type": "string", "title": "Commit Message" },
+          "commit_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Commit Timestamp"
+          },
+          "author": { "type": "string", "maxLength": 200, "title": "Author" },
+          "email": { "type": "string", "maxLength": 100, "title": "Email" },
+          "event_sent_on": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Event Sent On"
+          },
+          "rule_name": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Rule Name"
+          },
+          "repository_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Repository Id"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " },
+          "scan_ids": {
+            "items": { "type": "integer", "exclusiveMinimum": 0.0 },
+            "type": "array",
+            "maxItems": 9223372036854775807,
+            "title": "Scan Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_path",
+          "line_number",
+          "column_start",
+          "column_end",
+          "commit_id",
+          "commit_message",
+          "commit_timestamp",
+          "author",
+          "email",
+          "rule_name",
+          "repository_id",
+          "id_"
+        ],
+        "title": "FindingRead"
+      },
+      "FindingStatus": {
+        "type": "string",
+        "enum": [
+          "NOT_ANALYZED",
+          "UNDER_REVIEW",
+          "CLARIFICATION_REQUIRED",
+          "FALSE_POSITIVE",
+          "TRUE_POSITIVE"
+        ],
+        "title": "FindingStatus",
+        "description": "An enumeration."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Model400": {
+        "properties": {},
+        "type": "object",
+        "title": "Model400",
+        "description": "Response schema to be used for a 400 BAD REQUEST.",
+        "example": { "detail": "Bad Request" }
+      },
+      "Model404": {
+        "properties": {},
+        "type": "object",
+        "title": "Model404",
+        "description": "Response schema to be used for a 404 NOT FOUND.",
+        "example": { "data": {}, "detail": "<id> not found" }
+      },
+      "Model409": {
+        "properties": {},
+        "type": "object",
+        "title": "Model409",
+        "description": "Response schema to be used for a 409 CONFLICT.",
+        "example": { "detail": "Unable to process entity due to conflict" }
+      },
+      "Model422": {
+        "properties": {},
+        "type": "object",
+        "title": "Model422",
+        "description": "Response schema to be used for a 422 UNPROCESSABLE ENTITY.",
+        "example": { "detail": "Entity cannot be processed" }
+      },
+      "PaginationModel_AuditRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/AuditRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[AuditRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_DateCountModel_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/DateCountModel" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[DateCountModel]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_DetailedFindingRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/DetailedFindingRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[DetailedFindingRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_FindingRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/FindingRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[FindingRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_RepositoryEnrichedRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/RepositoryEnrichedRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[RepositoryEnrichedRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_RepositoryRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/RepositoryRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[RepositoryRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_RulePackRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/RulePackRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[RulePackRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_ScanRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/ScanRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[ScanRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PaginationModel_VCSInstanceRead_": {
+        "properties": {
+          "data": {
+            "items": { "$ref": "#/components/schemas/VCSInstanceRead" },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Limit"
+          },
+          "skip": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Skip"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "limit", "skip"],
+        "title": "PaginationModel[VCSInstanceRead]",
+        "description": "    Generic encapsulation class for paginated endpoints to standardize output of the API\n    example creation, PaginationModel[FindingRead](data=db_findings, total=total, limit=limit, skip=skip)\n:param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "PersonalAuditMetrics": {
+        "properties": {
+          "today": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Today",
+            "default": 0
+          },
+          "current_week": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Current Week",
+            "default": 0
+          },
+          "last_week": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Last Week",
+            "default": 0
+          },
+          "current_month": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Current Month",
+            "default": 0
+          },
+          "current_year": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Current Year",
+            "default": 0
+          },
+          "forever": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Forever",
+            "default": 0
+          },
+          "rank_current_week": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Rank Current Week",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "PersonalAuditMetrics"
+      },
+      "RepositoryCreate": {
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Project Key"
+          },
+          "repository_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Id"
+          },
+          "repository_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Name"
+          },
+          "repository_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Repository Url"
+          },
+          "vcs_instance": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Vcs Instance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_key",
+          "repository_id",
+          "repository_name",
+          "repository_url",
+          "vcs_instance"
+        ],
+        "title": "RepositoryCreate"
+      },
+      "RepositoryEnrichedRead": {
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Project Key"
+          },
+          "repository_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Id"
+          },
+          "repository_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Name"
+          },
+          "repository_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Repository Url"
+          },
+          "vcs_provider": { "$ref": "#/components/schemas/VCSProviders" },
+          "last_scan_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Last Scan Id"
+          },
+          "last_scan_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Scan Timestamp"
+          },
+          "true_positive": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "True Positive"
+          },
+          "false_positive": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "False Positive"
+          },
+          "not_analyzed": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Not Analyzed"
+          },
+          "under_review": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Under Review"
+          },
+          "clarification_required": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Clarification Required"
+          },
+          "total_findings_count": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Total Findings Count"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " }
+        },
+        "type": "object",
+        "required": [
+          "project_key",
+          "repository_id",
+          "repository_name",
+          "repository_url",
+          "vcs_provider",
+          "true_positive",
+          "false_positive",
+          "not_analyzed",
+          "under_review",
+          "clarification_required",
+          "total_findings_count",
+          "id_"
+        ],
+        "title": "RepositoryEnrichedRead"
+      },
+      "RepositoryRead": {
+        "properties": {
+          "project_key": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Project Key"
+          },
+          "repository_id": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Id"
+          },
+          "repository_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Repository Name"
+          },
+          "repository_url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Repository Url"
+          },
+          "vcs_instance": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Vcs Instance"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " }
+        },
+        "type": "object",
+        "required": [
+          "project_key",
+          "repository_id",
+          "repository_name",
+          "repository_url",
+          "vcs_instance",
+          "id_"
+        ],
+        "title": "RepositoryRead"
+      },
+      "RuleFindingCountModel": {
+        "properties": {
+          "rule_name": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Rule Name"
+          },
+          "finding_count": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Finding Count",
+            "default": 0
+          },
+          "finding_statuses_count": {
+            "items": { "$ref": "#/components/schemas/StatusCount" },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Finding Statuses Count",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": ["rule_name"],
+        "title": "RuleFindingCountModel",
+        "description": ":param Generic[Model]:\n    Type of the object in the data list"
+      },
+      "RulePackRead": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "pattern": "^\\d+(?:\\.\\d+){2}$",
+            "title": "Version"
+          },
+          "active": { "type": "boolean", "title": "Active", "default": false },
+          "global_allow_list": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Global Allow List"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created"
+          }
+        },
+        "type": "object",
+        "required": ["version", "created"],
+        "title": "RulePackRead"
+      },
+      "ScanCreate": {
+        "properties": {
+          "scan_type": {
+            "allOf": [{ "$ref": "#/components/schemas/ScanType" }],
+            "default": "BASE"
+          },
+          "last_scanned_commit": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Scanned Commit"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "increment_number": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Increment Number",
+            "default": 0
+          },
+          "rule_pack": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Rule Pack"
+          },
+          "repository_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Repository Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "last_scanned_commit",
+          "timestamp",
+          "rule_pack",
+          "repository_id"
+        ],
+        "title": "ScanCreate"
+      },
+      "ScanRead": {
+        "properties": {
+          "scan_type": {
+            "allOf": [{ "$ref": "#/components/schemas/ScanType" }],
+            "default": "BASE"
+          },
+          "last_scanned_commit": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Scanned Commit"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "increment_number": {
+            "type": "integer",
+            "exclusiveMinimum": -1.0,
+            "title": "Increment Number",
+            "default": 0
+          },
+          "rule_pack": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Rule Pack"
+          },
+          "repository_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Repository Id"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " }
+        },
+        "type": "object",
+        "required": [
+          "last_scanned_commit",
+          "timestamp",
+          "rule_pack",
+          "repository_id",
+          "id_"
+        ],
+        "title": "ScanRead"
+      },
+      "ScanType": {
+        "type": "string",
+        "enum": ["BASE", "INCREMENTAL"],
+        "title": "ScanType",
+        "description": "An enumeration."
+      },
+      "StatusCount": {
+        "properties": {
+          "status": { "$ref": "#/components/schemas/FindingStatus" },
+          "count": { "type": "integer", "title": "Count", "default": 0 }
+        },
+        "type": "object",
+        "required": ["status"],
+        "title": "StatusCount"
+      },
+      "VCSInstanceCreate": {
+        "properties": {
+          "name": { "type": "string", "maxLength": 200, "title": "Name" },
+          "provider_type": { "$ref": "#/components/schemas/VCSProviders" },
+          "hostname": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Hostname"
+          },
+          "port": {
+            "type": "integer",
+            "exclusiveMaximum": 65536.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Port"
+          },
+          "scheme": { "type": "string", "maxLength": 20, "title": "Scheme" },
+          "exceptions": {
+            "items": { "type": "string" },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Exceptions"
+          },
+          "scope": {
+            "items": { "type": "string" },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Scope"
+          },
+          "organization": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Organization"
+          }
+        },
+        "type": "object",
+        "required": ["name", "provider_type", "hostname", "port", "scheme"],
+        "title": "VCSInstanceCreate"
+      },
+      "VCSInstanceRead": {
+        "properties": {
+          "name": { "type": "string", "maxLength": 200, "title": "Name" },
+          "provider_type": { "$ref": "#/components/schemas/VCSProviders" },
+          "hostname": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Hostname"
+          },
+          "port": {
+            "type": "integer",
+            "exclusiveMaximum": 65536.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Port"
+          },
+          "scheme": { "type": "string", "maxLength": 20, "title": "Scheme" },
+          "exceptions": {
+            "items": { "type": "string" },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Exceptions"
+          },
+          "scope": {
+            "items": { "type": "string" },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Scope"
+          },
+          "organization": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Organization"
+          },
+          "id_": { "type": "integer", "exclusiveMinimum": 0.0, "title": "Id " }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "provider_type",
+          "hostname",
+          "port",
+          "scheme",
+          "id_"
+        ],
+        "title": "VCSInstanceRead"
+      },
+      "VCSProviders": {
+        "type": "string",
+        "enum": ["AZURE_DEVOPS", "BITBUCKET", "GITHUB_PUBLIC"],
+        "title": "VCSProviders",
+        "description": "An enumeration."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "VcsProviderFindingCount": {
+        "properties": {
+          "AZURE_DEVOPS": {
+            "type": "integer",
+            "title": "Azure Devops",
+            "default": 0
+          },
+          "BITBUCKET": {
+            "type": "integer",
+            "title": "Bitbucket",
+            "default": 0
+          },
+          "GITHUB_PUBLIC": {
+            "type": "integer",
+            "title": "Github Public",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "VcsProviderFindingCount"
+      }
+    },
+    "securitySchemes": { "HTTPBearer": { "type": "http", "scheme": "bearer" } }
+  },
+  "tags": [
+    { "name": "health", "description": "Checks health for API" },
+    { "name": "resc-common", "description": "Manage common information" },
+    { "name": "resc-rules", "description": "Manage rule information" },
+    {
+      "name": "resc-rule-packs",
+      "description": "Manage rule pack information"
+    },
+    {
+      "name": "resc-repositories",
+      "description": "Manage repository information"
+    },
+    { "name": "resc-scans", "description": "Manage scan information" },
+    { "name": "resc-findings", "description": "Manage findings information" },
+    {
+      "name": "resc-vcs-instances",
+      "description": "Manage vcs instance information"
+    },
+    { "name": "resc-metrics", "description": "Retrieve metrics" }
+  ]
+}

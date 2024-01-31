@@ -1,0 +1,9 @@
+{
+  "data": [
+    "NOT_ANALYZED",
+    "UNDER_REVIEW",
+    "CLARIFICATION_REQUIRED",
+    "FALSE_POSITIVE",
+    "TRUE_POSTIVE"
+  ]
+}

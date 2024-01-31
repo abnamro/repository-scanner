@@ -1,19 +1,19 @@
 <template>
   <div>
-    <b-tab title="HISTORY" title-item-class="tab-pills" @click="fetchAuditsForFinding">
-      <!-- Spinner -->
-      <Spinner :active="spinnerActive" />
+    <b-tab title="HISTORY" title-item-class="tab-pills" v-on:click="fetchAuditsForFinding">
+      <SpinnerVue v-if="!loadedData" />
 
       <!--Audit History Table -->
-      <div v-if="!hasRecords" class="text-center cursor-default">
+      <div v-if="!hasRecords && loadedData" class="text-center cursor-default">
         <br />
         <br />No Record Found...
       </div>
 
       <div class="pr-1" v-if="hasRecords">
+        <!-- sticky-header="230px" -->
         <b-table
           id="audit-history-table"
-          sticky-header="230px"
+          :sticky-header="true"
           :items="auditList"
           :fields="fields"
           :current-page="currentPage"
@@ -24,28 +24,29 @@
         >
           <!-- Timestamp Column -->
           <template #cell(timestamp)="data">
-            {{ formatDate(data.item.timestamp) }}
+            {{ formatDate((data.item as AuditRead).timestamp) }}
           </template>
 
           <!-- Auditor Column -->
           <template #cell(auditor)="data">
-            {{ data.item.auditor }}
+            {{ (data.item as AuditRead).auditor }}
           </template>
 
           <!-- Status Column -->
           <template #cell(status)="data">
-            {{ parseStatus(data.item.status) }}
+            {{ parseStatus((data.item as AuditRead).status) }}
           </template>
 
           <!-- Comment Column -->
           <template #cell(comment)="data">
             <p
-              v-if="data.item.comment && data.item.comment.length > 45"
-              v-b-popover.hover="data.item.comment"
+              v-if="(data.item as AuditRead).comment && ((data.item as AuditRead)?.comment?.length ?? 0) > 45"
+              v-b-popover.hover="(data.item as AuditRead).comment"
+              class="elipsis"
             >
-              {{ truncate(data.item.comment, 45, '...') }}
+              {{ (data.item as AuditRead).comment }}
             </p>
-            <p v-else>{{ data.item.comment }}</p>
+            <p v-else>{{ (data.item as AuditRead).comment }}</p>
           </template>
         </b-table>
       </div>
@@ -53,109 +54,85 @@
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
-import Config from '@/configuration/config';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
 import DateUtils from '@/utils/date-utils';
 import CommonUtils from '@/utils/common-utils';
 import FindingsService from '@/services/findings-service';
-import Spinner from '@/components/Common/Spinner.vue';
-import spinnerMixin from '@/mixins/spinner.js';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
+import type { AuditRead, DetailedFindingRead, FindingStatus } from '@/services/shema-to-types';
+import { computed, ref } from 'vue';
 
-export default {
-  name: 'HistoryTab1',
-  mixins: [spinnerMixin],
-  props: {
-    finding: {
-      type: Object,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      auditList: [],
-      currentItems: [],
-      totalRows: 0,
-      currentPage: 1,
-      perPage: Number(`${Config.value('defaultPageSize')}`),
-      pageSizes: [20, 50, 100],
-      requestedPageNumber: 1,
-      fields: [
-        {
-          key: 'timestamp',
-          sortable: true,
-          label: 'Date',
-          class: 'text-left position-sticky small',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'auditor',
-          sortable: false,
-          label: 'Auditor',
-          class: 'text-left position-sticky small',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'status',
-          sortable: false,
-          label: 'Status',
-          class: 'text-left position-sticky small',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'comment',
-          sortable: false,
-          label: 'Comment',
-          class: 'text-left position-sticky small',
-          thStyle: { borderTop: '0px' },
-        },
-      ],
-    };
-  },
-  computed: {
-    hasRecords() {
-      return this.auditList.length > 0;
-    },
-  },
-  methods: {
-    handlePageClick(page) {
-      this.currentPage = page;
-      this.fetchPaginatedAuditHistoryForFinding();
-    },
-    handlePageSizeChange(pageSize) {
-      this.perPage = Number(pageSize);
-      this.currentPage = 1;
-      this.fetchPaginatedAuditHistoryForFinding();
-    },
-    formatDate(timestamp) {
-      return DateUtils.formatDate(timestamp);
-    },
-    truncate: function (text, length, suffix) {
-      if (text.length > length) {
-        return text.substring(0, length) + suffix;
-      } else {
-        return text;
-      }
-    },
-    parseStatus(input) {
-      return CommonUtils.parseStatusLabels(input);
-    },
-    fetchAuditsForFinding() {
-      this.showSpinner();
-      FindingsService.getFindingAudits(this.finding.id_, 100, 0)
-        .then((response) => {
-          this.auditList = response.data.data;
-          this.totalRows = response.data.total;
-          this.hideSpinner();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-  },
-  created() {},
-  components: {
-    Spinner,
-  },
+const loadedData = ref(false);
+
+type Props = {
+  finding: DetailedFindingRead;
 };
+const props = defineProps<Props>();
+
+const finding = ref(props.finding);
+const auditList = ref([] as AuditRead[]);
+const currentItems = ref([]);
+const totalRows = ref(0);
+const currentPage = ref(1);
+const fields = ref([
+  {
+    key: 'timestamp',
+    sortable: true,
+    label: 'Date',
+    class: 'text-start position-sticky small',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'auditor',
+    sortable: false,
+    label: 'Auditor',
+    class: 'text-start position-sticky small',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'status',
+    sortable: false,
+    label: 'Status',
+    class: 'text-start position-sticky small',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'comment',
+    sortable: false,
+    label: 'Comment',
+    class: 'text-start position-sticky small',
+    thStyle: { borderTop: '0px' },
+  },
+]);
+
+const hasRecords = computed(() => {
+  return auditList.value.length > 0;
+});
+
+function formatDate(timestamp: string): string {
+  return DateUtils.formatDate(timestamp);
+}
+
+function parseStatus(input: FindingStatus): string {
+  return CommonUtils.formatStatusLabels(input);
+}
+
+function fetchAuditsForFinding() {
+  loadedData.value = false;
+  FindingsService.getFindingAudits(finding.value.id_, 100, 0)
+    .then((response) => {
+      auditList.value = response.data.data;
+      totalRows.value = response.data.total;
+      loadedData.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
 </script>
+<style>
+.elipsis {
+  text-overflow: ellipsis;
+}
+</style>

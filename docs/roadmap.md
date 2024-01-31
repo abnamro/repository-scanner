@@ -8,6 +8,7 @@ This document describes the current status and the upcoming milestones of the RE
 
 | Status | Category | Description | Item |
 | :---: | :--- | :---: | :---: |
+| 🚀 | Front-end | Front-end migration to Vue3 | <a href=https://github.com/ipfs/pm](https://github.com/abnamro/repository-scanner/releases/tag/resc-3.0.0)>resc-3.0.0</a>  |
 | 🚀 | Cache | Caching through Redis | <a href=https://github.com/ipfs/pm](https://github.com/abnamro/repository-scanner/releases/tag/resc-2.0.0)>resc-2.0.0</a>  |
 | 🚀 | Analytics | Personalized Audit Metrics | <a href=https://github.com/abnamro/repository-scanner/releases/tag/resc-1.4.0)>resc-1.4.0</a>  |
 | 🚀 | Continuous Integration| Integrate kube-audit and datree scan in Github action pipeline. | <a href=https://github.com/abnamro/repository-scanner/releases/tag/resc-1.4.0)>resc-1.4.0</a> |

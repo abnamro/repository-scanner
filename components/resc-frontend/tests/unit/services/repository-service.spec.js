@@ -1,9 +1,10 @@
-import RepositoryService from '@/services/repository-service';
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
+import RepositoryService from '@/services/repository-service';
 import Config from '@/configuration/config';
 import repositories from '@/../tests/resources/mock_repositories.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('function getDistinctRepositories', () => {
   let allRepos = ['bb_repo1', 'bb_repo2', 'ado_repo1', 'ado_repo2'];

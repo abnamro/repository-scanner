@@ -19,6 +19,7 @@
 [![Build][build-shield]][build-url]
 [![Version][version-shield]][version-url]
 [![Python][python-shield]][python-url]
+[![TypeScript][typescript-shield][typescript-url]
 [![Vue.js][vuejs-shield]][vuejs-url]
 [![Docker][docker-shield]][docker-url]
 [![Kubernetes][k8-shield]][k8-url]
@@ -81,7 +82,7 @@ The diagram below gives a high-level overview of the Repository Scanner tool. Al
 tool and the technologies that it utilizes are explained in detail here. As shown in the diagram, all the components mentioned
 are run as Docker containers in a Kubernetes ecosystem.
 
-* [RESC-Frontend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend): The RESC-Frontend is a fully responsive dashboard application developed using Vue.js 2 and the BootstrapVue framework. It has screens for Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
+* [RESC-Frontend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend): The RESC-Frontend is a fully responsive dashboard application developed using TypeScript, Vue 3 and the BootstrapVueNext framework (based on Bootstrap 5). It has screens for Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
 * [RESC-Backend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-backend): The RESC-Backend is the backend of the Repository Scanner tool. The RESC-Backend consists of RabbitMQ users and queue creation, Database models, the RESC Web service, and Alembic scripts for database migration. The RESC Web service is created using FASTAPI.
 * [RESC-VCS-Scanner](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner): RESC-VCS-Scanner, which runs as a celery worker, gathers repositories from the repositories queue and carries out a secret scan. Gitleaks is used as the scanner to find secrets.
 * [RESC-VCS-Scraper](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scraper): All projects and repositories from supported VCS providers such as Bitbucket, Azure Repos, and GitHub are gathered by the RESC-VCS-SCRAPER. This component contains the VCS-Scraper-Projects and VCS-Scraper-Repositories as its primary modules.
@@ -145,6 +146,8 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 
 [Python.org]: https://img.shields.io/badge/Python-2b5b84?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
+[typescript-shield]: https://shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=TypeScript&logoColor=FFF
+[typescript-url]: https://www.typescriptlang.org/
 [Docker.com]: https://img.shields.io/badge/Docker-0b214a?style=for-the-badge&logo=docker&logoColor=white
 [Docker-url]: https://www.docker.com/
 [Kubernetes.io]: https://img.shields.io/badge/Kubernetes-3371e3?style=for-the-badge&logo=kubernetes&logoColor=white
@@ -157,4 +160,3 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 [RabbitMQ-url]: https://rabbitmq.com/
 [Redis.com]: https://img.shields.io/badge/redis-%23DD0031.svg?&style=for-the-badge&logo=redis&logoColor=white
 [Redis-url]: https://redis.com/
-

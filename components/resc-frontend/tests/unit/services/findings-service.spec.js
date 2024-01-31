@@ -1,5 +1,6 @@
-import FindingsService from '@/services/findings-service';
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
+import FindingsService from '@/services/findings-service';
 import Config from '@/configuration/config';
 import findings from '@/../tests/resources/mock_findings.json';
 import detailed_findings from '@/../tests/resources/mock_detailed_findings.json';
@@ -9,7 +10,7 @@ import audits from '@/../tests/resources/mock_finding_audits.json';
 import findings_status_counts_per_vcs_provider_per_week from '@/../tests/resources/mock_findings_status_count_by_vcs_provider_per_week.json';
 import audit_count_by_auditor_per_week from '@/../tests/resources/mock_audit_count_by_auditor_per_week.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('function getFindingById', () => {
   it('fetch a single finding', async () => {

@@ -67,7 +67,7 @@
     "vcs_provider_finding_count": {
       "AZURE_DEVOPS": 18,
       "BITBUCKET": 4,
-      "GITHUB_PUBLIC": 0
+      "GITHUB_PUBLIC": 1
     },
     "total": 22
   },

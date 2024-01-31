@@ -1,23 +1,23 @@
 <template>
   <div>
-    <!-- Spinner -->
-    <Spinner :active="spinnerActive" />
+    <SpinnerVue v-if="!loadedData" />
     <b-modal
       id="rule_pack_upload_modal"
       ref="rule_pack_upload_modal"
       size="lg"
       button-size="sm"
-      :title="getModalTitle"
+      title="IMPORT RULEPACK"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
+      :static="true"
     >
       <form ref="form" @submit.stop.prevent="submitForm">
         <div class="row">
           <div class="col-md-7">
             <b-form-group>
               <b-form-input
-                id="version-input"
+                id="versionInput"
                 placeholder="Enter Version"
                 size="sm"
                 v-model="version"
@@ -37,6 +37,7 @@
           <div class="col-md-7">
             <b-form-group>
               <b-form-file
+                if="fileDrop"
                 v-model="file"
                 placeholder="Choose a file or drop it here..."
                 drop-placeholder="Drop file here..."
@@ -51,93 +52,89 @@
       <template #modal-footer>
         <div class="w-100">
           <b-button
-            variant="prime"
+            variant="primary"
             class="float-right"
-            @click="handleOk"
+            v-on:click="handleOk"
             :disabled="(file && file.length == 0) || !versionState"
           >
             UPLOAD
           </b-button>
-          <b-button variant="second" class="float-right mr-3" @click="hide"> CLOSE </b-button>
+          <b-button variant="secondary" class="float-right mr-3" v-on:click="hide">
+            CLOSE
+          </b-button>
         </div>
       </template>
     </b-modal>
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
-import Spinner from '@/components/Common/Spinner.vue';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
 import PushNotification from '@/utils/push-notification';
 import RulePackService from '@/services/rule-pack-service';
-import spinnerMixin from '@/mixins/spinner.js';
+import { nextTick, ref, type Ref } from 'vue';
+import type { BvEvent } from 'bootstrap-vue-next';
 
-export default {
-  name: 'RulePackUploadModal',
-  mixins: [spinnerMixin],
-  data() {
-    return {
-      file: [],
-      version: null,
-      versionState: null,
-    };
-  },
-  computed: {
-    getModalTitle() {
-      return `IMPORT RULEPACK`;
-    },
-  },
-  methods: {
-    show() {
-      this.$refs.rule_pack_upload_modal.show();
-    },
-    hide() {
-      this.version = null;
-      this.file = [];
-      this.versionState = null;
-      this.$refs.rule_pack_upload_modal.hide();
-    },
-    resetModal() {
-      this.version = null;
-      this.file = [];
-      this.versionState = null;
-    },
-    validateVersion() {
-      let valid = false;
-      this.versionState = false;
-      const versionRegex = /^\d+(?:\.\d+){2}$/;
-      if (versionRegex.test(this.version)) {
-        valid = true;
-        this.versionState = true;
+const loadedData = ref(true);
+const rule_pack_upload_modal = ref();
+
+const file = ref([] as File[]);
+const version = ref('');
+const versionState = ref(null) as Ref<boolean | null>;
+const emit = defineEmits(['on-file-upload-suceess']);
+
+function show(): void {
+  rule_pack_upload_modal.value.show();
+}
+
+function hide(): void {
+  version.value = '';
+  file.value = [];
+  versionState.value = null;
+  rule_pack_upload_modal.value.hide();
+}
+
+function resetModal(): void {
+  version.value = '';
+  file.value = [];
+  versionState.value = null;
+}
+
+function validateVersion(): boolean {
+  versionState.value = false;
+  const versionRegex = /^\d+(?:\.\d+){2}$/;
+  if (versionRegex.test(version.value)) {
+    versionState.value = true;
+    return true;
+  }
+  return false;
+}
+
+function handleOk(bvModalEvt: BvEvent | MouseEvent) {
+  bvModalEvt.preventDefault();
+  submitForm();
+}
+
+function submitForm() {
+  loadedData.value = false;
+  RulePackService.uploadRulePack(version.value, file.value[0])
+    .then((response) => {
+      emit('on-file-upload-suceess');
+      if (response && response.status === 200) {
+        PushNotification.success('Rulepack uploaded successfully', 'Success', 5000);
       }
-      return valid;
-    },
-    handleOk(bvModalEvt) {
-      bvModalEvt.preventDefault();
-      this.submitForm();
-    },
-    submitForm() {
-      this.showSpinner();
-      RulePackService.uploadRulePack(this.version, this.file)
-        .then((response) => {
-          this.$emit('on-file-upload-suceess');
-          if (response && response.status === 200) {
-            PushNotification.success('Rulepack uploaded successfully', 'Success', 5000);
-          }
-          this.hideSpinner();
-          // Hide the modal manually
-          this.$nextTick(() => {
-            this.$refs['rule_pack_upload_modal'].hide();
-          });
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-          this.hideSpinner();
-        });
-    },
-  },
-  components: {
-    Spinner,
-  },
-};
+      loadedData.value = true;
+      // Hide the modal manually
+      nextTick(() => {
+        rule_pack_upload_modal.value.hide();
+      });
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+      loadedData.value = false;
+    });
+}
+
+defineExpose({ show });
 </script>

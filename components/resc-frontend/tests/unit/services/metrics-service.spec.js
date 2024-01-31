@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 import MetricsService from '@/services/metrics-service';
 import personal_audits from '@/../tests/resources/mock_personal_audits.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('function getPersonalAuditMetrics', () => {
   describe('when getPersonalAuditMetrics API call is successful', () => {
@@ -15,7 +16,7 @@ describe('function getPersonalAuditMetrics', () => {
       expect(response.data).toBeDefined();
       expect(response.data).not.toBeNull();
       expect(response.data.today).toBe(10);
-      expect(response.data.current_week).toBe(1);
+      expect(response.data.current_week).toBe(18);
       expect(response.data.last_week).toBe(8);
       expect(response.data.current_month).toBe(1);
       expect(response.data.current_year).toBe(16);

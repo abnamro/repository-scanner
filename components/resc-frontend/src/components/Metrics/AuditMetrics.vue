@@ -1,102 +1,95 @@
 <template>
-  <div>
-    <div class="col-md-2 pt-2 text-left page-title">
+  <div class="ms-4">
+    <div class="col-md-2 pt-2 text-start page-title">
       <h3><small class="text-nowrap">Audit Metrics</small></h3>
     </div>
     <div class="pl-2">
       <h5><small class="text-nowrap">Audits by Auditor per week</small></h5>
-      <Spinner :active="!loadedAuditCounts" />
-      <MultiLineChart
+      <SpinnerVue v-if="!loadedAuditCounts" />
+      <MultiLineChartVue
         v-if="loadedAuditCounts"
         :chart-data="chartDataForAuditCountsGraph"
-        :chart-options="chartOptions"
         :height="600"
       />
     </div>
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
 import FindingsService from '@/services/findings-service';
-import MultiLineChart from '@/components/Charts/MultiLineChart.vue';
-import Spinner from '@/components/Common/Spinner.vue';
+import MultiLineChartVue from '@/components/Charts/MultiLineChartVue.vue';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
+import { ref, type Ref } from 'vue';
+import type { DataSetObject, DataSetObjectCollection, AuditData } from './types';
 
-export default {
-  name: 'AuditMetrics',
-  components: {
-    MultiLineChart,
-    Spinner,
-  },
-  data() {
-    return {
-      loadedAuditCounts: false,
-      loadedAuditCountsAuditors: false,
-      chartDataForAuditCountsGraph: { labels: [], datasets: [] },
-      auditCounts: [],
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    };
-  },
-  methods: {
-    arrayContainsAllZeros(arr) {
-      return arr.every((item) => item === 0);
-    },
-    getGraphData() {
-      FindingsService.getAuditsByAuditorPerWeek()
-        .then((response) => {
-          this.auditCounts = response.data;
-          let datasets = {};
-          this.auditCounts.forEach((data) => {
-            this.chartDataForAuditCountsGraph['labels'].push(data.time_period);
+const loadedAuditCounts = ref(false);
+const loadedAuditCountsAuditors = ref(false);
 
-            if (!this.loadedAuditCountsAuditors) {
-              Object.entries(data.audit_by_auditor_count).forEach((auditorData) => {
-                datasets[auditorData[0]] = this.prepareDataSet(auditorData[0], auditorData[1]);
-              });
-              datasets['Total'] = this.prepareDataSet('Total', data.total);
-              this.loadedAuditCountsAuditors = true;
-            } else {
-              Object.entries(data.audit_by_auditor_count).forEach((auditorData) => {
-                datasets[auditorData[0]].data.push(auditorData[1]);
-              });
-              datasets['Total'].data.push(data.total);
-            }
+const chartDataForAuditCountsGraph = ref({
+  labels: [] as string[],
+  datasets: [] as DataSetObject[],
+});
+const auditCounts = ref([]) as Ref<AuditData[]>;
+
+function getGraphData() {
+  FindingsService.getAuditsByAuditorPerWeek()
+    .then((response) => {
+      auditCounts.value = response.data;
+      let datasets: DataSetObjectCollection = {};
+      auditCounts.value.forEach((data: AuditData) => {
+        (chartDataForAuditCountsGraph.value.labels as string[]).push(data.time_period);
+
+        if (!loadedAuditCountsAuditors.value) {
+          Object.entries(data.audit_by_auditor_count).forEach((auditorData) => {
+            const auditor: string = auditorData[0];
+            const count: number = auditorData[1];
+            datasets[auditor] = prepareDataSet(auditor, count);
           });
-          Object.entries(datasets).forEach((auditorDataset) => {
-            this.chartDataForAuditCountsGraph.datasets.push(auditorDataset[1]);
+          datasets['Total'] = prepareDataSet('Total', data.total ?? 0);
+          loadedAuditCountsAuditors.value = true;
+        } else {
+          Object.entries(data.audit_by_auditor_count).forEach((auditorData) => {
+            const auditor: string = auditorData[0];
+            const count: number = auditorData[1];
+            datasets[auditor].data.push(count);
           });
-          this.loadedAuditCounts = true;
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    prepareDataSet(datasetLabel, datasetFirstValue) {
-      const datasetsObj = {};
-      let colourCode = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      datasetsObj.borderWidth = 1.5;
-      datasetsObj.cubicInterpolationMode = 'monotone';
-      datasetsObj.data = [datasetFirstValue];
-      datasetsObj.pointStyle = 'circle';
-      datasetsObj.pointRadius = 3;
-      datasetsObj.pointHoverRadius = 8;
-      datasetsObj.label = datasetLabel;
+          datasets['Total'].data.push(data.total ?? 0);
+        }
+      });
+      Object.entries(datasets).forEach((auditorDataset) => {
+        chartDataForAuditCountsGraph.value.datasets.push(auditorDataset[1]);
+      });
+      loadedAuditCounts.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
 
-      if (datasetLabel === 'Total') {
-        datasetsObj.hidden = true;
-      }
-      datasetsObj.borderColor = colourCode;
-      datasetsObj.pointBackgroundColor = colourCode;
-      datasetsObj.backgroundColor = colourCode;
+function prepareDataSet(datasetLabel: string, datasetFirstValue: number): DataSetObject {
+  const hexMult = 16777215;
+  const base16 = 16;
+  const colourCode: string = '#' + Math.floor(Math.random() * hexMult).toString(base16);
+  const datasetsObj: DataSetObject = {
+    borderWidth: 1.5,
+    cubicInterpolationMode: 'monotone',
+    data: [datasetFirstValue],
+    pointStyle: 'circle',
+    pointRadius: 3,
+    pointHoverRadius: 8,
+    label: datasetLabel,
+    borderColor: colourCode,
+    pointBackgroundColor: colourCode,
+    backgroundColor: colourCode,
+  };
 
-      return datasetsObj;
-    },
-  },
-  mounted() {
-    this.getGraphData();
-  },
-};
+  if (datasetLabel === 'Total') {
+    datasetsObj.hidden = true;
+  }
+
+  return datasetsObj;
+}
+
+getGraphData();
 </script>

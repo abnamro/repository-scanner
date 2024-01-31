@@ -1,10 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { useAuthUserStore } from '@/store/index';
 import { setActivePinia, createPinia } from 'pinia';
 
 describe('Store management unit test', () => {
   afterEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
   });
 
   describe('store Mutations', () => {

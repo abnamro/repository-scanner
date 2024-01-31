@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 import RulePackService from '@/services/rule-pack-service';
 import rule_packs from '@/../tests/resources/mock_rule_packs.json';
 import rule_tags from '@/../tests/resources/mock_rule_tags.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('function getRulePackVersions', () => {
   describe('when getRulePackVersions API call is successful', () => {

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-form-group class="label-title text-left" label="Status" label-for="status-filter">
+    <b-form-group class="label-title text-start" label="Status" label-for="status-filter">
       <multiselect
-        v-model="selectedStatusList"
-        :options="statusList"
+        v-model="selectedStatus"
+        :options="optionsStatus"
         :multiple="true"
         :show-labels="true"
         :close-on-select="true"
@@ -16,55 +16,54 @@
         label="label"
         track-by="id"
         :preselect-first="false"
-        @input="onStatusFilterChange"
+        @update:modelValue="onStatusFilterChange"
       >
-        <span slot="noResult">No status found</span>
+        <template v-slot:noResult><span>No status found</span></template>
       </multiselect>
     </b-form-group>
   </div>
 </template>
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
-import CommonUtils from '@/utils/common-utils';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
+import CommonUtils, { type StatusOptionType } from '@/utils/common-utils';
 import Multiselect from 'vue-multiselect';
 import ScanFindingsService from '@/services/scan-findings-service';
+import { ref } from 'vue';
+import type { FindingStatus } from '@/services/shema-to-types';
 
-export default {
-  name: 'FindingStatusFilter',
-  data() {
-    return {
-      statusList: [],
-      selectedStatusList: [],
-    };
-  },
-  methods: {
-    onStatusFilterChange() {
-      if (this.selectedStatusList.length > 0) {
-        const statusValues = [];
-        for (const status of this.selectedStatusList) {
-          statusValues.push(status.value);
-        }
-        this.$emit('on-findings-status-change', statusValues);
-      } else {
-        this.$emit('on-findings-status-change', null);
-      }
-    },
-    fetchStatuses() {
-      ScanFindingsService.getStatusList()
-        .then((response) => {
-          this.statusList = CommonUtils.parseStatusOptions(response.data);
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-  },
-  created() {
-    this.fetchStatuses();
-  },
-  components: {
-    Multiselect,
-  },
+type Props = {
+  statusOptions?: StatusOptionType[];
+  statusSelected?: StatusOptionType[];
 };
+
+const props = withDefaults(defineProps<Props>(), {
+  statusOptions: () => [],
+  statusSelected: () => [],
+});
+
+const optionsStatus = ref(props.statusOptions);
+const selectedStatus = ref(props.statusSelected);
+
+const emit = defineEmits(['on-findings-status-change']);
+
+function onStatusFilterChange() {
+  if (selectedStatus.value.length > 0) {
+    const statusValues: FindingStatus[] = [];
+    for (const status of selectedStatus.value) {
+      statusValues.push(status.value);
+    }
+    emit('on-findings-status-change', statusValues);
+  } else {
+    emit('on-findings-status-change', []);
+  }
+}
+
+ScanFindingsService.getStatusList()
+  .then((response) => {
+    optionsStatus.value = CommonUtils.parseStatusOptions(response.data as FindingStatus[]);
+  })
+  .catch((error) => {
+    AxiosConfig.handleError(error);
+  });
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
