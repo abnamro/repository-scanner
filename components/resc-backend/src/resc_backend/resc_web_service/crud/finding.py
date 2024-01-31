@@ -646,8 +646,9 @@ def get_finding_audit_status_count_over_time(db_connection: Session, status: Fin
                                     func.count(model.DBaudit.id_).label("finding_count")
                                     )
         max_audit_subquery = db_connection.query(func.max(model.DBaudit.id_).label("audit_id")) \
-            .filter(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time)) \
-            .filter(extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(or_(extract('year', model.DBaudit.timestamp) < extract('year', last_nth_week_date_time),
+                        and_(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time),
+                        extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time))))\
             .group_by(model.DBaudit.finding_id).subquery()
         query = query.join(max_audit_subquery, max_audit_subquery.c.audit_id == model.DBaudit.id_)
         query = query.join(model.DBfinding, model.DBfinding.id_ == model.DBaudit.finding_id)
@@ -684,8 +685,9 @@ def get_finding_count_by_vcs_provider_over_time(db_connection: Session, weeks: i
                                     )
         max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
                                             model.DBscan.repository_id) \
-            .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
-            .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(or_(extract('year', model.DBaudit.timestamp) < extract('year', last_nth_week_date_time),
+                        and_(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time),
+                        extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time))))\
             .filter(model.DBscan.scan_type == ScanType.BASE) \
             .group_by(model.DBscan.repository_id).subquery()
 
@@ -734,15 +736,17 @@ def get_un_triaged_finding_count_by_vcs_provider_over_time(db_connection: Sessio
                                     )
         max_base_scan = db_connection.query(func.max(model.DBscan.id_).label("scan_id"),
                                             model.DBscan.repository_id) \
-            .filter(extract('year', model.DBscan.timestamp) == extract('year', last_nth_week_date_time)) \
-            .filter(extract('week', model.DBscan.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(or_(extract('year', model.DBaudit.timestamp) < extract('year', last_nth_week_date_time),
+                        and_(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time),
+                        extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time))))\
             .filter(model.DBscan.scan_type == ScanType.BASE) \
             .group_by(model.DBscan.repository_id).subquery()
 
         max_audit_subquery = db_connection.query(model.DBaudit.finding_id,
                                                  func.max(model.DBaudit.id_).label("audit_id")) \
-            .filter(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time)) \
-            .filter(extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time)) \
+            .filter(or_(extract('year', model.DBaudit.timestamp) < extract('year', last_nth_week_date_time),
+                        and_(extract('year', model.DBaudit.timestamp) == extract('year', last_nth_week_date_time),
+                        extract('week', model.DBaudit.timestamp) <= extract('week', last_nth_week_date_time))))\
             .group_by(model.DBaudit.finding_id).subquery()
 
         query = query.join(model.DBscanFinding, model.DBfinding.id_ == model.DBscanFinding.finding_id)
