@@ -1,4 +1,4 @@
-apiVersion: v3
+apiVersion: v2
 name: resc
 description: A Helm chart for the Repository Scanner
 
