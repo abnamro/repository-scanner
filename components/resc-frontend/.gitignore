@@ -31,3 +31,4 @@ tests/reports/**
 
 # Auto generated
 components.d.ts
+sonar-report.xml

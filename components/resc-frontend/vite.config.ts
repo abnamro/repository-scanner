@@ -56,4 +56,8 @@ export default defineConfig({
       util: '@browsery/util',
     },
   },
+  test: {
+    reporters: ['verbose', 'vitest-sonar-reporter'],
+    outputFile: 'sonar-report.xml',
+  }
 });
