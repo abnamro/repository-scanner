@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.13.0]
+        node-version: [20.9.0]
     outputs:
       frontend_version: ${{ steps.getversion.outputs.frontend_version }}
     steps:
