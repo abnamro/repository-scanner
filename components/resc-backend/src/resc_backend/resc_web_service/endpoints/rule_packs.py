@@ -1,7 +1,6 @@
 # Standard Library
 import logging
 import re
-from functools import reduce
 from typing import List, Optional
 
 # Third Party
@@ -79,8 +78,6 @@ def get_rule_packs(version: Optional[str] = Query(None, pattern=r"^\d+(?:\.\d+){
                                                limit=limit)
     total_rule_packs_count = rule_pack_crud.get_total_rule_packs_count(db_connection=db_connection, version=version,
                                                                        active=active)
-    rule_packs.sort(key=lambda rule: reduce(lambda acc, x: acc * 100 + int(x),
-                                            rule.version.split("."), 0), reverse=True)
     return PaginationModel[RulePackRead](data=rule_packs, total=total_rule_packs_count, limit=limit, skip=skip)
 
 

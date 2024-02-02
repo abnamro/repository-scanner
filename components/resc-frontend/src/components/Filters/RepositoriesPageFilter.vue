@@ -8,13 +8,16 @@
 
       <!--Project Filter -->
       <div class="col-md-4">
-        <ProjectFilter :projectOptions="projectOptions" @on-project-change="onProjectChange" />
+        <ProjectFilter
+          :projectOptions="props.projectOptions"
+          @on-project-change="onProjectChange"
+        />
       </div>
 
       <!--Repository Search Filter -->
       <div class="col-md-4">
         <RepositoryFilter
-          :repositoryOptions="repositoryOptions"
+          :repositoryOptions="props.repositoryOptions"
           @on-repository-change="onRepositoryChange"
         />
       </div>
@@ -36,64 +39,56 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import ProjectFilter from '@/components/Filters/ProjectFilter.vue';
 import RepositoryFilter from '@/components/Filters/RepositoryFilter.vue';
 import VcsProviderFilter from '@/components/Filters/VcsProviderFilter.vue';
+import type { VCSProviders } from '@/services/shema-to-types';
+import { ref } from 'vue';
 
-export default {
-  name: 'RepositoriesPageFilter',
-  props: {
-    projectOptions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    repositoryOptions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      selectedVcsProvider: null,
-      selectedProject: null,
-      selectedRepository: null,
-      includeZeroFindingRepos: false,
-    };
-  },
-  methods: {
-    onProjectChange(project) {
-      this.selectedProject = project;
-      this.handleFilterChange();
-    },
-    onRepositoryChange(repository) {
-      this.selectedRepository = repository;
-      this.handleFilterChange();
-    },
-    onVcsProviderChange(vcsProvider) {
-      this.selectedVcsProvider = vcsProvider;
-      this.handleFilterChange();
-    },
-    toggleIncludeZeroFindingRepos() {
-      this.handleFilterChange();
-    },
-    handleFilterChange() {
-      // Refresh table data in Repositories page
-      this.$emit(
-        'on-filter-change',
-        this.selectedVcsProvider,
-        this.selectedProject,
-        this.selectedRepository,
-        this.includeZeroFindingRepos
-      );
-    },
-  },
-  components: {
-    ProjectFilter,
-    RepositoryFilter,
-    VcsProviderFilter,
-  },
+type Props = {
+  projectOptions: string[];
+  projectSelected?: string;
+  repositoryOptions: string[];
+  repositorySelected?: string;
+  vcsProviderSelected?: VCSProviders[];
 };
+
+const props = withDefaults(defineProps<Props>(), {
+  vcsProviderSelected: () => [],
+});
+
+const selectedVcsProvider = ref(props.vcsProviderSelected);
+const selectedProject = ref(props.projectSelected);
+const selectedRepository = ref(props.repositorySelected);
+const includeZeroFindingRepos = ref(false);
+
+const emit = defineEmits(['on-filter-change']);
+
+function onProjectChange(project: string | undefined) {
+  selectedProject.value = project;
+  handleFilterChange();
+}
+function onRepositoryChange(repository: string | undefined) {
+  selectedRepository.value = repository;
+  handleFilterChange();
+}
+function onVcsProviderChange(vcsProvider: VCSProviders[]) {
+  selectedVcsProvider.value = vcsProvider;
+  handleFilterChange();
+}
+function toggleIncludeZeroFindingRepos() {
+  handleFilterChange();
+}
+
+function handleFilterChange() {
+  // Refresh table data in Repositories page
+  emit(
+    'on-filter-change',
+    selectedVcsProvider.value,
+    selectedProject.value,
+    selectedRepository.value,
+    includeZeroFindingRepos.value
+  );
+}
 </script>

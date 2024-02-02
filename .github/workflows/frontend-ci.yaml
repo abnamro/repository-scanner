@@ -33,7 +33,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.13.0]
+        node-version: [20.9.0]
     outputs:
       frontend_version: ${{ steps.getversion.outputs.frontend_version }}
     steps:
@@ -55,7 +55,7 @@ jobs:
         cd ${{ env.RESC_FRONTEND_DIR }}
         npm run lint
 
-    - name: Run Unit Tests
+    - name: Run Unit Tests with Vitest and coverage
       run: | 
         cd ${{ env.RESC_FRONTEND_DIR }}
         npm run ut
@@ -64,19 +64,13 @@ jobs:
       run: | 
         cd ${{ env.RESC_FRONTEND_DIR }}
         npx auditjs@latest ossi -q || true
-
-    - name: Running Jest and Coverage
-      run: |
-        cd ${{ env.RESC_FRONTEND_DIR }}
-        yarn jest --coverage || true
-        npm install jest-sonar-reporter --save-dev
         
       ## Removing the dir paths and making them relative paths.
     - name: Fix coverage report
       run: |
         cd ${{ env.RESC_FRONTEND_DIR }}
-        sed -i "s+/home/runner/work/repository-scanner/repository-scanner/components/resc-frontend/++g" tests/unit/reports/coverage/lcov.info
-        cat tests/unit/reports/coverage/lcov.info
+        sed -i "s+/home/runner/work/repository-scanner/repository-scanner/components/resc-frontend/++g" tests/reports/coverage/lcov.info
+        cat tests/reports/coverage/lcov.info
 
     # This step will only execute if PR is created internally.
     - name: SonarCloud Scan
@@ -96,8 +90,8 @@ jobs:
           -Dsonar.tests=tests/
           -Dsonar.cpd.exclusions=**/*.example.js,**/*.spec.js,**/*.?spec.js
           -Dsonar.coverage.exclusions=**/*.html,**/*.json,**/*.spec.js,**/*.?spec.js,**/main.*,**/i18n.js,**/router/index.js,**/configuration/*.js
-          -Dsonar.javascript.jstest.reportsPath=tests/unit/reports/coverage
-          -Dsonar.javascript.lcov.reportPaths=tests/unit/reports/coverage/lcov.info
+          -Dsonar.javascript.jstest.reportsPath=tests/reports/coverage
+          -Dsonar.javascript.lcov.reportPaths=tests/reports/coverage/lcov.info
           -Dsonar.pdf.skip=true
           -Dsonar.branch.target=*
           -Dsonar.branch.name=*

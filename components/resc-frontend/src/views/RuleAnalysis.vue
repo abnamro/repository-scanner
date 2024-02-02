@@ -1,20 +1,19 @@
 <template>
   <div>
     <!-- Page Title -->
-    <div class="col-md-2 pt-2 text-left page-title">
+    <div class="col-md-2 pt-2 text-start page-title">
       <h3><small class="text-nowrap">RULE ANALYSIS</small></h3>
     </div>
 
-    <!-- Spinner -->
-    <Spinner :active="spinnerActive" />
+    <SpinnerVue v-if="!loadedData" />
 
     <!-- Filters -->
     <div class="mt-4">
       <RuleAnalysisFilter
         :projectOptions="projectNames"
         :repositoryOptions="repositoryNames"
-        :selectedRulePackVersionsList="selectedRulePackVersionsList"
-        :rulePackVersions="rulePackVersions"
+        :rulePackPreSelected="selectedRulePackVersionsList"
+        :rulePackOptions="rulePackVersions"
         @on-filter-change="handleFilterChange"
       ></RuleAnalysisFilter>
     </div>
@@ -23,9 +22,9 @@
       <!-- Button to audit multiple findings -->
       <b-button
         class="float-left mt-2 mb-2"
-        variant="prime"
+        variant="primary"
         size="sm"
-        @click="showAuditModal()"
+        v-on:click="showAuditModal()"
         :disabled="auditButtonDisabled"
         >AUDIT</b-button
       >
@@ -38,21 +37,21 @@
     </div>
 
     <!--Scan Findings Table -->
-    <div v-if="!hasRecords" class="text-center cursor-default">
+    <div v-if="!hasRecords && loadedData" class="text-center cursor-default">
       <br />
       <br />No Record Found...
     </div>
 
+    <!-- sticky-header="85vh" -->
     <div class="p-3" v-if="hasRecords">
       <b-table
         id="rule-analysis-table"
-        sticky-header="85vh"
+        :sticky-header="true"
         :items="findingList"
         :fields="fields"
-        :current-page="currentPage"
+        :current-page="1"
         :per-page="0"
         primary-key="id_"
-        v-model="currentItems"
         responsive
         small
         head-variant="light"
@@ -72,40 +71,43 @@
           <b-form-checkbox
             class="checkbox"
             v-model="selectedCheckBoxIds"
-            :value="data.item.id_"
+            :value="(data.item as DetailedFindingRead).id_"
             @change="selectSingleCheckbox"
           ></b-form-checkbox>
         </template>
 
         <!-- Collapse Icon Column -->
         <template v-slot:cell(toggle_row)="{ detailsShowing }">
-          <font-awesome-icon
+          <FontAwesomeIcon
             size="lg"
             class="collapse-arrow"
-            slot="dropdown-icon"
+            name="dropdown-icon"
             icon="angle-right"
-            :rotation="detailsShowing ? 90 : null"
+            :rotation="detailsShowing ? 90 : undefined"
           />
         </template>
 
         <!-- Path Column -->
         <template #cell(file_path)="data">
-          {{ data.item.file_path | truncate(45, '...') }}
+          {{ truncate((data.item as DetailedFindingRead).file_path, 45, '...') }}
         </template>
 
         <!-- Line Column -->
         <template #cell(line_number)="data">
-          {{ data.item.line_number }}
+          {{ (data.item as DetailedFindingRead).line_number }}
         </template>
 
         <!-- Position Column -->
         <template #cell(position)="data">
-          {{ data.item.column_start }} - {{ data.item.column_end }}
+          {{ (data.item as DetailedFindingRead).column_start }} -
+          {{ (data.item as DetailedFindingRead).column_end }}
         </template>
 
         <!-- Status Column -->
         <template #cell(status)="data">
-          <FindingStatusBadge :status="data.item.status" />
+          <FindingStatusBadge
+            :status="(data.item as DetailedFindingRead).status ?? 'NOT_ANALYZED'"
+          />
         </template>
 
         <!-- Remaining Columns (Rule) -->
@@ -116,7 +118,7 @@
         <!-- Expand Table Row To Display Finding Panel -->
         <template v-slot:row-details="{ item }">
           <FindingPanel
-            :finding="item"
+            :finding="(item as DetailedFindingRead)"
             :repository="{
               project_key: item.project_key,
               repository_name: item.repository_name,
@@ -141,332 +143,337 @@
   </div>
 </template>
 
-<script>
-import AuditModal from '@/components/ScanFindings/AuditModal';
+<script lang="ts" setup>
+import AuditModal from '@/components/ScanFindings/AuditModal.vue';
 import Config from '@/configuration/config';
-import AxiosConfig from '@/configuration/axios-config.js';
+import AxiosConfig from '@/configuration/axios-config';
 import FindingPanel from '@/components/ScanFindings/FindingPanel.vue';
-import FindingsService from '@/services/findings-service';
+import FindingsService, { type QueryFilterType } from '@/services/findings-service';
 import FindingStatusBadge from '@/components/Common/FindingStatusBadge.vue';
 import RepositoryService from '@/services/repository-service';
-import Spinner from '@/components/Common/Spinner.vue';
-import Pagination from '@/components/Common/Pagination.vue';
-import RuleAnalysisFilter from '@/components/Filters/RuleAnalysisFilter.vue';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
+import Pagination from '@/components/Common/PaginationVue.vue';
+import { type RuleAnalysisFilter } from '@/components/Filters/RuleAnalysisFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
-import spinnerMixin from '@/mixins/spinner.js';
-import { useAuthUserStore } from '@/store/index.js';
+import { useAuthUserStore, type PreviousRouteState } from '@/store/index';
+import { computed, nextTick, onMounted, ref, type Ref } from 'vue';
+import type {
+  DetailedFindingRead,
+  FindingStatus,
+  PaginationType,
+  RulePackRead,
+  VCSProviders,
+} from '@/services/shema-to-types';
+import type { AxiosResponse } from 'axios';
+import type { TableItem } from 'bootstrap-vue-next';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-export default {
-  name: 'RuleAnalysis',
-  mixins: [spinnerMixin],
-  data() {
-    return {
-      findingList: [],
-      currentItems: [],
-      totalRows: 0,
-      currentPage: 1,
-      perPage: Number(`${Config.value('defaultPageSize')}`),
-      pageSizes: [20, 50, 100],
-      requestedPageNumber: 1,
-      rulePackVersions: [],
-      ruleTagsList: [],
-      projectNames: [],
-      repositoryNames: [],
-      selectedStartDate: '',
-      selectedEndDate: '',
-      selectedVcsProvider: null,
-      selectedStatus: null,
-      selectedProject: null,
-      selectedRepository: null,
-      selectedRule: null,
-      selectedRuleTags: null,
-      selectedRulePackVersions: [],
-      selectedRulePackVersionsList: [],
-      selectedCheckBoxIds: [],
-      allSelected: false,
-      fields: [
-        {
-          key: 'select',
-          label: '',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'toggle_row',
-          label: '',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'project_key',
-          sortable: true,
-          label: 'Project',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'repository_name',
-          sortable: true,
-          label: 'Repository',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'rule_name',
-          sortable: true,
-          label: 'Rule',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'file_path',
-          sortable: true,
-          label: 'File Path',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'line_number',
-          sortable: false,
-          label: 'Line',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'position',
-          sortable: true,
-          label: 'Position',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'status',
-          sortable: true,
-          label: 'Status',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-      ],
-    };
-  },
-  computed: {
-    hasRecords() {
-      return this.findingList.length > 0;
-    },
-    skipRowCount() {
-      return (this.currentPage - 1) * this.perPage;
-    },
-    auditButtonDisabled() {
-      return this.selectedCheckBoxIds.length <= 0;
-    },
-  },
-  methods: {
-    isRedirectedFromRuleMetricsPage() {
-      const store = useAuthUserStore();
-      const sourceRoute = store.sourceRoute;
-      const destinationRoute = store.destinationRoute;
-      return sourceRoute === '/metrics/rule-metrics' &&
-        destinationRoute === '/rule-analysis' &&
-        store.previousRouteState
-        ? true
-        : false;
-    },
-    selectSingleCheckbox() {
-      this.allSelected = false;
-    },
-    selectAllCheckboxes() {
-      this.selectedCheckBoxIds = [];
-      if (this.allSelected) {
-        for (const finding of this.findingList) {
-          this.selectedCheckBoxIds.push(finding.id_);
-        }
-      }
-    },
-    showAuditModal() {
-      this.$refs.auditModal.show();
-    },
-    handlePageClick(page) {
-      this.allSelected = false;
-      this.currentPage = page;
-      this.fetchPaginatedDetailedFindings();
-    },
-    handlePageSizeChange(pageSize) {
-      this.perPage = Number(pageSize);
-      this.currentPage = 1;
-      this.fetchPaginatedDetailedFindings();
-    },
-    toggleFindingDetails(row) {
-      if (row._showDetails) {
-        this.$set(row, '_showDetails', false);
-      } else {
-        this.currentItems.forEach((item) => {
-          this.$set(item, '_showDetails', false);
-        });
-        this.$nextTick(() => {
-          this.$set(row, '_showDetails', true);
-        });
-      }
-    },
-    fetchPaginatedDetailedFindings() {
-      this.showSpinner();
-      const filterObj = {};
-      filterObj.skip = this.skipRowCount;
-      filterObj.limit = this.perPage;
-      filterObj.startDate = this.selectedStartDate;
-      filterObj.endDate = this.selectedEndDate;
-      filterObj.vcsProvider = this.selectedVcsProvider;
-      filterObj.findingStatus = this.selectedStatus;
-      filterObj.project = this.selectedProject;
-      filterObj.repository = this.selectedRepository;
-      filterObj.rule = this.selectedRule;
-      filterObj.ruleTags = this.selectedRuleTags;
-      filterObj.rulePackVersions = this.selectedRulePackVersions;
+type TableItemDetailedFindingRead = DetailedFindingRead & TableItem;
 
-      FindingsService.getDetailedFindings(filterObj)
-        .then((response) => {
-          this.totalRows = 0;
-          this.findingList = [];
-          this.selectedCheckBoxIds = [];
-          this.totalRows = response.data.total;
-          this.findingList = response.data.data;
-          this.hideSpinner();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    updateAudit(status, comment) {
-      this.findingList.forEach((finding) => {
-        if (this.selectedCheckBoxIds.includes(finding.id_)) {
-          finding.status = status;
-          finding.comment = comment;
-        }
-      });
-      this.allSelected = false;
-      this.fetchPaginatedDetailedFindings();
-    },
-    handleFilterChange(filterObj) {
-      this.selectedStartDate = filterObj.startDate;
-      this.selectedEndDate = filterObj.endDate;
-      this.selectedVcsProvider = filterObj.vcsProvider;
-      this.selectedStatus = filterObj.status;
-      this.selectedProject = filterObj.project;
-      this.selectedRepository = filterObj.repository;
-      this.selectedRule = filterObj.rule;
-      this.selectedRuleTags = filterObj.ruleTags;
-      this.selectedRulePackVersions = filterObj.rulePackVersions;
-      this.currentPage = 1;
-      this.allSelected = false;
-      this.fetchDistinctProjects();
-      this.fetchDistinctRepositories();
-      this.fetchPaginatedDetailedFindings();
-    },
-    fetchDistinctProjects() {
-      RepositoryService.getDistinctProjects(this.selectedVcsProvider, this.selectedRepository)
-        .then((response) => {
-          this.projectNames = [];
-          for (const project_key of response.data) {
-            this.projectNames.push(project_key);
-          }
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchDistinctRepositories() {
-      RepositoryService.getDistinctRepositories(this.selectedVcsProvider, this.selectedProject)
-        .then((response) => {
-          this.repositoryNames = [];
-          for (const repo_name of response.data) {
-            this.repositoryNames.push(repo_name);
-          }
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage() {
-      const store = useAuthUserStore();
-      RulePackService.getRulePackVersions(10000, 0)
-        .then((response) => {
-          this.rulePackVersions = [];
-          this.selectedRulePackVersions = [];
-          response.data.data.forEach((rulePack) => {
-            this.rulePackVersions.push(rulePack);
-          });
-          //Select rule pack versions passed from rule analysis scrren
-          if (store.previousRouteState) {
-            for (const obj of store.previousRouteState.rulePackVersions) {
-              this.selectedRulePackVersions.push(obj.version);
-              this.selectedRulePackVersionsList.push(obj);
-            }
-            this.fetchRuleTags();
-            store.update_previous_route_state(null);
-          }
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchRulePackVersions() {
-      RulePackService.getRulePackVersions(10000, 0)
-        .then((response) => {
-          this.rulePackVersions = [];
-          this.selectedRulePackVersions = [];
-          this.selectedRulePackVersionsList = [];
-          for (const index of response.data.data.keys()) {
-            const data = response.data.data[index];
-            if (data.active) {
-              this.selectedRulePackVersions.push(data.version);
-              this.selectedRulePackVersionsList.push(data);
-            }
-            this.rulePackVersions.push(data);
-          }
-          this.fetchPaginatedDetailedFindings();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchRuleTags() {
-      RulePackService.getRuleTagsByRulePackVersions(this.selectedRulePackVersions)
-        .then((response) => {
-          this.selectedRuleTags = [];
-          this.ruleTagsList = response.data;
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-  },
-  filters: {
-    truncate: function (text, length, suffix) {
-      if (text.length > length) {
-        return text.substring(0, length) + suffix;
-      } else {
-        return text;
-      }
-    },
-  },
+const loadedData = ref(false);
+const auditModal = ref();
 
-  created() {
-    if (this.isRedirectedFromRuleMetricsPage()) {
-      this.fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage();
-    } else {
-      const store = useAuthUserStore();
-      store.update_previous_route_state(null);
-      this.fetchRulePackVersions();
-      this.fetchDistinctProjects();
-      this.fetchDistinctRepositories();
+const findingList = ref([] as TableItemDetailedFindingRead[]);
+const totalRows = ref(0);
+const currentPage = ref(1);
+const perPage = ref(Number(`${Config.value('defaultPageSize')}`));
+const pageSizes = ref([20, 50, 100]);
+const requestedPageNumber = ref(1);
+const rulePackVersions = ref([] as RulePackRead[]);
+const ruleTagsList = ref([] as string[]);
+const projectNames = ref([] as string[]);
+const repositoryNames = ref([] as string[]);
+const selectedStartDate = ref(undefined) as Ref<string | undefined>;
+const selectedEndDate = ref(undefined) as Ref<string | undefined>;
+const selectedVcsProvider = ref([] as VCSProviders[]);
+const selectedStatus = ref(undefined) as Ref<FindingStatus[] | undefined>;
+const selectedProject = ref(undefined) as Ref<string | undefined>;
+const selectedRepository = ref(undefined) as Ref<string | undefined>;
+const selectedRule = ref(undefined) as Ref<string[] | undefined>;
+const selectedRuleTags = ref(undefined) as Ref<string[] | undefined>;
+const selectedRulePackVersions = ref([] as string[]);
+const selectedRulePackVersionsList = ref([] as RulePackRead[]);
+const selectedCheckBoxIds = ref([] as number[]);
+const allSelected = ref(false);
+const fields = ref([
+  {
+    key: 'select',
+    label: '',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'toggle_row',
+    label: '',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'project_key',
+    sortable: true,
+    label: 'Project',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'repository_name',
+    sortable: true,
+    label: 'Repository',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'rule_name',
+    sortable: true,
+    label: 'Rule',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'file_path',
+    sortable: true,
+    label: 'File Path',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'line_number',
+    sortable: false,
+    label: 'Line',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'position',
+    sortable: true,
+    label: 'Position',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'status',
+    sortable: true,
+    label: 'Status',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+]);
+
+const hasRecords = computed(() => findingList.value.length > 0);
+const skipRowCount = computed(() => (currentPage.value - 1) * perPage.value);
+const auditButtonDisabled = computed(() => selectedCheckBoxIds.value.length <= 0);
+
+function truncate(text: string, length: number, suffix: string) {
+  if (text.length > length) {
+    return text.substring(0, length) + suffix;
+  } else {
+    return text;
+  }
+}
+
+function isRedirectedFromRuleMetricsPage() {
+  const store = useAuthUserStore();
+  const sourceRoute = store.sourceRoute;
+  const destinationRoute = store.destinationRoute;
+  return sourceRoute === '/metrics/rule-metrics' &&
+    destinationRoute === '/rule-analysis' &&
+    store.previousRouteState
+    ? true
+    : false;
+}
+
+function selectSingleCheckbox() {
+  allSelected.value = false;
+}
+
+function selectAllCheckboxes() {
+  selectedCheckBoxIds.value = [];
+  if (allSelected.value) {
+    for (const finding of findingList.value) {
+      selectedCheckBoxIds.value.push(finding.id_);
     }
-  },
-  components: {
-    AuditModal,
-    FindingPanel,
-    FindingStatusBadge,
-    Pagination,
-    RuleAnalysisFilter,
-    Spinner,
-  },
-};
+  }
+}
+
+function showAuditModal() {
+  auditModal.value.show();
+}
+
+function handlePageClick(page: number) {
+  allSelected.value = false;
+  currentPage.value = page;
+  fetchPaginatedDetailedFindings();
+}
+
+function handlePageSizeChange(pageSize: number) {
+  perPage.value = pageSize;
+  currentPage.value = 1;
+  fetchPaginatedDetailedFindings();
+}
+
+function toggleFindingDetails(row: TableItem) {
+  if (row._showDetails) {
+    row._showDetails = false;
+  } else {
+    findingList.value.forEach((_item, idx, theArray) => {
+      theArray[idx]._showDetails = false;
+    });
+    nextTick(() => {
+      row._showDetails = true;
+    });
+  }
+}
+function fetchPaginatedDetailedFindings() {
+  loadedData.value = false;
+  const filterObj: QueryFilterType = {
+    skip: skipRowCount.value,
+    limit: perPage.value,
+    startDate: selectedStartDate.value,
+    endDate: selectedEndDate.value,
+    vcsProvider: selectedVcsProvider.value,
+    findingStatus: selectedStatus.value,
+    project: selectedProject.value,
+    repository: selectedRepository.value,
+    rule: selectedRule.value,
+    ruleTags: selectedRuleTags.value,
+    rulePackVersions: selectedRulePackVersions.value,
+  };
+
+  findingList.value = [];
+
+  FindingsService.getDetailedFindings(filterObj)
+    .then((response: AxiosResponse<PaginationType<DetailedFindingRead>>) => {
+      totalRows.value = 0;
+      selectedCheckBoxIds.value = [];
+      totalRows.value = response.data.total;
+      findingList.value = response.data.data;
+      loadedData.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function updateAudit(status: FindingStatus, comment: string) {
+  findingList.value.forEach((finding: DetailedFindingRead, idx, theArray) => {
+    if (selectedCheckBoxIds.value.includes(finding.id_)) {
+      theArray[idx].status = status;
+      theArray[idx].comment = comment;
+    }
+  });
+  allSelected.value = false;
+  fetchPaginatedDetailedFindings();
+}
+
+function handleFilterChange(filterObj: RuleAnalysisFilter) {
+  selectedStartDate.value = filterObj.startDate;
+  selectedEndDate.value = filterObj.endDate;
+  selectedVcsProvider.value = filterObj.vcsProvider ?? [];
+  selectedStatus.value = filterObj.status;
+  selectedProject.value = filterObj.project;
+  selectedRepository.value = filterObj.repository;
+  selectedRule.value = filterObj.rule;
+  selectedRuleTags.value = filterObj.ruleTags;
+  selectedRulePackVersions.value = filterObj.rulePackVersions ?? [];
+  currentPage.value = 1;
+  allSelected.value = false;
+  fetchDistinctProjects();
+  fetchDistinctRepositories();
+  fetchPaginatedDetailedFindings();
+}
+
+function fetchDistinctProjects() {
+  RepositoryService.getDistinctProjects(selectedVcsProvider.value, selectedRepository.value)
+    .then((response) => {
+      projectNames.value = [];
+      for (const projectKey of response.data) {
+        projectNames.value.push(projectKey);
+      }
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function fetchDistinctRepositories() {
+  RepositoryService.getDistinctRepositories(selectedVcsProvider.value, selectedProject.value)
+    .then((response) => {
+      repositoryNames.value = [];
+      for (const repoName of response.data) {
+        repositoryNames.value.push(repoName);
+      }
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage() {
+  const store = useAuthUserStore();
+  RulePackService.getRulePackVersions(10000, 0)
+    .then((response: AxiosResponse<PaginationType<RulePackRead>>) => {
+      rulePackVersions.value = [];
+      selectedRulePackVersions.value = [];
+      response.data.data.forEach((rulePack) => {
+        rulePackVersions.value.push(rulePack);
+      });
+      //Select rule pack versions passed from rule analysis scrren
+      const previousRouteState = store.previousRouteState as PreviousRouteState;
+      if (previousRouteState && previousRouteState.rulePackVersions !== undefined) {
+        for (const obj of previousRouteState.rulePackVersions) {
+          selectedRulePackVersions.value.push(obj.version);
+          selectedRulePackVersionsList.value.push(obj);
+        }
+        fetchRuleTags();
+        store.update_previous_route_state(null);
+      }
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function fetchRulePackVersions() {
+  RulePackService.getRulePackVersions(10000, 0)
+    .then((response: AxiosResponse<PaginationType<RulePackRead>>) => {
+      rulePackVersions.value = [];
+      selectedRulePackVersions.value = [];
+      selectedRulePackVersionsList.value = [];
+      for (const index of response.data.data.keys()) {
+        const data = response.data.data[index];
+        if (data.active) {
+          selectedRulePackVersions.value.push(data.version);
+          selectedRulePackVersionsList.value.push(data);
+        }
+        rulePackVersions.value.push(data);
+      }
+      fetchPaginatedDetailedFindings();
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function fetchRuleTags() {
+  RulePackService.getRuleTagsByRulePackVersions(selectedRulePackVersions.value)
+    .then((response: AxiosResponse<string[]>) => {
+      selectedRuleTags.value = [];
+      ruleTagsList.value = response.data;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+onMounted(() => {
+  if (isRedirectedFromRuleMetricsPage()) {
+    fetchRulePackVersionsWhenRedirectedFromRuleMetricsPage();
+  } else {
+    const store = useAuthUserStore();
+    store.update_previous_route_state(null);
+    fetchRulePackVersions();
+    fetchDistinctProjects();
+    fetchDistinctRepositories();
+  }
+});
 </script>

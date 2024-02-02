@@ -3,11 +3,11 @@
     <b-button-toolbar aria-label="Toolbar with button groups and dropdown menu">
       <b-dropdown class="mx-1" right toggle-class="rounded-circle" no-caret>
         <template #button-content>
-          <font-awesome-icon icon="user"></font-awesome-icon>
+          <FontAwesomeIcon icon="user" />
         </template>
 
         <b-dropdown-item disabled>
-          <table>
+          <table aria-hidden="true">
             <tr>
               <td class="user-avatar-badge">
                 <b-avatar
@@ -26,8 +26,8 @@
 
         <div>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item @click="logout">
-            <font-awesome-icon class="sign-out-icon" icon="sign-out-alt"></font-awesome-icon>
+          <b-dropdown-item v-on:click="logout">
+            <FontAwesomeIcon class="sign-out-icon" icon="sign-out-alt" />
             <span class="sign-out-text">Logout</span></b-dropdown-item
           >
         </div>
@@ -36,42 +36,38 @@
   </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import AuthService from '@/services/auth-service';
 import Config from '@/configuration/config';
-import { useAuthUserStore } from '@/store/index.js';
+import { useAuthUserStore } from '@/store/index';
+import { computed } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-export default {
-  name: 'TopBarMenu',
-  data() {
-    return {};
-  },
-  computed: {
-    displayLoggedInUser() {
-      const authenticationRequired = `${Config.value('authenticationRequired')}`;
-      return authenticationRequired === 'true' ? true : false;
-    },
-    avatarText() {
-      const store = useAuthUserStore();
-      return store.firstName && store.lastName
-        ? `${store.firstName.charAt(0)}${store.lastName.charAt(0)}`
-        : null;
-    },
-    userFullName() {
-      const store = useAuthUserStore();
-      return store.firstName && store.lastName ? `${store.firstName} ${store.lastName}` : null;
-    },
-    userEmail() {
-      const store = useAuthUserStore();
-      return store.email ? `${store.email}` : null;
-    },
-  },
-  methods: {
-    logout() {
-      AuthService.doLogOut();
-    },
-  },
-};
+const displayLoggedInUser = computed(() => {
+  const authenticationRequired = `${Config.value('authenticationRequired')}`;
+  return authenticationRequired === 'true' ? true : false;
+});
+
+const avatarText = computed(() => {
+  const store = useAuthUserStore();
+  return store.firstName && store.lastName
+    ? `${store.firstName.charAt(0)}${store.lastName.charAt(0)}`
+    : undefined;
+});
+
+const userFullName = computed(() => {
+  const store = useAuthUserStore();
+  return store.firstName && store.lastName ? `${store.firstName} ${store.lastName}` : null;
+});
+
+const userEmail = computed(() => {
+  const store = useAuthUserStore();
+  return store.email ? `${store.email}` : null;
+});
+
+function logout() {
+  AuthService.doLogOut();
+}
 </script>
 <style scoped>
 .topbar-menu-group {

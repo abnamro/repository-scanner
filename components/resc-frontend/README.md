@@ -69,7 +69,7 @@ docker build -t rescabnamro/resc-frontend:latest .
 - Run the RESC frontend by using the following command: 
 
 ```bash
-docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend rescabnamro/resc-frontend:latest
+docker run -p 8080:8080 -e VITE_AUTHENTICATION_REQUIRED="false" -e VITE_RESC_WEB_SERVICE_URL="http://localhost:30800/resc"  --name resc-frontend rescabnamro/resc-frontend:latest
 ```
 
  Access the application using this url: http://localhost:8080/
@@ -77,9 +77,9 @@ docker run -p 8080:8080 -e VUE_APP_AUTHENTICATION_REQUIRED="false" -e VUE_APP_RE
 ### Enable or disable Single Sign-On for local run
 To enable/disable single sign-on (SSO) set the following values in .env.development file.
     
-Enable SSO:```VUE_APP_AUTHENTICATION_REQUIRED=true```
+Enable SSO:```VITE_AUTHENTICATION_REQUIRED=true```
     
-Disable SSO:```VUE_APP_AUTHENTICATION_REQUIRED=false```
+Disable SSO:```VITE_AUTHENTICATION_REQUIRED=false```
     
 Note: Ensure to restart the server by running npm run serve for the change to take effect.    
     

@@ -52,121 +52,128 @@
       <template #modal-footer>
         <div class="w-100">
           <b-button
-            variant="prime"
+            variant="primary"
             class="float-right"
-            @click="handleOk"
+            v-on:click="handleOk"
             :disabled="!isStatusValid || !isCommentValid"
           >
             APPLY
           </b-button>
-          <b-button variant="second" class="float-right mr-3" @click="hide"> CLOSE </b-button>
+          <b-button variant="secondary" class="float-right mr-3" v-on:click="hide">
+            CLOSE
+          </b-button>
         </div>
       </template>
     </b-modal>
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
-import CommonUtils from '@/utils/common-utils';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
+import CommonUtils, { type StatusOptionType } from '@/utils/common-utils';
 import FindingsService from '@/services/findings-service';
 import ScanFindingsService from '@/services/scan-findings-service';
+import { computed, ref } from 'vue';
+import type { FindingStatus } from '@/services/shema-to-types';
+import type { BvTriggerableEvent } from 'bootstrap-vue-next';
+import { nextTick } from 'vue';
 
-export default {
-  name: 'AuditModal',
-  props: {
-    selectedCheckBoxIds: {
-      type: Array,
-      required: true,
-    },
-  },
-  emits: ['update-audit'],
-  data() {
-    return {
-      comment: '',
-      status: '',
-      commentState: null,
-      statusState: null,
-      statusList: [],
-    };
-  },
-  computed: {
-    getModalTitle() {
-      return `AUDIT FINDINGS (${this.selectedCheckBoxIds.length})`;
-    },
-    isStatusValid() {
-      return this.status && this.status !== null;
-    },
-    isCommentValid() {
-      return this.comment && this.comment.length > 255 ? false : true;
-    },
-  },
-  methods: {
-    fetchStatuses() {
-      ScanFindingsService.getStatusList()
-        .then((response) => {
-          this.statusList = CommonUtils.parseStatusOptions(response.data);
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    show() {
-      this.$refs.audit_modal.show();
-    },
-    hide() {
-      this.$refs.audit_modal.hide();
-    },
-    checkFormValidity() {
-      let valid = false;
-      if (this.isStatusValid && this.isCommentValid) {
-        valid = true;
-        this.statusState = true;
-        this.commentState = true;
-      } else if (!this.isStatusValid && this.isCommentValid) {
-        this.statusState = false;
-        this.commentState = true;
-      } else if (this.isStatusValid && !this.isCommentValid) {
-        this.statusState = true;
-        this.commentState = false;
-      } else {
-        this.statusState = false;
-        this.commentState = false;
-      }
-      return valid;
-    },
-    resetModal() {
-      this.status = '';
-      this.comment = '';
-      this.statusState = null;
-      this.commentState = null;
-    },
-    handleOk(bvModalEvt) {
-      bvModalEvt.preventDefault();
-      this.handleSubmit();
-    },
-    handleSubmit() {
-      // Don't close the modal if form is invalid
-      if (!this.checkFormValidity()) {
-        return;
-      }
+const audit_modal = ref();
 
-      FindingsService.auditFindings(this.selectedCheckBoxIds, this.status, this.comment)
-        .then(() => {
-          this.$emit('update-audit', this.status, this.comment);
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-
-      // Hide the modal manually
-      this.$nextTick(() => {
-        this.$refs['audit_modal'].hide();
-      });
-    },
-  },
-  created() {
-    this.fetchStatuses();
-  },
+type Props = {
+  selectedCheckBoxIds: number[];
 };
+const props = defineProps<Props>();
+
+const emit = defineEmits(['update-audit']);
+
+const comment = ref('');
+const status = ref('NOT_ANALYZED' as FindingStatus | '');
+const commentState = ref(true);
+const statusState = ref(true);
+const statusList = ref([] as StatusOptionType[]);
+
+const getModalTitle = computed(() => {
+  return `AUDIT ${props.selectedCheckBoxIds.length} FINDINGS`;
+});
+const isStatusValid = computed(() => {
+  return status.value !== '';
+});
+const isCommentValid = computed(() => {
+  return comment.value.length > 255 ? false : true;
+});
+
+function show() {
+  audit_modal.value.show();
+}
+
+function hide() {
+  audit_modal.value.hide();
+}
+
+// ! TODO is this really necessary?
+function checkFormValidity() {
+  let valid = false;
+  if (isStatusValid.value && isCommentValid.value) {
+    valid = true;
+    statusState.value = true;
+    commentState.value = true;
+  } else if (!isStatusValid.value && isCommentValid.value) {
+    statusState.value = false;
+    commentState.value = true;
+  } else if (isStatusValid.value && !isCommentValid.value) {
+    statusState.value = true;
+    commentState.value = false;
+  } else {
+    statusState.value = false;
+    commentState.value = false;
+  }
+  return valid;
+}
+
+function resetModal() {
+  status.value = 'NOT_ANALYZED';
+  comment.value = '';
+  statusState.value = true;
+  commentState.value = true;
+}
+
+function handleOk(bvModalEvt: BvTriggerableEvent | MouseEvent) {
+  bvModalEvt.preventDefault();
+  handleSubmit();
+}
+
+function handleSubmit() {
+  // Don't close the modal if form is invalid
+  if (!checkFormValidity()) {
+    return;
+  }
+
+  FindingsService.auditFindings(
+    props.selectedCheckBoxIds,
+    status.value as FindingStatus,
+    comment.value
+  )
+    .then(() => {
+      emit('update-audit', status, comment);
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+
+  // Hide the modal manually
+  nextTick(() => {
+    audit_modal.value.hide();
+  });
+}
+
+ScanFindingsService.getStatusList()
+  .then((response) => {
+    statusList.value = CommonUtils.parseStatusOptions(response.data as FindingStatus[]);
+  })
+  .catch((error) => {
+    AxiosConfig.handleError(error);
+  });
+
+defineExpose({ show });
 </script>

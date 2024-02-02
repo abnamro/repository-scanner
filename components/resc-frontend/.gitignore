@@ -3,6 +3,7 @@ node_modules
 /dist
 .idea/
 
+package-lock.json
 
 # local env files
 .env.local
@@ -15,7 +16,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Coverage reports
-tests/unit/reports/**
+tests/reports/**
 
 # Editor directories and files
 .idea
@@ -25,3 +26,9 @@ tests/unit/reports/**
 *.njsproj
 *.sln
 *.sw?
+
+.old
+
+# Auto generated
+components.d.ts
+sonar-report.xml

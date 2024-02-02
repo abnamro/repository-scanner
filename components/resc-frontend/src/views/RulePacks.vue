@@ -1,20 +1,19 @@
 <template>
   <div>
     <!-- Page Title -->
-    <div class="col-md-2 pt-2 text-left page-title">
+    <div class="col-md-2 pt-2 text-start page-title">
       <h3><small class="text-nowrap">RULEPACKS</small></h3>
     </div>
 
-    <!-- Spinner -->
-    <Spinner :active="spinnerActive" />
+    <SpinnerVue v-if="!loadedData" />
 
     <div class="ml-3">
       <!-- Import button to upload rulepack -->
       <b-button
         class="float-left mt-2 mb-2"
-        variant="prime"
+        variant="primary"
         size="sm"
-        @click="showRulePackUploadModal()"
+        v-on:click="showRulePackUploadModal()"
         >IMPORT</b-button
       >
       <!-- RulePackUpload Modal -->
@@ -25,18 +24,19 @@
     </div>
 
     <!--Rule Packs Table -->
-    <div v-if="!hasRecords" class="text-center cursor-default">
+    <div v-if="!hasRecords && loadedData" class="text-center cursor-default">
       <br />
       <br />No Record Found...
     </div>
 
     <div class="p-3" v-if="hasRecords">
+      <!-- sticky-header="85vh" -->
       <b-table
         id="rule-packs-table"
-        sticky-header="85vh"
         :items="rulePackList"
+        :sticky-header="true"
         :fields="fields"
-        :current-page="currentPage"
+        :current-page="1"
         :per-page="0"
         primary-key="version"
         v-model="currentItems"
@@ -46,25 +46,29 @@
       >
         <!-- Version Column -->
         <template #cell(version)="data">
-          {{ data.item.version }}
+          {{ (data.item as RulePackRead).version }}
         </template>
 
         <!-- Active Column -->
         <template #cell(active)="data">
-          <font-awesome-icon
-            v-if="data.item.active"
+          <FontAwesomeIcon
+            v-if="(data.item as RulePackRead).active"
             icon="check-circle"
             :style="{ color: 'green' }"
           />
-          <font-awesome-icon v-if="!data.item.active" icon="check-circle" class="disabled-button" />
+          <FontAwesomeIcon
+            v-if="!(data.item as RulePackRead).active"
+            icon="check-circle"
+            class="disabled-button"
+          />
         </template>
 
         <!-- Download Column -->
         <template #cell(download)="data">
-          <font-awesome-icon
+          <FontAwesomeIcon
             icon="download"
             class="download-button"
-            @click="downloadRulePack(data.item.version)"
+            v-on:click="downloadRulePack((data.item as RulePackRead).version)"
           />
         </template>
       </b-table>
@@ -83,127 +87,122 @@
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
 import Config from '@/configuration/config';
 import DateUtils from '@/utils/date-utils';
-import Spinner from '@/components/Common/Spinner.vue';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
 import RulePackUploadModal from '@/components/RulePack/RulePackUploadModal.vue';
-import Pagination from '@/components/Common/Pagination.vue';
+import Pagination from '@/components/Common/PaginationVue.vue';
 import RulePackService from '@/services/rule-pack-service';
-import spinnerMixin from '@/mixins/spinner.js';
+import { computed, ref } from 'vue';
+import type { AxiosResponse } from 'axios';
+import type { PaginationType, RulePackRead } from '@/services/shema-to-types';
+import type { TableItem } from 'bootstrap-vue-next';
+import type { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-export default {
-  name: 'RulePacks',
-  mixins: [spinnerMixin],
-  data() {
-    return {
-      rulePackList: [],
-      currentItems: [],
-      totalRows: 0,
-      currentPage: 1,
-      perPage: Number(`${Config.value('defaultPageSize')}`),
-      pageSizes: [20, 50, 100],
-      requestedPageNumber: 1,
-      fields: [
-        {
-          key: 'version',
-          sortable: true,
-          label: 'Version',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'active',
-          sortable: true,
-          label: 'Active',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'created',
-          sortable: true,
-          label: 'Created',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-          formatter: 'formatDate',
-        },
-        {
-          key: 'download',
-          sortable: false,
-          label: 'Download',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-      ],
-    };
-  },
-  computed: {
-    hasRecords() {
-      return this.rulePackList.length > 0;
-    },
-  },
-  methods: {
-    handlePageClick(page) {
-      this.currentPage = page;
-      this.fetchPaginatedRulePacks();
-    },
-    handlePageSizeChange(pageSize) {
-      this.perPage = Number(pageSize);
-      this.currentPage = 1;
-      this.fetchPaginatedRulePacks();
-    },
-    showRulePackUploadModal() {
-      this.$refs.rulePackUploadModal.show();
-    },
-    onRulePackUploadSuccess() {
-      this.fetchPaginatedRulePacks();
-    },
-    fetchPaginatedRulePacks() {
-      this.showSpinner();
-      RulePackService.getRulePackVersions()
-        .then((response) => {
-          this.rulePackList = response.data.data;
-          this.totalRows = response.data.total;
-          this.hideSpinner();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    forceFileDownload(response, title) {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', title);
-      document.body.appendChild(link);
-      link.click();
-    },
-    downloadRulePack(rulePackVersion) {
-      this.showSpinner();
-      const title = `RESC-SECRETS-RULE_v${rulePackVersion}.TOML`;
-      RulePackService.downloadRulePack(rulePackVersion)
-        .then((response) => {
-          this.forceFileDownload(response, title);
-          this.hideSpinner();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    formatDate(timestamp) {
-      const date = DateUtils.formatDate(timestamp);
-      return timestamp ? date : 'Not Available';
-    },
-  },
+const loadedData = ref(false);
+const rulePackUploadModal = ref();
 
-  created() {
-    this.fetchPaginatedRulePacks();
+const rulePackList = ref([] as RulePackRead[]);
+const currentItems = ref([] as TableItem[]);
+const totalRows = ref(0);
+const currentPage = ref(1);
+const perPage = ref(Number(`${Config.value('defaultPageSize')}`));
+const pageSizes = ref([20, 50, 100]);
+const requestedPageNumber = ref(1);
+const fields = ref([
+  {
+    key: 'version',
+    sortable: true,
+    label: 'Version',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
   },
-  components: {
-    Pagination,
-    RulePackUploadModal,
-    Spinner,
+  {
+    key: 'active',
+    sortable: true,
+    label: 'Active',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
   },
-};
+  {
+    key: 'created',
+    sortable: true,
+    label: 'Created',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+    formatter: 'formatDate',
+  },
+  {
+    key: 'download',
+    sortable: false,
+    label: 'Download',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+]);
+
+const hasRecords = computed(() => rulePackList.value.length > 0);
+
+function handlePageClick(page: number) {
+  currentPage.value = page;
+  fetchPaginatedRulePacks();
+}
+
+function handlePageSizeChange(pageSize: number) {
+  perPage.value = pageSize;
+  currentPage.value = 1;
+  fetchPaginatedRulePacks();
+}
+function showRulePackUploadModal() {
+  rulePackUploadModal.value.show();
+}
+function onRulePackUploadSuccess() {
+  fetchPaginatedRulePacks();
+}
+
+function fetchPaginatedRulePacks() {
+  loadedData.value = false;
+  RulePackService.getRulePackVersions()
+    .then((response: AxiosResponse<PaginationType<RulePackRead>>) => {
+      rulePackList.value = response.data.data;
+      totalRows.value = response.data.total;
+      loadedData.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function forceFileDownload(response: AxiosResponse<unknown>, title: string) {
+  const url = window.URL.createObjectURL(new Blob([response.data] as BlobPart[]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', title);
+  document.body.appendChild(link);
+  link.click();
+}
+
+function downloadRulePack(rulePackVersion: string) {
+  loadedData.value = false;
+  const title = `RESC-SECRETS-RULE_v${rulePackVersion}.TOML`;
+  RulePackService.downloadRulePack(rulePackVersion)
+    .then((response) => {
+      forceFileDownload(response, title);
+      loadedData.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+// Used in code above
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function formatDate(timestamp: number) {
+  const date = DateUtils.formatDate(timestamp);
+  return timestamp ? date : 'Not Available';
+}
+
+fetchPaginatedRulePacks();
 </script>

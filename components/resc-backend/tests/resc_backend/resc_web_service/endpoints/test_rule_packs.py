@@ -156,8 +156,8 @@ class TestRules(unittest.TestCase):
             assert response.status_code == 200, response.text
             data = response.json()
             assert len(data["data"]) == 2
-            self.assert_rule_packs(data["data"][0], self.db_rule_packs[1])
-            self.assert_rule_packs(data["data"][1], self.db_rule_packs[0])
+            self.assert_rule_packs(data["data"][0], self.db_rule_packs[0])
+            self.assert_rule_packs(data["data"][1], self.db_rule_packs[1])
             assert data["total"] == 2
             assert data["limit"] == 5
             assert data["skip"] == 0
@@ -244,8 +244,8 @@ class TestRules(unittest.TestCase):
             assert response.status_code == 200, response.text
             data = response.json()
             assert len(data["data"]) == 2
-            self.assert_rule_packs(data["data"][0], self.db_rule_packs[1])
-            self.assert_rule_packs(data["data"][1], self.db_rule_packs[0])
+            self.assert_rule_packs(data["data"][0], self.db_rule_packs[0])
+            self.assert_rule_packs(data["data"][1], self.db_rule_packs[1])
             assert data["data"][0]["active"] is False
             assert data["data"][1]["active"] is False
             assert data["total"] == 2

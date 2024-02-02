@@ -1,41 +1,41 @@
 <template>
-  <div>
+  <div class="ms-4">
     <!-- Page Title -->
-    <div class="col-md-2 pt-2 text-left page-title">
+    <div class="col-md-2 pt-2 text-start page-title">
       <h3><small class="text-nowrap">RULE METRICS</small></h3>
     </div>
 
-    <!-- Spinner -->
-    <Spinner :active="spinnerActive" />
+    <SpinnerVue v-if="!loadedData" />
 
     <div class="row pl-3 mt-4">
       <div class="col-md-4">
         <RulePackFilter
-          :selectedRulePackVersionsList="selectedVersionsList"
-          :rulePackVersions="allRulePackVersions"
+          :rulePackPreSelected="selectedVersionsList"
+          :rulePackOptions="allRulePackVersions"
           @on-rule-pack-version-change="onRulePackVersionChange"
         />
       </div>
       <div class="col-md-4">
         <RuleTagsFilter
           ref="ruleTagsFilterChildComponent"
-          :options="ruleTagsList"
-          :requestedRuleTagsFilterValue="selectedRuleTags"
+          :ruleTagsOptions="ruleTagsList"
+          :ruleTagsSelected="selectedRuleTags"
           @on-rule-tags-change="onRuleTagsFilterChange"
         />
       </div>
     </div>
 
     <!--Rule Metrics Table -->
-    <div v-if="!hasRecords" class="text-center cursor-default">
+    <div v-if="!hasRecords && loadedData" class="text-center cursor-default">
       <br />
       <br />No Record Found...
     </div>
 
-    <div class="p-3" v-if="hasRecords">
+    <div class="pt-3" v-if="hasRecords">
+      <!-- sticky-header="85vh" -->
       <b-table
         id="rule-metrics-table"
-        sticky-header="85vh"
+        :sticky-header="true"
         :no-border-collapse="true"
         :items="ruleList"
         :fields="fields"
@@ -52,7 +52,10 @@
 
         <!-- True Positive Count Column -->
         <template #cell(true_positive)="data">
-          <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
+          <span
+            v-for="(item, i) in (data.item as RuleFindingCountModel).finding_statuses_count"
+            :key="i"
+          >
             <span v-if="item.status == 'TRUE_POSITIVE'">
               {{ item.count }}
             </span>
@@ -62,8 +65,8 @@
         <!-- False Positive Count Column -->
         <template #cell(false_positive)="data">
           <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
-            <span v-if="item.status == 'FALSE_POSITIVE'">
-              {{ item.count }}
+            <span v-if="(item as StatusCount).status == 'FALSE_POSITIVE'">
+              {{ (item as StatusCount).count }}
             </span>
           </span>
         </template>
@@ -71,8 +74,8 @@
         <!-- Clarification Required Count Column -->
         <template #cell(clarification_required)="data">
           <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
-            <span v-if="item.status == 'CLARIFICATION_REQUIRED'">
-              {{ item.count }}
+            <span v-if="(item as StatusCount).status == 'CLARIFICATION_REQUIRED'">
+              {{ (item as StatusCount).count }}
             </span>
           </span>
         </template>
@@ -80,8 +83,8 @@
         <!-- Under Review Count Column -->
         <template #cell(under_review)="data">
           <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
-            <span v-if="item.status == 'UNDER_REVIEW'">
-              {{ item.count }}
+            <span v-if="(item as StatusCount).status == 'UNDER_REVIEW'">
+              {{ (item as StatusCount).count }}
             </span>
           </span>
         </template>
@@ -89,36 +92,26 @@
         <!-- Under Review Count Column -->
         <template #cell(not_analyzed)="data">
           <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
-            <span v-if="item.status == 'NOT_ANALYZED'">
-              {{ item.count }}
+            <span v-if="(item as StatusCount).status == 'NOT_ANALYZED'">
+              {{ (item as StatusCount).count }}
             </span>
           </span>
         </template>
 
         <!-- Health Bar Column -->
         <template #cell(health)="data">
-          <span v-for="(item, i) in data.item.finding_statuses_count" :key="i">
-            <span v-if="item.status == 'TRUE_POSITIVE'" :set="(tpCount = item.count)"></span>
-            <span v-if="item.status == 'FALSE_POSITIVE'" :set="(fpCount = item.count)"></span>
-            <span
-              v-if="item.status == 'CLARIFICATION_REQUIRED'"
-              :set="(crCount = item.count)"
-            ></span>
-            <span v-if="item.status == 'UNDER_REVIEW'" :set="(urCount = item.count)"></span>
-            <span v-if="item.status == 'NOT_ANALYZED'" :set="(naCount = item.count)"></span>
-          </span>
           <HealthBar
-            :truePositive="tpCount"
-            :falsePositive="fpCount"
-            :notAnalyzed="naCount"
-            :underReview="urCount"
-            :clarificationRequired="crCount"
-            :totalCount="data.item.finding_count"
+            :truePositive="(data.item as RuleFindingCountModelAugmented).tpCount"
+            :falsePositive="(data.item as RuleFindingCountModelAugmented).fpCount"
+            :notAnalyzed="(data.item as RuleFindingCountModelAugmented).naCount"
+            :underReview="(data.item as RuleFindingCountModelAugmented).urCount"
+            :clarificationRequired="(data.item as RuleFindingCountModelAugmented).crCount"
+            :totalCount="(data.item as RuleFindingCountModelAugmented).finding_count ?? 0"
           />
         </template>
 
         <!-- Total Calculation Row-->
-        <template slot="bottom-row">
+        <tr name="bottomRow">
           <td :class="ruleTotalRowClass">Sum</td>
           <td :class="ruleTotalRowClass">Avg:{{ avgTruePosiitveRate }}%</td>
           <td :class="ruleTotalRowClass">{{ truePositiveTotalCount }}</td>
@@ -128,277 +121,316 @@
           <td :class="ruleTotalRowClass">{{ notAnalyzedTotalCount }}</td>
           <td :class="ruleTotalRowClass">{{ totalFindingsCountForAllRules }}</td>
           <td :class="ruleTotalRowClass"></td>
-        </template>
+        </tr>
       </b-table>
     </div>
   </div>
 </template>
 
-<script>
-import AxiosConfig from '@/configuration/axios-config.js';
+<script setup lang="ts">
+import AxiosConfig from '@/configuration/axios-config';
 import Config from '@/configuration/config';
 import HealthBar from '@/components/Common/HealthBar.vue';
 import RulePackFilter from '@/components/Filters/RulePackFilter.vue';
 import RulePackService from '@/services/rule-pack-service';
 import RuleService from '@/services/rule-service';
 import RuleTagsFilter from '@/components/Filters/RuleTagsFilter.vue';
-import Spinner from '@/components/Common/Spinner.vue';
-import spinnerMixin from '@/mixins/spinner.js';
-import { useAuthUserStore } from '@/store/index.js';
+import { useAuthUserStore, type PreviousRouteState } from '@/store/index';
+import SpinnerVue from '@/components/Common/SpinnerVue.vue';
+import { computed, ref } from 'vue';
+import type {
+  FindingStatus,
+  PaginationType,
+  RuleFindingCountModel,
+  RulePackRead,
+  StatusCount,
+  Swr,
+} from '@/services/shema-to-types';
+import { useRouter } from 'vue-router';
+import type { AxiosResponse } from 'axios';
+import type { TableItem } from 'bootstrap-vue-next';
 
-export default {
-  name: 'RuleMetrics',
-  mixins: [spinnerMixin],
-  props: {
-    selectedRulePackVersionsList: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    rulePackVersions: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      ruleList: [],
-      ruleTagsList: [],
-      truePositiveTotalCount: 0,
-      falsePositiveTotalCount: 0,
-      clarificationRequiredTotalCount: 0,
-      underReviewTotalCount: 0,
-      notAnalyzedTotalCount: 0,
-      totalFindingsCountForAllRules: 0,
-      truePositiveRateList: [],
-      avgTruePosiitveRate: 0,
-      allRulePackVersions: [],
-      selectedRulePackVersions: [],
-      selectedRuleTags: [],
-      selectedVersionsList: [],
-      selectedVersions: [],
-      ruleTotalRowClass: ['text-left', 'font-weight-bold'],
-      fields: [
-        {
-          key: 'rule_name',
-          sortable: true,
-          label: 'Rule',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'true_positive_rate',
-          sortable: false,
-          label: 'True Positive Rate',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'true_positive',
-          sortable: false,
-          label: 'True Positive',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'false_positive',
-          sortable: false,
-          label: 'False Positive',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'clarification_required',
-          sortable: false,
-          label: 'Clarification Required',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'under_review',
-          sortable: false,
-          label: 'Under Review',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'not_analyzed',
-          sortable: false,
-          label: 'Not Analyzed',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-        },
-        {
-          key: 'finding_count',
-          sortable: true,
-          label: 'Total Count',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px' },
-          tdClass: 'font-weight-bold',
-        },
-        {
-          key: 'health',
-          label: 'Findings(%)',
-          class: 'text-left position-sticky',
-          thStyle: { borderTop: '0px', width: '25%' },
-        },
-      ],
-    };
-  },
-  computed: {
-    hasRecords() {
-      return this.ruleList.length > 0;
-    },
-  },
-  methods: {
-    onRuleTagsFilterChange(ruleTags) {
-      this.selectedRuleTags = ruleTags;
-      this.fetchRulesWithFindingStatusCount();
-    },
-    fetchRuleTags() {
-      RulePackService.getRuleTagsByRulePackVersions(this.selectedVersions)
-        .then((response) => {
-          this.selectedRuleTags = [];
-          this.ruleTagsList = response.data;
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchRulePackVersions() {
-      RulePackService.getRulePackVersions(10000, 0)
-        .then((response) => {
-          this.selectedVersions = [];
-          this.allRulePackVersions = [];
-          this.selectedRulePackVersions = [];
-          for (const index of response.data.data.keys()) {
-            const data = response.data.data[index];
-            if (data.active) {
-              this.selectedVersions.push(data.version);
-              this.selectedRulePackVersions.push(data.version);
-              this.selectedVersionsList.push(data);
-            }
-            this.allRulePackVersions.push(data);
-          }
-          this.fetchRuleTags();
-          this.fetchRulesWithFindingStatusCount();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    fetchRulesWithFindingStatusCount() {
-      this.showSpinner();
-      RuleService.getRulesWithFindingStatusCount(this.selectedVersions, this.selectedRuleTags)
-        .then((response) => {
-          this.ruleList = response.data;
-          this.getTotalCountRowValuesForRuleMetricsTable();
-          this.hideSpinner();
-        })
-        .catch((error) => {
-          AxiosConfig.handleError(error);
-        });
-    },
-    calculateTruePositiveRate(data) {
-      let true_positive_count = 0;
-      let false_positive_count = 0;
-      data.item.finding_statuses_count.forEach((finding_status) => {
-        if (finding_status.status === `${Config.value('truePostiveStatusVal')}`) {
-          true_positive_count = finding_status.count;
-        }
-        if (finding_status.status === `${Config.value('falsePositiveStatusVal')}`) {
-          false_positive_count = finding_status.count;
-        }
-      });
-      let true_positive_rate = Math.round(
-        (true_positive_count / (true_positive_count + false_positive_count)) * 100
-      );
-      true_positive_rate = true_positive_rate || 0;
-      return `${true_positive_rate}%`;
-    },
-    getTotalCountRowValuesForRuleMetricsTable() {
-      this.totalFindingsCountForAllRules = 0;
-      this.truePositiveTotalCount = 0;
-      this.falsePositiveTotalCount = 0;
-      this.clarificationRequiredTotalCount = 0;
-      this.underReviewTotalCount = 0;
-      this.notAnalyzedTotalCount = 0;
-      this.notAnalyzedTotalCount = 0;
-      this.truePositiveRateList = [];
-      this.ruleList.forEach((rule) => {
-        let tpCount = 0;
-        let fpCount = 0;
-        let true_positive_rate = 0;
-        this.totalFindingsCountForAllRules += rule.finding_count;
-        rule.finding_statuses_count.forEach((finding_status) => {
-          if (finding_status.status === `${Config.value('truePostiveStatusVal')}`) {
-            this.truePositiveTotalCount += finding_status.count;
-            tpCount = finding_status.count;
-          }
-          if (finding_status.status === `${Config.value('falsePositiveStatusVal')}`) {
-            this.falsePositiveTotalCount += finding_status.count;
-            fpCount = finding_status.count;
-          }
-          if (finding_status.status === `${Config.value('clarificationRequiredStatusVal')}`) {
-            this.clarificationRequiredTotalCount += finding_status.count;
-          }
-          if (finding_status.status === `${Config.value('underReviewStatusVal')}`) {
-            this.underReviewTotalCount += finding_status.count;
-          }
-          if (finding_status.status === `${Config.value('notAnalyzedStatusVal')}`) {
-            this.notAnalyzedTotalCount += finding_status.count;
-          }
-        });
+const loadedData = ref(false);
 
-        true_positive_rate = Math.round((tpCount / (tpCount + fpCount)) * 100);
-        true_positive_rate = true_positive_rate || 0;
-        this.truePositiveRateList.push(true_positive_rate);
-      });
-
-      this.calculateAverageTruePositiveRatePercentage();
-    },
-    calculateAverageTruePositiveRatePercentage() {
-      if (this.ruleList.length > 0 && this.truePositiveRateList.length > 0) {
-        const sum_of_true_positve_rates = this.truePositiveRateList.reduce((a, b) => a + b, 0);
-        this.avgTruePosiitveRate = `${Math.round(
-          sum_of_true_positve_rates / this.ruleList.length
-        )}`;
-      }
-    },
-    goToRuleAnalysisPage(record) {
-      const store = useAuthUserStore();
-      store.update_previous_route_state({
-        ruleName: record.rule_name,
-        rulePackVersions: this.selectedVersionsList,
-        ruleTags: this.selectedRuleTags,
-      });
-      this.$router.push({ name: 'RuleAnalysis' });
-    },
-    onRulePackVersionChange(rulePackVersions) {
-      this.selectedRulePackVersions = rulePackVersions;
-      this.selectedVersions = [];
-      this.selectedVersionsList = [];
-      if (rulePackVersions) {
-        for (const obj of rulePackVersions) {
-          this.selectedVersionsList.push(obj);
-          this.selectedVersions.push(obj.version);
-        }
-        // Referesh rule tags dropdown options and reset selected value
-        this.selectedRuleTags = null;
-        this.fetchRuleTags(this.selectedVersions);
-      }
-      this.fetchRulesWithFindingStatusCount();
-    },
-  },
-  created() {
-    this.fetchRulePackVersions();
-  },
-  components: {
-    HealthBar,
-    RulePackFilter,
-    RuleTagsFilter,
-    Spinner,
-  },
+// Is this really used???
+type Props = {
+  selectedRulePackVersionsList?: string[];
+  rulePackVersions?: RulePackRead[];
 };
+
+const props = withDefaults(defineProps<Props>(), {
+  selectedRulePackVersionsList: () => [],
+  rulePackVersions: () => [],
+});
+
+type Stats = {
+  tpCount: number;
+  fpCount: number;
+  naCount: number;
+  urCount: number;
+  crCount: number;
+};
+
+function getTruePositiveRate(stat: Stats): number {
+  let truePositiveRate = Math.round((stat.tpCount / (stat.tpCount + stat.fpCount)) * 100);
+  return truePositiveRate || 0;
+}
+
+type RuleFindingCountModelAugmented = RuleFindingCountModel & Stats;
+
+const router = useRouter();
+const ruleList = ref([] as RuleFindingCountModelAugmented[]);
+const ruleTagsList = ref([] as string[]);
+const truePositiveTotalCount = ref(0);
+const falsePositiveTotalCount = ref(0);
+const clarificationRequiredTotalCount = ref(0);
+const underReviewTotalCount = ref(0);
+const notAnalyzedTotalCount = ref(0);
+const totalFindingsCountForAllRules = ref(0);
+const truePositiveRateList = ref([] as number[]);
+const avgTruePosiitveRate = ref('0');
+const allRulePackVersions = ref([] as RulePackRead[]);
+const selectedRulePackVersions = ref([] as string[]);
+const selectedRuleTags = ref([] as string[]);
+const selectedVersionsList = ref([] as RulePackRead[]);
+const selectedVersions = ref([] as string[]);
+const ruleTotalRowClass = ref(['text-start', 'fw-bold']);
+
+type FieldType = {
+  key: string;
+  sortable?: boolean;
+  label: string;
+  class: string;
+  thStyle: { borderTop: string; width?: string };
+  tdClass?: string;
+};
+
+const fields = ref([
+  {
+    key: 'rule_name',
+    sortable: true,
+    label: 'Rule',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'true_positive_rate',
+    sortable: false,
+    label: 'True Positive Rate',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'true_positive',
+    sortable: false,
+    label: 'True Positive',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'false_positive',
+    sortable: false,
+    label: 'False Positive',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'clarification_required',
+    sortable: false,
+    label: 'Clarification Required',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'under_review',
+    sortable: false,
+    label: 'Under Review',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'not_analyzed',
+    sortable: false,
+    label: 'Not Analyzed',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+  },
+  {
+    key: 'finding_count',
+    sortable: true,
+    label: 'Total Count',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px' },
+    tdClass: 'fw-bold',
+  },
+  {
+    key: 'health',
+    label: 'Findings(%)',
+    class: 'text-start position-sticky',
+    thStyle: { borderTop: '0px', width: '25%' },
+  },
+] as FieldType[]);
+
+const hasRecords = computed(() => ruleList.value.length > 0);
+
+function onRuleTagsFilterChange(ruleTags: string[]) {
+  selectedRuleTags.value = ruleTags;
+  fetchRulesWithFindingStatusCount();
+}
+
+function fetchRuleTags() {
+  RulePackService.getRuleTagsByRulePackVersions(selectedVersions.value)
+    .then((response) => {
+      selectedRuleTags.value = [];
+      ruleTagsList.value = response.data;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function fetchRulesWithFindingStatusCount() {
+  loadedData.value = false;
+  RuleService.getRulesWithFindingStatusCount(selectedVersions.value, selectedRuleTags.value)
+    .then((response: AxiosResponse<RuleFindingCountModel[]>) => {
+      getTotalCountRowValuesForRuleMetricsTable(response.data);
+      loadedData.value = true;
+    })
+    .catch((error) => {
+      AxiosConfig.handleError(error);
+    });
+}
+
+function calculateTruePositiveRate(data: any): string {
+  let truePositiveCount = 0;
+  let falsePositiveCount = 0;
+  const item: RuleFindingCountModel = data.item as RuleFindingCountModel;
+  if (item.finding_statuses_count === undefined) {
+    return 'NAN%';
+  }
+  item.finding_statuses_count.forEach((findingStatus) => {
+    if (findingStatus.status === `${Config.value('truePostiveStatusVal')}`) {
+      truePositiveCount = findingStatus.count ?? 0;
+    }
+    if (findingStatus.status === `${Config.value('falsePositiveStatusVal')}`) {
+      falsePositiveCount = findingStatus.count ?? 0;
+    }
+  });
+  let truePositiveRate = Math.round(
+    (truePositiveCount / (truePositiveCount + falsePositiveCount)) * 100
+  );
+  truePositiveRate = truePositiveRate || 0;
+  return `${truePositiveRate}%`;
+}
+
+function getTotalCountRowValuesForRuleMetricsTable(ruleListCounts: RuleFindingCountModel[]) {
+  totalFindingsCountForAllRules.value = 0;
+  truePositiveTotalCount.value = 0;
+  falsePositiveTotalCount.value = 0;
+  clarificationRequiredTotalCount.value = 0;
+  underReviewTotalCount.value = 0;
+  notAnalyzedTotalCount.value = 0;
+  notAnalyzedTotalCount.value = 0;
+  truePositiveRateList.value = [];
+  ruleList.value = [];
+
+  ruleListCounts.forEach((rule: RuleFindingCountModel) => {
+    const ruleFindingCountAugmented = getRuleFindingCountAugmented(rule);
+    ruleList.value.push(ruleFindingCountAugmented);
+
+    const truePositiveRate = getTruePositiveRate(ruleFindingCountAugmented);
+    truePositiveRateList.value.push(truePositiveRate);
+
+    totalFindingsCountForAllRules.value += ruleFindingCountAugmented.finding_count ?? 0;
+    truePositiveTotalCount.value += ruleFindingCountAugmented.tpCount;
+    falsePositiveTotalCount.value += ruleFindingCountAugmented.fpCount;
+    clarificationRequiredTotalCount.value += ruleFindingCountAugmented.crCount;
+    underReviewTotalCount.value += ruleFindingCountAugmented.urCount;
+    notAnalyzedTotalCount.value += ruleFindingCountAugmented.naCount;
+  });
+
+  calculateAverageTruePositiveRatePercentage();
+}
+
+function getRuleFindingCountAugmented(rule: RuleFindingCountModel): RuleFindingCountModelAugmented {
+  let counts: { [key in FindingStatus]: number } = {
+    TRUE_POSITIVE: 0,
+    FALSE_POSITIVE: 0,
+    CLARIFICATION_REQUIRED: 0,
+    UNDER_REVIEW: 0,
+    NOT_ANALYZED: 0,
+  };
+  rule.finding_statuses_count?.forEach((findingStatus) => {
+    counts[findingStatus.status] = findingStatus.count ?? 0;
+  });
+
+  const ruleFindingCountAugmented: RuleFindingCountModelAugmented = {
+    rule_name: rule.rule_name,
+    finding_count: rule.finding_count,
+    finding_statuses_count: rule.finding_statuses_count,
+    tpCount: counts['TRUE_POSITIVE'],
+    fpCount: counts['FALSE_POSITIVE'],
+    naCount: counts['NOT_ANALYZED'],
+    urCount: counts['UNDER_REVIEW'],
+    crCount: counts['CLARIFICATION_REQUIRED'],
+  };
+
+  return ruleFindingCountAugmented;
+}
+
+function calculateAverageTruePositiveRatePercentage() {
+  if (ruleList.value.length > 0 && truePositiveRateList.value.length > 0) {
+    const sumOfTruePositveRates = truePositiveRateList.value.reduce((a, b) => a + b, 0);
+    avgTruePosiitveRate.value = `${Math.round(sumOfTruePositveRates / ruleList.value.length)}`;
+  }
+}
+
+function goToRuleAnalysisPage(recordItem: TableItem) {
+  const record = recordItem as RuleFindingCountModelAugmented;
+  const store = useAuthUserStore();
+  const updateState: PreviousRouteState = {
+    ruleName: record.rule_name,
+    rulePackVersions: selectedVersionsList.value,
+    ruleTags: selectedRuleTags.value,
+  };
+  store.update_previous_route_state(updateState);
+  router.push({ name: 'RuleAnalysis' });
+}
+
+function onRulePackVersionChange(rulePackVersions: string[]) {
+  selectedRulePackVersions.value = rulePackVersions;
+  selectedVersions.value = [];
+  selectedVersionsList.value = [];
+  if (props.rulePackVersions) {
+    for (const obj of props.rulePackVersions) {
+      selectedVersionsList.value.push(obj);
+      selectedVersions.value.push(obj.version);
+    }
+    // Referesh rule tags dropdown options and reset selected value
+    selectedRuleTags.value = [];
+    fetchRuleTags();
+  }
+  fetchRulesWithFindingStatusCount();
+}
+
+RulePackService.getRulePackVersions(10000, 0)
+  .then((response: AxiosResponse<PaginationType<RulePackRead>>) => {
+    selectedVersions.value = [];
+    allRulePackVersions.value = [];
+    selectedRulePackVersions.value = [];
+    for (const index of response.data.data.keys()) {
+      const data: RulePackRead = response.data.data[index];
+      if (data.active) {
+        selectedVersions.value.push(data.version);
+        selectedRulePackVersions.value.push(data.version);
+        selectedVersionsList.value.push(data);
+      }
+      allRulePackVersions.value.push(data);
+    }
+    fetchRuleTags();
+    fetchRulesWithFindingStatusCount();
+  })
+  .catch((error: Swr) => {
+    AxiosConfig.handleError(error);
+  });
 </script>

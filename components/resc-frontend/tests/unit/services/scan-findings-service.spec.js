@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 import Config from '@/configuration/config';
 import ScanFindingsService from '@/services/scan-findings-service';
 import scans_for_a_repository from '@/../tests/resources/mock_scans_for_a_repository.json';
 import repositories from '@/../tests/resources/mock_repositories.json';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('getRepositoryById', () => {
   describe('when API call is successful', () => {

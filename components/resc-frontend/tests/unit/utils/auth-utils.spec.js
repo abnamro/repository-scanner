@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import AuthUtils from '@/utils/auth-utils';
 
 describe('function base64URLEncode', () => {
@@ -24,94 +25,70 @@ describe('function sha256', () => {
 });
 
 describe('Unit tests for parseJwtTokenErrors function', () => {
-  const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-  beforeEach(() => {
-    consoleSpy.mockClear();
+  it('Verify JWT is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWT_INVALID')).toThrowError('JWT is invalid');
   });
-  it('Verify JWT is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWT_INVALID');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWT is invalid');
+  it('Verify JWT is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWT_EXPIRED')).toThrowError('JWT has expired');
   });
-  it('Verify JWT is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWT_EXPIRED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWT has expired');
+  it('Verify JWT claim validation failed is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWT_CLAIM_VALIDATION_FAILED')).toThrowError(
+      'JWT claim validation failed'
+    );
   });
-  it('Verify JWT claim validation failed is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWT_CLAIM_VALIDATION_FAILED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWT claim validation failed');
+  it('Verify JWS signature verification failed is thrown', async () => {
+    expect(() =>
+      AuthUtils.parseJwtTokenErrors('ERR_JWS_SIGNATURE_VERIFICATION_FAILED')
+    ).toThrowError('JWS signature verification failed');
   });
-  it('Verify JWS signature verification failed is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWS_SIGNATURE_VERIFICATION_FAILED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWS signature verification failed');
+  it('Verify JWS is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWS_INVALID')).toThrowError('JWS is invalid');
   });
-  it('Verify JWS is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWS_INVALID');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWS is invalid');
-  });
-  it('Verify Timeout was reached when retrieving the JWKS response is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWKS_TIMEOUT');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith(
+  it('Verify Timeout was reached when retrieving the JWKS response is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_TIMEOUT')).toThrowError(
       'Timeout was reached when retrieving the JWKS response'
     );
   });
-  it('Verify No applicable key found in the JSON Web Key Set is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWKS_NO_MATCHING_KEY');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith(
+  it('Verify No applicable key found in the JSON Web Key Set is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_NO_MATCHING_KEY')).toThrowError(
       'No applicable key found in the JSON Web Key Set'
     );
   });
-  it('Verify Multiple matching keys found in the JSON Web Key Set is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWKS_MULTIPLE_MATCHING_KEYS');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith(
+  it('Verify Multiple matching keys found in the JSON Web Key Set is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_MULTIPLE_MATCHING_KEYS')).toThrowError(
       'Multiple matching keys found in the JSON Web Key Set'
     );
   });
-  it('Verify JWKS is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWKS_INVALID');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWKS is invalid');
+  it('Verify JWKS is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_INVALID')).toThrowError('JWKS is invalid');
   });
-  it('Verify JWK is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWK_INVALID');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWK is invalid');
+  it('Verify JWK is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWK_INVALID')).toThrowError('JWK is invalid');
   });
-  it('Verify JWE is invalid is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWE_INVALID');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWE is invalid');
+  it('Verify JWE is invalid is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWE_INVALID')).toThrowError('JWE is invalid');
   });
-  it('Verify JWE ciphertext decryption failed is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JWE_DECRYPTION_FAILED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('JWE ciphertext decryption failed');
+  it('Verify JWE ciphertext decryption failed is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWE_DECRYPTION_FAILED')).toThrowError(
+      'JWE ciphertext decryption failed'
+    );
   });
-  it('Verify Algorithm is not supported is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JOSE_NOT_SUPPORTED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('Algorithm is not supported');
+  it('Verify Algorithm is not supported is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_NOT_SUPPORTED')).toThrowError(
+      'Algorithm is not supported'
+    );
   });
-  it('Verify Algorithm is not allowed is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JOSE_ALG_NOT_ALLOWED');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('Algorithm is not allowed');
+  it('Verify Algorithm is not allowed is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_ALG_NOT_ALLOWED')).toThrowError(
+      'Algorithm is not allowed'
+    );
   });
-  it('Verify An error occurred is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors('ERR_JOSE_GENERIC');
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('An error occurred');
+  it('Verify An error occurred is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_GENERIC')).toThrowError(
+      'An error occurred'
+    );
   });
-  it('Verify An unexpected error occurred is printed in console.error', async () => {
-    AuthUtils.parseJwtTokenErrors();
-    expect(console.error).toBeCalledTimes(1);
-    expect(console.error).toHaveBeenLastCalledWith('An unexpected error occurred');
+  it('Verify An unexpected error occurred is thrown', async () => {
+    expect(() => AuthUtils.parseJwtTokenErrors()).toThrowError('An unexpected error occurred');
   });
 });

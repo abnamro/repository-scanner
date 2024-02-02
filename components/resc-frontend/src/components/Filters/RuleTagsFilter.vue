@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-form-group class="label-title text-left" label="Tags" label-for="rule-tags-filter">
+    <b-form-group class="label-title text-start" label="Tags" label-for="rule-tags-filter">
       <multiselect
         v-model="selectedRuleTags"
-        :options="options"
+        :options="props.ruleTagsOptions"
         :multiple="true"
         :show-labels="true"
         :close-on-select="true"
@@ -14,54 +14,48 @@
         :deselect-label="'Remove'"
         placeholder="Select Tag"
         :preselect-first="false"
-        @input="onRuleTagFilterChange"
+        @update:modelValue="onRuleTagFilterChange"
       >
-        <span slot="noResult">No tag found</span>
+        <template v-slot:noResult><span>No tag found</span></template>
       </multiselect>
     </b-form-group>
   </div>
 </template>
-<script>
+<script setup lang="ts">
+import { ref, watch } from 'vue';
 import Multiselect from 'vue-multiselect';
 
-export default {
-  name: 'RuleTagsFilter',
-  props: {
-    options: {
-      type: Array,
-      required: true,
-    },
-    requestedRuleTagsFilterValue: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      selectedRuleTags: this.requestedRuleTagsFilterValue,
-    };
-  },
-  methods: {
-    onRuleTagFilterChange() {
-      if (this.selectedRuleTags.length > 0) {
-        this.$emit('on-rule-tags-change', this.selectedRuleTags);
-      } else {
-        this.$emit('on-rule-tags-change', null);
-      }
-    },
-    resetRuleTagsFilterSelection() {
-      this.selectedRuleTags = this.requestedRuleTagsFilterValue;
-    },
-  },
-  watch: {
-    requestedRuleTagsFilterValue(newValue) {
-      this.selectedRuleTags = newValue;
-    },
-  },
-  components: {
-    Multiselect,
-  },
+type Props = {
+  ruleTagsOptions: string[];
+  ruleTagsSelected?: string[];
 };
+
+const props = withDefaults(defineProps<Props>(), { ruleTagsSelected: () => [] });
+const selectedRuleTags = ref(props.ruleTagsSelected);
+
+const emit = defineEmits(['on-rule-tags-change']);
+
+function onRuleTagFilterChange() {
+  if (selectedRuleTags.value.length > 0) {
+    emit('on-rule-tags-change', selectedRuleTags.value);
+  } else {
+    emit('on-rule-tags-change', []);
+  }
+}
+
+function resetRuleTagsFilterSelection() {
+  selectedRuleTags.value = props.ruleTagsSelected;
+}
+
+// Double check if I work.
+watch(
+  () => props.ruleTagsSelected,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (newValue, _second) => {
+    selectedRuleTags.value = newValue;
+  }
+);
+
+defineExpose({ resetRuleTagsFilterSelection });
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>

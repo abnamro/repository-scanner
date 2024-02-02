@@ -1,17 +1,14 @@
 <template>
   <div></div>
 </template>
-
-<script>
+<script setup lang="ts">
 import AuthService from '@/services/auth-service';
+import { onMounted } from 'vue';
 
-export default {
-  name: 'LoginCallback',
-  mounted() {
-    const promise = AuthService.doLogin();
-    if (!promise) {
-      AuthService.doLogOut();
-    }
-  },
-};
+onMounted(() => {
+  const promise = AuthService.doLogin();
+  if (!promise) {
+    AuthService.doLogOut();
+  }
+});
 </script>

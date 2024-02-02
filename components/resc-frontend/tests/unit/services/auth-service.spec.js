@@ -1,12 +1,12 @@
+import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 import AuthService from '@/services/auth-service';
 import { useAuthUserStore } from '@/store/index';
 import { setActivePinia, createPinia } from 'pinia';
+import * as jose from 'jose';
 
-const axios = require('axios');
-const jose = require('jose');
-
-jest.mock('jose');
-jest.mock('axios');
+vi.mock('jose');
+vi.mock('axios');
 
 describe('function generateCodeVerifier', () => {
   it('fetch a base64 encoded code verifier', async () => {
@@ -29,7 +29,7 @@ describe('function generateCodeChallenge', () => {
 describe('function getCodeVerifier', () => {
   it('fetch a code verifier from local storage', async () => {
     const input = 'mock_code_verifier';
-    const getItem = jest.spyOn(Storage.prototype, 'getItem');
+    const getItem = vi.spyOn(Storage.prototype, 'getItem');
     getItem.mockReturnValue(input);
     const codeVerifier = AuthService.getCodeVerifier(input);
     expect(codeVerifier).toBe(input);
@@ -38,7 +38,7 @@ describe('function getCodeVerifier', () => {
 
 describe('function setCodeVerifier', () => {
   it('set code_verifier in local storage', async () => {
-    const setItem = jest.spyOn(Storage.prototype, 'setItem');
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
     const input = 'testvalue';
     AuthService.setCodeVerifier(input);
     expect(setItem).toHaveBeenCalledWith('code_verifier', input);
@@ -47,7 +47,7 @@ describe('function setCodeVerifier', () => {
 
 describe('function removeCodeVerifier', () => {
   it('remove code_verifier from local storage', async () => {
-    const removeItem = jest.spyOn(Storage.prototype, 'removeItem');
+    const removeItem = vi.spyOn(Storage.prototype, 'removeItem');
     AuthService.removeCodeVerifier();
     expect(removeItem).toHaveBeenCalledWith('code_verifier');
   });
@@ -55,8 +55,15 @@ describe('function removeCodeVerifier', () => {
 
 describe('function requestLoginPage', () => {
   it('redirect browser to pingfederate sso', async () => {
-    window.location.replace = jest.fn();
-    AuthService.generateCodeChallenge = jest.fn().mockReturnValue('mockcodechalange');
+    const location = new URL('https://www.example.com');
+    location.assign = vi.fn();
+    location.replace = vi.fn();
+    location.reload = vi.fn();
+
+    delete window.location;
+    window.location = location;
+
+    AuthService.generateCodeChallenge = vi.fn().mockReturnValue('mockcodechalange');
     const expected_url =
       'https://fake-sso-url/as/authorization.oauth2?response_type=code&scope=openid%20profile%20email&client_id=RESC&code_challenge_method=fake-code-challenge-method&code_challenge=mockcodechalange&redirect_uri=http://localhost:8080/callback';
     AuthService.requestLoginPage();
@@ -80,7 +87,7 @@ describe('function isValidJwtToken', () => {
     const jwtToken = 'fake-token';
     const jwksUrl = 'http://fake-jwks-url';
     const issuerUrl = 'fake-issuer-url';
-    jose.createRemoteJWKSet = jest.fn().mockResolvedValue(jwksUrl);
+    vi.spyOn(jose, 'createRemoteJWKSet').mockImplementation(() => jwksUrl);
     jose.jwtVerify.mockResolvedValue(true);
     return AuthService.isValidJwtToken(jwtToken, jwksUrl, issuerUrl).then((data) =>
       expect(data).toEqual(true)
@@ -109,8 +116,8 @@ describe('function isUserAuthenticated', () => {
       email: 'johndoe@example.com',
     };
     jose.decodeJwt.mockResolvedValue(claims);
-    AuthService.isTokenExpired = jest.fn().mockReturnValue(false);
-    AuthService.isValidJwtToken = jest.fn().mockResolvedValue(true);
+    AuthService.isTokenExpired = vi.fn().mockReturnValue(false);
+    AuthService.isValidJwtToken = vi.fn().mockResolvedValue(true);
     return AuthService.isUserAuthenticated().then((data) => expect(data).toEqual(true));
   });
 });
