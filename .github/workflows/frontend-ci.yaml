@@ -55,7 +55,7 @@ jobs:
         cd ${{ env.RESC_FRONTEND_DIR }}
         npm run lint
 
-    - name: Run Unit Tests with Vitest and coverate
+    - name: Run Unit Tests with Vitest and coverage
       run: | 
         cd ${{ env.RESC_FRONTEND_DIR }}
         npm run ut
@@ -64,12 +64,6 @@ jobs:
       run: | 
         cd ${{ env.RESC_FRONTEND_DIR }}
         npx auditjs@latest ossi -q || true
-
-    - name: Running Vitest and Coverage
-      run: |
-        cd ${{ env.RESC_FRONTEND_DIR }}
-        npm run ut || true
-        npm install vitest-sonar-reporter --save-dev
         
       ## Removing the dir paths and making them relative paths.
     - name: Fix coverage report
