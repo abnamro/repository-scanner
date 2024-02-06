@@ -27,6 +27,8 @@ resc:
     dbPass: 
     odbcDriver: "ODBC Driver 18 for SQL Server"
     dbDSN: "rescdb"
+    dbUseAzureTokenAuth:
+    dbManagedIdentityClientId:
     redisPass:
   authRequired: "false"
   ssoConfig:

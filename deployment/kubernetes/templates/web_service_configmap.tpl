@@ -60,9 +60,14 @@ data:
   {{ if .Values.resc.config.dbDSN }}
   MSSQL_DSN: {{ .Values.resc.config.dbDSN }}
   {{ end }}
+  {{ if .Values.resc.config.dbUseAzureTokenAuth }}
+  DB_USE_AZURE_TOKEN_AUTH: "{{ .Values.resc.config.dbUseAzureTokenAuth }}"
+  {{ end }}
+  {{ if .Values.resc.config.dbManagedIdentityClientId }}
+  MANAGED_IDENTITY_CLIENT_ID: {{ .Values.resc.config.dbManagedIdentityClientId }}
+  {{ end }}
   odbc.ini: |
     [{{ .Values.resc.config.dbDSN }}]    
     Driver = {{ .Values.resc.config.odbcDriver }}
-    Server = tcp:{{ .Values.resc.config.dbHost }},{{ .Values.resc.config.dbPort }}    
-    Authentication = ActiveDirectoryMsi
+    Server = tcp:{{ .Values.resc.config.dbHost }},{{ .Values.resc.config.dbPort }}
 {{- end }}
