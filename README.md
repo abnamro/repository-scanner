@@ -19,7 +19,7 @@
 [![Build][build-shield]][build-url]
 [![Version][version-shield]][version-url]
 [![Python][python-shield]][python-url]
-[![TypeScript][typescript-shield][typescript-url]
+[![TypeScript][typescript-shield]][typescript-url]
 [![Vue.js][vuejs-shield]][vuejs-url]
 [![Docker][docker-shield]][docker-url]
 [![Kubernetes][k8-shield]][k8-url]
