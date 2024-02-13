@@ -26,6 +26,8 @@ env:
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-backend
 
+permissions: read-all
+
 jobs:
   python-basic-validation:
     name: Python Basic Validation

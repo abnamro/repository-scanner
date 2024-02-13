@@ -24,6 +24,8 @@ on:
 env:
   CACHE_KEY_PREFIX: tox-dir
 
+permissions: read-all
+
 jobs:
   python-basic-validation:
     name: Tests
