@@ -17,7 +17,7 @@ describe('LoginCallback tests', () => {
         global: {
           plugins: [createTestingPinia()],
         },
-      })
+      }),
     ).toThrowError('authCode && codeVerifier are null!');
   });
 
@@ -30,7 +30,7 @@ describe('LoginCallback tests', () => {
         global: {
           plugins: [createTestingPinia()],
         },
-      })
+      }),
     ).not.toThrow();
   });
 
@@ -43,7 +43,7 @@ describe('LoginCallback tests', () => {
         global: {
           plugins: [createTestingPinia()],
         },
-      })
+      }),
     ).not.toThrow();
   });
 });

@@ -82,7 +82,7 @@ describe('getRepositoryById', () => {
         expect(response.data.length).toBe(2);
         expect(response.data[0].scan_type).toBe('BASE');
         expect(response.data[0].last_scanned_commit).toBe(
-          '5af6e79b1a9a1484ae3946a7e2c8d05febfe2c63'
+          '5af6e79b1a9a1484ae3946a7e2c8d05febfe2c63',
         );
         expect(response.data[0].timestamp).toBe('2023-04-30T06:01:47.503000');
         expect(response.data[0].increment_number).toBe(0);

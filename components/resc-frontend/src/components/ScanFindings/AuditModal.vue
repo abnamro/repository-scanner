@@ -152,7 +152,7 @@ function handleSubmit() {
   FindingsService.auditFindings(
     props.selectedCheckBoxIds,
     status.value as FindingStatus,
-    comment.value
+    comment.value,
   )
     .then(() => {
       emit('update-audit', status, comment);

@@ -12,7 +12,7 @@ const RepositoryService = {
     vcsTypeList: string[],
     projectFilter: string | undefined,
     repositoryFilter: string | undefined,
-    includeZeroFindingRepos = true
+    includeZeroFindingRepos = true,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/findings-metadata/']['get']['responses']['200']['content']['application/json']
@@ -33,7 +33,7 @@ const RepositoryService = {
   },
 
   async getLastScanForRepository(
-    repositoryId: string
+    repositoryId: string,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/{repository_id}/last-scan']['get']['responses']['200']['content']['application/json']
@@ -53,7 +53,7 @@ const RepositoryService = {
   async getDistinctProjects(
     vcsTypeList: string[],
     repositoryFilter: string | undefined,
-    includeZeroFindingRepos = true
+    includeZeroFindingRepos = true,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/distinct-projects/']['get']['responses']['200']['content']['application/json']
@@ -73,7 +73,7 @@ const RepositoryService = {
   async getDistinctRepositories(
     vcsTypeList: string[],
     projectFilter: string | undefined,
-    includeZeroFindingRepos = true
+    includeZeroFindingRepos = true,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/distinct-repositories/']['get']['responses']['200']['content']['application/json']

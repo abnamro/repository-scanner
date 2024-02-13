@@ -120,15 +120,15 @@
         <!-- Scan Type Column -->
         <template #cell(scanType)="data">
           <ScanTypeBadge
-            :scanType="((data.item as AugmentedDetailedFindingRead).scanType as string)"
-            :incrementNumber="((data.item as AugmentedDetailedFindingRead).incrementNumber as number)"
+            :scanType="(data.item as AugmentedDetailedFindingRead).scanType as string"
+            :incrementNumber="(data.item as AugmentedDetailedFindingRead).incrementNumber as number"
           />
         </template>
 
         <!-- Expand Table Row To Display Finding Panel -->
         <template v-slot:row-details="{ item }">
           <FindingPanel
-            :finding="(item as AugmentedDetailedFindingRead)"
+            :finding="item as AugmentedDetailedFindingRead"
             :repository="repository"
           ></FindingPanel>
         </template>
@@ -418,7 +418,7 @@ function handleFilterChange(
   scanId: number,
   rule: string[],
   status: FindingStatus[],
-  ruleTags: string[]
+  ruleTags: string[],
 ) {
   selectedScanID.value = scanId;
   ruleFilter.value = rule;
@@ -433,7 +433,7 @@ function displayPreviousScans(
   rule: string[],
   ruleTags: string[],
   status: FindingStatus[],
-  previousScanListUpdate: ScanRead[]
+  previousScanListUpdate: ScanRead[],
 ) {
   currentPage.value = 1;
   allSelected.value = false;

@@ -8,7 +8,7 @@ const PushNotification = {
     message: string,
     titlePush: string,
     variantType: keyof BaseColorVariant,
-    autoHideDelay: number
+    autoHideDelay: number,
   ) {
     c?.show({
       title: titlePush,

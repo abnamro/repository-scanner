@@ -90,7 +90,7 @@ describe('function isValidJwtToken', () => {
     vi.spyOn(jose, 'createRemoteJWKSet').mockImplementation(() => jwksUrl);
     jose.jwtVerify.mockResolvedValue(true);
     return AuthService.isValidJwtToken(jwtToken, jwksUrl, issuerUrl).then((data) =>
-      expect(data).toEqual(true)
+      expect(data).toEqual(true),
     );
   });
 });

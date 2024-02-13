@@ -7,7 +7,7 @@ axiosRetry(axios, { retries: 3 });
 
 const VCSInstanceService = {
   getVCSInstance(
-    vcsInstanceId: number
+    vcsInstanceId: number,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/vcs-instances/{vcs_instance_id}']['get']['responses']['200']['content']['application/json']

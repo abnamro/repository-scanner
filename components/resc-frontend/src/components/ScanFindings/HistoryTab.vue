@@ -40,7 +40,10 @@
           <!-- Comment Column -->
           <template #cell(comment)="data">
             <p
-              v-if="(data.item as AuditRead).comment && ((data.item as AuditRead)?.comment?.length ?? 0) > 45"
+              v-if="
+                (data.item as AuditRead).comment &&
+                ((data.item as AuditRead)?.comment?.length ?? 0) > 45
+              "
               v-b-popover.hover="(data.item as AuditRead).comment"
               class="elipsis"
             >

@@ -9,7 +9,7 @@ axiosRetry(axios, { retries: 3 });
 const RulePackService = {
   async getRulePackVersions(
     perPage: number | undefined = undefined,
-    skipRowCount: number | undefined = undefined
+    skipRowCount: number | undefined = undefined,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rule-packs/versions']['get']['responses']['200']['content']['application/json']
@@ -25,7 +25,7 @@ const RulePackService = {
 
   async uploadRulePack(
     version: string,
-    ruleFile: File
+    ruleFile: File,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rule-packs']['post']['responses']['200']['content']['application/json']
@@ -41,7 +41,7 @@ const RulePackService = {
   },
 
   async downloadRulePack(
-    rulePackVersion: string
+    rulePackVersion: string,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rule-packs']['get']['responses']['200']['content']['application/json']
@@ -56,7 +56,7 @@ const RulePackService = {
   },
 
   async getRuleTagsByRulePackVersions(
-    rulePackVersions: string[]
+    rulePackVersions: string[],
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rule-packs/tags']['get']['responses']['200']['content']['application/json']

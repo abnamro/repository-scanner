@@ -317,7 +317,7 @@ function calculateTruePositiveRate(data: any): string {
     }
   });
   let truePositiveRate = Math.round(
-    (truePositiveCount / (truePositiveCount + falsePositiveCount)) * 100
+    (truePositiveCount / (truePositiveCount + falsePositiveCount)) * 100,
   );
   truePositiveRate = truePositiveRate || 0;
   return `${truePositiveRate}%`;

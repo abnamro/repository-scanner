@@ -52,11 +52,11 @@ const AuthService = {
       const codeChallenge = this.generateCodeChallenge(codeVerifier);
 
       const loginUrl = `${Config.value('ssoAuthorizationUrl')}?response_type=${Config.value(
-        'ssoResponseType'
+        'ssoResponseType',
       )}&scope=${Config.value('ssoScope')}&client_id=${Config.value(
-        'ssoClientId'
+        'ssoClientId',
       )}&code_challenge_method=${Config.value(
-        'ssoCodeChallengeMethod'
+        'ssoCodeChallengeMethod',
       )}&code_challenge=${codeChallenge}&redirect_uri=${Config.value('ssoRedirectUri')}`;
 
       window.location.replace(encodeURI(loginUrl));
@@ -163,7 +163,7 @@ const AuthService = {
     if (token && !this.isTokenExpired(token)) {
       const isAuthenticated = await this.isValidJwtToken(
         token,
-        `${Config.value('ssoIdTokenJwksUrl')}`
+        `${Config.value('ssoIdTokenJwksUrl')}`,
       );
       return isAuthenticated ? true : false;
     }

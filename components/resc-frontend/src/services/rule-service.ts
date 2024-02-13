@@ -14,7 +14,7 @@ const RuleService = {
     repositoryFilter: string | undefined,
     startDate: string | undefined,
     endDate: string | undefined,
-    rulePackVersions: string[] | null
+    rulePackVersions: string[] | null,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/detected-rules']['get']['responses']['200']['content']['application/json']
@@ -37,7 +37,7 @@ const RuleService = {
 
   async getRulesWithFindingStatusCount(
     rulePackVersions: string[] | null,
-    ruleTags: string[] | null
+    ruleTags: string[] | null,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rules/finding-status-count']['get']['responses']['200']['content']['application/json']
@@ -55,7 +55,7 @@ const RuleService = {
 
   async getRulePacks(
     perPage: string,
-    skipRowCount: string
+    skipRowCount: string,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/rule-packs']['get']['responses']['200']['content']['application/json']

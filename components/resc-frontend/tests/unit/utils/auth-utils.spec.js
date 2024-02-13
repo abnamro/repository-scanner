@@ -33,12 +33,12 @@ describe('Unit tests for parseJwtTokenErrors function', () => {
   });
   it('Verify JWT claim validation failed is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWT_CLAIM_VALIDATION_FAILED')).toThrowError(
-      'JWT claim validation failed'
+      'JWT claim validation failed',
     );
   });
   it('Verify JWS signature verification failed is thrown', async () => {
     expect(() =>
-      AuthUtils.parseJwtTokenErrors('ERR_JWS_SIGNATURE_VERIFICATION_FAILED')
+      AuthUtils.parseJwtTokenErrors('ERR_JWS_SIGNATURE_VERIFICATION_FAILED'),
     ).toThrowError('JWS signature verification failed');
   });
   it('Verify JWS is invalid is thrown', async () => {
@@ -46,17 +46,17 @@ describe('Unit tests for parseJwtTokenErrors function', () => {
   });
   it('Verify Timeout was reached when retrieving the JWKS response is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_TIMEOUT')).toThrowError(
-      'Timeout was reached when retrieving the JWKS response'
+      'Timeout was reached when retrieving the JWKS response',
     );
   });
   it('Verify No applicable key found in the JSON Web Key Set is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_NO_MATCHING_KEY')).toThrowError(
-      'No applicable key found in the JSON Web Key Set'
+      'No applicable key found in the JSON Web Key Set',
     );
   });
   it('Verify Multiple matching keys found in the JSON Web Key Set is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWKS_MULTIPLE_MATCHING_KEYS')).toThrowError(
-      'Multiple matching keys found in the JSON Web Key Set'
+      'Multiple matching keys found in the JSON Web Key Set',
     );
   });
   it('Verify JWKS is invalid is thrown', async () => {
@@ -70,22 +70,22 @@ describe('Unit tests for parseJwtTokenErrors function', () => {
   });
   it('Verify JWE ciphertext decryption failed is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JWE_DECRYPTION_FAILED')).toThrowError(
-      'JWE ciphertext decryption failed'
+      'JWE ciphertext decryption failed',
     );
   });
   it('Verify Algorithm is not supported is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_NOT_SUPPORTED')).toThrowError(
-      'Algorithm is not supported'
+      'Algorithm is not supported',
     );
   });
   it('Verify Algorithm is not allowed is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_ALG_NOT_ALLOWED')).toThrowError(
-      'Algorithm is not allowed'
+      'Algorithm is not allowed',
     );
   });
   it('Verify An error occurred is thrown', async () => {
     expect(() => AuthUtils.parseJwtTokenErrors('ERR_JOSE_GENERIC')).toThrowError(
-      'An error occurred'
+      'An error occurred',
     );
   });
   it('Verify An unexpected error occurred is thrown', async () => {

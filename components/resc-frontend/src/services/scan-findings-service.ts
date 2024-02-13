@@ -8,7 +8,7 @@ axiosRetry(axios, { retries: 3 });
 
 const ScanFindingsService = {
   async getRepositoryById(
-    repositoryId: number
+    repositoryId: number,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/{repository_id}']['get']['responses']['200']['content']['application/json']
@@ -18,7 +18,7 @@ const ScanFindingsService = {
   },
 
   async getScanById(
-    scanId: number
+    scanId: number,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/scans/{scan_id}']['get']['responses']['200']['content']['application/json']
@@ -28,7 +28,7 @@ const ScanFindingsService = {
   },
 
   async getRulesByScanIds(
-    scanIds: number[]
+    scanIds: number[],
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/detected-rules']['get']['responses']['200']['content']['application/json']
@@ -46,7 +46,7 @@ const ScanFindingsService = {
   async getScansByRepositoryId(
     repositoryId: number,
     skipRowCount: number,
-    perPage: number
+    perPage: number,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/repositories/{repository_id}/scans']['get']['responses']['200']['content']['application/json']

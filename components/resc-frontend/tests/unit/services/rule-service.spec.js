@@ -22,23 +22,23 @@ describe('function getRulesWithFindingStatusCount', () => {
       expect(response[0].rule_name).toBe('Rule-1');
       expect(response[0].finding_count).toBe(25);
       expect(response[0].finding_statuses_count[0].status).toBe(
-        `${Config.value('truePostiveStatusVal')}`
+        `${Config.value('truePostiveStatusVal')}`,
       );
       expect(response[0].finding_statuses_count[0].count).toBe(11);
       expect(response[0].finding_statuses_count[1].status).toBe(
-        `${Config.value('falsePositiveStatusVal')}`
+        `${Config.value('falsePositiveStatusVal')}`,
       );
       expect(response[0].finding_statuses_count[1].count).toBe(2);
       expect(response[0].finding_statuses_count[2].status).toBe(
-        `${Config.value('clarificationRequiredStatusVal')}`
+        `${Config.value('clarificationRequiredStatusVal')}`,
       );
       expect(response[0].finding_statuses_count[2].count).toBe(3);
       expect(response[0].finding_statuses_count[3].status).toBe(
-        `${Config.value('underReviewStatusVal')}`
+        `${Config.value('underReviewStatusVal')}`,
       );
       expect(response[0].finding_statuses_count[3].count).toBe(4);
       expect(response[0].finding_statuses_count[4].status).toBe(
-        `${Config.value('notAnalyzedStatusVal')}`
+        `${Config.value('notAnalyzedStatusVal')}`,
       );
       expect(response[0].finding_statuses_count[4].count).toBe(5);
     });
@@ -87,7 +87,7 @@ describe('function getAllDetectedRules', () => {
         null,
         null,
         null,
-        null
+        null,
       );
 
       expect(response).toEqual(rules);
@@ -107,7 +107,7 @@ describe('function getAllDetectedRules', () => {
         null,
         null,
         null,
-        null
+        null,
       );
 
       expect(response).toEqual(rules);
@@ -127,7 +127,7 @@ describe('function getAllDetectedRules', () => {
         'project-A',
         null,
         null,
-        null
+        null,
       );
 
       expect(response).toEqual(rules);
@@ -147,7 +147,7 @@ describe('function getAllDetectedRules', () => {
         null,
         'repository-A',
         null,
-        null
+        null,
       );
 
       expect(response).toEqual(rules);
@@ -167,7 +167,7 @@ describe('function getAllDetectedRules', () => {
         null,
         null,
         '2022-05-01T00:00:00',
-        null
+        null,
       );
 
       expect(response).toEqual(rules);
@@ -187,7 +187,7 @@ describe('function getAllDetectedRules', () => {
         null,
         null,
         null,
-        '2022-06-01T23:59:59'
+        '2022-06-01T23:59:59',
       );
 
       expect(response).toEqual(rules);
@@ -207,7 +207,7 @@ describe('function getAllDetectedRules', () => {
         'project-A',
         'repository-A',
         '2022-05-01T00:00:00',
-        '2022-06-01T23:59:59'
+        '2022-06-01T23:59:59',
       );
 
       expect(response).toEqual(rules);

@@ -44,6 +44,6 @@ export function importFA() {
     faInfoCircle,
     faThumbsDown,
     faMedal,
-    faAward
+    faAward,
   );
 }

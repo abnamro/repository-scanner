@@ -95,13 +95,13 @@ function getTruePositiveCounts() {
       findingsCount.value.forEach((data) => {
         labelsWeekTruePositive.value.push(data.time_period);
         azureDevOpsTruePositiveFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0
+          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0,
         );
         bitbucketTruePositiveFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.BITBUCKET ?? 0
+          data.vcs_provider_finding_count?.BITBUCKET ?? 0,
         );
         gitHubTruePositiveFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0
+          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0,
         );
         totalTruePositiveFindingsCountList.value.push(data.total ?? 0);
       });
@@ -120,11 +120,11 @@ function getTotalCounts() {
       findingsCount.value.forEach((data) => {
         labelsWeekTotal.value.push(data.time_period);
         azureDevOpsTotalFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0
+          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0,
         );
         bitbucketTotalFindingsCountList.value.push(data.vcs_provider_finding_count?.BITBUCKET ?? 0);
         gitHubTotalFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0
+          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0,
         );
         totalTotalFindingsCountList.value.push(data.total ?? 0);
       });
@@ -143,13 +143,13 @@ function getUnTriagedCounts() {
       findingsCount.value.forEach((data) => {
         labelsWeekUnTriaged.value.push(data.time_period);
         azureDevOpsUnTriagedFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0
+          data.vcs_provider_finding_count?.AZURE_DEVOPS ?? 0,
         );
         bitbucketUnTriagedFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.BITBUCKET ?? 0
+          data.vcs_provider_finding_count?.BITBUCKET ?? 0,
         );
         gitHubUnTriagedFindingsCountList.value.push(
-          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0
+          data.vcs_provider_finding_count?.GITHUB_PUBLIC ?? 0,
         );
         totalUnTriagedFindingsCountList.value.push(data.total ?? 0);
       });
@@ -201,7 +201,7 @@ function setChartDataForTotalFindingsCount() {
   if (!arrayContainsAllZeros(azureDevOpsTotalFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('azureDevOpsVal')}`,
-      azureDevOpsTotalFindingsCountList.value
+      azureDevOpsTotalFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -209,7 +209,7 @@ function setChartDataForTotalFindingsCount() {
   if (!arrayContainsAllZeros(bitbucketTotalFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('bitbucketVal')}`,
-      bitbucketTotalFindingsCountList.value
+      bitbucketTotalFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -217,7 +217,7 @@ function setChartDataForTotalFindingsCount() {
   if (!arrayContainsAllZeros(gitHubTotalFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('githubPublicVal')}`,
-      gitHubTotalFindingsCountList.value
+      gitHubTotalFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -236,7 +236,7 @@ function setChartDataForTruePositiveFindingsCount() {
   if (!arrayContainsAllZeros(azureDevOpsTruePositiveFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('azureDevOpsVal')}`,
-      azureDevOpsTruePositiveFindingsCountList.value
+      azureDevOpsTruePositiveFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -244,7 +244,7 @@ function setChartDataForTruePositiveFindingsCount() {
   if (!arrayContainsAllZeros(bitbucketTruePositiveFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('bitbucketVal')}`,
-      bitbucketTruePositiveFindingsCountList.value
+      bitbucketTruePositiveFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -252,7 +252,7 @@ function setChartDataForTruePositiveFindingsCount() {
   if (!arrayContainsAllZeros(gitHubTruePositiveFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('githubPublicVal')}`,
-      gitHubTruePositiveFindingsCountList.value
+      gitHubTruePositiveFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -260,7 +260,7 @@ function setChartDataForTruePositiveFindingsCount() {
   if (!arrayContainsAllZeros(totalTruePositiveFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       'Total',
-      totalTruePositiveFindingsCountList.value
+      totalTruePositiveFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -274,7 +274,7 @@ function setChartDataForUnTriagedFindingsCount() {
   if (!arrayContainsAllZeros(azureDevOpsUnTriagedFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('azureDevOpsVal')}`,
-      azureDevOpsUnTriagedFindingsCountList.value
+      azureDevOpsUnTriagedFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -282,7 +282,7 @@ function setChartDataForUnTriagedFindingsCount() {
   if (!arrayContainsAllZeros(bitbucketUnTriagedFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('bitbucketVal')}`,
-      bitbucketUnTriagedFindingsCountList.value
+      bitbucketUnTriagedFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }
@@ -290,7 +290,7 @@ function setChartDataForUnTriagedFindingsCount() {
   if (!arrayContainsAllZeros(gitHubUnTriagedFindingsCountList.value)) {
     const datasetObj = prepareDataSetForVcsProvider(
       `${Config.value('githubPublicVal')}`,
-      gitHubUnTriagedFindingsCountList.value
+      gitHubUnTriagedFindingsCountList.value,
     );
     datasets.push(datasetObj);
   }

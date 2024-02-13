@@ -145,7 +145,7 @@ function togglePreviousScans() {
       selectedRule.value,
       selectedRuleTags.value,
       selectedStatus.value,
-      previousScans.value
+      previousScans.value,
     );
   } else {
     previousScans.value = [];
@@ -195,7 +195,7 @@ function handleFilterChange() {
       selectedScan.value.scanId,
       selectedRule,
       selectedStatus,
-      selectedRuleTags
+      selectedRuleTags,
     );
   } else {
     togglePreviousScans();
@@ -210,8 +210,8 @@ function getPreviousScanIds() {
   const scanIds = includePreviousScans.value
     ? previousScanIds
     : selectedScan.value !== null
-    ? [selectedScan.value.scanId]
-    : [];
+      ? [selectedScan.value.scanId]
+      : [];
   return scanIds;
 }
 
@@ -223,8 +223,8 @@ function getSelectedRulePacks() {
   const rulePacks = includePreviousScans.value
     ? rulePacksForPreviousScanIds
     : selectedScan.value !== null
-    ? [selectedScan.value.rulePackVersion]
-    : [];
+      ? [selectedScan.value.rulePackVersion]
+      : [];
   return rulePacks;
 }
 function refreshRuleFilter() {
@@ -302,7 +302,7 @@ function fetchScanDates() {
     ScanFindingsService.getScansByRepositoryId(
       props.repository.id_,
       skipRecords.value,
-      limitRecords.value
+      limitRecords.value,
     )
       .then((res) => {
         const response: ScanRead[] = res.data.data;
@@ -348,7 +348,7 @@ watch(
     if (newVal !== oldVal) {
       fetchScanDates();
     }
-  }
+  },
 );
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

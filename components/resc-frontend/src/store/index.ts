@@ -75,5 +75,5 @@ export const useAuthUserStore: () => Store<'authUser', State, {}, ActionsStore> 
     },
     modules: {},
     persist: true,
-  }
+  },
 );
