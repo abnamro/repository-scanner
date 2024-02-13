@@ -146,7 +146,7 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 
 [Python.org]: https://img.shields.io/badge/Python-2b5b84?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
-<!-- for-the-badge is broken on TypeScript... use flat-square instead -->
+<!-- for-the-badge is broken on TypeScript... use flat instead -->
 [typescript-shield]: https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF
 [typescript-url]: https://www.typescriptlang.org/
 [Docker.com]: https://img.shields.io/badge/Docker-0b214a?style=for-the-badge&logo=docker&logoColor=white
