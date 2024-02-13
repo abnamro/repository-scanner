@@ -4,8 +4,8 @@ import sys
 
 # Third Party
 import pyodbc
-from sqlalchemy.exc import DBAPIError
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 
 # First Party
 from resc_backend.common import initialise_logs
