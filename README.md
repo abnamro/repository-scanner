@@ -19,7 +19,7 @@
 [![Build][build-shield]][build-url]
 [![Version][version-shield]][version-url]
 [![Python][python-shield]][python-url]
-[![TypeScript][typescript-shield][typescript-url]
+[![TypeScript][typescript-shield]][typescript-url]
 [![Vue.js][vuejs-shield]][vuejs-url]
 [![Docker][docker-shield]][docker-url]
 [![Kubernetes][k8-shield]][k8-url]
@@ -146,7 +146,8 @@ Since the Repository Scanner (RESC) makes use of [GitLeaks](https://github.com/z
 
 [Python.org]: https://img.shields.io/badge/Python-2b5b84?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
-[typescript-shield]: https://shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=TypeScript&logoColor=FFF
+<!-- for-the-badge is broken on TypeScript... use flat instead -->
+[typescript-shield]: https://shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=FFF
 [typescript-url]: https://www.typescriptlang.org/
 [Docker.com]: https://img.shields.io/badge/Docker-0b214a?style=for-the-badge&logo=docker&logoColor=white
 [Docker-url]: https://www.docker.com/
