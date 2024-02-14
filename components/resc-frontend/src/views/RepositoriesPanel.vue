@@ -209,7 +209,7 @@ function handleFilterChange(
   vcsProvider: VCSProviders[],
   project: string | undefined,
   repository: string | undefined,
-  includeZeroFindingReposArg: boolean
+  includeZeroFindingReposArg: boolean,
 ) {
   vcsFilter.value = vcsProvider;
   projectFilter.value = project;
@@ -230,7 +230,7 @@ function fetchPaginatedRepositories() {
     vcsFilter.value,
     projectFilter.value,
     repositoryFilter.value,
-    includeZeroFindingRepos.value
+    includeZeroFindingRepos.value,
   )
     .then((response) => {
       totalRows.value = response.data.total;
@@ -246,7 +246,7 @@ function fetchDistinctProjects() {
   RepositoryService.getDistinctProjects(
     vcsFilter.value,
     repositoryFilter.value,
-    includeZeroFindingRepos.value
+    includeZeroFindingRepos.value,
   )
     .then((response) => {
       projectNames.value = [];
@@ -262,7 +262,7 @@ function fetchDistinctRepositories() {
   RepositoryService.getDistinctRepositories(
     vcsFilter.value,
     projectFilter.value,
-    includeZeroFindingRepos.value
+    includeZeroFindingRepos.value,
   )
     .then((response) => {
       repositoryNames.value = [];

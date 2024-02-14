@@ -1,61 +1,61 @@
 <template>
   <div>
-    <b-progress class="mt-2" :max="total" height="0.8rem" show-value>
+    <b-progress class="mt-2" :max="props.totalCount" height="0.8rem" show-value>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent('True Positive', truePositiveCount)"
-        :value="truePositiveCount"
+        v-b-popover.hover.bottom="getPopOverContent('True Positive', props.truePositive)"
+        :value="props.truePositive"
         variant="danger"
       >
         <div>
           <small>
-            <strong>{{ showFindingsInPercentage(truePositiveCount) }}</strong></small
+            <strong>{{ showFindingsInPercentage(props.truePositive) }}</strong></small
           >
         </div>
       </b-progress-bar>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent('False Positive', falsePositiveCount)"
-        :value="falsePositiveCount"
+        v-b-popover.hover.bottom="getPopOverContent('False Positive', props.falsePositive)"
+        :value="props.falsePositive"
         variant="success"
       >
         <div>
           <small
-            ><strong>{{ showFindingsInPercentage(falsePositiveCount) }}</strong></small
+            ><strong>{{ showFindingsInPercentage(props.falsePositive) }}</strong></small
           >
         </div>
       </b-progress-bar>
       <b-progress-bar
         v-b-popover.hover.bottom="
-          getPopOverContent('Clarification Required', clarificationRequiredCount)
+          getPopOverContent('Clarification Required', props.clarificationRequired)
         "
-        :value="clarificationRequiredCount"
+        :value="props.clarificationRequired"
         variant="warning"
       >
         <div>
           <small
-            ><strong>{{ showFindingsInPercentage(clarificationRequiredCount) }}</strong></small
+            ><strong>{{ showFindingsInPercentage(props.clarificationRequired) }}</strong></small
           >
         </div>
       </b-progress-bar>
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent('Under Review', underReviewCount)"
-        :value="underReviewCount"
+        v-b-popover.hover.bottom="getPopOverContent('Under Review', props.underReview)"
+        :value="props.underReview"
         variant="info"
       >
         <div>
           <small
-            ><strong>{{ showFindingsInPercentage(underReviewCount) }}</strong></small
+            ><strong>{{ showFindingsInPercentage(props.underReview) }}</strong></small
           >
         </div>
       </b-progress-bar>
       <!-- @vue-ignore -->
       <b-progress-bar
-        v-b-popover.hover.bottom="getPopOverContent('Not Analyzed', notAnalyzedCount)"
-        :value="notAnalyzedCount"
+        v-b-popover.hover.bottom="getPopOverContent('Not Analyzed', props.notAnalyzed)"
+        :value="props.notAnalyzed"
         variant="not-analyzed"
       >
         <div>
           <small
-            ><strong>{{ showFindingsInPercentage(notAnalyzedCount) }}</strong></small
+            ><strong>{{ showFindingsInPercentage(props.notAnalyzed) }}</strong></small
           >
         </div>
       </b-progress-bar>
@@ -63,7 +63,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
 type Props = {
   truePositive: number;
   falsePositive: number;
@@ -74,16 +73,9 @@ type Props = {
 };
 const props = defineProps<Props>();
 
-const truePositiveCount = ref(props.truePositive);
-const falsePositiveCount = ref(props.falsePositive);
-const notAnalyzedCount = ref(props.notAnalyzed);
-const underReviewCount = ref(props.underReview);
-const clarificationRequiredCount = ref(props.clarificationRequired);
-const total = ref(props.totalCount);
-
 const percent = 100;
 function showFindingsInPercentage(count: number) {
-  return String(Math.round((count / total.value) * percent));
+  return String(Math.round((count / props.totalCount) * percent));
 }
 
 function getPopOverContent(title: string, count: number) {

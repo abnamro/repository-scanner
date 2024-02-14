@@ -264,7 +264,7 @@ function fetchAllDetectedRules() {
     selectedRepository.value,
     startDate.value,
     endDate.value,
-    rulePackVersionsFetched
+    rulePackVersionsFetched,
   )
     .then((response) => {
       optionsRules.value = response.data;

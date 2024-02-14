@@ -77,7 +77,7 @@ const contentStyle = ref({
 const titleIconDefinition = ref(props.titleIcon ? ['fas', props.titleIcon] : null);
 const contentIconDefinition = ref(props.contentIcon ? ['fas', props.contentIcon] : null);
 const formatCardBodyContent = ref(
-  props.cardBodyContent ? props.cardBodyContent.toLocaleString() : '0'
+  props.cardBodyContent ? props.cardBodyContent.toLocaleString() : '0',
 );
 const titleIconTooltip = ref(props.titleIconTooltip);
 // This converts a tooltip in a HTML compliant ID

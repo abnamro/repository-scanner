@@ -37,7 +37,7 @@ describe('MultilineChart tests', () => {
     expect(wrapper.find('canvas').exists()).toBe(true);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0][0]).toContain(
-      "Failed to create chart: can't acquire context from the given item"
+      "Failed to create chart: can't acquire context from the given item",
     );
   });
 
@@ -57,7 +57,7 @@ describe('MultilineChart tests', () => {
     expect(wrapper.find('canvas').exists()).toBe(true);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0][0]).toContain(
-      "Failed to create chart: can't acquire context from the given item"
+      "Failed to create chart: can't acquire context from the given item",
     );
   });
 });

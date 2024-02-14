@@ -52,7 +52,7 @@ watch(
   () => props.rulesSelected,
   (newValue, _second) => {
     selectedRules.value = newValue;
-  }
+  },
 );
 
 // We probably need to expose this.

@@ -46,7 +46,7 @@ describe('App.vue unit tests', () => {
 
   it('Configuration with non Existing key should return error', () => {
     expect(() => Config.value('notExisting')).toThrow(
-      'Configuration: There is no key named "notExisting"'
+      'Configuration: There is no key named "notExisting"',
     );
     expect(Config.value('ssoClientId')).toBe('RESC');
   });

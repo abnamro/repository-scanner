@@ -88,7 +88,7 @@ function handleFilterChange() {
     selectedVcsProvider.value,
     selectedProject.value,
     selectedRepository.value,
-    includeZeroFindingRepos.value
+    includeZeroFindingRepos.value,
   );
 }
 </script>

@@ -23,7 +23,7 @@ const AxiosConfig = {
             PushNotification.danger(
               'Your session has expired. You will be redirected to the Login page.',
               'Session Expired',
-              3000
+              3000,
             );
             setTimeout(function () {
               AuthService.doLogOut();
@@ -44,7 +44,7 @@ const AxiosConfig = {
       },
       function (error: Swr) {
         return Promise.reject(error);
-      }
+      },
     );
 
     axios.interceptors.response.use(
@@ -60,7 +60,7 @@ const AxiosConfig = {
             PushNotification.danger(
               'You do not have permission to access this resource. You will be redirected to the Login page.',
               'Access Denied',
-              3000
+              3000,
             );
             setTimeout(function () {
               AuthService.doLogOut();
@@ -77,7 +77,7 @@ const AxiosConfig = {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
   },
   handleError(error: Swr) {

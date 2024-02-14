@@ -53,7 +53,7 @@ watch(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (newValue, _second) => {
     selectedRuleTags.value = newValue;
-  }
+  },
 );
 
 defineExpose({ resetRuleTagsFilterSelection });

@@ -126,7 +126,7 @@ function onSubmit(event: Event) {
   FindingsService.auditFindings(
     selectedFindingIds.value,
     status.value as FindingStatus,
-    comment.value
+    comment.value,
   )
     .then(() => {
       loadedData.value = true;

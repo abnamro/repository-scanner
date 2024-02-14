@@ -15,6 +15,6 @@ type Props = {
 const props = defineProps<Props>();
 
 const baseScanTag = computed(() =>
-  props.incrementNumber > 0 ? `BASE: ${props.incrementNumber}` : 'BASE'
+  props.incrementNumber > 0 ? `BASE: ${props.incrementNumber}` : 'BASE',
 );
 </script>

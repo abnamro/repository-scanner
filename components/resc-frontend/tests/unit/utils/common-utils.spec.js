@@ -5,15 +5,15 @@ import Config from '@/configuration/config';
 describe('function formatVcsProvider', () => {
   it('format VCS provider label', async () => {
     expect(CommonUtils.formatVcsProvider(`${Config.value('azureDevOpsVal')}`)).toBe(
-      `${Config.value('azureDevOpsLabel')}`
+      `${Config.value('azureDevOpsLabel')}`,
     );
 
     expect(CommonUtils.formatVcsProvider(`${Config.value('bitbucketVal')}`)).toBe(
-      `${Config.value('bitbucketLabel')}`
+      `${Config.value('bitbucketLabel')}`,
     );
 
     expect(CommonUtils.formatVcsProvider(`${Config.value('githubPublicVal')}`)).toBe(
-      `${Config.value('githubPublicLabel')}`
+      `${Config.value('githubPublicLabel')}`,
     );
   });
 });

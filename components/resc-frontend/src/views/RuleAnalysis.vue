@@ -118,7 +118,7 @@
         <!-- Expand Table Row To Display Finding Panel -->
         <template v-slot:row-details="{ item }">
           <FindingPanel
-            :finding="(item as DetailedFindingRead)"
+            :finding="item as DetailedFindingRead"
             :repository="{
               project_key: item.project_key,
               repository_name: item.repository_name,

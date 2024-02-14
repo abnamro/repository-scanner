@@ -33,7 +33,7 @@ describe('function auditFindings', () => {
     const response = await FindingsService.auditFindings(
       [1, 2],
       `${Config.value('falsePositiveStatusVal')}`,
-      'test'
+      'test',
     );
     expect(response).not.toBeDefined();
   });

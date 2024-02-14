@@ -55,7 +55,7 @@ const CommonUtils = {
 };
 
 export function toRaw(
-  input: string | null | number | undefined | string[] | number[]
+  input: string | null | number | undefined | string[] | number[],
 ): string | null | number | string[] | number[] {
   // We collapse undefined from any into null. undefined is not a valid Json type...
   return JSON.parse(JSON.stringify(input ?? null));

@@ -28,7 +28,7 @@ describe('function getDistinctRepositories', () => {
 
       const response = await RepositoryService.getDistinctRepositories(
         [`${Config.value('bitbucketVal')}`, `${Config.value('azureDevOpsVal')}`],
-        ''
+        '',
       );
       expect(response).toEqual(allRepos);
       expect(response).toBeDefined();
@@ -56,7 +56,7 @@ describe('function getDistinctRepositories', () => {
 
       const response = await RepositoryService.getDistinctRepositories(
         [`${Config.value('bitbucketVal')}`],
-        null
+        null,
       );
 
       expect(response).toEqual(bitbucketRepos);
@@ -72,7 +72,7 @@ describe('function getDistinctRepositories', () => {
 
       const response = await RepositoryService.getDistinctRepositories(
         [`${Config.value('azureDevOpsVal')}`],
-        ''
+        '',
       );
 
       expect(response).toEqual(adoRepos);
@@ -88,7 +88,7 @@ describe('function getDistinctRepositories', () => {
 
       const response = await RepositoryService.getDistinctRepositories(
         [`${Config.value('bitbucketVal')}`],
-        'project-A'
+        'project-A',
       );
 
       expect(response).toEqual(bitbucketRepos);
@@ -104,7 +104,7 @@ describe('function getDistinctRepositories', () => {
 
       const response = await RepositoryService.getDistinctRepositories(
         [`${Config.value('azureDevOpsVal')}`],
-        'project-A'
+        'project-A',
       );
 
       expect(response).toEqual(adoRepos);
@@ -219,7 +219,7 @@ describe('getDistinctProjects', () => {
 
       const response = await RepositoryService.getDistinctProjects(
         [`${Config.value('bitbucketVal')}`],
-        ''
+        '',
       );
 
       expect(response).toEqual(bitbucketProjects);
@@ -235,7 +235,7 @@ describe('getDistinctProjects', () => {
 
       const response = await RepositoryService.getDistinctProjects(
         [`${Config.value('azureDevOpsVal')}`],
-        ''
+        '',
       );
 
       expect(response).toEqual(adoProjects);
@@ -251,7 +251,7 @@ describe('getDistinctProjects', () => {
 
       const response = await RepositoryService.getDistinctProjects(
         [`${Config.value('bitbucketVal')}`],
-        'repository-A'
+        'repository-A',
       );
 
       expect(response).toEqual(projectNameByRepoName);

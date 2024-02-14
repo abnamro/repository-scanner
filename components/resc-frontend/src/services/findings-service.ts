@@ -24,7 +24,7 @@ export type QueryFilterType = {
 
 const FindingsService = {
   async getFindingById(
-    findingId: string
+    findingId: string,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/findings/{finding_id}']['get']['responses']['200']['content']['application/json']
@@ -36,7 +36,7 @@ const FindingsService = {
   async auditFindings(
     findingIds: number[],
     findingStatus: FindingStatus,
-    comment: string
+    comment: string,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/findings/audit/']['post']['responses']['201']['content']['application/json']
@@ -52,7 +52,7 @@ const FindingsService = {
   },
 
   async getDetailedFindings(
-    filter: QueryFilterType
+    filter: QueryFilterType,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/detailed-findings']['get']['responses']['200']['content']['application/json']
@@ -127,7 +127,7 @@ const FindingsService = {
   async getFindingAudits(
     findingId: number,
     perPage: number,
-    skipRowCount: number
+    skipRowCount: number,
   ): Promise<
     AxiosResponse<
       paths['/resc/v1/findings/{finding_id}/audit']['get']['responses']['200']['content']['application/json']
