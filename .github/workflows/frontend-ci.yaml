@@ -26,6 +26,8 @@ env:
   CONTAINER_REGISTRY: rescabnamro
   IMAGE_NAME: resc-frontend
 
+permissions: read-all
+
 jobs:
   nodejs-basic-validation:
     name: Build Nodejs

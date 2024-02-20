@@ -26,6 +26,8 @@ env:
   KUBE_AUDIT_VERSION: 0.22.0
   DATREE_VERSION: 1.9.19
 
+permissions: read-all
+
 jobs:
   helm-chart-validation:
     name: Helm Chart Validation and IaC scan
