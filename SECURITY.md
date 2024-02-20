@@ -7,12 +7,14 @@
 ## Supported Versions
 
 We release patches for security vulnerabilities. Which versions are eligible for
-receiving such patches depends on the CVSS v3.0 Rating:
+receiving such patches are listed below:
 
-| CVSS v3.0 | Supported Versions                        |
-| --------- | ----------------------------------------- |
-| 9.0-10.0  | Releases within the previous three months |
-| 4.0-8.9   | Most recent release                       |
+| Version | Supported          |
+| ------- | ------------------ |
+| main  | :white_check_mark:  |
+| latest release  | :white_check_mark: |
+| < 3.0.0   | :x:                |
+
 
 ## Reporting a Vulnerability
 
