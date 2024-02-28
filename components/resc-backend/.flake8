@@ -1,8 +1,0 @@
-[flake8]
-max-line-length = 120
-per-file-ignores =
-    src/resc_backend/db/model/__init__.py:E402,F401
-    src/resc_backend/resc_web_service/dependencies.py:B902
-    src/resc_backend/resc_web_service/schema/rule.py:F722
-    src/resc_backend/resc_web_service/schema/rule_pack.py:F722
-    src/resc_backend/bin/rule_pack_initialization.py:E402

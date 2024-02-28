@@ -1,6 +1,0 @@
-#commented_path|commented_rule|commented_line_number|expiry_date
-empty_line
-expired_path|expired_rule|38|2022-09-09T15:30:30
-wrong_date_path|wrong_date_rule|38|2022X09-09T15:30:30
-active_path|active_rule|57|2122-09-09T15:30:30
-active_path_2|active_rule_2|58

@@ -1,6 +1,0 @@
-[report]
-fail_under=81
-exclude_lines =
-    pragma: no cover
-    if __name__ == .__main__.:
-show_missing=true
