@@ -1,9 +1,0 @@
-[report]
-fail_under=60
-exclude_lines =
-    pragma: no cover
-    if __name__ == .__main__.:
-omit =
-    src/resc_backend/bin/*
-    src/resc_backend/constants.py
-show_missing=true

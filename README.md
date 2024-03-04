@@ -82,10 +82,10 @@ The diagram below gives a high-level overview of the Repository Scanner tool. Al
 tool and the technologies that it utilizes are explained in detail here. As shown in the diagram, all the components mentioned
 are run as Docker containers in a Kubernetes ecosystem.
 
-* [RESC-Frontend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-frontend): The RESC-Frontend is a fully responsive dashboard application developed using TypeScript, Vue 3 and the BootstrapVueNext framework (based on Bootstrap 5). It has screens for Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
-* [RESC-Backend](https://github.com/abnamro/repository-scanner/tree/main/components/resc-backend): The RESC-Backend is the backend of the Repository Scanner tool. The RESC-Backend consists of RabbitMQ users and queue creation, Database models, the RESC Web service, and Alembic scripts for database migration. The RESC Web service is created using FASTAPI.
-* [RESC-VCS-Scanner](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scanner): RESC-VCS-Scanner, which runs as a celery worker, gathers repositories from the repositories queue and carries out a secret scan. Gitleaks is used as the scanner to find secrets.
-* [RESC-VCS-Scraper](https://github.com/abnamro/repository-scanner/tree/main/components/resc-vcs-scraper): All projects and repositories from supported VCS providers such as Bitbucket, Azure Repos, and GitHub are gathered by the RESC-VCS-SCRAPER. This component contains the VCS-Scraper-Projects and VCS-Scraper-Repositories as its primary modules.
+* [RESC-Frontend](https://github.com/abnamro/resc-frontend): The RESC-Frontend is a fully responsive dashboard application developed using TypeScript, Vue 3 and the BootstrapVueNext framework (based on Bootstrap 5). It has screens for Analytics, Repositories, Scan Findings, Rule Analytics, and Rule Pack.
+* [RESC-Backend](https://github.com/abnamro/resc-backend): The RESC-Backend is the backend of the Repository Scanner tool. The RESC-Backend consists of RabbitMQ users and queue creation, Database models, the RESC Web service, and Alembic scripts for database migration. The RESC Web service is created using FASTAPI.
+* [RESC-VCS-Scanner](https://github.com/abnamro/resc-vcs-scanner): RESC-VCS-Scanner, which runs as a celery worker, gathers repositories from the repositories queue and carries out a secret scan. Gitleaks is used as the scanner to find secrets.
+* [RESC-VCS-Scraper](https://github.com/abnamro/resc-vcs-scraper): All projects and repositories from supported VCS providers such as Bitbucket, Azure Repos, and GitHub are gathered by the RESC-VCS-SCRAPER. This component contains the VCS-Scraper-Projects and VCS-Scraper-Repositories as its primary modules.
 
 Please visit [architecture.md](https://github.com/abnamro/repository-scanner/blob/main/docs/architecture.md) for more information.
 
@@ -93,7 +93,7 @@ Please visit [architecture.md](https://github.com/abnamro/repository-scanner/blo
 Please refer [resc-helm-wizard](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md) for an interactive and easy way to deploy RESC on a Kubernetes cluster.
 
 ##  Dummy data generation <a name = "dummy-data-generation-guide"></a>
-A standalone utility to generate dummy data for testing purposes is located at `./components/resc_backend/src/resc_backend/bin/dummy-data-generator`. More details can be found [here](./components/resc-backend/src/resc_backend/bin/dummy-data-generator/README.md)
+A standalone utility to generate dummy data for testing purposes is located at [RESC-Backend](https://github.com/abnamro/resc-backend). More details can be found [here](https://github.com/abnamro/resc-backend/blob/main/src/resc_backend/bin/dummy-data-generator/README.md)
 
 ## 💁🏽 Contributing guidelines <a name = "contribution-guide"></a>
 We believe that innovating together can lead to the most incredible results and developments. Contributions to the Repository Scanner tool are therefore highly encouraged. We have created [guidelines](https://github.com/abnamro/repository-scanner/blob/main/contributing.md) that we expect contributors to the project to follow.  By contributing to the project you also agree with our [Code of Conduct](https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md).
