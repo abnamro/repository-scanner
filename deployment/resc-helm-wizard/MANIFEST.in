@@ -1,3 +1,4 @@
 exclude README.md
 exclude MANIFEST.in
 include src/resc_helm_wizard/config/*.yaml
+include requirements.txt
