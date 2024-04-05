@@ -1,0 +1,4 @@
+questionary
+requests
+PyYAML
+
