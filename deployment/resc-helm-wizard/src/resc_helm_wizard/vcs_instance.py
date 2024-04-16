@@ -25,15 +25,17 @@ class VcsInstance:
         List of scope
     """
 
-    def __init__(self,
-                 provider_type: str,
-                 scheme: str,
-                 host: str,
-                 port: str,
-                 username: str,
-                 password: str,
-                 organization: str,
-                 scope: List[str]):
+    def __init__(
+        self,
+        provider_type: str,
+        scheme: str,
+        host: str,
+        port: str,
+        username: str,
+        password: str,
+        organization: str,
+        scope: List[str],
+    ):
         self.provider_type: str = provider_type
         self.scheme: str = scheme
         self.host: str = host
