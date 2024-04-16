@@ -19,9 +19,20 @@ def install_or_upgrade_helm_release(action: str) -> bool:
         Returns true if install or upgrade succeeded else returns false
     """
     logging.info(f"Running {action}. Please wait for a moment...")
-    helm_command = ["helm", action, "--timeout", constants.HELM_DEPLOY_TIMEOUT, "-n",
-                    constants.NAMESPACE, constants.RELEASE_NAME, constants.CHART_NAME, "-f",
-                    constants.VALUES_FILE, "--set-file", "global.secretScanRulePackConfig=" + constants.RULE_FILE]
+    helm_command = [
+        "helm",
+        action,
+        "--timeout",
+        constants.HELM_DEPLOY_TIMEOUT,
+        "-n",
+        constants.NAMESPACE,
+        constants.RELEASE_NAME,
+        constants.CHART_NAME,
+        "-f",
+        constants.VALUES_FILE,
+        "--set-file",
+        "global.secretScanRulePackConfig=" + constants.RULE_FILE,
+    ]
     try:
         output = subprocess.check_output(helm_command)
         logging.info(output.decode("utf-8"))
@@ -37,8 +48,12 @@ def check_helm_release_exists() -> bool:
     :return: bool
         Returns true if helm release exists else returns false
     """
-    output = subprocess.run(["helm", "list", "-f", constants.RELEASE_NAME, "-n", constants.NAMESPACE],
-                            capture_output=True, text=True, check=True)
+    output = subprocess.run(
+        ["helm", "list", "-f", constants.RELEASE_NAME, "-n", constants.NAMESPACE],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
     return bool(constants.RELEASE_NAME in output.stdout.strip())
 
 
@@ -48,7 +63,9 @@ def get_version_from_downloaded_chart() -> str:
     :return: str
         Returns version of the downloaded chart
     """
-    cmd = f"helm search repo {constants.HELM_REPO_NAME} -n {constants.NAMESPACE} -o json"
+    cmd = (
+        f"helm search repo {constants.HELM_REPO_NAME} -n {constants.NAMESPACE} -o json"
+    )
     output = subprocess.check_output(cmd, shell=True)
     chart_info = json.loads(output.decode("utf-8"))
 
@@ -59,9 +76,17 @@ def get_version_from_downloaded_chart() -> str:
 
 def add_helm_repository():
     """
-        Adds a helm repository
+    Adds a helm repository
     """
-    cmd = ["helm", "repo", "add", constants.HELM_REPO_NAME, constants.RESC_HELM_REPO_URL, "-n", constants.NAMESPACE]
+    cmd = [
+        "helm",
+        "repo",
+        "add",
+        constants.HELM_REPO_NAME,
+        constants.RESC_HELM_REPO_URL,
+        "-n",
+        constants.NAMESPACE,
+    ]
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
@@ -71,7 +96,7 @@ def add_helm_repository():
 
 def update_helm_repository():
     """
-        Updates a helm repository
+    Updates a helm repository
     """
     cmd = ["helm", "repo", "update", "-n", constants.NAMESPACE]
     try:
@@ -83,18 +108,28 @@ def update_helm_repository():
 
 def validate_helm_deployment_status():
     """
-        Validate the status of the helm deployment
+    Validate the status of the helm deployment
     """
     try:
-        result = subprocess.run(['helm', 'status', constants.RELEASE_NAME, "-n", constants.NAMESPACE],
-                                capture_output=True, check=True, text=True)
+        result = subprocess.run(
+            ["helm", "status", constants.RELEASE_NAME, "-n", constants.NAMESPACE],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
         output = result.stdout.strip()
         if "STATUS: deployed" in output:
-            logging.info("The deployment was successful. Visit http://127.0.0.1:30000 to get started with RESC!")
-            logging.info("Refer this link for more information on how to trigger the scan: "
-                         "https://github.com/abnamro/repository-scanner/tree/main/"
-                         "deployment/kubernetes#trigger-scanning")
+            logging.info(
+                "The deployment was successful. Visit http://127.0.0.1:30000 to get started with RESC!"
+            )
+            logging.info(
+                "Refer this link for more information on how to trigger the scan: "
+                "https://github.com/abnamro/repository-scanner/tree/main/"
+                "deployment/kubernetes#trigger-scanning"
+            )
     except subprocess.CalledProcessError:
-        logging.error("An error occurred during deployment. Please run this command to debug any issue: "
-                      "kubectl get pods -n resc")
+        logging.error(
+            "An error occurred during deployment. Please run this command to debug any issue: "
+            "kubectl get pods -n resc"
+        )
         sys.exit(1)
