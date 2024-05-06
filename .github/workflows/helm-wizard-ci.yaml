@@ -37,20 +37,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Run tests with Python 3.9
-            python-version: "3.9"
+          - name: Run tests with Python 3.12
+            python-version: "3.12"
             toxenv: py
-          - name: Run tests with Python 3.10
-            python-version: "3.10"
-            toxenv: py
-          - name: Run tests with Python 3.11
-            python-version: "3.11"
-            toxenv: py
-          - name: Run ruff with Python 3.11
-            python-version: "3.11"
+          - name: Run ruff with Python 3.12
+            python-version: "3.12"
             toxenv: ruff
-          - name: Run pylint with Python 3.11
-            python-version: "3.11"
+          - name: Run pylint with Python 3.12
+            python-version: "3.12"
             toxenv: pylint
     steps:
     - name: Checkout repository
@@ -111,7 +105,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ["3.12"]
     outputs:
       wizard_version: ${{ steps.getversion.outputs.wizard_version }}
     steps:
@@ -125,6 +119,7 @@ jobs:
 
       - name: Building python package
         run: |
+          python -m pip install --upgrade setuptools
           python -m pip install --upgrade pip
           pip install build wheel
           python setup.py sdist bdist_wheel
