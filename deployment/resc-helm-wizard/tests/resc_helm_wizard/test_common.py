@@ -325,7 +325,7 @@ def test_create_helm_values_yaml_success(mock_file_path_exists, mock_read_yaml_f
 
     mock_file_path_exists.return_type = True
     input_file_path = os.path.join(
-        THIS_DIR.parent, "tests", "fixtures", "test-values.yaml"
+        THIS_DIR.parent, "resc_helm_wizard", "fixtures", "test-values.yaml"
     )
     with open(input_file_path, "r", encoding="utf-8") as file_in:
         values_dict = yaml.safe_load(file_in)
@@ -342,7 +342,7 @@ def test_create_helm_values_yaml_success(mock_file_path_exists, mock_read_yaml_f
 @patch("logging.Logger.error")
 def test_create_helm_values_sys_exit_when_file_not_exists(mock_error_log):
     input_file_path = os.path.join(
-        THIS_DIR.parent, "tests", "fixtures", "not_exist.yaml"
+        THIS_DIR.parent, "resc_helm_wizard", "fixtures", "not_exist.yaml"
     )
     expected_error_log = f"Aborting the program! {input_file_path} file was not found"
     with pytest.raises(SystemExit) as excinfo:
@@ -366,7 +366,7 @@ def test_create_helm_values_sys_exit_when_key_not_exists(
         vcs_instances=[],
     )
     input_file_path = os.path.join(
-        THIS_DIR.parent, "tests", "fixtures", "test-invalid-values.yaml"
+        THIS_DIR.parent, "resc_helm_wizard", "fixtures", "test-invalid-values.yaml"
     )
     with open(input_file_path, "r", encoding="utf-8") as file_in:
         values_dict = yaml.safe_load(file_in)
