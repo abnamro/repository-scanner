@@ -43,14 +43,15 @@ instances of exposed sensitive information in the source code.
 ![RESC-Demo](/images/RESC_Preview.gif)
 
 ## 📒 Table of contents
-* [Links](#links)
-* [Technical information](#technical-information)
-* [Getting started](#getting-started)
-* [Dummy data generation](#dummy-data-generation-guide)
-* [Contributing guidelines](#contribution-guide)
-* [Contact](#contact)
-* [License](#license)
-* [Acknowledgments](#acknowledgement)
+* [🔗 Links](#links)
+* [🛠️ Technical information](#technical-information)
+* [🏁 Getting started](#getting-started)
+* [🏎️ Key bindings](#kb)
+* [📊 Dummy data generation](#dummy-data-generation-guide)
+* [💁🏽 Contributing guidelines](#contribution-guide)
+* [📧 Contact](#contact)
+* [⚖️ License](#license)
+* [🎉 Acknowledgments](#acknowledgement)
 
 ## 🔗 Links <a name = "links"></a>
 
@@ -89,16 +90,17 @@ are run as Docker containers in a Kubernetes ecosystem.
 
 Please visit [architecture.md](https://github.com/abnamro/repository-scanner/blob/main/docs/architecture.md) for more information.
 
-## 🛠️ Getting started <a name = "getting-started"></a>
+## 🏁 Getting started <a name = "getting-started"></a>
 Please refer [resc-helm-wizard](https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md) for an interactive and easy way to deploy RESC on a Kubernetes cluster.
 
-##  Dummy data generation <a name = "dummy-data-generation-guide"></a>
-A standalone utility to generate dummy data for testing purposes is located at [RESC-Backend](https://github.com/abnamro/resc-backend). More details can be found [here](https://github.com/abnamro/resc-backend/blob/main/src/resc_backend/bin/dummy-data-generator/README.md)
+## 🏎️ Key bindings <a name="kb"></a>
+RESC comes with the following keybindings:
+![keybindings](./images/keybindings.png)
 
 ## 💁🏽 Contributing guidelines <a name = "contribution-guide"></a>
 We believe that innovating together can lead to the most incredible results and developments. Contributions to the Repository Scanner tool are therefore highly encouraged. We have created [guidelines](https://github.com/abnamro/repository-scanner/blob/main/contributing.md) that we expect contributors to the project to follow.  By contributing to the project you also agree with our [Code of Conduct](https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md).
 
-## 📧    Contact <a name = "contact"></a>
+## 📧 Contact <a name = "contact"></a>
 If you need to get in touch with the maintainers of the Repository Scanner tool, please use the following e-mail address: [resc@nl.abnamro.com](mailto:resc@nl.abnamro.com).
 
 ## ⚖️ License <a name = "license"></a>
