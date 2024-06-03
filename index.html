@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Repository Scanner (RESC) Helm Deployment | repository-scanner</title>
+    <meta name="generator" content="Jekyll v3.9.3" />
+    <meta property="og:title" content="Repository Scanner (RESC) Helm Deployment" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="description" content="Tool to detect secrets in source code management systems." />
+    <meta property="og:description" content="Tool to detect secrets in source code management systems." />
+    <link rel="canonical" href="https://abnamro.github.io/repository-scanner/" />
+    <meta property="og:url" content="https://abnamro.github.io/repository-scanner/" />
+    <meta property="og:site_name" content="repository-scanner" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="twitter:title" content="Repository Scanner (RESC) Helm Deployment" />
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"Tool to detect secrets in source code management systems.","headline":"Repository Scanner (RESC) Helm Deployment","name":"repository-scanner","url":"https://abnamro.github.io/repository-scanner/"}
+</script>
+    <link rel="stylesheet" href="/repository-scanner/assets/css/style.css">
+</head>
+<body>
+    <div style="background-image: linear-gradient(-296deg, #003737, #005e5d);">
+        <h1 class="text-white"><a href="https://abnamro.github.io/repository-scanner/">repository-scanner</a></h1>
+    </div>
+    <div class="container-lg px-3 my-5 markdown-body">
+        <!-- TABLE OF CONTENTS -->
+        <h2 id="table-of-contents">Table of contents</h2>
+        <ol>
+            <li><a href="#about-the-project">About the project</a></li>
+            <li><a href="#getting-started">Getting started</a>
+                <ul>
+                    <li><a href="#prerequisites">Prerequisites</a></li>
+                    <li><a href="#deploying-charts">Deploying charts</a></li>
+                </ul>
+            </li>
+            <li><a href="#additional-information">Additional Information</a></li>
+        </ol>
+
+        <!-- ABOUT THE PROJECT -->
+        <h2 id="about-the-project">About the project</h2>
+        <p>It is now possible to directly download the helm charts from the Repository Scanner (RESC) GitHub Repository
+            since it now also
+            acts as a helm repository! The charts are now published automatically to gh-pages branch by <a
+                href="https://github.com/marketplace/actions/helm-chart-releaser">Chart Releaser Action</a>.</p>
+
+        <p>This helm repository allows for a quicker and easier way to obtain the helm charts and use them on your
+            machine.</p>
+
+        <!-- GETTING STARTED -->
+        <h2 id="getting-started">Getting started</h2>
+        <p>These instructions will help you to downlaod and install the helm chart on your machine for development and
+            testing purposes.</p>
+
+        <h3 id="prerequisites">Prerequisites</h3>
+        <h4 id="1-install-software">1. Install Software</h4>
+        <ul>
+            <li><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a></li>
+            <li><a href="https://docs.docker.com/desktop/kubernetes/">Kubernetes</a> - To install Kubernetes, enable it
+                in Docker Desktop. If you install Kubernetes using minikube, ensure the version is 1.21 or later.</li>
+            <li><a href="https://helm.sh/docs/intro/install/">Helm</a></li>
+        </ul>
+
+        <h4 id="2-populate-resc-ruletoml-file">2. Populate RESC-RULE.toml file</h4>
+        <ul>
+            <li>Ensure you have the rule pack config file in TOML format available, which needs to be provided as
+                deployment argument.<br />
+                To download this GitLeaks rule you need to execute the following command.</li>
+        </ul>
+
+        <div class="language-bash highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml <span class="o">&gt;</span> RESC-RULE.toml
+</code></pre>
+            </div>
+        </div>
+
+        <h4 id="3-populate-custom-valuesyaml-file">3. Populate custom-values.yaml file</h4>
+        <p>Run the interactive CLI wizard to populate custom-values.yaml.
+            Detailed information can be found <a
+                href="https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md">here</a>
+        </p>
+
+        <h4 id="4-ensure-the-resc-namespace-is-created-if-not-then-run">4. Ensure the <em>resc</em> namespace is
+            created, if not then run</h4>
+        <div class="language-plaintext highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>kubectl create namespace resc
+</code></pre>
+            </div>
+        </div>
+
+        <h2 id="deploying-charts">Deploying charts</h2>
+        <p>Make sure you have completed the <a href="#prerequisites">pre-requisite</a> steps.</p>
+
+        <ul>
+            <li>Add the chart repository</li>
+        </ul>
+
+        <div class="language-bash highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>helm repo add <span class="o">[</span>NAME] <span class="o">[</span>URL]
+
+helm repo add resc-helm-repo https://abnamro.github.io/repository-scanner/
+</code></pre>
+            </div>
+        </div>
+
+        <ul>
+            <li>(Optional): If the repo was already added earlier, you can run the following command to retrieve the
+                latest versions of the packages.</li>
+        </ul>
+
+        <div class="language-bash highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>helm repo update
+</code></pre>
+            </div>
+        </div>
+
+        <ul>
+            <li>To ensure this went well, you can execute the following command to see the charts.
+                <div class="language-bash highlighter-rouge">
+                    <div class="highlight">
+                        <pre class="highlight"><code>helm search repo resc-helm-repo
+</code></pre>
+                    </div>
+                </div>
+            </li>
+            <li>To install with the release name, run the following command.</li>
+        </ul>
+
+        <div class="language-bash highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>helm <span class="nb">install</span> <span class="nt">--namespace</span> resc resc-release resc-helm-repo/resc <span class="nt">-f</span> &lt;custom-values.yaml file location&gt; <span class="nt">--set-file</span> global.secretScanRulePackConfig<span class="o">=</span>&lt;RESC-RULE.toml file location&gt;
+</code></pre>
+            </div>
+        </div>
+
+        <ul>
+            <li>At any point if you wish to uninstall the chart.</li>
+        </ul>
+
+        <div class="language-bash highlighter-rouge">
+            <div class="highlight">
+                <pre class="highlight"><code>helm delete resc-release <span class="nt">--namespace</span> resc
+</code></pre>
+            </div>
+        </div>
+
+        <p><em>Note:</em> resc-release corresponds to the release name, feel free to change it to suit your needs.</p>
+
+        <h2 id="additional-information">Additional Information</h2>
+        <p>For additional information please refer this <a
+                href="https://github.com/abnamro/repository-scanner/tree/main/deployment/kubernetes#additional-information">page</a>
+        </p>
+
+
+
+        <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+            This site is open source. <a
+                href="https://github.com/abnamro/repository-scanner/edit/gh-pages/README.md">Improve this page</a>.
+        </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js"
+        integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+</body>
+
+</html>
