@@ -1,3 +1,5 @@
+# Repository Scanner (RESC) Helm Deployment
+
 <!-- TABLE OF CONTENTS -->
 ## Table of contents
 1. [About the project](#about-the-project)
