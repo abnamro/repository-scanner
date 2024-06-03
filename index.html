@@ -21,25 +21,37 @@
     <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","description":"Tool to detect secrets in source code management systems.","headline":"Repository Scanner (RESC) Helm Deployment","name":"repository-scanner","url":"https://abnamro.github.io/repository-scanner/"}
 </script>
-    <link rel="stylesheet" href="/repository-scanner/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
-    <div style="background-image: linear-gradient(-296deg, #003737, #005e5d);">
-        <h1 class="text-white"><a href="https://abnamro.github.io/repository-scanner/">repository-scanner</a></h1>
+<body class="bg-gray">
+    <div style="background-image: linear-gradient(-296deg, #003737, #005e5d); border-bottom: 2px solid #ffd444; height: 80px;">
+        <nav class="container-lg" style="height: 100%;">
+            <div style="height: 100%; display: flex; justify-content: flex-end; align-items:center" class="float-lg-right" >
+                <span style="display: block; padding-bottom: 12px;" class="text-white text-bold">by</span>
+                <img src="assets/img/AAB.png" style="height: 100%; display: block;" />
+            </div>
+            <h1 class="py-3"><a href="https://abnamro.github.io/repository-scanner/" class="text-white">Repository Scanner (RESC)</a></h1>
+        </nav>
     </div>
-    <div class="container-lg px-3 my-5 markdown-body">
-        <!-- TABLE OF CONTENTS -->
-        <h2 id="table-of-contents">Table of contents</h2>
-        <ol>
-            <li><a href="#about-the-project">About the project</a></li>
-            <li><a href="#getting-started">Getting started</a>
-                <ul>
-                    <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#deploying-charts">Deploying charts</a></li>
-                </ul>
-            </li>
-            <li><a href="#additional-information">Additional Information</a></li>
-        </ol>
+    <div class="container-lg bg-white px-3 pt-5 markdown-body">
+        <div class="float-lg-right one-fourth">
+            <img src="assets/img/RESC.png" class="width-fit" />
+        </div>
+        <div class="one-half">
+            <!-- TABLE OF CONTENTS -->
+            <h2 id="table-of-contents">Table of contents</h2>
+            <ol>
+                <li><a href="#about-the-project">About the project</a></li>
+                <li><a href="#getting-started">Getting started</a>
+                    <ul>
+                        <li><a href="#prerequisites">Prerequisites</a></li>
+                        <li><a href="#deploying-charts">Deploying charts</a></li>
+                    </ul>
+                </li>
+                <li><a href="#additional-information">Additional Information</a></li>
+            </ol>
+        </div>
+        <div class="clearfix"></div>
 
         <!-- ABOUT THE PROJECT -->
         <h2 id="about-the-project">About the project</h2>
@@ -163,7 +175,7 @@ helm repo add resc-helm-repo https://abnamro.github.io/repository-scanner/
 
         <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
             This site is open source. <a
-                href="https://github.com/abnamro/repository-scanner/edit/gh-pages/README.md">Improve this page</a>.
+                href="https://github.com/abnamro/repository-scanner/edit/gh-pages/index.html">Improve this page</a>.
         </div>
 
     </div>
