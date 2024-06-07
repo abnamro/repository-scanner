@@ -23,18 +23,22 @@
 </script>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body class="bg-gray">
-    <div style="background-image: linear-gradient(-296deg, #003737, #005e5d); border-bottom: 2px solid #ffd444; height: 80px;">
+    <div
+        style="background-image: linear-gradient(-296deg, #003737, #005e5d); border-bottom: 2px solid #ffd444; height: 80px;">
         <nav class="container-lg" style="height: 100%;">
-            <div style="height: 100%; display: flex; justify-content: flex-end; align-items:center" class="float-lg-right" >
+            <div style="height: 100%; display: flex; justify-content: flex-end; align-items:center"
+                class="float-lg-right">
                 <span style="display: block; padding-bottom: 12px;" class="text-white text-bold">by</span>
                 <img src="assets/img/AAB.png" style="height: 100%; display: block;" />
             </div>
-            <h1 class="py-3"><a href="https://abnamro.github.io/repository-scanner/" class="text-white">Repository Scanner (RESC)</a></h1>
+            <h1 class="py-3"><a href="https://abnamro.github.io/repository-scanner/" class="text-white">Repository
+                    Scanner (RESC)</a></h1>
         </nav>
     </div>
     <div class="container-lg bg-white px-3 pt-5 markdown-body">
-        <div class="float-lg-right one-fourth">
+        <div class="float-lg-right one-third">
             <img src="assets/img/RESC.png" class="width-fit" />
         </div>
         <div class="one-half">
@@ -42,31 +46,76 @@
             <h2 id="table-of-contents">Table of contents</h2>
             <ol>
                 <li><a href="#about-the-project">About the project</a></li>
-                <li><a href="#getting-started">Getting started</a>
+                <li><a href="#links">🔗 Links</a></li>
+                <li><a href="getting-started">🏁 Getting started</a>
                     <ul>
                         <li><a href="#prerequisites">Prerequisites</a></li>
                         <li><a href="#deploying-charts">Deploying charts</a></li>
+                        <li><a href="#additional-information">Additional Information</a></li>
                     </ul>
                 </li>
-                <li><a href="#additional-information">Additional Information</a></li>
+                <li><a href="kb">🏎️ Key bindings</a></li>
+                <li><a href="contribution-guide">💁🏽 Contributing guidelines</a></li>
+                <li><a href="contact">📧 Contact</a></li>
+                <li><a href="license">⚖️ License</a></li>
+                <li><a href="acknowledgement">🎉 Acknowledgements</a></li>
+
+                <!-- <li><a href="#getting-started">Getting started</a>
+                </li>
+                <li><a href="#additional-information">Additional Information</a></li> -->
             </ol>
         </div>
         <div class="clearfix"></div>
 
         <!-- ABOUT THE PROJECT -->
         <h2 id="about-the-project">About the project</h2>
-        <p>It is now possible to directly download the helm charts from the Repository Scanner (RESC) GitHub Repository
-            since it now also
-            acts as a helm repository! The charts are now published automatically to gh-pages branch by <a
-                href="https://github.com/marketplace/actions/helm-chart-releaser">Chart Releaser Action</a>.</p>
+        <p>The Repository Scanner (RESC) is a tool used to detect secrets in source code management and version control
+            systems
+            (e.g. GitHub, BitBucket, or Azure DevOps). Among the types of secrets that the Repository Scanner detects
+            are credentials,
+            passwords, tokens, API keys, and certificates. The tool is maintained and updated by the ABN AMRO Bank to
+            match the
+            constantly changing cyber security landscape.</p>
 
-        <p>This helm repository allows for a quicker and easier way to obtain the helm charts and use them on your
-            machine.</p>
+        <p>The Repository Scanner was created to prevent that credentials and other sensitive information are left
+            unprotected in code repositories.
+            Exposing sensitive information in such a way can have severe consequences for the security posture of an
+            organization. An attacker can use
+            the data to compromise the organization's network. This can be prevented by scanning a repository with the
+            RESC tool. It marks all the
+            instances of exposed sensitive information in the source code.</p>
+
+        <img src="assets/img/RESC_Preview.gif" />
+
+        <h2 id="links">🔗 Links</h2>
+
+        <p>Throughout the process of open sourcing this project, the ABN AMRO Bank created a series of articles that
+            describe the
+            capabilities of the Repository Scanner (RESC) tool, the architectural decisions behind it, and the road to
+            open sourcing
+            RESC. With the articles, users can look "behind the scenes" and gain a deeper understanding of the tool.</p>
+
+        <ul>
+            <li><a
+                    href="https://medium.com/abn-amro-developer/abn-amro-open-source-project-repository-scanner-cf62aa62b059">ABN
+                    AMRO Open Source project: Repository Scanner</a></li>
+            <li><a
+                    href="https://medium.com/abn-amro-developer/open-source-project-update-repository-scanner-b44bc3f3921a">Source
+                    Project Update: Repository Scanner</a></li>
+            <li><a
+                    href="https://medium.com/abn-amro-developer/open-source-project-update-repository-scanner-2-0-0-a2120f8ccf4b">Source
+                    Project Update: Repository Scanner 2.0.0</a></li>
+        </ul>
 
         <!-- GETTING STARTED -->
-        <h2 id="getting-started">Getting started</h2>
-        <p>These instructions will help you to downlaod and install the helm chart on your machine for development and
-            testing purposes.</p>
+        <h2 id="getting-started">🏁 Getting started</h2>
+        <p>
+            Please refer <a
+                href="https://github.com/abnamro/repository-scanner/blob/main/deployment/resc-helm-wizard/README.md">resc-helm-wizard</a>
+            for an interactive and easy way to deploy RESC on a Kubernetes cluster.</p>
+
+        <p>Thee following instructions will help you to downlaod and install the helm chart on your machine for
+            development and testing purposes.</p>
 
         <h3 id="prerequisites">Prerequisites</h3>
         <h4 id="1-install-software">1. Install Software</h4>
@@ -106,7 +155,7 @@
             </div>
         </div>
 
-        <h2 id="deploying-charts">Deploying charts</h2>
+        <h3 id="deploying-charts">Deploying charts</h3>
         <p>Make sure you have completed the <a href="#prerequisites">pre-requisite</a> steps.</p>
 
         <ul>
@@ -166,11 +215,53 @@ helm repo add resc-helm-repo https://abnamro.github.io/repository-scanner/
 
         <p><em>Note:</em> resc-release corresponds to the release name, feel free to change it to suit your needs.</p>
 
-        <h2 id="additional-information">Additional Information</h2>
+        <h3 id="additional-information">Additional Information</h3>
         <p>For additional information please refer this <a
                 href="https://github.com/abnamro/repository-scanner/tree/main/deployment/kubernetes#additional-information">page</a>
         </p>
 
+        <h2 id="kb">🏎️ Key bindings</h2>
+        <p>
+            RESC comes with the following keybindings:
+        </p>
+
+        <img src="assets/img/keybindings.png" />
+
+        <h2 id="contribution-guide">💁🏽 Contributing guidelines</h2>
+        <p>
+
+            We believe that innovating together can lead to the most incredible results and developments. Contributions
+            to
+            the Repository Scanner tool are therefore highly encouraged. We have created <a
+                href="https://github.com/abnamro/repository-scanner/blob/main/contributing.md">
+                guidelines</a> that we expect contributors to the project to follow. By contributing to the project you
+            also agree with our <a
+                href="https://github.com/abnamro/repository-scanner/blob/main/code-of-conduct.md">Code of
+                Conduct</a>.
+        </p>
+
+        <h2 id="contact">📧 Contact</h2>
+        <p>
+            If you need to get in touch with the maintainers of the Repository Scanner tool, please use the following
+            e-mail
+            address: <a href="mailto:resc@nl.abnamro.com">resc@nl.abnamro.com</a>.
+        </p>
+
+        <h2 id="license">⚖️ License</h2>
+        <p>
+            The Repository Scanner (RESC) Tool is licensed under the <a
+                href="https://github.com/abnamro/repository-scanner/blob/main/LICENSE.md">MIT</a>
+            License.</p>
+
+
+        <h2 id="acknowledgement">🎉 Acknowledgements</h2>
+
+        <p>
+            Since the Repository Scanner (RESC) makes use of <a
+                href="https://github.com/zricethezav/gitleaks">GitLeaks</a>, we want to
+            give Zachary Rice credits for creating and maintaining GitLeaks. GitLeaks has helped many organizations in
+            securing their codebases for any leaked secrets.
+        </p>
 
 
         <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
