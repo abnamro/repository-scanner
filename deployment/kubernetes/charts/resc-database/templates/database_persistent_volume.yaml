@@ -9,7 +9,9 @@ metadata:
   labels:
     type: local
 spec:
+  {{ if ne .Values.hostOS "windows" }}
   storageClassName: {{ .Values.global.appName }}-sql-storage
+  {{ end }}
   capacity:
     storage: {{ .Values.database.pvc_size }}
   accessModes:
