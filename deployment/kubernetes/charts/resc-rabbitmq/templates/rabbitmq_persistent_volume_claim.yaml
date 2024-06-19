@@ -4,7 +4,9 @@ metadata:
   name: {{ .Values.global.appName }}-mq-pv-volume-claim
   namespace: {{ .Values.global.namespace }}
 spec:
+  {{ if ne .Values.hostOS "windows" }}
   storageClassName: {{ .Values.global.appName }}-mq-storage
+  {{ end }}
   accessModes:
     - ReadWriteMany
   resources:

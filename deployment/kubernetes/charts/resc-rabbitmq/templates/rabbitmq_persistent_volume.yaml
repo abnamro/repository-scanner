@@ -8,7 +8,9 @@ metadata:
   labels:
     type: local
 spec:
+  {{ if ne .Values.hostOS "windows" }}
   storageClassName: {{ .Values.global.appName }}-mq-storage
+  {{ end }}
   capacity:
     storage: {{ .Values.rabbitMQ.pvc_size }}
   accessModes:
