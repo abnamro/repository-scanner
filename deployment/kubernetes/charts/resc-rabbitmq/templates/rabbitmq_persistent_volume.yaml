@@ -8,7 +8,7 @@ metadata:
   labels:
     type: local
 spec:
-  {{ if ne .Values.hostOS "windows" }}
+  {{ if ne .Values.filemountType "windows" }}
   storageClassName: {{ .Values.global.appName }}-mq-storage
   {{ end }}
   capacity:
