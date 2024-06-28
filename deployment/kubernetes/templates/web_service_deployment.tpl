@@ -82,7 +82,7 @@ spec:
               port: {{ .Values.port }}
             initialDelaySeconds: 20
             periodSeconds: 300
-            timeoutSeconds: 10
+            timeoutSeconds: 30
           readinessProbe:
             httpGet:
               path: /resc/v1/health
