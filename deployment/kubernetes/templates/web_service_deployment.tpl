@@ -37,7 +37,7 @@ spec:
           image: {{ .Values.resc.image.repository | default .Values.global.resc.image.repository }}{{ .Values.resc.image.name | default .Values.global.resc.image.name }}:{{ .Values.resc.image.tag | default .Values.global.resc.image.tag }}
           imagePullPolicy: {{ .Values.resc.image.pullPolicy | default .Values.global.resc.image.pullPolicy }}
           command: ["sh", "-c"]
-          args: ["{{ .Values.preStartUpCommand }} cp /tmp/odbc.ini ~/.odbc.ini; uvicorn resc_backend.resc_web_service.api:app --workers {{ .Values.workers }} --host 0.0.0.0 --port {{ .Values.port }}"]
+          args: ["{{ .Values.preStartUpCommand }} cp /tmp/odbc.ini ~/.odbc.ini; uvicorn resc_backend.resc_web_service.api:app --workers {{ .Values.workers }} --host 0.0.0.0 --port {{ .Values.port }} --no-access-log"]
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}
