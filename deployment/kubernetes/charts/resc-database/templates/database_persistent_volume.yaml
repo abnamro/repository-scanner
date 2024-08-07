@@ -6,18 +6,25 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   annotations:
     pv.beta.kubernetes.io/gid: "999"
+  {{- if ne .Values.filemountType "csi" }}
   labels:
     type: local
+  {{- end }}
 spec:
-  {{ if ne .Values.hostOS "windows" }}
+  {{- if ne .Values.filemountType "windows" }}
   storageClassName: {{ .Values.global.appName }}-sql-storage
-  {{ end }}
+  {{- end }}
   capacity:
     storage: {{ .Values.database.pvc_size }}
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  {{ if eq .Values.hostOS "windows" }}
+  {{ if eq .Values.filemountType "csi" }}
+  csi:
+    {{- range $key, $val := .Values.csi }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{ else if eq .Values.filemountType "windows" }}
   local:
     path: {{ .Values.database.pvc_path }}
   nodeAffinity:

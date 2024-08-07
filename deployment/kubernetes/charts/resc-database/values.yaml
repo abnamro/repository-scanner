@@ -1,4 +1,5 @@
-hostOS: ""
+filemountType: ""
+csi:
 database:
   exposeToHostPort:
   port: 1433

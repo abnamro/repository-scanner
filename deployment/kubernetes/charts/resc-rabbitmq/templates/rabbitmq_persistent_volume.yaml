@@ -5,8 +5,10 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   annotations:
     pv.beta.kubernetes.io/gid: "999"
+  {{- if ne .Values.filemountType "csi" }}
   labels:
     type: local
+  {{- end }}
 spec:
   {{ if ne .Values.filemountType "windows" }}
   storageClassName: {{ .Values.global.appName }}-mq-storage
@@ -22,8 +24,12 @@ spec:
     secretNamespace: resc
     shareName: resc-data
     readOnly: false
-  {{ else }}
-  {{ if eq .Values.filemountType "windows" }}
+  {{ else if eq .Values.filemountType "csi" }}
+  csi:
+    {{- range $key, $val := .Values.csi }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{ else if eq .Values.filemountType "windows" }}
   local:
     path: {{ .Values.rabbitMQ.pvc_path }}
   nodeAffinity:
@@ -38,4 +44,4 @@ spec:
   hostPath:
     path: {{ .Values.rabbitMQ.pvc_path }}
   {{ end }}
-  {{ end }}
+  
