@@ -8,6 +8,13 @@ metadata:
     tier: frontend
   annotations:
     datree.skip/SERVICE_INCORRECT_TYPE_VALUE_NODEPORT: irrelevant as frontend needs to be exposed outside of the cluster
+    {{- if .Values.service }}
+    {{- if .Values.service.annotations }}
+    {{- range $key, $val := .Values.service.annotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
 spec:
   {{ if .Values.exposeToHostPort }}
   type: NodePort
