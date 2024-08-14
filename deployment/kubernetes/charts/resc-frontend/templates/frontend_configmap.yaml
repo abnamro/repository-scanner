@@ -30,6 +30,12 @@ data:
   {{ if .Values.ssoConfig.accessTokenJwksUrl }}
   VITE_SSO_ACCESS_TOKEN_JWKS_URL: {{ .Values.ssoConfig.accessTokenJwksUrl }}
   {{ end }}
+  {{- if .Values.ssoConfig.scope }}
+  VITE_SSO_SCOPE: {{ .Values.ssoConfig.scope }}
+  {{- end }}
+  {{- if .Values.ssoConfig.clientId }}
+  VITE_SSO_CLIENT_ID: {{ .Values.ssoConfig.clientId }}
+  {{- end }}
   {{ if .Values.ssoConfig.ssoCodeChallengeMethod }}
   VITE_SSO_CODE_CHALLENGE_METHOD: {{ .Values.ssoConfig.ssoCodeChallengeMethod }}
   {{ end }}

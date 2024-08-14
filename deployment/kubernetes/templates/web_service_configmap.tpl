@@ -21,6 +21,9 @@ data:
   {{ if .Values.resc.enableCORS }}
   ENABLE_CORS: {{ .Values.resc.enableCORS | quote }}
   {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtClaimAudience }}
+  SSO_JWT_CLAIM_AUDIENCE: {{ .Values.resc.ssoConfig.ssoJwtClaimAudience }}
+  {{ end }}
   {{ if .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
   SSO_ACCESS_TOKEN_ISSUER_URL: {{ .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
   {{ end }}
