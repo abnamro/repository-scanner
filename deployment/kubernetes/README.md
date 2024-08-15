@@ -67,19 +67,19 @@ Create two folders in your user folder and name them _database_ and _rabbitmq_ a
 Windows: C:\Users\<username>\resc\database and C:\Users\<username>\resc\rabbitmq  
 Linux: /Users/<username>/var/resc/database and /Users/<username>/var/resc/rabbitmq
 
-Update persistent volume claim path and hostOS for database.
+Update persistent volume claim path and filemountType for database.
 ```
 Windows:
 --------------
 resc-database:
-  hostOS: "windows"
+  filemountType: "windows"
   database:
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/database"
 
 Linux:
 --------------
 resc-database:
-  hostOS: "linux"
+  filemountType: "linux"
   database:
     pvc_path: "/Users/<username>/var/resc/database"
 ```

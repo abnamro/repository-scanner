@@ -1,5 +1,5 @@
 resc-database:
-  hostOS: ""
+  filemountType: ""
   database:
     pvc_path: ""
     config:
