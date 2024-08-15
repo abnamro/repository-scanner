@@ -20,6 +20,8 @@ ssoConfig:
   tokenEndPointUrl: 
   idTokenJwksUrl: 
   accessTokenJwksUrl:
+  scope: openid profile email
+  clientId: RESC
   ssoCodeChallengeMethod:
   ssoJwtSigningAlgorithm:
   ssoLoginPageMessage: "Please use the Login button"
