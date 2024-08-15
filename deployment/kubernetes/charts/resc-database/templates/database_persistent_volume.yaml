@@ -11,7 +11,7 @@ metadata:
     type: local
   {{ end }}
 spec:
-  {{ if ne .Values.filemountType "windows" }}
+  {{ if and (ne .Values.filemountType "windows") (ne .Values.hostOS "windows") }}
   storageClassName: {{ .Values.global.appName }}-sql-storage
   {{ end }}
   capacity:
@@ -22,7 +22,7 @@ spec:
   {{ if eq .Values.filemountType "csi" }}
   csi:
     {{- toYaml .Values.csi | nindent 4 }}
-  {{ else if eq .Values.filemountType "windows" }}
+  {{ else if or (eq .Values.filemountType "windows") (eq .Values.hostOS "windows") }}
   local:
     path: {{ .Values.database.pvc_path }}
   nodeAffinity:
