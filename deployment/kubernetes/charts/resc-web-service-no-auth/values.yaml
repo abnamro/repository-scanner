@@ -49,3 +49,5 @@ additionalLabels:
 useKubernetesSecret: "true"
 enableIngress: "false"
 preStartUpCommand: "export MSSQL_DB_HOST=$RESC_MS_DATABASE_SERVICE_HOST;"
+service:
+  annotations:
