@@ -89,7 +89,7 @@ resc-web-service-no-auth:
       redisPass: "Y0urStr0ngPassword" # <enter Redis password here for caching, default to Y0urStr0ngPassword>
 
 resc-database:
-  hostOS: "windows" # possible values windows/linux
+  filemontType: "windows" # possible values csi/windows/linux
   database:
     exposeToHostPort: 30880
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/database" # "<enter path to store database data>" # Linux: /Users/<username>/var/resc/database, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/database
@@ -114,7 +114,7 @@ resc-rabbitmq:
       queues_username: "queue_user" # <enter queue username, default to queue_user>
       queues_password: "Y0urStr0ngPassword" # <enter queue password, default to Y0urStr0ngPassword>
     pvc_path: "/run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq" # "<enter path to store rabbitmq data>" # Linux: /Users/<username>/var/resc/rabbitmq, Windows: # /run/desktop/mnt/host/c/Users/<username>/resc/rabbitmq
-  filemountType: "windows" # possible values windows/linux/azure
+  filemountType: "windows" # possible values windows/linux/azure/csi
 
 resc-redis:
   redis:

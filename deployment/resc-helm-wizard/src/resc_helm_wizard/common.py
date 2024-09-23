@@ -211,7 +211,7 @@ def create_helm_values_yaml(
     try:
         values_dict = read_yaml_file(input_values_yaml_file)
 
-        values_dict["resc-database"]["hostOS"] = helm_values.operating_system
+        values_dict["resc-database"]["filemountType"] = helm_values.operating_system
         values_dict["resc-database"]["database"]["pvc_path"] = (
             helm_values.db_storage_path
         )

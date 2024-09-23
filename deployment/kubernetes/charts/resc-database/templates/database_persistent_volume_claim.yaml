@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.global.appName }}-database-pv-volume-claim
   namespace: {{ .Values.global.namespace }}
 spec:
-  {{ if ne .Values.hostOS "windows" }}
+  {{ if and (ne .Values.filemountType "windows") (ne .Values.hostOS "windows") }}
   storageClassName: {{ .Values.global.appName }}-sql-storage
   {{ end }}
   accessModes:
