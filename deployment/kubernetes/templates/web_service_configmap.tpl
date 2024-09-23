@@ -33,6 +33,9 @@ data:
   {{ if .Values.resc.ssoConfig.ssoJwtRequiredClaims }}
   SSO_JWT_REQUIRED_CLAIMS: {{ .Values.resc.ssoConfig.ssoJwtRequiredClaims }}
   {{ end }}
+  {{ if .Values.resc.ssoConfig.ssoJwtClaimAudience }}
+  SSO_JWT_CLAIM_AUDIENCE: {{ .Values.resc.ssoConfig.ssoJwtClaimAudience }}
+  {{ end }}
   {{ if .Values.resc.ssoConfig.ssoJwtClaimKeyUserId }}
   SSO_JWT_CLAIM_KEY_USER_ID: {{ .Values.resc.ssoConfig.ssoJwtClaimKeyUserId }}
   {{ end }}
