@@ -4,9 +4,9 @@ description: A Helm chart for the Repository Scanner
 
 type: application
 
-version: 3.0.0
+version: 3.0.1
 
-appVersion: "3.0.0"
+appVersion: "3.0.1"
 
 dependencies:
     - name: resc-vcs-instances
