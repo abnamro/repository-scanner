@@ -2,6 +2,53 @@ apiVersion: v1
 entries:
   resc:
   - apiVersion: v2
+    appVersion: 3.0.1
+    created: "2024-11-07T15:21:33.613512874Z"
+    dependencies:
+    - name: resc-vcs-instances
+      repository: ""
+      version: 1.0.0
+    - name: resc-vcs-scraper-projects
+      repository: ""
+      version: 1.0.0
+    - name: resc-vcs-scraper-repositories
+      repository: ""
+      version: 1.0.0
+    - name: resc-vcs-scanner-secrets
+      repository: ""
+      version: 1.0.0
+    - name: resc-frontend
+      repository: ""
+      version: 1.0.0
+    - name: resc-rabbitmq
+      repository: ""
+      version: 1.0.0
+    - name: resc-web-service
+      repository: ""
+      version: 1.0.0
+    - name: resc-web-service-no-auth
+      repository: ""
+      version: 1.0.0
+    - name: resc-database-init
+      repository: ""
+      version: 1.0.0
+    - name: resc-database
+      repository: ""
+      version: 1.0.0
+    - name: resc-rules-init
+      repository: ""
+      version: 1.0.0
+    - name: resc-redis
+      repository: ""
+      version: 1.0.0
+    description: A Helm chart for the Repository Scanner
+    digest: c75cdc2ea36efc4ae8ebc1072e127a47ee4c85b75ed38c193a2bc76bf3fd7f62
+    name: resc
+    type: application
+    urls:
+    - https://github.com/abnamro/repository-scanner/releases/download/resc-3.0.1/resc-3.0.1.tgz
+    version: 3.0.1
+  - apiVersion: v2
     appVersion: 3.0.0
     created: "2024-02-02T13:49:52.510157343Z"
     dependencies:
@@ -403,4 +450,4 @@ entries:
     urls:
     - https://github.com/abnamro/repository-scanner/releases/download/resc-1.0.1/resc-1.0.1.tgz
     version: 1.0.1
-generated: "2024-02-02T13:49:52.510186116Z"
+generated: "2024-11-07T15:21:33.613557999Z"
