@@ -41,6 +41,7 @@ resc:
     ssoJwtClaimValueAuthorization: "notApplicable"
   corsAllowedDomains: "notApplicable"
   enableCORS: "false"
+  debug_value: "0"
 
 ingress:
   path: "/resc"

@@ -21,6 +21,9 @@ data:
   {{ if .Values.resc.enableCORS }}
   ENABLE_CORS: {{ .Values.resc.enableCORS | quote }}
   {{ end }}
+  {{ if .Values.config.debug_value }}
+  DEBUG_MODE: {{ .Values.config.debug_value }}
+  {{ end }}
   {{ if .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
   SSO_ACCESS_TOKEN_ISSUER_URL: {{ .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
   {{ end }}
@@ -49,7 +52,7 @@ data:
   CORS_ALLOWED_DOMAINS: {{ .Values.resc.corsAllowedDomains }}
   {{ end }}
   {{ if .Values.resc.config.dbPort }}
-  MSSQL_DB_PORT: "{{ .Values.resc.config.dbPort }}"
+  MSSQL_DB_PORT: {{ .Values.resc.config.dbPort | quote }}
   {{ end }}
   {{ if .Values.resc.config.dbUser }}
   MSSQL_USERNAME: {{ .Values.resc.config.dbUser }}
@@ -64,7 +67,7 @@ data:
   MSSQL_DSN: {{ .Values.resc.config.dbDSN }}
   {{ end }}
   {{ if .Values.resc.config.dbUseAzureTokenAuth }}
-  DB_USE_AZURE_TOKEN_AUTH: "{{ .Values.resc.config.dbUseAzureTokenAuth }}"
+  DB_USE_AZURE_TOKEN_AUTH: {{ .Values.resc.config.dbUseAzureTokenAuth | quote }}
   {{ end }}
   {{ if .Values.resc.config.dbManagedIdentityClientId }}
   MANAGED_IDENTITY_CLIENT_ID: {{ .Values.resc.config.dbManagedIdentityClientId }}
