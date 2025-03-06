@@ -30,6 +30,7 @@ resc:
     dbUseAzureTokenAuth:
     dbManagedIdentityClientId:
     redisPass:
+    debug_value: "0"
   authRequired: "false"
   ssoConfig:
     ssoAccessTokenIssuerUrl: "notApplicable"
