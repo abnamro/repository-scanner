@@ -30,6 +30,7 @@ resc:
     dbUseAzureTokenAuth:
     dbManagedIdentityClientId:
     redisPass:
+    debug_value: "0"
   authRequired: "false"
   ssoConfig:
     ssoAccessTokenIssuerUrl: "notApplicable"
@@ -41,7 +42,6 @@ resc:
     ssoJwtClaimValueAuthorization: "notApplicable"
   corsAllowedDomains: "notApplicable"
   enableCORS: "false"
-  debug_value: "0"
 
 ingress:
   path: "/resc"

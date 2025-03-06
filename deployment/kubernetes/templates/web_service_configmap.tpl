@@ -21,8 +21,8 @@ data:
   {{ if .Values.resc.enableCORS }}
   ENABLE_CORS: {{ .Values.resc.enableCORS | quote }}
   {{ end }}
-  {{ if .Values.config.debug_value }}
-  DEBUG_MODE: {{ .Values.config.debug_value }}
+  {{ if .Values.resc.config.debug_value }}
+  DEBUG_MODE: {{ .Values.resc.config.debug_value }}
   {{ end }}
   {{ if .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
   SSO_ACCESS_TOKEN_ISSUER_URL: {{ .Values.resc.ssoConfig.ssoAccessTokenIssuerUrl }}
