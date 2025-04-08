@@ -36,4 +36,3 @@ rescFrontend:
 
 ingress:
   path: "/"
-  cspConnectSrc: 
