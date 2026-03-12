@@ -30,6 +30,9 @@
 [![OpenSSF Scorecard][ossf-shield]][ossf-url]
 [![SonarCloud][sonar-cloud-shield]][sonar-cloud-url]
 
+> ## Due to evolving security requirements, stricter regulatory expectations, and an increased focus on responsible software supply‑chain risk management, we are currently unable to continue active maintenance of this open‑source project. To ensure alignment with our internal standards and industry best practices, updates are paused at this time. We hope to revisit future contributions when conditions permit.
+
+
 The Repository Scanner (RESC) is a tool used to detect secrets in source code management and version control systems 
 (e.g. GitHub, BitBucket, or Azure DevOps). Among the types of secrets that the Repository Scanner detects are credentials, 
 passwords, tokens, API keys, and certificates. The tool is maintained and updated by the ABN AMRO Bank to match the 
