@@ -48,11 +48,11 @@ jobs:
             toxenv: pylint
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       id: python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         check-latest: true
@@ -84,10 +84,10 @@ jobs:
       run: |
         if [[ ${GITHUB_EVENT_NAME} == 'pull_request' ]]; then
             export BRANCH_NAME="${GITHUB_HEAD_REF}"
-            echo "::set-output name=branch_name::${BRANCH_NAME}"
+            echo "branch_name=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
         elif [[ ${GITHUB_EVENT_NAME} == 'push' ]]; then
             export BRANCH_NAME="${GITHUB_REF_NAME}"
-            echo "::set-output name=branch_name::${BRANCH_NAME}"
+            echo "branch_name=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
         else
             echo "Event is neither pull_request nor push"
         fi
@@ -110,10 +110,10 @@ jobs:
       wizard_version: ${{ steps.getversion.outputs.wizard_version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 

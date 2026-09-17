@@ -35,7 +35,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -47,7 +47,7 @@ jobs:
     - name: Download Secret Scan Rule Config File
       run: |
         cd ${{ env.KUBERNETES_INFRA_DIR }}
-        curl https://raw.githubusercontent.com/zricethezav/gitleaks/master/config/gitleaks.toml > gitleaks.toml
+        curl -fsSL https://raw.githubusercontent.com/gitleaks/gitleaks/master/config/gitleaks.toml > gitleaks.toml
 
     - name: Helm Dependency Update
       run: |
@@ -119,7 +119,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
